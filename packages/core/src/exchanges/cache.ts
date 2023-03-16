@@ -76,12 +76,15 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
               }),
         });
 
-        const result: OperationResult = {
-          ...cachedResult,
-          operation: addMetadata(operation, {
-            cacheOutcome: cachedResult ? 'hit' : 'miss',
-          }),
-        };
+        let result: OperationResult = cachedResult!;
+        if (process.env.NODE_ENV !== 'production') {
+          result = {
+            ...result,
+            operation: addMetadata(operation, {
+              cacheOutcome: cachedResult ? 'hit' : 'miss',
+            }),
+          };
+        }
 
         if (operation.context.requestPolicy === 'cache-and-network') {
           result.stale = true;

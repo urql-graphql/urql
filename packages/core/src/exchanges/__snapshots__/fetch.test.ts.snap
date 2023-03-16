@@ -5,6 +5,7 @@ exports[`on error > returns error data 1`] = `
   "data": undefined,
   "error": [CombinedError: [Network] No Content],
   "extensions": undefined,
+  "hasNext": false,
   "operation": {
     "context": {
       "fetchOptions": {
@@ -141,6 +142,7 @@ exports[`on error > returns error data 1`] = `
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 
@@ -149,6 +151,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
   "data": undefined,
   "error": [CombinedError: [Network] No Content],
   "extensions": undefined,
+  "hasNext": false,
   "operation": {
     "context": {
       "fetchOptions": [MockFunction spy] {
@@ -295,6 +298,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 
@@ -452,6 +456,7 @@ exports[`on success > returns response data 1`] = `
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 

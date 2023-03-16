@@ -21,13 +21,16 @@ import {
 
 import { vi, expect, it } from 'vitest';
 import { print } from 'graphql';
-import { queryOperation } from '../../../packages/core/src/test-utils';
+import {
+  queryResponse,
+  queryOperation,
+} from '../../../packages/core/src/test-utils';
 import { authExchange } from './authExchange';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];
   const result = vi.fn(
-    (operation: Operation): OperationResult => ({ operation })
+    (operation: Operation): OperationResult => ({ ...queryResponse, operation })
   );
 
   return {
@@ -247,7 +250,9 @@ it('triggers authentication when an operation did error', async () => {
   await new Promise(resolve => setTimeout(resolve));
 
   result.mockReturnValueOnce({
+    ...queryResponse,
     operation: queryOperation,
+    data: undefined,
     error: new CombinedError({
       graphQLErrors: [{ message: 'Oops' }],
     }),

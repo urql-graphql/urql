@@ -2,7 +2,7 @@ import { map, tap, pipe, fromValue, toArray, toPromise } from 'wonka';
 import { vi, expect, describe, it } from 'vitest';
 
 import { Client } from '../client';
-import { queryOperation } from '../test-utils';
+import { queryResponse, queryOperation } from '../test-utils';
 import { Operation } from '../types';
 import { mapExchange } from './map';
 
@@ -210,7 +210,7 @@ describe('onError', () => {
       forward: op$ =>
         pipe(
           op$,
-          map((operation: Operation) => ({ operation }))
+          map((operation: Operation) => ({ ...queryResponse, operation }))
         ),
       client: {} as Client,
       dispatchDebug: () => null,

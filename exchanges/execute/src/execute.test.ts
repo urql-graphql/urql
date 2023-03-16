@@ -272,6 +272,7 @@ describe('on success response', () => {
       operation: queryOperation,
       data: mockHttpResponseData,
       hasNext: false,
+      stale: false,
     });
   });
 });

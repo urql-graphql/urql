@@ -6,6 +6,7 @@ import {
   OperationResult,
   CombinedError,
 } from '@urql/core';
+
 import { vi, expect, it, describe } from 'vitest';
 
 import {
@@ -23,6 +24,7 @@ import {
 } from 'wonka';
 
 import { minifyIntrospectionQuery } from '@urql/introspection';
+import { queryResponse } from '../../../packages/core/src/test-utils';
 import { cacheExchange } from './cacheExchange';
 
 const queryOne = gql`
@@ -80,7 +82,7 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
-        return { operation: forwardOp, data: expected };
+        return { ...queryResponse, operation: forwardOp, data: expected };
       }
     );
 
@@ -133,7 +135,7 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
-        return { operation: forwardOp, data: queryOneData };
+        return { ...queryResponse, operation: forwardOp, data: queryOneData };
       }
     );
 
@@ -205,9 +207,13 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         } else if (forwardOp.key === 2) {
-          return { operation: opMultiple, data: queryMultipleData };
+          return {
+            ...queryResponse,
+            operation: opMultiple,
+            data: queryMultipleData,
+          };
         }
 
         return undefined as any;
@@ -344,11 +350,15 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryByIdDataA };
+          return { ...queryResponse, operation: opOne, data: queryByIdDataA };
         } else if (forwardOp.key === 2) {
-          return { operation: opTwo, data: queryByIdDataB };
+          return { ...queryResponse, operation: opTwo, data: queryByIdDataB };
         } else if (forwardOp.key === 3) {
-          return { operation: opMutation, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutation,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -446,9 +456,13 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         } else if (forwardOp.key === 2) {
-          return { operation: opUnrelated, data: queryUnrelatedData };
+          return {
+            ...queryResponse,
+            operation: opUnrelated,
+            data: queryUnrelatedData,
+          };
         }
 
         return undefined as any;
@@ -505,7 +519,11 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opMutation, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutation,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -565,7 +583,11 @@ describe('data dependencies', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opMutation, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutation,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -626,6 +648,7 @@ describe('data dependencies', () => {
     });
 
     const queryResult: OperationResult = {
+      ...queryResponse,
       operation,
       data: {
         __typename: 'Query',
@@ -729,9 +752,13 @@ describe('optimistic updates', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         } else if (forwardOp.key === 2) {
-          return { operation: opMutation, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutation,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -831,11 +858,19 @@ describe('optimistic updates', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         } else if (forwardOp.key === 2) {
-          return { operation: opMutationOne, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutationOne,
+            data: mutationData,
+          };
         } else if (forwardOp.key === 3) {
-          return { operation: opMutationTwo, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutationTwo,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -931,7 +966,7 @@ describe('optimistic updates', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         }
 
         return undefined as any;
@@ -1045,9 +1080,10 @@ describe('optimistic updates', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: authorsQueryData };
+          return { ...queryResponse, operation: opOne, data: authorsQueryData };
         } else if (forwardOp.key === 2) {
           return {
+            ...queryResponse,
             operation: opMutation,
             error: 'error' as any,
             data: { __typename: 'Mutation', addAuthor: null },
@@ -1121,7 +1157,7 @@ describe('custom resolvers', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         }
 
         return undefined as any;
@@ -1203,9 +1239,13 @@ describe('custom resolvers', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: opOne, data: queryOneData };
+          return { ...queryResponse, operation: opOne, data: queryOneData };
         } else if (forwardOp.key === 2) {
-          return { operation: opMutation, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: opMutation,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -1349,9 +1389,17 @@ describe('custom resolvers', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: queryOperation, data: queryData };
+          return {
+            ...queryResponse,
+            operation: queryOperation,
+            data: queryData,
+          };
         } else if (forwardOp.key === 2) {
-          return { operation: mutationOperation, data: mutationData };
+          return {
+            ...queryResponse,
+            operation: mutationOperation,
+            data: mutationData,
+          };
         }
 
         return undefined as any;
@@ -1506,9 +1554,17 @@ describe('schema awareness', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: initialQueryOperation, data: queryData };
+          return {
+            ...queryResponse,
+            operation: initialQueryOperation,
+            data: queryData,
+          };
         } else if (forwardOp.key === 2) {
-          return { operation: queryOperation, data: queryData };
+          return {
+            ...queryResponse,
+            operation: queryOperation,
+            data: queryData,
+          };
         }
 
         return undefined as any;
@@ -1643,9 +1699,17 @@ describe('schema awareness', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
-          return { operation: initialQueryOperation, data: queryData };
+          return {
+            ...queryResponse,
+            operation: initialQueryOperation,
+            data: queryData,
+          };
         } else if (forwardOp.key === 2) {
-          return { operation: queryOperation, data: queryData };
+          return {
+            ...queryResponse,
+            operation: queryOperation,
+            data: queryData,
+          };
         }
 
         return undefined as any;
@@ -1724,6 +1788,7 @@ describe('commutativity', () => {
     const result = (operation: Operation): Source<OperationResult> =>
       pipe(
         fromValue({
+          ...queryResponse,
           operation,
           data: {
             __typename: 'Query',
@@ -1871,6 +1936,7 @@ describe('commutativity', () => {
     nextOp(queryOpA);
 
     nextRes({
+      ...queryResponse,
       operation: queryOpA,
       data: {
         __typename: 'Query',
@@ -1964,6 +2030,7 @@ describe('commutativity', () => {
     nextOp(queryOpB);
 
     nextRes({
+      ...queryResponse,
       operation: queryOpA,
       data: {
         __typename: 'Query',
@@ -1978,6 +2045,7 @@ describe('commutativity', () => {
     expect(data).toHaveProperty('node.name', 'query a');
 
     nextRes({
+      ...queryResponse,
       operation: mutationOp,
       data: {
         __typename: 'Mutation',
@@ -1993,6 +2061,7 @@ describe('commutativity', () => {
     expect(data).toHaveProperty('node.name', 'mutation');
 
     nextRes({
+      ...queryResponse,
       operation: queryOpB,
       data: {
         __typename: 'Query',
@@ -2082,6 +2151,7 @@ describe('commutativity', () => {
     nextOp(mutationOp);
 
     nextRes({
+      ...queryResponse,
       operation: queryOp,
       data: {
         __typename: 'Query',
@@ -2096,6 +2166,7 @@ describe('commutativity', () => {
     expect(data).toHaveProperty('node.name', 'optimistic');
 
     nextRes({
+      ...queryResponse,
       operation: mutationOp,
       data: {
         __typename: 'Query',
@@ -2183,6 +2254,7 @@ describe('commutativity', () => {
     nextOp(subscriptionOp);
 
     nextRes({
+      ...queryResponse,
       operation: queryOpA,
       data: {
         __typename: 'Query',
@@ -2195,6 +2267,7 @@ describe('commutativity', () => {
     });
 
     nextRes({
+      ...queryResponse,
       operation: subscriptionOp,
       data: {
         node: {
@@ -2296,6 +2369,7 @@ describe('commutativity', () => {
     nextOp(subscriptionOp);
 
     nextRes({
+      ...queryResponse,
       operation: queryOpA,
       data: {
         __typename: 'Query',
@@ -2310,6 +2384,7 @@ describe('commutativity', () => {
     nextOp(mutationOp);
 
     nextRes({
+      ...queryResponse,
       operation: mutationOp,
       data: {
         node: {
@@ -2321,6 +2396,7 @@ describe('commutativity', () => {
     });
 
     nextRes({
+      ...queryResponse,
       operation: subscriptionOp,
       data: {
         node: {
@@ -2332,6 +2408,7 @@ describe('commutativity', () => {
     });
 
     nextRes({
+      ...queryResponse,
       operation: subscriptionOp,
       data: {
         node: {
@@ -2440,6 +2517,7 @@ describe('commutativity', () => {
     nextOp(normalOp);
 
     nextRes({
+      ...queryResponse,
       operation: deferredOp,
       data: {
         __typename: 'Query',
@@ -2450,6 +2528,7 @@ describe('commutativity', () => {
     expect(deferredData).not.toHaveProperty('deferred');
 
     nextRes({
+      ...queryResponse,
       operation: normalOp,
       data: {
         __typename: 'Query',
@@ -2466,6 +2545,7 @@ describe('commutativity', () => {
     expect(combinedData).toHaveProperty('node.id', 2);
 
     nextRes({
+      ...queryResponse,
       operation: deferredOp,
       data: {
         __typename: 'Query',

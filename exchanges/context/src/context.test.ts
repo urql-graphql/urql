@@ -9,6 +9,7 @@ import {
   ExchangeIO,
 } from '@urql/core';
 
+import { queryResponse } from '../../../packages/core/src/test-utils';
 import { contextExchange } from './context';
 
 const queryOne = gql`
@@ -48,6 +49,7 @@ it(`calls getContext`, () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
+        ...queryResponse,
         operation: forwardOp,
         data: queryOneData,
       };
@@ -83,6 +85,7 @@ it(`calls getContext async`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
+        ...queryResponse,
         operation: forwardOp,
         data: queryOneData,
       };

@@ -72,6 +72,8 @@ const queryResponse: OperationResult = {
       name: 'Clive',
     },
   },
+  stale: false,
+  hasNext: false,
 };
 
 const url = 'https://hostname.com';

@@ -19,11 +19,13 @@ export const fromStore = <T>(store$: Readable<T>): Source<T> =>
   make(observer => store$.subscribe(observer.next));
 
 export const initialResult = {
+  operation: undefined,
   fetching: false,
-  stale: false,
-  error: undefined,
   data: undefined,
+  error: undefined,
   extensions: undefined,
+  hasNext: false,
+  stale: false,
 };
 
 export interface Pausable {

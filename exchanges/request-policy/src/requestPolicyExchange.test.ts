@@ -9,6 +9,7 @@ import {
   ExchangeIO,
 } from '@urql/core';
 
+import { queryResponse } from '../../../packages/core/src/test-utils';
 import { requestPolicyExchange } from './requestPolicyExchange';
 
 const dispatchDebug = vi.fn();
@@ -53,6 +54,7 @@ it(`upgrades to cache-and-network`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
+        ...queryResponse,
         operation: forwardOp,
         data: queryOneData,
       };
@@ -99,6 +101,7 @@ it(`doesn't upgrade when shouldUpgrade returns false`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
+        ...queryResponse,
         operation: forwardOp,
         data: queryOneData,
       };

@@ -9,6 +9,7 @@ import {
   ExchangeIO,
 } from '@urql/core';
 
+import { queryResponse } from '../../../packages/core/src/test-utils';
 import { refocusExchange } from './refocusExchange';
 
 const dispatchDebug = vi.fn();
@@ -49,6 +50,7 @@ it(`attaches a listener and redispatches queries on call`, () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
+        ...queryResponse,
         operation: forwardOp,
         data: queryOneData,
       };

@@ -118,5 +118,6 @@ exports[`should return response data from forwardSubscription observable 1`] = `
       "user": "colin",
     },
   },
+  "stale": false,
 }
 `;
