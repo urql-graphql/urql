@@ -1,5 +1,5 @@
 ---
-'@urql/exchange-persisted-fetch': major
+'@urql/exchange-persisted': major
 ---
 
 Rename `@urql/exchange-persisted-fetch` to `@urql/exchange-persisted`

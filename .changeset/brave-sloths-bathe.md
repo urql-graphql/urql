@@ -1,5 +1,5 @@
 ---
-'@urql/exchange-persisted-fetch': patch
+'@urql/exchange-persisted': patch
 ---
 
-Refactor `persistedFetchExchange` and SHA256 logic to save on bundlesize.
+Refactor SHA256 logic to save on bundlesize.
