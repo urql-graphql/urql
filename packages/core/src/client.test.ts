@@ -800,8 +800,6 @@ describe('shared sources behavior', () => {
       return pipe(
         ops$,
         map(op => ({
-          hasNext: false,
-          stale: false,
           data: ++i,
           operation: op,
           hasNext: false,
