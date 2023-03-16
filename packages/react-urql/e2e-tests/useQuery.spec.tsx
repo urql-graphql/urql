@@ -33,7 +33,7 @@ describe('Suspense', () => {
   let UrqlProvider;
 
   const PokemonsQuery = gql`
-    query($skip: Int!) {
+    query ($skip: Int!) {
       pokemons(limit: 10, skip: $skip) {
         id
         name

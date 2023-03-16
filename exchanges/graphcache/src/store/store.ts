@@ -39,7 +39,8 @@ type RootField = 'query' | 'mutation' | 'subscription';
 
 export class Store<
   C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
-> implements Cache {
+> implements Cache
+{
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
@@ -219,9 +220,9 @@ export class Store<
     maybeLink?: Link<Entity>
   ): void {
     const args = (maybeLink !== undefined ? argsOrLink : null) as FieldArgs;
-    const link = (maybeLink !== undefined
-      ? maybeLink
-      : argsOrLink) as Link<Entity>;
+    const link = (
+      maybeLink !== undefined ? maybeLink : argsOrLink
+    ) as Link<Entity>;
     const entityKey = ensureLink(this, entity);
     if (typeof entityKey === 'string') {
       InMemoryData.writeLink(

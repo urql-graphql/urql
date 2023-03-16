@@ -8,7 +8,10 @@ import { noop } from '../utils';
 const mockClient = {} as any;
 
 const forward = vi.fn();
-const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
+const noopExchange: Exchange =
+  ({ forward }) =>
+  ops$ =>
+    forward(ops$);
 
 beforeEach(() => {
   vi.spyOn(Date, 'now').mockReturnValue(1234);

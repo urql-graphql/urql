@@ -46,15 +46,13 @@ beforeEach(() => {
 });
 
 it(`calls getContext`, () => {
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      return {
-        ...queryResponse,
-        operation: forwardOp,
-        data: queryOneData,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    return {
+      ...queryResponse,
+      operation: forwardOp,
+      data: queryOneData,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
@@ -82,15 +80,13 @@ it(`calls getContext`, () => {
 });
 
 it(`calls getContext async`, async () => {
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      return {
-        ...queryResponse,
-        operation: forwardOp,
-        data: queryOneData,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    return {
+      ...queryResponse,
+      operation: forwardOp,
+      data: queryOneData,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {

@@ -70,7 +70,7 @@ describe('Graphcache updates', () => {
   `;
 
   const UpdateMutation = gql`
-    mutation($id: ID!, $text: String!) {
+    mutation ($id: ID!, $text: String!) {
       updateTodo(id: $id, text: $text) {
         id
         text

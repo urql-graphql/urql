@@ -85,19 +85,17 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
     query: queryTwo,
   });
 
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      expect(
-        forwardOp.key === op.key || forwardOp.key === opTwo.key
-      ).toBeTruthy();
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    expect(
+      forwardOp.key === op.key || forwardOp.key === opTwo.key
+    ).toBeTruthy();
 
-      return {
-        operation: forwardOp,
-        // @ts-ignore
-        error: forwardOp.key === 2 ? queryTwoError : queryOneError,
-      };
-    }
-  );
+    return {
+      operation: forwardOp,
+      // @ts-ignore
+      error: forwardOp.key === 2 ? queryTwoError : queryOneError,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
@@ -146,18 +144,16 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
 
 it('should retry x number of times and then return the successful result', () => {
   const numberRetriesBeforeSuccess = 3;
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      expect(forwardOp.key).toBe(op.key);
-      // @ts-ignore
-      return {
-        operation: forwardOp,
-        ...(forwardOp.context.retryCount! >= numberRetriesBeforeSuccess
-          ? { data: queryOneData }
-          : { error: queryOneError }),
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    expect(forwardOp.key).toBe(op.key);
+    // @ts-ignore
+    return {
+      operation: forwardOp,
+      ...(forwardOp.context.retryCount! >= numberRetriesBeforeSuccess
+        ? { data: queryOneData }
+        : { error: queryOneError }),
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
@@ -195,16 +191,14 @@ it(`should still retry if retryIf undefined but there is a networkError`, () => 
     ...queryOneError,
     networkError: 'scary network error',
   };
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      expect(forwardOp.key).toBe(op.key);
-      return {
-        operation: forwardOp,
-        // @ts-ignore
-        error: errorWithNetworkError,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    expect(forwardOp.key).toBe(op.key);
+    return {
+      operation: forwardOp,
+      // @ts-ignore
+      error: errorWithNetworkError,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
@@ -238,16 +232,14 @@ it('should allow retryWhen to return falsy value and act as replacement of retry
     ...queryOneError,
     networkError: 'scary network error',
   };
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      expect(forwardOp.key).toBe(op.key);
-      return {
-        operation: forwardOp,
-        // @ts-ignore
-        error: errorWithNetworkError,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    expect(forwardOp.key).toBe(op.key);
+    return {
+      operation: forwardOp,
+      // @ts-ignore
+      error: errorWithNetworkError,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
@@ -285,16 +277,14 @@ it('should allow retryWhen to return new operations when retrying', () => {
     ...queryOneError,
     networkError: 'scary network error',
   };
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      expect(forwardOp.key).toBe(op.key);
-      return {
-        operation: forwardOp,
-        // @ts-ignore
-        error: errorWithNetworkError,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    expect(forwardOp.key).toBe(op.key);
+    return {
+      operation: forwardOp,
+      // @ts-ignore
+      error: errorWithNetworkError,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {

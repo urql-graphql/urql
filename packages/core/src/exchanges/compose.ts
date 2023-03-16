@@ -14,23 +14,21 @@ import type { ExchangeIO, Exchange, ExchangeInput } from '../types';
  * This simply merges all exchanges into one and is used by the {@link Client}
  * to merge the `exchanges` option it receives.
  */
-export const composeExchanges = (exchanges: Exchange[]): Exchange => ({
-  client,
-  forward,
-  dispatchDebug,
-}: ExchangeInput): ExchangeIO =>
-  exchanges.reduceRight(
-    (forward, exchange) =>
-      exchange({
-        client,
-        forward,
-        dispatchDebug(event) {
-          dispatchDebug({
-            timestamp: Date.now(),
-            source: exchange.name,
-            ...event,
-          });
-        },
-      }),
-    forward
-  );
+export const composeExchanges =
+  (exchanges: Exchange[]): Exchange =>
+  ({ client, forward, dispatchDebug }: ExchangeInput): ExchangeIO =>
+    exchanges.reduceRight(
+      (forward, exchange) =>
+        exchange({
+          client,
+          forward,
+          dispatchDebug(event) {
+            dispatchDebug({
+              timestamp: Date.now(),
+              source: exchange.name,
+              ...event,
+            });
+          },
+        }),
+      forward
+    );

@@ -78,7 +78,7 @@ describe('withUrqlClient', () => {
     const token = Math.random().toString(36).slice(-10);
     let mockSsrExchange;
 
-    const mockContext = ({
+    const mockContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -89,7 +89,7 @@ describe('withUrqlClient', () => {
         },
       } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
-    } as unknown) as NextUrqlPageContext;
+    } as unknown as NextUrqlPageContext;
 
     beforeEach(() => {
       Component = withUrqlClient(
@@ -119,7 +119,7 @@ describe('withUrqlClient', () => {
   });
 
   it('should not bind getInitialProps when there are no options', async () => {
-    const mockContext = ({
+    const mockContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -130,7 +130,7 @@ describe('withUrqlClient', () => {
         },
       } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
-    } as unknown) as NextUrqlPageContext;
+    } as unknown as NextUrqlPageContext;
     const Component = withUrqlClient(
       (ssrExchange, ctx) => ({
         url: 'http://localhost:3000',
@@ -152,7 +152,7 @@ describe('withUrqlClient', () => {
     const token = Math.random().toString(36).slice(-10);
     let mockSsrExchange;
 
-    const mockContext = ({
+    const mockContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -163,7 +163,7 @@ describe('withUrqlClient', () => {
         },
       } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
-    } as unknown) as NextUrqlPageContext;
+    } as unknown as NextUrqlPageContext;
 
     beforeEach(() => {
       Component = withUrqlClient(

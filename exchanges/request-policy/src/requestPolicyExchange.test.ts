@@ -51,15 +51,13 @@ beforeEach(() => {
 });
 
 it(`upgrades to cache-and-network`, async () => {
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      return {
-        ...queryResponse,
-        operation: forwardOp,
-        data: queryOneData,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    return {
+      ...queryResponse,
+      operation: forwardOp,
+      data: queryOneData,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
@@ -98,15 +96,13 @@ it(`upgrades to cache-and-network`, async () => {
 });
 
 it(`doesn't upgrade when shouldUpgrade returns false`, async () => {
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      return {
-        ...queryResponse,
-        operation: forwardOp,
-        data: queryOneData,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    return {
+      ...queryResponse,
+      operation: forwardOp,
+      data: queryOneData,
+    };
+  });
 
   const result = vi.fn();
   const forward: ExchangeIO = ops$ => {

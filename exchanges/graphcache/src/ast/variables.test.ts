@@ -8,7 +8,7 @@ describe('normalizeVariables', () => {
     const input = { x: 42 };
     const operation = getMainOperation(
       gql`
-        query($x: Int!) {
+        query ($x: Int!) {
           field
         }
       `
@@ -21,7 +21,7 @@ describe('normalizeVariables', () => {
     const input = { x: undefined };
     const operation = getMainOperation(
       gql`
-        query($x: Int! = 42) {
+        query ($x: Int! = 42) {
           field
         }
       `
@@ -34,7 +34,7 @@ describe('normalizeVariables', () => {
     const input = { x: undefined };
     const operation = getMainOperation(
       gql`
-        query($x: Int!) {
+        query ($x: Int!) {
           field
         }
       `
@@ -87,7 +87,7 @@ describe('filterVariables', () => {
     const input = { x: true, y: false };
     const operation = getMainOperation(
       gql`
-        query($x: Int!) {
+        query ($x: Int!) {
           field
         }
       `
@@ -100,7 +100,7 @@ describe('filterVariables', () => {
     const input = { x: undefined };
     const operation = getMainOperation(
       gql`
-        query($x: Int! = 42) {
+        query ($x: Int! = 42) {
           field
         }
       `

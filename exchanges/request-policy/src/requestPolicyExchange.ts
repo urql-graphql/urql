@@ -55,48 +55,48 @@ export interface Options {
  * });
  * ```
  */
-export const requestPolicyExchange = (options: Options): Exchange => ({
-  forward,
-}) => {
-  const operations = new Map();
-  const TTL = (options || {}).ttl || defaultTTL;
+export const requestPolicyExchange =
+  (options: Options): Exchange =>
+  ({ forward }) => {
+    const operations = new Map();
+    const TTL = (options || {}).ttl || defaultTTL;
 
-  const processIncomingOperation = (operation: Operation): Operation => {
-    if (
-      operation.kind !== 'query' ||
-      (operation.context.requestPolicy !== 'cache-first' &&
-        operation.context.requestPolicy !== 'cache-only')
-    ) {
+    const processIncomingOperation = (operation: Operation): Operation => {
+      if (
+        operation.kind !== 'query' ||
+        (operation.context.requestPolicy !== 'cache-first' &&
+          operation.context.requestPolicy !== 'cache-only')
+      ) {
+        return operation;
+      }
+
+      const currentTime = new Date().getTime();
+      const lastOccurrence = operations.get(operation.key) || 0;
+      if (
+        currentTime - lastOccurrence > TTL &&
+        (!options.shouldUpgrade || options.shouldUpgrade(operation))
+      ) {
+        return makeOperation(operation.kind, operation, {
+          ...operation.context,
+          requestPolicy: 'cache-and-network',
+        });
+      }
+
       return operation;
-    }
+    };
 
-    const currentTime = new Date().getTime();
-    const lastOccurrence = operations.get(operation.key) || 0;
-    if (
-      currentTime - lastOccurrence > TTL &&
-      (!options.shouldUpgrade || options.shouldUpgrade(operation))
-    ) {
-      return makeOperation(operation.kind, operation, {
-        ...operation.context,
-        requestPolicy: 'cache-and-network',
-      });
-    }
+    const processIncomingResults = (result: OperationResult): void => {
+      const meta = result.operation.context.meta;
+      const isMiss = !meta || meta.cacheOutcome === 'miss';
+      if (isMiss) {
+        operations.set(result.operation.key, new Date().getTime());
+      }
+    };
 
-    return operation;
+    return ops$ => {
+      return pipe(
+        forward(pipe(ops$, map(processIncomingOperation))),
+        tap(processIncomingResults)
+      );
+    };
   };
-
-  const processIncomingResults = (result: OperationResult): void => {
-    const meta = result.operation.context.meta;
-    const isMiss = !meta || meta.cacheOutcome === 'miss';
-    if (isMiss) {
-      operations.set(result.operation.key, new Date().getTime());
-    }
-  };
-
-  return ops$ => {
-    return pipe(
-      forward(pipe(ops$, map(processIncomingOperation))),
-      tap(processIncomingResults)
-    );
-  };
-};

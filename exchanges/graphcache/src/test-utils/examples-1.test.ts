@@ -27,7 +27,7 @@ const TodoFragment = gql`
 `;
 
 const Todo = gql`
-  query($id: ID!) {
+  query ($id: ID!) {
     __typename
     todo(id: $id) {
       id
@@ -38,7 +38,7 @@ const Todo = gql`
 `;
 
 const ToggleTodo = gql`
-  mutation($id: ID!) {
+  mutation ($id: ID!) {
     __typename
     toggleTodo(id: $id) {
       __typename
@@ -50,7 +50,7 @@ const ToggleTodo = gql`
 `;
 
 const NestedClearNameTodo = gql`
-  mutation($id: ID!) {
+  mutation ($id: ID!) {
     __typename
     clearName(id: $id) {
       __typename
@@ -691,7 +691,7 @@ it('supports seeing the same optimistic key multiple times (correctly reorders)'
   write(store, { query: Todos }, todosData);
 
   const updateTodo = gql`
-    mutation($id: ID!, $completed: Boolean!) {
+    mutation ($id: ID!, $completed: Boolean!) {
       __typename
       updateTodo(id: $id, completed: $completed) {
         __typename

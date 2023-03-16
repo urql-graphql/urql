@@ -3,9 +3,8 @@ import { useContext } from 'preact/hooks';
 import { Client } from '@urql/core';
 
 const OBJ = {};
-export const Context: import('preact').Context<Client | object> = createContext(
-  OBJ
-);
+export const Context: import('preact').Context<Client | object> =
+  createContext(OBJ);
 export const Provider: import('preact').Provider<Client | object> =
   Context.Provider;
 export const Consumer: import('preact').Consumer<Client | object> =

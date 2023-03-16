@@ -1,8 +1,10 @@
-const webCrypto = (typeof window !== 'undefined'
-  ? window.crypto
-  : typeof self !== 'undefined'
-  ? self.crypto
-  : null) as typeof globalThis.crypto | null;
+const webCrypto = (
+  typeof window !== 'undefined'
+    ? window.crypto
+    : typeof self !== 'undefined'
+    ? self.crypto
+    : null
+) as typeof globalThis.crypto | null;
 
 let nodeCrypto: Promise<typeof import('crypto') | void> | void;
 

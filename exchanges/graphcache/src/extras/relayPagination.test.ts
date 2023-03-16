@@ -20,7 +20,7 @@ function itemEdge(numItem: number) {
 
 it('works with forward pagination', () => {
   const Pagination = gql`
-    query($cursor: String) {
+    query ($cursor: String) {
       __typename
       items(first: 1, after: $cursor) {
         __typename
@@ -98,7 +98,7 @@ it('works with forward pagination', () => {
 
 it('works with backwards pagination', () => {
   const Pagination = gql`
-    query($cursor: String) {
+    query ($cursor: String) {
       __typename
       items(last: 1, before: $cursor) {
         __typename
@@ -176,7 +176,7 @@ it('works with backwards pagination', () => {
 
 it('handles duplicate edges', () => {
   const Pagination = gql`
-    query($cursor: String) {
+    query ($cursor: String) {
       __typename
       items(first: 2, after: $cursor) {
         __typename
@@ -262,7 +262,7 @@ it('handles duplicate edges', () => {
 
 it('works with simultaneous forward and backward pagination (outwards merging)', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -393,7 +393,7 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
 
 it('works with simultaneous forward and backward pagination (inwards merging)', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -524,7 +524,7 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
 
 it('prevents overlapping of pagination on different arguments', () => {
   const Pagination = gql`
-    query($filter: String) {
+    query ($filter: String) {
       items(first: 1, filter: $filter) {
         __typename
         edges {
@@ -692,7 +692,7 @@ it('returns other fields on the same level as the edges', () => {
 
 it('returns a subset of the cached items if the query requests less items than the cached ones', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -756,7 +756,7 @@ it('returns a subset of the cached items if the query requests less items than t
 
 it("returns the cached items even if they don't fullfil the query", () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -824,7 +824,7 @@ it("returns the cached items even if they don't fullfil the query", () => {
 
 it('returns the cached items even when they come from a different query', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -888,7 +888,7 @@ it('returns the cached items even when they come from a different query', () => 
 
 it('caches and retrieves correctly queries with inwards pagination', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -956,7 +956,7 @@ it('caches and retrieves correctly queries with inwards pagination', () => {
 
 it('does not include a previous result when adding parameters', () => {
   const Pagination = gql`
-    query($first: Int, $filter: String) {
+    query ($first: Int, $filter: String) {
       __typename
       items(first: $first, filter: $filter) {
         __typename
@@ -1039,7 +1039,7 @@ it('does not include a previous result when adding parameters', () => {
 
 it('Works with edges absent from query', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -1095,7 +1095,7 @@ it('Works with edges absent from query', () => {
 
 it('Works with nodes absent from query', () => {
   const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
+    query ($first: Int, $last: Int, $before: String, $after: String) {
       __typename
       items(first: $first, last: $last, before: $before, after: $after) {
         __typename
@@ -1154,7 +1154,7 @@ it('Works with nodes absent from query', () => {
 
 it('handles subsequent queries with larger last values', () => {
   const Pagination = gql`
-    query($last: Int!) {
+    query ($last: Int!) {
       __typename
       items(last: $last) {
         __typename
@@ -1246,7 +1246,7 @@ it('handles subsequent queries with larger last values', () => {
 
 it('handles subsequent queries with larger first values', () => {
   const Pagination = gql`
-    query($first: Int!) {
+    query ($first: Int!) {
       __typename
       items(first: $first) {
         __typename
@@ -1317,7 +1317,7 @@ it('handles subsequent queries with larger first values', () => {
 
 it('ignores empty pages when paginating', () => {
   const PaginationForward = gql`
-    query($first: Int!, $after: String) {
+    query ($first: Int!, $after: String) {
       __typename
       items(first: $first, after: $after) {
         __typename
@@ -1334,7 +1334,7 @@ it('ignores empty pages when paginating', () => {
     }
   `;
   const PaginationBackward = gql`
-    query($last: Int!, $before: String) {
+    query ($last: Int!, $before: String) {
       __typename
       items(last: $last, before: $before) {
         __typename
@@ -1426,7 +1426,7 @@ it('ignores empty pages when paginating', () => {
 
 it('allows for an empty page when this is the only result', () => {
   const Pagination = gql`
-    query($first: Int!, $after: String) {
+    query ($first: Int!, $after: String) {
       __typename
       items(first: $first, after: $after) {
         __typename

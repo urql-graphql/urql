@@ -109,5 +109,5 @@ export const formatDocument = <T extends DocumentNode>(node: T): T => {
     formattedDocs.set(query.__key, result);
   }
 
-  return (result as unknown) as T;
+  return result as unknown as T;
 };

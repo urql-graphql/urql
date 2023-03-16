@@ -36,108 +36,108 @@ export interface PersistedExchangeOptions {
   enableForMutation?: boolean;
 }
 
-export const persistedExchange = (
-  options?: PersistedExchangeOptions
-): Exchange => ({ forward }) => {
-  if (!options) options = {};
+export const persistedExchange =
+  (options?: PersistedExchangeOptions): Exchange =>
+  ({ forward }) => {
+    if (!options) options = {};
 
-  const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
-  const enforcePersistedQueries = !!options.enforcePersistedQueries;
-  const hashFn = options.generateHash || hash;
-  const enableForMutation = !!options.enableForMutation;
-  let supportsPersistedQueries = true;
+    const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
+    const enforcePersistedQueries = !!options.enforcePersistedQueries;
+    const hashFn = options.generateHash || hash;
+    const enableForMutation = !!options.enableForMutation;
+    let supportsPersistedQueries = true;
 
-  const operationFilter = (operation: Operation) =>
-    supportsPersistedQueries &&
-    !operation.context.persistAttempt &&
-    ((enableForMutation && operation.kind === 'mutation') ||
-      operation.kind === 'query');
+    const operationFilter = (operation: Operation) =>
+      supportsPersistedQueries &&
+      !operation.context.persistAttempt &&
+      ((enableForMutation && operation.kind === 'mutation') ||
+        operation.kind === 'query');
 
-  return operations$ => {
-    const retries = makeSubject<Operation>();
-    const sharedOps$ = share(operations$);
+    return operations$ => {
+      const retries = makeSubject<Operation>();
+      const sharedOps$ = share(operations$);
 
-    const forwardedOps$ = pipe(
-      sharedOps$,
-      filter(operation => !operationFilter(operation))
-    );
+      const forwardedOps$ = pipe(
+        sharedOps$,
+        filter(operation => !operationFilter(operation))
+      );
 
-    const persistedOps$ = pipe(
-      sharedOps$,
-      filter(operationFilter),
-      map(async operation => {
-        const persistedOperation = makeOperation(operation.kind, operation, {
-          ...operation.context,
-          persistAttempt: true,
-        });
+      const persistedOps$ = pipe(
+        sharedOps$,
+        filter(operationFilter),
+        map(async operation => {
+          const persistedOperation = makeOperation(operation.kind, operation, {
+            ...operation.context,
+            persistAttempt: true,
+          });
 
-        const sha256Hash = await hashFn(
-          stringifyDocument(operation.query),
-          operation.query
-        );
-        if (sha256Hash) {
-          persistedOperation.extensions = {
-            ...persistedOperation.extensions,
-            persistedQuery: {
-              version: 1,
-              sha256Hash,
-            },
-          };
-          if (
-            persistedOperation.kind === 'query' &&
-            preferGetForPersistedQueries
-          ) {
-            persistedOperation.context.preferGetMethod = 'force';
-          }
-        }
-
-        return persistedOperation;
-      }),
-      mergeMap(fromPromise)
-    );
-
-    return pipe(
-      merge([persistedOps$, forwardedOps$, retries.source]),
-      forward,
-      map(result => {
-        if (
-          !enforcePersistedQueries &&
-          result.operation.extensions &&
-          result.operation.extensions.persistedQuery
-        ) {
-          if (result.error && isPersistedUnsupported(result.error)) {
-            // Disable future persisted queries if they're not enforced
-            supportsPersistedQueries = false;
-            // Update operation with unsupported attempt
-            const followupOperation = makeOperation(
-              result.operation.kind,
-              result.operation
-            );
-            if (followupOperation.extensions)
-              delete followupOperation.extensions.persistedQuery;
-            retries.next(followupOperation);
-            return null;
-          } else if (result.error && isPersistedMiss(result.error)) {
-            // Update operation with unsupported attempt
-            const followupOperation = makeOperation(
-              result.operation.kind,
-              result.operation
-            );
-            // Mark as missed persisted query
-            followupOperation.extensions = {
-              ...followupOperation.extensions,
+          const sha256Hash = await hashFn(
+            stringifyDocument(operation.query),
+            operation.query
+          );
+          if (sha256Hash) {
+            persistedOperation.extensions = {
+              ...persistedOperation.extensions,
               persistedQuery: {
-                ...(followupOperation.extensions || {}).persistedQuery,
-                miss: true,
-              } as PersistedRequestExtensions,
+                version: 1,
+                sha256Hash,
+              },
             };
-            retries.next(followupOperation);
-            return null;
+            if (
+              persistedOperation.kind === 'query' &&
+              preferGetForPersistedQueries
+            ) {
+              persistedOperation.context.preferGetMethod = 'force';
+            }
           }
-        }
-        return result;
-      }),
-      filter((result): result is OperationResult => !!result)
-    );
+
+          return persistedOperation;
+        }),
+        mergeMap(fromPromise)
+      );
+
+      return pipe(
+        merge([persistedOps$, forwardedOps$, retries.source]),
+        forward,
+        map(result => {
+          if (
+            !enforcePersistedQueries &&
+            result.operation.extensions &&
+            result.operation.extensions.persistedQuery
+          ) {
+            if (result.error && isPersistedUnsupported(result.error)) {
+              // Disable future persisted queries if they're not enforced
+              supportsPersistedQueries = false;
+              // Update operation with unsupported attempt
+              const followupOperation = makeOperation(
+                result.operation.kind,
+                result.operation
+              );
+              if (followupOperation.extensions)
+                delete followupOperation.extensions.persistedQuery;
+              retries.next(followupOperation);
+              return null;
+            } else if (result.error && isPersistedMiss(result.error)) {
+              // Update operation with unsupported attempt
+              const followupOperation = makeOperation(
+                result.operation.kind,
+                result.operation
+              );
+              // Mark as missed persisted query
+              followupOperation.extensions = {
+                ...followupOperation.extensions,
+                persistedQuery: {
+                  ...(followupOperation.extensions || {}).persistedQuery,
+                  miss: true,
+                } as PersistedRequestExtensions,
+              };
+              retries.next(followupOperation);
+              return null;
+            }
+          }
+          return result;
+        }),
+        filter((result): result is OperationResult => !!result)
+      );
+    };
   };
-};
