@@ -302,15 +302,15 @@ importers:
       '@testing-library/preact': ^2.0.0
       '@urql/core': ^3.2.2
       graphql: ^16.0.0
-      preact: ^10.5.5
+      preact: ^10.13.0
       wonka: ^6.2.4
     dependencies:
       '@urql/core': link:../core
       wonka: 6.2.4
     devDependencies:
-      '@testing-library/preact': 2.0.1_preact@10.5.13
+      '@testing-library/preact': 2.0.1_preact@10.13.1
       graphql: 16.0.1
-      preact: 10.5.13
+      preact: 10.13.1
 
   packages/react-urql:
     specifiers:
@@ -2690,14 +2690,14 @@ packages:
       pretty-format: 26.6.2
     dev: true
 
-  /@testing-library/preact/2.0.1_preact@10.5.13:
+  /@testing-library/preact/2.0.1_preact@10.13.1:
     resolution: {integrity: sha512-79kwVOY+3caoLgaPbiPzikjgY0Aya7Fc7TvGtR1upCnz2wrtmPDnN2t9vO7I7vDP2zoA+feSwOH5Q0BFErhaaQ==}
     engines: {node: '>= 10'}
     peerDependencies:
       preact: '>=10 || ^10.0.0-alpha.0 || ^10.0.0-beta.0'
     dependencies:
       '@testing-library/dom': 7.30.4
-      preact: 10.5.13
+      preact: 10.13.1
     dev: true
 
   /@testing-library/react-hooks/5.1.2_7qv3rjnqa3j7exc7qtvho7thru:
@@ -11286,6 +11286,10 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /preact/10.13.1:
+    resolution: {integrity: sha512-KyoXVDU5OqTpG9LXlB3+y639JAGzl8JSBXLn1J9HTSB3gbKcuInga7bZnXLlxmK94ntTs1EFeZp0lrja2AuBYQ==}
     dev: true
 
   /preact/10.5.13:

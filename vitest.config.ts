@@ -3,6 +3,15 @@ import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      'preact/hooks':
+        __dirname +
+        '/packages/preact-urql/node_modules/preact/hooks/dist/hooks.js',
+      preact:
+        __dirname + '/packages/preact-urql/node_modules/preact/dist/preact.js',
+    },
+  },
   plugins: [tsconfigPaths()],
   test: {
     environment: 'jsdom',
