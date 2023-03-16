@@ -169,12 +169,12 @@ property of our `Client`. In the case of these two we'll have to add it before t
 else our requests will never get upgraded.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 import { refocusExchange } from '@urql/exchange-refocus';
 
-const client = createClient({
+const client = new Client({
   url: 'some-url',
-  exchanges: [dedupExchange, refocusExchange(), cacheExchange, fetchExchange],
+  exchanges: [refocusExchange(), cacheExchange, fetchExchange],
 });
 ```
 
