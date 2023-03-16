@@ -105,19 +105,25 @@ export interface SSRExchange extends Exchange {
 
 /** Serialize an OperationResult to plain JSON */
 const serializeResult = (
-  { hasNext, data, extensions, error }: OperationResult,
+  result: OperationResult,
   includeExtensions: boolean
 ): SerializedResult => {
-  const result: SerializedResult = {};
-  if (data !== undefined) result.data = JSON.stringify(data);
-  if (includeExtensions && extensions !== undefined) {
-    result.extensions = JSON.stringify(extensions);
-  }
-  if (hasNext) result.hasNext = true;
+  const serialized: SerializedResult = {
+    data: JSON.stringify(result.data),
+    hasNext: result.hasNext,
+  };
 
-  if (error) {
-    result.error = {
-      graphQLErrors: error.graphQLErrors.map(error => {
+  if (result.data !== undefined) {
+    serialized.data = JSON.stringify(result.data);
+  }
+
+  if (includeExtensions && result.extensions !== undefined) {
+    serialized.extensions = JSON.stringify(result.extensions);
+  }
+
+  if (result.error) {
+    serialized.error = {
+      graphQLErrors: result.error.graphQLErrors.map(error => {
         if (!error.path && !error.extensions) return error.message;
 
         return {
@@ -128,12 +134,12 @@ const serializeResult = (
       }),
     };
 
-    if (error.networkError) {
-      result.error.networkError = '' + error.networkError;
+    if (result.error.networkError) {
+      serialized.error.networkError = '' + result.error.networkError;
     }
   }
 
-  return result;
+  return serialized;
 };
 
 /** Deserialize plain JSON to an OperationResult
@@ -158,7 +164,8 @@ const deserializeResult = (
         graphQLErrors: result.error.graphQLErrors,
       })
     : undefined,
-  hasNext: result.hasNext,
+  stale: false,
+  hasNext: !!result.hasNext,
 });
 
 const revalidated = new Set<number>();

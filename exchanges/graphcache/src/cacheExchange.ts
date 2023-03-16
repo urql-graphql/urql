@@ -195,8 +195,6 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     result: OperationResult,
     pendingOperations: Operations
   ): OperationResult => {
-    const { error, extensions } = result;
-
     // Retrieve the original operation to remove changes made by formatDocument
     const originalOperation = operations.get(result.operation.key);
     const operation = originalOperation
@@ -261,7 +259,14 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       updateDependencies(result.operation, queryDependencies);
     }
 
-    return { data, error, extensions, operation };
+    return {
+      operation,
+      data,
+      error: result.error,
+      extensions: result.extensions,
+      hasNext: result.hasNext,
+      stale: result.stale,
+    };
   };
 
   return ops$ => {
@@ -339,6 +344,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
             error: res.error,
             extensions: res.extensions,
             stale: shouldReexecute || isPartial,
+            hasNext: false,
           };
 
           if (!shouldReexecute) {
