@@ -169,8 +169,8 @@ export const createRequest = <
  */
 export const getOperationName = (query: DocumentNode): string | undefined => {
   for (const node of query.definitions) {
-    if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
-      return node.name.value;
+    if (node.kind === Kind.OPERATION_DEFINITION) {
+      return node.name ? node.name.value : undefined;
     }
   }
 };
