@@ -12,7 +12,6 @@ import {
   Source,
   take,
   takeUntil,
-  takeWhile,
   publish,
   subscribe,
   switchMap,
@@ -615,16 +614,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       );
     }
 
-    // A mutation is always limited to just a single result and is never shared
     if (operation.kind === 'mutation') {
+      // A mutation is always limited to just a single result and is never shared
       return pipe(result$, take(1));
-    }
-
-    if (operation.kind === 'subscription') {
-      result$ = pipe(
-        result$,
-        takeWhile(result => !!result.hasNext)
-      );
     }
 
     return pipe(
