@@ -9,10 +9,10 @@ meaning they can be removed if not used.
 A migration would look as follows if you are currently creating a client without exchanges
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/core'
+import { createClient, cacheExchange, fetchExchange } from '@urql/core'
 
 const client = createClient({
   url: '',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange]
+  exchanges: [cacheExchange, fetchExchange]
 });
 ```
