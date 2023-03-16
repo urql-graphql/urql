@@ -12,6 +12,7 @@ import {
   Source,
   take,
   takeUntil,
+  takeWhile,
   publish,
   subscribe,
   switchMap,
@@ -566,17 +567,19 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
   // This subject forms the input of operations; executeOperation may be
   // called to dispatch a new operation on the subject
-  const { source: operations$, next: nextOperation } = makeSubject<Operation>();
+  const operations = makeSubject<Operation>();
+
+  function nextOperation(operation: Operation) {
+    const prevReplay = replays.get(operation.key);
+    if (operation.kind === 'mutation' || !prevReplay || !prevReplay.hasNext)
+      operations.next(operation);
+  }
 
   // We define a queued dispatcher on the subject, which empties the queue when it's
   // activated to allow `reexecuteOperation` to be trampoline-scheduled
   let isOperationBatchActive = false;
   function dispatchOperation(operation?: Operation | void) {
-    if (operation) {
-      const prevReplay = replays.get(operation.key);
-      if (operation.kind === 'mutation' || !prevReplay || !prevReplay.hasNext)
-        nextOperation(operation);
-    }
+    if (operation) nextOperation(operation);
 
     if (!isOperationBatchActive) {
       isOperationBatchActive = true;
@@ -610,13 +613,22 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     if (operation.kind !== 'query') {
       result$ = pipe(
         result$,
-        onStart(() => dispatchOperation(operation))
+        onStart(() => {
+          nextOperation(operation);
+        })
       );
     }
 
+    // A mutation is always limited to just a single result and is never shared
     if (operation.kind === 'mutation') {
-      // A mutation is always limited to just a single result and is never shared
       return pipe(result$, take(1));
+    }
+
+    if (operation.kind === 'subscription') {
+      result$ = pipe(
+        result$,
+        takeWhile(result => !!result.hasNext)
+      );
     }
 
     return pipe(
@@ -624,7 +636,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       // End the results stream when an active teardown event is sent
       takeUntil(
         pipe(
-          operations$,
+          operations.source,
           filter(op => op.kind === 'teardown' && op.key === operation.key)
         )
       ),
@@ -637,7 +649,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           fromValue(result),
           // Mark a result as stale when a new operation is sent for it
           pipe(
-            operations$,
+            operations.source,
             filter(
               op =>
                 op.kind === 'query' &&
@@ -670,7 +682,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     this instanceof Client ? this : Object.create(Client.prototype);
   const client: Client = Object.assign(instance, {
     suspense: !!opts.suspense,
-    operations$,
+    operations$: operations.source,
 
     reexecuteOperation(operation: Operation) {
       // Reexecute operation only if any subscribers are still subscribed to the
@@ -829,7 +841,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       client,
       dispatchDebug,
       forward: fallbackExchange({ dispatchDebug }),
-    })(operations$)
+    })(operations.source)
   );
 
   // Prevent the `results$` exchange pipeline from being closed by active
