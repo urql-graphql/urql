@@ -811,9 +811,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     },
 
     mutation(query, variables, context) {
-      return withPromise(
-        client.executeMutation(createRequest(query, variables), context)
-      );
+      return client.executeMutation(createRequest(query, variables), context);
     },
   } as Client);
 
