@@ -133,10 +133,11 @@ async function* fetchOperation(
     }
 
     for await (const payload of results) {
-      networkMode = false;
-      yield (result = result
+      result = result
         ? mergeResultPatch(result, payload, response)
-        : makeResult(operation, payload, response));
+        : makeResult(operation, payload, response);
+      networkMode = false;
+      yield result;
       networkMode = true;
     }
 
