@@ -17,6 +17,7 @@ import {
   subscribe,
   ExecutionArgs,
   SubscriptionArgs,
+  Kind,
 } from 'graphql';
 
 import {
@@ -27,7 +28,6 @@ import {
   mergeResultPatch,
   Operation,
   OperationResult,
-  getOperationName,
 } from '@urql/core';
 
 export interface ExecuteExchangeArgs {
@@ -150,6 +150,14 @@ export const executeExchange = ({
           }
         }
 
+        let operationName: string | undefined;
+        for (const node of operation.query.definitions) {
+          if (node.kind === Kind.OPERATION_DEFINITION) {
+            operationName = node.name ? node.name.value : undefined;
+            break;
+          }
+        }
+
         return pipe(
           makeExecuteSource(operation, {
             schema,
@@ -157,7 +165,7 @@ export const executeExchange = ({
             rootValue,
             contextValue,
             variableValues,
-            operationName: getOperationName(operation.query),
+            operationName,
             fieldResolver,
             typeResolver,
             subscribeFieldResolver,

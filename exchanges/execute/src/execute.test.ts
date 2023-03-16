@@ -33,7 +33,6 @@ import {
   makeErrorResult,
   makeOperation,
   Client,
-  getOperationName,
   OperationResult,
 } from '@urql/core';
 
@@ -45,10 +44,8 @@ const exchangeArgs = {
   client: {},
 } as any;
 
-const expectedQueryOperationName = getOperationName(queryOperation.query);
-const expectedSubscribeOperationName = getOperationName(
-  subscriptionOperation.query
-);
+const expectedQueryOperationName = 'getUser';
+const expectedSubscribeOperationName = 'subscribeToUser';
 
 const fetchMock = (global as any).fetch as Mock;
 const mockHttpResponseData = { key: 'value' };
