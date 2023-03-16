@@ -1,3 +1,4 @@
+import { OperationResult, OperationResultSource } from '@urql/core';
 import { nextTick, reactive, ref } from 'vue';
 import { vi, expect, it, describe } from 'vitest';
 
@@ -18,7 +19,9 @@ describe('useSubscription', () => {
     const subject = makeSubject<any>();
     const executeQuery = vi
       .spyOn(client, 'executeSubscription')
-      .mockImplementation(() => subject.source);
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
 
     const sub = reactive(
       useSubscription({
@@ -60,7 +63,9 @@ describe('useSubscription', () => {
     const subject = makeSubject<any>();
     const executeSubscription = vi
       .spyOn(client, 'executeSubscription')
-      .mockImplementation(() => subject.source);
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
 
     const variables = ref({});
     const sub = reactive(
@@ -101,7 +106,9 @@ describe('useSubscription', () => {
     const subject = makeSubject<any>();
     const executeSubscription = vi
       .spyOn(client, 'executeSubscription')
-      .mockImplementation(() => subject.source);
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
 
     const scanHandler = (currentState: any, nextState: any) => ({
       counter: (currentState ? currentState.counter : 0) + nextState.counter,
