@@ -1,7 +1,12 @@
 import React, { createElement as h } from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { Client } from '@urql/core';
+import {
+  Client,
+  dedupExchange,
+  fetchExchange,
+  cacheExchange,
+} from '@urql/core';
 import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
 import { withUrqlClient } from '../with-urql-client';
@@ -26,9 +31,15 @@ describe('withUrqlClient', () => {
 
   describe('with client options', () => {
     beforeEach(() => {
-      Component = withUrqlClient(() => ({ url: 'http://localhost:3000' }), {
-        ssr: true,
-      })(MockApp);
+      Component = withUrqlClient(
+        ssr => ({
+          url: 'http://localhost:3000',
+          exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
+        }),
+        {
+          ssr: true,
+        }
+      )(MockApp);
     });
 
     const mockContext: NextUrqlPageContext = {

@@ -55,7 +55,10 @@ const queryOneError = {
 
 let client, op, ops$, next;
 beforeEach(() => {
-  client = createClient({ url: 'http://0.0.0.0' });
+  client = createClient({
+    url: 'http://0.0.0.0',
+    exchanges: [],
+  });
   op = client.createRequestOperation('query', {
     key: 1,
     query: queryOne,

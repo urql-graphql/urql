@@ -11,6 +11,7 @@ describe('provideClient', () => {
         provideClient(
           new Client({
             url: 'test',
+            exchanges: [],
           })
         );
 

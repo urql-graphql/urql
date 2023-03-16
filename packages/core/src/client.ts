@@ -23,7 +23,7 @@ import {
 
 import { DocumentNode } from 'graphql';
 
-import { composeExchanges, defaultExchanges } from './exchanges';
+import { composeExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
 import {
@@ -111,13 +111,13 @@ export interface ClientOptions {
    * This is the basis for how `urql` handles GraphQL operations, and exchanges handle the creation, execution,
    * and control flow of exchanges for the `Client`.
    *
-   * When this option is left out, the `Client` defaults to a list of {@link defaultExchanges}. By default, these
-   * will implement deduping, caching (via a document cache), and fetching (GraphQL over HTTP).
+   * To easily get started you should consider using the {@link dedupExchange}, {@link cacheExchange} and {@link fetchExchange}
+   * these are all exported from the core package.
    *
    * @see {@link https://formidable.com/open-source/urql/docs/architecture/#the-client-and-exchanges} for more information
    * on what `Exchange`s are and how they work.
    */
-  exchanges?: Exchange[];
+  exchanges: Exchange[];
   /** A configuration flag indicating whether support for "Suspense" is activated.
    *
    * @remarks
@@ -812,12 +812,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     dispatchDebug = next as ExchangeInput['dispatchDebug'];
   }
 
-  const exchanges =
-    opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
   // All exchange are composed into a single one and are called using the constructed client
   // and the fallback exchange stream
-  const composedExchange = composeExchanges(exchanges);
+  const composedExchange = composeExchanges(opts.exchanges);
 
   // All exchanges receive inputs using which they can forward operations to the next exchange
   // and receive a stream of results in return, access the client, or dispatch debugging events

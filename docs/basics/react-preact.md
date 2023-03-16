@@ -41,10 +41,11 @@ The `urql` and `@urql/preact` packages export a method called `createClient` whi
 create the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient } from 'urql';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
 
@@ -60,6 +61,7 @@ GraphQL API.
 ```js
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getToken();
     return {
@@ -76,10 +78,11 @@ To make use of the `Client` in React & Preact we will have to provide it via the
 the `Provider` export.
 
 ```jsx
-import { createClient, Provider } from 'urql';
+import { createClient, Provider, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 
 const App = () => (
@@ -245,6 +248,7 @@ import { createClient } from 'urql';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
   // every operation will by default use cache-and-network rather
   // than cache-first now:
   requestPolicy: 'cache-and-network',

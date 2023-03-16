@@ -22,7 +22,7 @@ It accepts several options on creation.
 
 | Input             | Type                                        | Description                                                                                                                                                                                                                                                                                                    |
 | ----------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `exchanges`       | `Exchange[]`                                | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                                                                                                                                                                   |
+| `exchanges`       | `Exchange[]`                                | An array of `Exchange`s that the client should use                                                                                                                                                                                                                   |
 | `url`             | `string`                                    | The GraphQL API URL as used by `fetchExchange`                                                                                                                                                                                                                                                                 |
 | `fetchOptions`    | `RequestInit \| () => RequestInit`          | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                                                                                                                                         |
 | `fetch`           | `typeof fetch`                              | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                                                                                                                                                    |
@@ -522,15 +522,6 @@ inputs on mutations, which is a common use-case. This utility hides these fields
 this problem.
 
 It's used by the [`Client`](#client) when the `maskTypename` option is enabled.
-
-### defaultExchanges
-
-This is an array of the default `Exchange`s that the `Client` uses when the `exchanges` option isn't
-passed.
-
-```js
-const defaultExchanges = [dedupExchange, cacheExchange, fetchExchange];
-```
 
 ### composeExchanges
 

@@ -1,35 +1,28 @@
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
-import { Client, createClient } from '@urql/core';
+import { Client } from '@urql/core';
 
-// We assume some default options here; mainly not to actually be used
-// but not to error catastrophically if someone is just playing around
-const defaultClient = createClient({ url: '/graphql' });
+const OBJ = {};
+export const Context: import('preact').Context<Client | object> = createContext(
+  OBJ
+);
+export const Provider: import('preact').Provider<Client | object> =
+  Context.Provider;
+export const Consumer: import('preact').Consumer<Client | object> =
+  Context.Consumer;
 
-export const Context = createContext<Client>(defaultClient);
-export const Provider = Context.Provider;
-export const Consumer = Context.Consumer;
 Context.displayName = 'UrqlContext';
-
-let hasWarnedAboutDefault = false;
 
 export const useClient = (): Client => {
   const client = useContext(Context);
 
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    client === defaultClient &&
-    !hasWarnedAboutDefault
-  ) {
-    hasWarnedAboutDefault = true;
+  if (client === OBJ && process.env.NODE_ENV !== 'production') {
+    const error =
+      "No client has been specified using urql's Provider. please create a client and add a Provider.";
 
-    console.warn(
-      "Default Client: No client has been specified using urql's Provider." +
-        'This means that urql will be falling back to defaults including making ' +
-        'requests to `/graphql`.\n' +
-        "If that's not what you want, please create a client and add a Provider."
-    );
+    console.error(error);
+    throw new Error(error);
   }
 
-  return client;
+  return client as Client;
 };

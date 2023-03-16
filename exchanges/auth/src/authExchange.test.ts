@@ -40,7 +40,10 @@ const makeExchangeArgs = () => {
           tap(op => operations.push(op)),
           map(result)
         ),
-      client: new Client({ url: '/api' }),
+      client: new Client({
+        url: '/api',
+        exchanges: [],
+      }),
     } as any,
   };
 };

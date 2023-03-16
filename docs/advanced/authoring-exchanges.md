@@ -283,7 +283,6 @@ The default order of exchanges is:
 ```js
 import { dedupExchange, cacheExchange, fetchExchange } from 'urql';
 
-// Also exported as `defaultExchanges`:
 [dedupExchange, cacheExchange, fetchExchange];
 ```
 
