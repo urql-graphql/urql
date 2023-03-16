@@ -103,6 +103,8 @@ export const subscriptionOperation: Operation = makeOperation(
 
 export const undefinedQueryResponse: OperationResult = {
   operation: queryOperation,
+  stale: false,
+  hasNext: false,
 };
 
 export const queryResponse: OperationResult = {
@@ -112,11 +114,15 @@ export const queryResponse: OperationResult = {
       name: 'Clive',
     },
   },
+  stale: false,
+  hasNext: false,
 };
 
 export const mutationResponse: OperationResult = {
   operation: mutationOperation,
   data: {},
+  stale: false,
+  hasNext: false,
 };
 
 export const subscriptionResult: ExecutionResult = {

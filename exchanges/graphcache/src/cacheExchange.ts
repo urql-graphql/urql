@@ -26,10 +26,11 @@ import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 import { Data, Dependencies, CacheExchangeOpts } from './types';
 
-type OperationResultWithMeta = OperationResult & {
+interface OperationResultWithMeta extends Partial<OperationResult> {
+  operation: Operation;
   outcome: CacheOutcome;
   dependencies: Dependencies;
-};
+}
 
 type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
