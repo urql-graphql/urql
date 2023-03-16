@@ -1,3 +1,4 @@
+import { OperationResult, OperationResultSource } from '@urql/core';
 import { nextTick, reactive, ref } from 'vue';
 import { vi, expect, it, describe } from 'vitest';
 
@@ -18,7 +19,9 @@ describe('useQuery', () => {
     const subject = makeSubject<any>();
     const executeQuery = vi
       .spyOn(client, 'executeQuery')
-      .mockImplementation(() => subject.source);
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
 
     const _query = useQuery({
       query: `{ test }`,
@@ -109,7 +112,9 @@ describe('useQuery', () => {
     const subject = makeSubject<any>();
     const executeQuery = vi
       .spyOn(client, 'executeQuery')
-      .mockImplementation(() => subject.source);
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
 
     const _query = useQuery({
       query: `{ test }`,

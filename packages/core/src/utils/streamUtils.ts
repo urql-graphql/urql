@@ -1,5 +1,5 @@
-import { Source, take, filter, toPromise, pipe } from 'wonka';
-import { OperationResult, PromisifiedSource } from '../types';
+import { Sink, Source, subscribe, take, filter, toPromise, pipe } from 'wonka';
+import { OperationResult, OperationResultSource } from '../types';
 
 /** Patches a `toPromise` method onto the `Source` passed to it.
  * @param source$ - the Wonka {@link Source} to patch.
@@ -7,15 +7,19 @@ import { OperationResult, PromisifiedSource } from '../types';
  * @internal
  */
 export function withPromise<T extends OperationResult>(
-  source$: Source<T>
-): PromisifiedSource<T> {
-  (source$ as PromisifiedSource<T>).toPromise = () =>
+  _source$: Source<T>
+): OperationResultSource<T> {
+  const source$ = ((sink: Sink<T>) =>
+    _source$(sink)) as OperationResultSource<T>;
+  source$.toPromise = () =>
     pipe(
       source$,
       filter(result => !result.stale && !result.hasNext),
       take(1),
       toPromise
     );
-
-  return source$ as PromisifiedSource<T>;
+  source$.then = (onResolve, onReject) =>
+    source$.toPromise().then(onResolve, onReject);
+  source$.subscribe = onResult => subscribe(onResult)(source$);
+  return source$;
 }

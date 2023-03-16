@@ -1,3 +1,4 @@
+import { OperationResult, OperationResultSource } from '@urql/core';
 import { reactive } from 'vue';
 import { vi, expect, it, beforeEach, describe } from 'vitest';
 
@@ -25,7 +26,9 @@ describe('useMutation', () => {
     const subject = makeSubject<any>();
     const clientMutation = vi
       .spyOn(client, 'executeMutation')
-      .mockImplementation(() => subject.source);
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
 
     const mutation = reactive(
       useMutation(
