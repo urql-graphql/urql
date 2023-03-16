@@ -70,12 +70,12 @@ _Graphcache_ as introduced in the ["Features" section above.](#features) However
 without passing any options.
 
 ```js
-import { createClient, dedupExchange, fetchExchange } from 'urql';
+import { Client, fetchExchange } from 'urql';
 import { cacheExchange } from '@urql/exchange-graphcache';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange({}), fetchExchange],
+  exchanges: [cacheExchange({}), fetchExchange],
 });
 ```
 
