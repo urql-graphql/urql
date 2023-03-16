@@ -23,14 +23,14 @@ jobs:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2.2.4
         with:
           version: 7
           run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
@@ -71,14 +71,14 @@ jobs:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2.2.4
         with:
           version: 7
           run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
@@ -120,14 +120,14 @@ jobs:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2.2.4
         with:
           version: 7
           run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
@@ -175,14 +175,14 @@ jobs:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2.2.4
         with:
           version: 7
           run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
