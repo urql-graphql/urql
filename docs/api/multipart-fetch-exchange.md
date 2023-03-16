@@ -17,8 +17,7 @@ It follows the unofficial [GraphQL Multipart Request
 Spec](https://github.com/jaydenseric/graphql-multipart-request-spec) which is supported by the
 [Apollo Sever package](https://www.apollographql.com/docs/apollo-server/data/file-uploads/).
 
-This exchange uses the same fetch logic as the [`fetchExchange`](./core.md#fetchexchange) and the
-[`persistedFetchExchange`](./persisted-fetch-exchange.md) by reusing logic from `@urql/core/internal`.
+This exchange uses the same fetch logic as the [`fetchExchange`](./core.md#fetchexchange) and by reusing logic from `@urql/core/internal`.
 The `multipartFetchExchange` is a drop-in replacement for the default
 [`fetchExchange`](./core.md#fetchexchange) and will act exactly like the `fetchExchange` unless the
 `variables` that it receives for mutations contain any `File`s as detected by the `extract-files` package.

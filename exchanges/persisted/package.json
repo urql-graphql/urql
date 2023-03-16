@@ -1,5 +1,5 @@
 {
-  "name": "@urql/exchange-persisted-fetch",
+  "name": "@urql/exchange-persisted",
   "version": "2.1.0",
   "description": "An exchange that allows for persisted queries support when fetching queries",
   "sideEffects": false,
@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/urql-graphql/urql.git",
-    "directory": "exchanges/persisted-fetch"
+    "directory": "exchanges/persisted"
   },
   "keywords": [
     "urql",
@@ -17,15 +17,15 @@
     "persisted queries",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-persisted-fetch",
-  "module": "dist/urql-exchange-persisted-fetch.mjs",
-  "types": "dist/urql-exchange-persisted-fetch.d.ts",
+  "main": "dist/urql-exchange-persisted",
+  "module": "dist/urql-exchange-persisted.mjs",
+  "types": "dist/urql-exchange-persisted.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-persisted-fetch.mjs",
-      "require": "./dist/urql-exchange-persisted-fetch.js",
-      "types": "./dist/urql-exchange-persisted-fetch.d.ts",
+      "import": "./dist/urql-exchange-persisted.mjs",
+      "require": "./dist/urql-exchange-persisted.js",
+      "types": "./dist/urql-exchange-persisted.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

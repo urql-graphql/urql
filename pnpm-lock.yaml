@@ -190,7 +190,7 @@ importers:
     devDependencies:
       graphql: 16.0.1
 
-  exchanges/persisted-fetch:
+  exchanges/persisted:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.0.0

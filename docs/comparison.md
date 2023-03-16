@@ -35,28 +35,28 @@ All features are marked to indicate the following:
 
 ### Core Features
 
-|                                            | urql                                | Apollo                                                                     | Relay                          |
-| ------------------------------------------ | ----------------------------------- | -------------------------------------------------------------------------- | ------------------------------ |
-| Extensible on a network level              | ✅ Exchanges                        | ✅ Links                                                                   | ✅ Network Layers              |
-| Extensible on a cache / control flow level | ✅ Exchanges                        | 🛑                                                                         | 🛑                             |
-| Base Bundle Size                           | **5.9kB** (7.1kB with bindings)     | 32.9kB                                                                     | 27.7kB (34.1kB with bindings)  |
-| Devtools                                   | ✅                                  | ✅                                                                         | ✅                             |
-| Subscriptions                              | ✅                                  | ✅                                                                         | ✅                             |
-| Client-side Rehydration                    | ✅                                  | ✅                                                                         | ✅                             |
-| Polled Queries                             | 🔶                                  | ✅                                                                         | ✅                             |
-| Lazy Queries                               | ✅                                  | ✅                                                                         | ✅                             |
-| Stale while Revalidate / Cache and Network | ✅                                  | ✅                                                                         | ✅                             |
-| Focus Refetching                           | ✅ `@urql/exchange-refocus`         | 🛑                                                                         | 🛑                             |
-| Stale Time Configuration                   | ✅ `@urql/exchange-request-policy`  | ✅                                                                         | 🛑                             |
-| Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`                                         | ✅                             |
-| Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                                                | 🟡 `react-relay-network-layer` |
-| Live Queries                               | 🛑                                  | 🛑                                                                         | ✅                             |
-| Defer & Stream Directives                  | ✅                                  | ✅ / 🛑 (`@defer` is supported in >=3.7.0, `@stream` is not yet supported) | 🟡 (unreleased)                |
-| Switching to `GET` method                  | ✅                                  | ✅                                                                         | 🟡 `react-relay-network-layer` |
-| File Uploads                               | ✅                                  | 🟡 `apollo-upload-client`                                                  | 🛑                             |
-| Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                                                     | ✅ `DefaultNetworkLayer`       |
-| Easy Authentication Flows                  | ✅ `@urql/exchange-auth`            | 🛑 (no docs for refresh-based authentication)                              | 🟡 `react-relay-network-layer` |
-| Automatic Refetch after Mutation           | ✅ (with document cache)            | 🛑                                                                         | ✅                             |
+|                                            | urql                               | Apollo                                                                     | Relay                          |
+| ------------------------------------------ | ---------------------------------- | -------------------------------------------------------------------------- | ------------------------------ |
+| Extensible on a network level              | ✅ Exchanges                       | ✅ Links                                                                   | ✅ Network Layers              |
+| Extensible on a cache / control flow level | ✅ Exchanges                       | 🛑                                                                         | 🛑                             |
+| Base Bundle Size                           | **5.9kB** (7.1kB with bindings)    | 32.9kB                                                                     | 27.7kB (34.1kB with bindings)  |
+| Devtools                                   | ✅                                 | ✅                                                                         | ✅                             |
+| Subscriptions                              | ✅                                 | ✅                                                                         | ✅                             |
+| Client-side Rehydration                    | ✅                                 | ✅                                                                         | ✅                             |
+| Polled Queries                             | 🔶                                 | ✅                                                                         | ✅                             |
+| Lazy Queries                               | ✅                                 | ✅                                                                         | ✅                             |
+| Stale while Revalidate / Cache and Network | ✅                                 | ✅                                                                         | ✅                             |
+| Focus Refetching                           | ✅ `@urql/exchange-refocus`        | 🛑                                                                         | 🛑                             |
+| Stale Time Configuration                   | ✅ `@urql/exchange-request-policy` | ✅                                                                         | 🛑                             |
+| Persisted Queries                          | ✅ `@urql/exchange-persisted`      | ✅ `apollo-link-persisted-queries`                                         | ✅                             |
+| Batched Queries                            | 🛑                                 | ✅ `apollo-link-batch-http`                                                | 🟡 `react-relay-network-layer` |
+| Live Queries                               | 🛑                                 | 🛑                                                                         | ✅                             |
+| Defer & Stream Directives                  | ✅                                 | ✅ / 🛑 (`@defer` is supported in >=3.7.0, `@stream` is not yet supported) | 🟡 (unreleased)                |
+| Switching to `GET` method                  | ✅                                 | ✅                                                                         | 🟡 `react-relay-network-layer` |
+| File Uploads                               | ✅                                 | 🟡 `apollo-upload-client`                                                  | 🛑                             |
+| Retrying Failed Queries                    | ✅ `@urql/exchange-retry`          | ✅ `apollo-link-retry`                                                     | ✅ `DefaultNetworkLayer`       |
+| Easy Authentication Flows                  | ✅ `@urql/exchange-auth`           | 🛑 (no docs for refresh-based authentication)                              | 🟡 `react-relay-network-layer` |
+| Automatic Refetch after Mutation           | ✅ (with document cache)           | 🛑                                                                         | ✅                             |
 
 Typically these are all additional addon features that you may expect from a GraphQL client, no
 matter which framework you use it with. It's worth mentioning that all three clients support some
