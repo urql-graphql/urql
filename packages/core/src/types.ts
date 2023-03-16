@@ -1,5 +1,5 @@
 import type { GraphQLError, DocumentNode } from 'graphql';
-import { Source } from 'wonka';
+import { Subscription, Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
 
@@ -127,16 +127,22 @@ export interface ExecutionResult {
   hasNext?: boolean;
 }
 
-/** A `Source` with a `PromisifiedSource.toPromise` helper method, to promisify a single result.
+/** A source of {@link OperationResult | OperationResults}, convertable to a promise, subscribable, or Wonka Source.
  *
  * @remarks
- * The {@link Client} will often return a `PromisifiedSource` to provide the `toPromise` method. When called, this returns
- * a promise of the source that resolves on the first {@link OperationResult} of the `Source` that doesn't have `stale: true`
- * nor `hasNext: true` set, meaning, it'll resolve to the first result that is stable and complete.
+ * The {@link Client} will often return a `OperationResultSource` to provide a more flexible Wonka {@link Source}.
+ *
+ * While a {@link Source} may require you to import helpers to convert it to a `Promise` for a single result, or
+ * to subscribe to it, the `OperationResultSource` is a `PromiseLike` and has methods to convert it to a promise,
+ * or to subscribe to it with a single method call.
  */
-export type PromisifiedSource<T = any> = Source<T> & {
-  toPromise: () => Promise<T>;
-};
+export type OperationResultSource<T extends OperationResult> = Source<T> &
+  PromiseLike<T> & {
+    /** Returns the first non-stale, settled results of the source. */
+    toPromise(): Promise<T>;
+    /** Alias for Wonka's `subscribe` and calls `onResult` when subscribed to for each new `OperationResult`. */
+    subscribe(onResult: (value: T) => void): Subscription;
+  };
 
 /** A type of Operation, either a GraphQL `query`, `mutation`, or `subscription`; or a `teardown` signal.
  *

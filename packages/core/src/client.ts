@@ -37,9 +37,9 @@ import {
   OperationInstance,
   OperationContext,
   OperationResult,
+  OperationResultSource,
   OperationType,
   RequestPolicy,
-  PromisifiedSource,
   DebugEvent,
 } from './types';
 
@@ -313,21 +313,21 @@ export interface Client {
     Variables extends AnyVariables = AnyVariables
   >(
     operation: Operation<Data, Variables>
-  ): Source<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 
   /** Creates a `Source` that executes the GraphQL query operation created from the passed parameters.
    *
    * @param query - a GraphQL document containing the query operation that will be executed.
    * @param variables - the variables used to execute the operation.
    * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
-   * @returns A {@link PromisifiedSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   * @returns A {@link OperationResultSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
    *
    * @remarks
    * The `Client.query` method is useful to programmatically create and issue a GraphQL query operation.
    * It automatically calls {@link createRequest}, {@link client.createRequestOperation}, and
    * {@link client.executeRequestOperation} for you, and is a convenience method.
    *
-   * Since it returns a {@link PromisifiedSource} it may be chained with a `toPromise()` call to only
+   * Since it returns a {@link OperationResultSource} it may be chained with a `toPromise()` call to only
    * await a single result in an async function.
    *
    * Hint: This is the recommended way to create queries programmatically when not using the bindings,
@@ -361,7 +361,7 @@ export interface Client {
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 
   /** Returns the first synchronous result a `Client` provides for a given operation.
    *
@@ -405,7 +405,7 @@ export interface Client {
   executeQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
-  ): Source<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 
   /** Creates a `Source` that executes the GraphQL subscription operation created from the passed parameters.
    *
@@ -453,7 +453,7 @@ export interface Client {
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
-  ): Source<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 
   /** Creates a `Source` that executes the GraphQL subscription operation for the passed `GraphQLRequest`.
    *
@@ -474,7 +474,7 @@ export interface Client {
   >(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
-  ): Source<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 
   /** Creates a `Source` that executes the GraphQL mutation operation created from the passed parameters.
    *
@@ -522,7 +522,7 @@ export interface Client {
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 
   /** Creates a `Source` that executes the GraphQL mutation operation for the passed `GraphQLRequest`.
    *
@@ -540,7 +540,7 @@ export interface Client {
   executeMutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
-  ): Source<OperationResult<Data, Variables>>;
+  ): OperationResultSource<OperationResult<Data, Variables>>;
 }
 
 export const Client: new (opts: ClientOptions) => Client = function Client(
@@ -721,45 +721,47 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
     executeRequestOperation(operation) {
       if (operation.kind === 'mutation') {
-        return makeResultSource(operation);
+        return withPromise(makeResultSource(operation));
       }
 
-      return make<OperationResult>(observer => {
-        let source = active.get(operation.key);
-        if (!source) {
-          active.set(operation.key, (source = makeResultSource(operation)));
-        }
+      return withPromise(
+        make<OperationResult>(observer => {
+          let source = active.get(operation.key);
+          if (!source) {
+            active.set(operation.key, (source = makeResultSource(operation)));
+          }
 
-        return pipe(
-          source,
-          onStart(() => {
-            const prevReplay = replays.get(operation.key);
-            const isNetworkOperation =
-              operation.context.requestPolicy === 'cache-and-network' ||
-              operation.context.requestPolicy === 'network-only';
-            if (operation.kind !== 'query') {
-              return;
-            } else if (isNetworkOperation) {
-              dispatchOperation(operation);
-              if (prevReplay && !prevReplay.hasNext) prevReplay.stale = true;
-            }
+          return pipe(
+            source,
+            onStart(() => {
+              const prevReplay = replays.get(operation.key);
+              const isNetworkOperation =
+                operation.context.requestPolicy === 'cache-and-network' ||
+                operation.context.requestPolicy === 'network-only';
+              if (operation.kind !== 'query') {
+                return;
+              } else if (isNetworkOperation) {
+                dispatchOperation(operation);
+                if (prevReplay && !prevReplay.hasNext) prevReplay.stale = true;
+              }
 
-            if (
-              prevReplay != null &&
-              prevReplay === replays.get(operation.key)
-            ) {
-              observer.next(prevReplay);
-            } else if (!isNetworkOperation) {
-              dispatchOperation(operation);
-            }
-          }),
-          onEnd(() => {
-            isOperationBatchActive = false;
-            observer.complete();
-          }),
-          subscribe(observer.next)
-        ).unsubscribe;
-      });
+              if (
+                prevReplay != null &&
+                prevReplay === replays.get(operation.key)
+              ) {
+                observer.next(prevReplay);
+              } else if (!isNetworkOperation) {
+                dispatchOperation(operation);
+              }
+            }),
+            onEnd(() => {
+              isOperationBatchActive = false;
+              observer.complete();
+            }),
+            subscribe(observer.next)
+          ).unsubscribe;
+        })
+      );
     },
 
     executeQuery(query, opts) {
@@ -785,10 +787,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       if (!context || typeof context.suspense !== 'boolean') {
         context = { ...context, suspense: false };
       }
-
-      return withPromise(
-        client.executeQuery(createRequest(query, variables), context)
-      );
+      return client.executeQuery(createRequest(query, variables), context);
     },
 
     readQuery(query, variables, context) {
