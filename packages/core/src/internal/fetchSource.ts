@@ -104,6 +104,7 @@ async function* fetchOperation(
   url: string,
   fetchOptions: RequestInit
 ) {
+  let networkMode = true;
   let abortController: AbortController | void;
   let result: OperationResult | null = null;
   let response: Response;
@@ -132,16 +133,19 @@ async function* fetchOperation(
     }
 
     for await (const payload of results) {
-      yield (result = result
+      result = result
         ? mergeResultPatch(result, payload, response)
-        : makeResult(operation, payload, response));
+        : makeResult(operation, payload, response);
+      networkMode = false;
+      yield result;
+      networkMode = true;
     }
 
     if (!result) {
       yield (result = makeResult(operation, {}, response));
     }
   } catch (error: any) {
-    if (result) {
+    if (!networkMode) {
       throw error;
     }
 
