@@ -198,6 +198,8 @@ it('resolves cached query results correctly', () => {
   expect(output).not.toHaveBeenCalled();
   expect(onPush).toHaveBeenCalledWith({
     ...queryResponse,
+    stale: false,
+    hasNext: false,
     operation: {
       ...queryResponse.operation,
       context: {
@@ -234,8 +236,9 @@ it('resolves deferred, cached query results correctly', () => {
   expect(output).toHaveBeenCalledTimes(1);
   expect(onPush).toHaveBeenCalledTimes(2);
   expect(onPush.mock.calls[1][0]).toEqual({
-    hasNext: true,
     ...queryResponse,
+    hasNext: true,
+    stale: false,
     operation: {
       ...queryResponse.operation,
       context: {
@@ -267,6 +270,8 @@ it('deletes cached results in non-suspense environments', async () => {
   expect(Object.keys(ssr.extractData()).length).toBe(0);
   expect(onPush).toHaveBeenCalledWith({
     ...queryResponse,
+    stale: false,
+    hasNext: false,
     operation: {
       ...queryResponse.operation,
       context: {

@@ -226,6 +226,7 @@ describe('offline', () => {
       error: undefined,
       extensions: undefined,
       operation: expect.any(Object),
+      hasNext: false,
       stale: false,
     });
 
