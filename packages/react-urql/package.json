@@ -54,7 +54,7 @@
     "react-is": "^17.0.1",
     "react-ssr-prepass": "^1.1.2",
     "react-test-renderer": "^17.0.1",
-    "vite": "^4.2.0"
+    "vite": "^3.2.4"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0",
