@@ -52,7 +52,8 @@ it('caches query results correctly', () => {
 });
 
 it('serializes query results quickly', () => {
-  const queryResponse: OperationResult = {
+  const result: OperationResult = {
+    ...queryResponse,
     operation: queryOperation,
     data: {
       user: {
@@ -62,11 +63,11 @@ it('serializes query results quickly', () => {
   };
 
   const serializedQueryResponse = {
-    ...queryResponse,
+    ...result,
     data: JSON.stringify(queryResponse.data),
   };
 
-  output.mockReturnValueOnce(queryResponse);
+  output.mockReturnValueOnce(result);
 
   const ssr = ssrExchange();
   const { source: ops$, next } = input;

@@ -38,6 +38,8 @@ describe('mergeResultPatch', () => {
           },
         ],
       },
+      stale: false,
+      hasNext: true,
     };
 
     const merged = mergeResultPatch(prevResult, {
@@ -77,6 +79,8 @@ describe('mergeResultPatch', () => {
           },
         ],
       },
+      stale: false,
+      hasNext: true,
     };
 
     const patch = { __typename: 'Child' };
@@ -111,6 +115,8 @@ describe('mergeResultPatch', () => {
         __typename: 'Query',
         item: undefined,
       },
+      stale: false,
+      hasNext: true,
     };
 
     const merged = mergeResultPatch(prevResult, {
@@ -133,6 +139,8 @@ describe('mergeResultPatch', () => {
         __typename: 'Query',
         items: [{ __typename: 'Item' }],
       },
+      stale: false,
+      hasNext: true,
     };
 
     const patch = { __typename: 'Item' };
@@ -162,6 +170,8 @@ describe('mergeResultPatch', () => {
         __typename: 'Query',
         items: [{ __typename: 'Item' }],
       },
+      stale: false,
+      hasNext: true,
     };
 
     const merged = mergeResultPatch(prevResult, {
@@ -190,6 +200,8 @@ describe('mergeResultPatch', () => {
       extensions: {
         base: true,
       },
+      stale: false,
+      hasNext: true,
     };
 
     const merged = mergeResultPatch(prevResult, {
@@ -240,6 +252,8 @@ describe('mergeResultPatch', () => {
       extensions: {
         base: true,
       },
+      stale: false,
+      hasNext: true,
     };
 
     const merged = mergeResultPatch(prevResult, {
@@ -264,6 +278,8 @@ describe('mergeResultPatch', () => {
           },
         ],
       },
+      stale: false,
+      hasNext: true,
     };
 
     const patch = { __typename: 'Child' };

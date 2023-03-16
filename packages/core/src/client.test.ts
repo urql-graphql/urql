@@ -372,6 +372,8 @@ describe('queuing behavior', () => {
           }
         }),
         map(op => ({
+          stale: false,
+          hasNext: false,
           data: op.key,
           operation: op,
         }))
@@ -427,6 +429,8 @@ describe('queuing behavior', () => {
           ops$,
           filter(op => op.kind !== 'teardown'),
           map(op => ({
+            hasNext: false,
+            stale: false,
             data: ++countRes,
             operation: op,
           })),
@@ -499,6 +503,7 @@ describe('queuing behavior', () => {
           data: 1,
           operation: op,
           stale: true,
+          hasNext: false,
         })),
         delay(1)
       );
@@ -562,6 +567,8 @@ describe('shared sources behavior', () => {
       return pipe(
         ops$,
         map(op => ({
+          hasNext: false,
+          stale: false,
           data: ++i,
           operation: op,
         })),
@@ -608,6 +615,8 @@ describe('shared sources behavior', () => {
       return pipe(
         ops$,
         map(op => ({
+          hasNext: false,
+          stale: false,
           data: ++i,
           operation: op,
         })),
@@ -665,6 +674,8 @@ describe('shared sources behavior', () => {
       return pipe(
         ops$,
         map(op => ({
+          hasNext: false,
+          stale: false,
           data: ++i,
           operation: op,
         })),
@@ -723,6 +734,8 @@ describe('shared sources behavior', () => {
         ops$,
         filter(op => op.kind !== 'teardown'),
         map(op => ({
+          hasNext: false,
+          stale: false,
           data: ++i,
           operation: op,
         })),
@@ -769,6 +782,8 @@ describe('shared sources behavior', () => {
       return pipe(
         ops$,
         map(op => ({
+          hasNext: false,
+          stale: false,
           data: ++i,
           operation: op,
         })),
@@ -804,7 +819,7 @@ describe('shared sources behavior', () => {
     const exchange: Exchange = () => ops$ => {
       return pipe(
         ops$,
-        map(op => ({ data: 1, operation: op })),
+        map(op => ({ hasNext: false, stale: false, data: 1, operation: op })),
         filter(() => false)
       );
     };
@@ -830,7 +845,7 @@ describe('shared sources behavior', () => {
       let i = 0;
       return pipe(
         ops$,
-        map(op => ({ data: ++i, operation: op }))
+        map(op => ({ hasNext: false, stale: false, data: ++i, operation: op }))
       );
     };
 
@@ -871,7 +886,7 @@ describe('shared sources behavior', () => {
     const exchange: Exchange = () => ops$ => {
       return pipe(
         ops$,
-        map(op => ({ stale: true, data: 1, operation: op })),
+        map(op => ({ hasNext: false, stale: true, data: 1, operation: op })),
         take(1)
       );
     };
@@ -938,7 +953,7 @@ describe('shared sources behavior', () => {
     const exchange: Exchange = () => ops$ => {
       return pipe(
         ops$,
-        map(op => ({ stale: true, data: 1, operation: op }))
+        map(op => ({ hasNext: false, stale: true, data: 1, operation: op }))
       );
     };
 

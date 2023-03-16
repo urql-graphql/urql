@@ -9,6 +9,7 @@ import { print } from 'graphql';
 import { vi, expect, it, describe } from 'vitest';
 
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
+import { queryResponse } from '../../../packages/core/src/test-utils';
 import { offlineExchange } from './offlineExchange';
 
 const mutationOne = gql`
@@ -79,7 +80,11 @@ describe('storage', () => {
     const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
-        return { operation: forwardOp, data: mutationOneData };
+        return {
+          ...queryResponse,
+          operation: forwardOp,
+          data: mutationOneData,
+        };
       }
     );
 
@@ -125,10 +130,11 @@ describe('offline', () => {
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === queryOp.key) {
           onlineSpy.mockReturnValueOnce(true);
-          return { operation: forwardOp, data: queryOneData };
+          return { ...queryResponse, operation: forwardOp, data: queryOneData };
         } else {
           onlineSpy.mockReturnValueOnce(false);
           return {
+            ...queryResponse,
             operation: forwardOp,
             // @ts-ignore
             error: { networkError: new Error('failed to fetch') },
