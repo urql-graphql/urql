@@ -138,7 +138,15 @@ export interface ExecutionResult {
  */
 export type OperationResultSource<T extends OperationResult> = Source<T> &
   PromiseLike<T> & {
-    /** Returns the first non-stale, settled results of the source. */
+    /** Returns the first non-stale, settled results of the source.
+     * @remarks
+     * The `toPromise` method gives you the first result of an `OperationResultSource`
+     * that has `hasNext: false` and `stale: false` set as a `Promise`.
+     *
+     * Hint: If you're trying to get updates for your results, this won't work.
+     * This gives you only a single, promisified result, so it won't receive
+     * cache or other updates.
+     */
     toPromise(): Promise<T>;
     /** Alias for Wonka's `subscribe` and calls `onResult` when subscribed to for each new `OperationResult`. */
     subscribe(onResult: (value: T) => void): Subscription;
