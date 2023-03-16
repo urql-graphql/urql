@@ -13,14 +13,17 @@ import {
 import { Client, Operation, OperationResult, CombinedError } from '@urql/core';
 
 import { vi, expect, it } from 'vitest';
-import { queryOperation } from '../../../packages/core/src/test-utils';
+import {
+  queryResponse,
+  queryOperation,
+} from '../../../packages/core/src/test-utils';
 import { persistedExchange } from './persistedExchange';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];
 
   const result = vi.fn(
-    (operation: Operation): OperationResult => ({ operation })
+    (operation: Operation): OperationResult => ({ ...queryResponse, operation })
   );
 
   return {
@@ -33,7 +36,7 @@ const makeExchangeArgs = () => {
           tap(op => operations.push(op)),
           map(result)
         ),
-      client: new Client({ url: '/api' }),
+      client: new Client({ url: '/api', exchanges: [] }),
     } as any,
   };
 };
@@ -62,6 +65,7 @@ it('retries query when persisted query resulted in miss', async () => {
   const { result, operations, exchangeArgs } = makeExchangeArgs();
 
   result.mockImplementationOnce(operation => ({
+    ...queryResponse,
     operation,
     error: new CombinedError({
       graphQLErrors: [{ message: 'PersistedQueryNotFound' }],
@@ -91,6 +95,7 @@ it('retries query persisted query resulted in unsupported', async () => {
   const { result, operations, exchangeArgs } = makeExchangeArgs();
 
   result.mockImplementationOnce(operation => ({
+    ...queryResponse,
     operation,
     error: new CombinedError({
       graphQLErrors: [{ message: 'PersistedQueryNotSupported' }],
