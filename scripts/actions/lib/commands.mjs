@@ -1,14 +1,17 @@
-const path = require('path');
-const execa = require('execa');
-const fs = require('fs');
-const tar = require('tar');
-const stream = require('stream');
-const packlist = require('npm-packlist');
+import * as stream from 'stream';
+import * as path from 'path';
+import * as fs from 'fs';
+import { promisify } from 'util';
 
-const { workspaceRoot } = require('./constants');
-const { getPackageManifest, getPackageArtifact } = require('./packages');
+import * as tar from 'tar';
+import { execa, execaNode } from 'execa';
+import Arborist from '@npmcli/arborist';
+import packlist from 'npm-packlist';
 
-const pipeline = require('util').promisify(stream.pipeline);
+import { workspaceRoot, require } from './constants.mjs';
+import { getPackageManifest, getPackageArtifact } from './packages.mjs';
+
+const pipeline = promisify(stream.pipeline);
 
 const buildPackage = async (cwd) => {
   const manifest = getPackageManifest(cwd);
@@ -35,7 +38,7 @@ const preparePackage = async (cwd) => {
   console.log('> Preparing', manifest.name);
 
   try {
-    await execa.node(
+    await execaNode(
       require.resolve('../../prepare/index.js'),
       { cwd },
     );
@@ -50,6 +53,9 @@ const packPackage = async (cwd) => {
   const artifact = getPackageArtifact(cwd);
   console.log('> Packing', manifest.name);
 
+  const arborist = new Arborist({ path: cwd });
+  const tree = await arborist.loadActual();
+
   try {
     await pipeline(
       tar.create(
@@ -59,7 +65,7 @@ const packPackage = async (cwd) => {
           portable: true,
           gzip: true,
         },
-        (await packlist({ path: cwd })).map((f) => `./${f}`)
+        (await packlist(tree)).map((f) => `./${f}`)
       ),
       fs.createWriteStream(path.resolve(cwd, artifact))
     );
@@ -69,4 +75,4 @@ const packPackage = async (cwd) => {
   }
 };
 
-module.exports = { buildPackage, preparePackage, packPackage };
+export { buildPackage, preparePackage, packPackage };

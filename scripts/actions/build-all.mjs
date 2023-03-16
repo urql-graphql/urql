@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const { listPackages } = require('./lib/packages');
-const { buildPackage } = require('./lib/commands');
+import { listPackages } from './lib/packages.mjs';
+import { buildPackage } from './lib/commands.mjs';
 
 (async () => {
   try {

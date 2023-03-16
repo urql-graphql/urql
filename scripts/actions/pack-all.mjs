@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { listPackages } = require('./lib/packages');
-const { preparePackage, packPackage } = require('./lib/commands');
-const { uploadArtifact } = require('./lib/github');
+import { listPackages } from './lib/packages.mjs';
+import { preparePackage, packPackage } from './lib/commands.mjs';
+import { uploadArtifact } from './lib/github.mjs';
 
 (async () => {
   try {
