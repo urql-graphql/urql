@@ -47,6 +47,7 @@ it('caches query results correctly', () => {
     [queryOperation.key]: {
       data: serializedQueryResponse.data,
       error: undefined,
+      hasNext: false,
     },
   });
 });
@@ -64,7 +65,7 @@ it('serializes query results quickly', () => {
 
   const serializedQueryResponse = {
     ...result,
-    data: JSON.stringify(queryResponse.data),
+    data: JSON.stringify(result.data),
   };
 
   output.mockReturnValueOnce(result);
@@ -75,7 +76,7 @@ it('serializes query results quickly', () => {
 
   publish(exchange);
   next(queryOperation);
-  queryResponse.data.user.name = 'Not Clive';
+  result.data.user.name = 'Not Clive';
 
   const data = ssr.extractData();
   expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
@@ -84,6 +85,7 @@ it('serializes query results quickly', () => {
     [queryOperation.key]: {
       data: serializedQueryResponse.data,
       error: undefined,
+      hasNext: false,
     },
   });
 });
@@ -120,6 +122,7 @@ it('caches errored query results correctly', () => {
         ],
         networkError: undefined,
       },
+      hasNext: false,
     },
   });
 });
@@ -148,6 +151,7 @@ it('caches extensions when includeExtensions=true', () => {
     [queryOperation.key]: {
       data: '{"user":{"name":"Clive"}}',
       extensions: '{"foo":"bar"}',
+      hasNext: false,
     },
   });
 });
@@ -220,8 +224,8 @@ it('resolves deferred, cached query results correctly', () => {
     isClient: true,
     initialState: {
       [queryOperation.key]: {
-        hasNext: true,
         ...(serializedQueryResponse as any),
+        hasNext: true,
       },
     },
   });

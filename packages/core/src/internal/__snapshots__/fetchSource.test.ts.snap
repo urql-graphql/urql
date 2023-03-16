@@ -5,6 +5,7 @@ exports[`on error > ignores the error when a result is available 1`] = `
   "data": undefined,
   "error": [CombinedError: [Network] Forbidden],
   "extensions": undefined,
+  "hasNext": false,
   "operation": {
     "context": {
       "fetchOptions": {
@@ -141,6 +142,7 @@ exports[`on error > ignores the error when a result is available 1`] = `
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 
@@ -149,6 +151,7 @@ exports[`on error > returns error data 1`] = `
   "data": undefined,
   "error": [CombinedError: [Network] Forbidden],
   "extensions": undefined,
+  "hasNext": false,
   "operation": {
     "context": {
       "fetchOptions": {
@@ -285,6 +288,7 @@ exports[`on error > returns error data 1`] = `
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 
@@ -293,6 +297,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
   "data": undefined,
   "error": [CombinedError: [Network] Forbidden],
   "extensions": undefined,
+  "hasNext": false,
   "operation": {
     "context": {
       "fetchOptions": {
@@ -429,6 +434,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 
@@ -578,6 +584,7 @@ exports[`on success > returns response data 1`] = `
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;
 
@@ -759,5 +766,6 @@ exports[`on success > uses the mock fetch if given 1`] = `
       "name": "Clara",
     },
   },
+  "stale": false,
 }
 `;

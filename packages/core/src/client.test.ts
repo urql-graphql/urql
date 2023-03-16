@@ -483,7 +483,7 @@ describe('queuing behavior', () => {
 
     expect(output.length).toBe(3);
     expect(output[2]).toHaveProperty('data', 2);
-    expect(output[2]).not.toHaveProperty('stale');
+    expect(output[2]).toHaveProperty('stale', false);
     expect(output[2]).toHaveProperty('operation.key', queryOperation.key);
     expect(output[2]).toHaveProperty(
       'operation.context.requestPolicy',
@@ -594,6 +594,8 @@ describe('shared sources behavior', () => {
     expect(resultOne).toHaveBeenCalledWith({
       data: 1,
       operation: queryOperation,
+      stale: false,
+      hasNext: false,
     });
 
     pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
@@ -601,6 +603,8 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 1,
       operation: queryOperation,
+      stale: false,
+      hasNext: false,
     });
 
     vi.advanceTimersByTime(1);
@@ -650,6 +654,8 @@ describe('shared sources behavior', () => {
     expect(resultOne).toHaveBeenCalledWith({
       data: 1,
       operation: operationOne,
+      hasNext: false,
+      stale: false,
     });
 
     pipe(client.executeRequestOperation(operationTwo), subscribe(resultTwo));
@@ -658,6 +664,7 @@ describe('shared sources behavior', () => {
       data: 1,
       operation: operationOne,
       stale: true,
+      hasNext: false,
     });
 
     vi.advanceTimersByTime(1);
@@ -665,6 +672,8 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 2,
       operation: operationTwo,
+      stale: false,
+      hasNext: false,
     });
   });
 
@@ -706,6 +715,8 @@ describe('shared sources behavior', () => {
     expect(resultOne).toHaveBeenCalledWith({
       data: 1,
       operation,
+      stale: false,
+      hasNext: false,
     });
 
     pipe(client.executeRequestOperation(operation), subscribe(resultTwo));
@@ -714,6 +725,7 @@ describe('shared sources behavior', () => {
       data: 1,
       operation,
       stale: true,
+      hasNext: false,
     });
 
     vi.advanceTimersByTime(1);
@@ -724,6 +736,8 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 2,
       operation,
+      stale: false,
+      hasNext: false,
     });
   });
 
@@ -761,6 +775,8 @@ describe('shared sources behavior', () => {
     expect(resultOne).toHaveBeenCalledWith({
       data: 1,
       operation: queryOperation,
+      hasNext: false,
+      stale: false,
     });
 
     subscription.unsubscribe();
@@ -773,6 +789,8 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 2,
       operation: queryOperation,
+      stale: false,
+      hasNext: false,
     });
   });
 
@@ -786,6 +804,8 @@ describe('shared sources behavior', () => {
           stale: false,
           data: ++i,
           operation: op,
+          hasNext: false,
+          stale: false,
         })),
         take(1)
       );
@@ -812,6 +832,7 @@ describe('shared sources behavior', () => {
       data: 1,
       operation,
       stale: true,
+      hasNext: false,
     });
   });
 
@@ -867,6 +888,8 @@ describe('shared sources behavior', () => {
     expect(resultOne).toHaveBeenCalledWith({
       data: 1,
       operation,
+      hasNext: false,
+      stale: false,
     });
 
     pipe(client.executeRequestOperation(operation), subscribe(resultTwo));
@@ -874,11 +897,15 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 2,
       operation,
+      hasNext: false,
+      stale: false,
     });
 
     expect(resultOne).toHaveBeenCalledWith({
       data: 2,
       operation,
+      hasNext: false,
+      stale: false,
     });
   });
 
@@ -905,6 +932,7 @@ describe('shared sources behavior', () => {
       data: 1,
       operation: queryOperation,
       stale: true,
+      hasNext: false,
     });
 
     pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
@@ -913,6 +941,7 @@ describe('shared sources behavior', () => {
       data: 1,
       operation: queryOperation,
       stale: true,
+      hasNext: false,
     });
   });
 
@@ -972,6 +1001,7 @@ describe('shared sources behavior', () => {
       data: 1,
       operation: queryOperation,
       stale: true,
+      hasNext: false,
     });
   });
 });
