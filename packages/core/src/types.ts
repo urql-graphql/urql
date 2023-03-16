@@ -565,7 +565,7 @@ export interface OperationResult<
    * Most commonly, this flag is set for a cached result when the operation is executed using the
    * `cache-and-network` {@link RequestPolicy}.
    */
-  stale?: boolean;
+  stale: boolean;
   /** Indicates that the GraphQL response is streamed and updated results will follow.
    *
    * @remarks
@@ -575,7 +575,7 @@ export interface OperationResult<
    *
    * For GraphQL subscriptions, this flag will always be set to `true`.
    */
-  hasNext?: boolean;
+  hasNext: boolean;
 }
 
 /** The input parameters a `Client` passes to an `Exchange` when it's created.

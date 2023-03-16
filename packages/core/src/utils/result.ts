@@ -44,6 +44,7 @@ export const makeResult = (
       : undefined,
     extensions: result.extensions ? { ...result.extensions } : undefined,
     hasNext: result.hasNext == null ? defaultHasNext : result.hasNext,
+    stale: false,
   };
 };
 
@@ -126,6 +127,7 @@ export const mergeResultPatch = (
       : undefined,
     extensions: hasExtensions ? extensions : undefined,
     hasNext: !!nextResult.hasNext,
+    stale: false,
   };
 };
 
@@ -154,4 +156,6 @@ export const makeErrorResult = (
     response,
   }),
   extensions: undefined,
+  hasNext: false,
+  stale: false,
 });
