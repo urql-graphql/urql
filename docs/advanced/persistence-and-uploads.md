@@ -5,12 +5,9 @@ order: 1
 
 # Persisted Queries and Uploads
 
-`urql` supports both [Automatic Persisted
-Queries](https://www.apollographql.com/docs/apollo-server/performance/apq/), Persisted Queries, and
-[File Uploads](https://www.apollographql.com/docs/apollo-server/data/file-uploads/).
-
-While File Uploads should work without any modifications, an additional exchange must be installed
-and added for Persisted Queries to work.
+`urql` supports (Automatic) Persisted Queries, and File Uploads via GraphQL
+Multipart requests. For persisted queries to work, some setup work is needed,
+while File Upload support is built into `@urql/core@4`.
 
 ## Automatic Persisted Queries
 
@@ -31,8 +28,9 @@ requests. If we only send the persisted queries with hashes as GET requests then
 easier for a CDN to cache, as by default most caches would not cache POST requests automatically.
 
 In `urql`, we may use the `@urql/exchange-persisted` package's `persistedExchange` to
-implement Automatic Persisted Queries. This exchange works alongside the default `fetchExchange`
-and other exchanges by adding the `extensions.persistedQuery` parameters to a GraphQL request.
+enable support for Automatic Persisted Queries. This exchange works alongside other fetch or
+subscription exchanges by adding metadata for persisted queries to each GraphQL
+request by modifying the `extensions` object of operations.
 
 ### Installation & Setup
 
@@ -45,11 +43,11 @@ npm install --save @urql/exchange-persisted
 ```
 
 You'll then need to add the `persistedExchange` function, that this package exposes,
-to your `exchanges`.
+to your `exchanges`, in front of exchanges that communicate with the API:
 
 ```js
 import { Client, fetchExchange, cacheExchange } from 'urql';
-import { persistedExchange } from '@urql/exchange-persisted-fetch';
+import { persistedExchange } from '@urql/exchange-persisted';
 
 const client = new Client({
   url: 'http://localhost:1234/graphql',
@@ -65,13 +63,13 @@ const client = new Client({
 
 As we can see, typically it's recommended to set `preferGetForPersistedQueries` to `true` to force
 all persisted queries to use GET requests instead of POST so that CDNs can do their job.
-We also added the `persistedExchange` in front of the usual `fetchExchange`, since it has to
-update operations before they reach an exchange that talks to an API.
+It does so by setting the `preferGetMethod` option to `'force'` when it's
+updating operations.
 
-The `preferGetForPersistedQueries` is similar to the [`Client`'s
-`preferGetMethod`](../api/core.md#client) but only switches persisted queries to use GET requests
-instead. This is preferable since sometimes the GraphQL query can grow too large for a simple GET
-query to handle, while the `persistedExchange`'s SHA256 hashes will remain predictably small.
+The `fetchExchange` can see the modifications that the `persistedExchange` is
+making to operations, and understands to leave out the `query` from any request
+as needed. The same should be happening to the `subscriptionExchange`, if you're
+using it for queries.
 
 ### Customizing Hashing
 
@@ -88,7 +86,7 @@ out the `generateHash` function with a much simpler one that uses the `generateH
 second argument, a GraphQL `DocumentNode` object.
 
 ```js
-persistedFetchExchange({
+persistedExchange({
   generateHash: (_, document) => document.documentId,
 });
 ```
@@ -100,8 +98,8 @@ so easily by using the first argument `generateHash` receives, a GraphQL query a
 ```js
 import sha256 from 'hash.js/lib/hash/sha/256';
 
-persistedFetchExchange({
-  generateHash: async query => {
+persistedExchange({
+  async generateHash(query) {
     return sha256().update(query).digest('hex');
   },
 });
