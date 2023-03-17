@@ -30,10 +30,20 @@ import {
   OperationResult,
 } from '@urql/core';
 
+/** Input parameters for the {@link executeExchange}.
+ * @see {@link ExecutionArgs} which this interface mirrors. */
 export interface ExecuteExchangeArgs {
+  /** GraphQL Schema definition that `Operation`s are execute against. */
   schema: GraphQLSchema;
+  /** Context object or a factory function creating a `context` object.
+   *
+   * @remarks
+   * The `context` that is passed to the `schema` may either be passed
+   * or created from an incoming `Operation`, which also allows it to
+   * be recreated per `Operation`.
+   */
+  context?: ((operation: Operation) => any) | any;
   rootValue?: any;
-  context?: ((op: Operation) => any) | any;
   fieldResolver?: GraphQLFieldResolver<any, any>;
   typeResolver?: GraphQLTypeResolver<any, any>;
   subscribeFieldResolver?: GraphQLFieldResolver<any, any>;
@@ -108,16 +118,18 @@ const makeExecuteSource = (
   });
 };
 
-/** Exchange for executing queries locally on a schema using graphql-js. */
+/** Exchange factory that executes operations against a GraphQL schema.
+ *
+ * @param options - A {@link ExecuteExchangeArgs} configuration object.
+ * @returns the created execute {@link Exchange}.
+ *
+ * @remarks
+ * The `executeExchange` executes GraphQL operations against the `schema`
+ * that it’s passed. As such, its options mirror the options that GraphQL.js’
+ * {@link execute} function accepts.
+ */
 export const executeExchange =
-  ({
-    schema,
-    rootValue,
-    context,
-    fieldResolver,
-    typeResolver,
-    subscribeFieldResolver,
-  }: ExecuteExchangeArgs): Exchange =>
+  (options: ExecuteExchangeArgs): Exchange =>
   ({ forward }) => {
     return ops$ => {
       const sharedOps$ = share(ops$);
@@ -139,7 +151,9 @@ export const executeExchange =
           );
 
           const contextValue =
-            typeof context === 'function' ? context(operation) : context;
+            typeof options.context === 'function'
+              ? options.context(operation)
+              : options.context;
 
           // Filter undefined values from variables before calling execute()
           // to support default values within directives.
@@ -162,15 +176,15 @@ export const executeExchange =
 
           return pipe(
             makeExecuteSource(operation, {
-              schema,
+              schema: options.schema,
               document: operation.query,
-              rootValue,
+              rootValue: options.rootValue,
               contextValue,
               variableValues,
               operationName,
-              fieldResolver,
-              typeResolver,
-              subscribeFieldResolver,
+              fieldResolver: options.fieldResolver,
+              typeResolver: options.typeResolver,
+              subscribeFieldResolver: options.subscribeFieldResolver,
             }),
             takeUntil(teardown$)
           );
