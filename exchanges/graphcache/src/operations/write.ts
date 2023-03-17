@@ -53,7 +53,9 @@ export interface WriteResult {
   dependencies: Dependencies;
 }
 
-/** Writes a request given its response to the store */
+/** Writes a GraphQL response to the cache.
+ * @internal
+ */
 export const write = (
   store: Store,
   request: OperationRequest,

@@ -59,6 +59,9 @@ export interface QueryResult {
   data: null | Data;
 }
 
+/** Reads a GraphQL query from the cache.
+ * @internal
+ */
 export const query = (
   store: Store,
   request: OperationRequest,

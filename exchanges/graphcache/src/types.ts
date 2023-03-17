@@ -261,56 +261,250 @@ export interface QueryInput<T = Data, V = Variables> {
   variables?: V;
 }
 
+/** Interface to interact with cached data, which resolvers receive. */
 export interface Cache {
-  /** keyOfEntity() returns the key for an entity or null if it's unkeyable */
+  /** Returns the cache key for a given entity or `null` if it’s unkeyable.
+   *
+   * @param entity - the {@link Entity} to generate a key for.
+   * @returns the entity’s key or `null`.
+   *
+   * @remarks
+   * `cache.keyOfEntity` may be called with a partial GraphQL object (“entity”)
+   * and generates a key for it. It uses your {@link KeyingConfig} and otherwise
+   * defaults to `id` and `_id` fields.
+   *
+   * If it’s passed a `string` or `null`, it will simply return what it’s been passed.
+   * Objects that lack a `__typename` field will return `null`.
+   */
   keyOfEntity(entity: Entity): string | null;
 
-  /** keyOfField() returns the key for a field */
+  /** Returns the cache key for a field.
+   *
+   * @param fieldName - the field’s name.
+   * @param args - the field’s arguments, if any.
+   * @returns the field key
+   *
+   * @remarks
+   * `cache.keyOfField` is used to create a field’s cache key from a given
+   * field name and its arguments. This is used internally by {@link cache.resolve}
+   * to combine an entity key and a field key into a path that normalized data is
+   * accessed on in Graphcache’s internal data structure.
+   */
   keyOfField(fieldName: string, args?: FieldArgs): string | null;
 
-  /** resolve() retrieves the value (or link) of a field on any entity, given a partial/keyable entity or an entity key */
+  /** Returns a cached value on a given entity’s field.
+   *
+   * @param entity - a GraphQL object (“entity”) or an entity key.
+   * @param fieldName - the field’s name.
+   * @param args - the field’s arguments, if any.
+   * @returns the field’s value or the entity key(s) this field is pointing at.
+   *
+   * @remarks
+   * `cache.resolve` is used to retrieve either the cached value of a field, or
+   * to get the relation of the field (“link”). When a cached field points at
+   * another normalized entity, this method will return the related entity key
+   * (or a list, if it’s pointing at a list of entities).
+   *
+   * As such, if you’re accessing a nested field, you may have to call
+   * `cache.resolve` again and chain its calls.
+   *
+   * Hint: If you have a field key from {@link FieldInfo} or {@link cache.keyOfField},
+   * you may pass it as a second argument.
+   *
+   * @example
+   * ```ts
+   * const authorName = cache.resolve(
+   *   cache.resolve({ __typename: 'Book', id }, 'author'),
+   *   'name'
+   * );
+   * ```
+   */
   resolve(entity: Entity, fieldName: string, args?: FieldArgs): DataField;
 
-  /** @deprecated use resolve() instead */
+  /** Returns a cached value on a given entity’s field by its field key.
+   *
+   * @deprecated
+   * Use {@link cache.resolve} instead.
+   */
   resolveFieldByKey(entity: Entity, fieldKey: string): DataField;
 
-  /** inspectFields() retrieves all known fields for a given entity */
+  /** Returns a list of cached fields for a given GraphQL object (“entity”).
+   *
+   * @param entity - a GraphQL object (“entity”) or an entity key.
+   * @returns a list of {@link FieldInfo} objects.
+   *
+   * @remarks
+   * `cache.inspectFields` can be used to list out all known fields
+   * of a given entity. This can be useful in an {@link UpdateResolver}
+   * if you have a `Query` field that accepts many different arguments,
+   * for instance a paginated field.
+   *
+   * The returned list of fields are all fields that the cache knows about,
+   * and you may have to filter them by name or arguments to find only which
+   * ones you need.
+   *
+   * Hint: This method is theoretically a slower operation than simple
+   * cache lookups, as it has to decode field keys. It’s only recommended
+   * to be used in updaters.
+   */
   inspectFields(entity: Entity): FieldInfo[];
 
-  /** invalidate() invalidates an entity or a specific field of an entity */
+  /** Deletes a cached entity or an entity’s field.
+   *
+   * @param entity - a GraphQL object (“entity”) or an entity key.
+   * @param fieldName - optionally, a field name.
+   * @param args - optionally, the field’s arguments, if any.
+   *
+   * @remarks
+   * `cache.invalidate` can be used in updaters to delete data from
+   * the cache. This will cause the {@link cacheExchange} to reexecute
+   * queries that contain the deleted data.
+   *
+   * If you only pass its first argument, the entire entity is deleted.
+   * However, if a field name (and optionally, its arguments) are passed,
+   * only a single field is erased.
+   */
   invalidate(entity: Entity, fieldName?: string, args?: FieldArgs): void;
 
-  /** updateQuery() can be used to update the data of a given query using an updater function */
+  /** Updates a GraphQL query‘s cached data.
+   *
+   * @param input - a {@link QueryInput}, which is a GraphQL query request.
+   * @param updater - a function called with the query’s result or `null` in case of a cache miss, which
+   * may return updated data, which is written to the cache using the query.
+   *
+   * @remarks
+   * `cache.updateQuery` can be used to update data for an entire GraphQL query document.
+   * When it's passed a GraphQL query request, it calls the passed `updater` function
+   * with the cached result for this query. You may then modify and update the data and
+   * return it, after which it’s written back to the cache.
+   *
+   * Hint: While this allows for large updates at once, {@link cache.link},
+   * {@link cache.resolve}, and {@link cache.writeFragment} are often better
+   * choices for more granular and compact updater code.
+   *
+   * @example
+   * ```ts
+   * cache.updateQuery({ query: TodoList }, data => {
+   *   data.todos.push(newTodo);
+   *   return data;
+   * });
+   * ```
+   */
   updateQuery<T = Data, V = Variables>(
     input: QueryInput<T, V>,
     updater: (data: T | null) => T | null
   ): void;
 
-  /** readQuery() retrieves the data for a given query */
+  /** Returns a GraphQL query‘s cached result.
+   *
+   * @param input - a {@link QueryInput}, which is a GraphQL query request.
+   * @returns the cached data result of the query or `null`, in case of a cache miss.
+   *
+   * @remarks
+   * `cache.readQuery` can be used to read an entire query’s data all at once
+   * from the cache.
+   *
+   * This can be useful when typing out many {@link cache.resolve}
+   * calls is too tedious.
+   *
+   * @example
+   * ```ts
+   * const data = cache.readQuery({
+   *   query: TodosQuery,
+   *   variables: { from: 0, limit: 10 }
+   * });
+   * ```
+   */
   readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null;
 
-  /** readFragment() retrieves the data for a given fragment, given a partial/keyable entity or an entity key */
+  /** Returns a GraphQL fragment‘s cached result.
+   *
+   * @param fragment - a {@link DocumentNode} containing a fragment definition.
+   * @param entity - a GraphQL object (“entity”) or an entity key to read the fragment on.
+   * @param variables - optionally, GraphQL variables, if the fragments use any.
+   * @returns the cached data result of the fragment or `null`, in case of a cache miss.
+   *
+   * @remarks
+   * `cache.readFragment` can be used to read an entire query’s data all at once
+   * from the cache.
+   *
+   * It attempts to read the fragment starting from the `entity` that’s passed to it.
+   * If the entity can’t be resolved or has mismatching types, `null` is returned.
+   *
+   * This can be useful when typing out many {@link cache.resolve}
+   * calls is too tedious.
+   *
+   * @example
+   * ```ts
+   * const data = cache.readFragment(
+   *   gql`fragment _ on Todo { id, text }`,
+   *   { id: '123' }
+   * );
+   * ```
+   */
   readFragment<T = Data, V = Variables>(
     fragment: DocumentNode | TypedDocumentNode<T, V>,
     entity: string | Data | T,
     variables?: V
   ): T | null;
 
-  /** writeFragment() can be used to update the data of a given fragment, given an entity that is supposed to be written using the fragment */
+  /** Writes a GraphQL fragment to the cache.
+   *
+   * @param fragment - a {@link DocumentNode} containing a fragment definition.
+   * @param data - a GraphQL object to be written with the given fragment.
+   * @param variables - optionally, GraphQL variables, if the fragments use any.
+   *
+   * @remarks
+   * `cache.writeFragment` can be used to write an entity to the cache.
+   * The method will generate a key for the `data` it’s passed, and start writing
+   * it using the fragment.
+   *
+   * This method is used when writing scalar values to the cache.
+   * Since it's rare for an updater to write values to the cache, {@link cache.link}
+   * only allows relations (“links”) to be updated, and `cache.writeFragment` is
+   * instead used when writing multiple scalars.
+   *
+   * @example
+   * ```ts
+   * const data = cache.writeFragment(
+   *   gql`fragment _ on Todo { id, text }`,
+   *   { id: '123', text: 'New Text' }
+   * );
+   * ```
+   */
   writeFragment<T = Data, V = Variables>(
     fragment: DocumentNode | TypedDocumentNode<T, V>,
     data: T,
     variables?: V
   ): void;
 
-  /** link() can be used to update a given entity field to link to another entity or entities */
+  /** Updates the relation (“link”) from an entity’s field to another entity.
+   *
+   * @param entity - a GraphQL object (“entity”) or an entity key.
+   * @param fieldName - the field’s name.
+   * @param args - optionally, the field’s arguments, if any.
+   * @param link - the GraphQL object(s) that should be set on this field.
+   *
+   * @remarks
+   * The normalized cache stores relations between GraphQL objects separately.
+   * As such, a field can be updated using `cache.link` to point to a new entity,
+   * or a list of entities.
+   *
+   * In other words, `cache.link` is used to set a field to point to another
+   * entity or a list of entities.
+   *
+   * @example
+   * ```ts
+   * const todos = cache.resolve('Query', 'todos');
+   * cache.link('Query', 'todos', [...todos, newTodo]);
+   * ```
+   */
   link(
     entity: Entity,
     field: string,
     args: FieldArgs,
     link: Link<Entity>
   ): void;
-  /** link() can be used to update a given entity field to link to another entity or entities */
   link(entity: Entity, field: string, value: Link<Entity>): void;
 }
 
