@@ -8,14 +8,25 @@ const getPackageManifest = (cwd) =>
   require(path.resolve(cwd, 'package.json'));
 
 const updatePackageManifest = async (cwd, manifest) => {
+  const sortDependencies = (dependencies) => {
+    if (dependencies == null)
+      return undefined;
+    return Object.keys(dependencies).sort().reduce((acc, key) => {
+      acc[key] = dependencies[key];
+      return acc;
+    }, {});
+  };
+
   try {
     if (!!getPackageManifest(cwd)) {
+      manifest.dependencies = sortDependencies(manifest.dependencies);
+      manifest.devDependencies = sortDependencies(manifest.devDependencies);
       await fs.writeFile(
         path.resolve(cwd, 'package.json'),
         JSON.stringify(manifest, null, 2) + '\n',
       );
     }
-  } catch (error) {
+  } catch (_error) {
     throw new Error('package.json does not exist in: ' + cwd);
   }
 };
