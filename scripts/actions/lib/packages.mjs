@@ -1,7 +1,7 @@
-const path = require('path');
-const glob = require('util').promisify(require('glob'));
+import * as path from 'path';
+import glob from 'glob';
 
-const { workspaceRoot, workspaces } = require('./constants');
+import { workspaceRoot, workspaces, require } from './constants.mjs';
 
 const getPackageManifest = (cwd) =>
   require(path.resolve(cwd, 'package.json'));
@@ -46,7 +46,7 @@ const listArtifacts = async () => {
   });
 };
 
-module.exports = {
+export {
   getPackageManifest,
   getPackageArtifact,
   listPackages,

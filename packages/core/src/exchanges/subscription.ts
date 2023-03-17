@@ -58,9 +58,7 @@ export interface ObservableLike<T> {
    * @param observer - an {@link ObserverLike} object with result, error, and completion callbacks.
    * @returns a subscription handle providing an `unsubscribe` method to stop the subscription.
    */
-  subscribe(
-    observer: ObserverLike<T>
-  ): {
+  subscribe(observer: ObserverLike<T>): {
     unsubscribe: () => void;
   };
 }
@@ -132,93 +130,98 @@ export interface SubscriptionExchangeOpts {
  * but is compatible with many libraries implementing GraphQL request or
  * subscription interfaces.
  */
-export const subscriptionExchange = ({
-  forwardSubscription,
-  enableAllOperations,
-  isSubscriptionOperation,
-}: SubscriptionExchangeOpts): Exchange => ({ client, forward }) => {
-  const createSubscriptionSource = (
-    operation: Operation
-  ): Source<OperationResult> => {
-    const observableish = forwardSubscription(
-      makeFetchBody(operation),
-      operation
-    );
+export const subscriptionExchange =
+  ({
+    forwardSubscription,
+    enableAllOperations,
+    isSubscriptionOperation,
+  }: SubscriptionExchangeOpts): Exchange =>
+  ({ client, forward }) => {
+    const createSubscriptionSource = (
+      operation: Operation
+    ): Source<OperationResult> => {
+      const observableish = forwardSubscription(
+        makeFetchBody(operation),
+        operation
+      );
 
-    return make<OperationResult>(({ next, complete }) => {
-      let isComplete = false;
-      let sub: Subscription | void;
-      let result: OperationResult | void;
+      return make<OperationResult>(({ next, complete }) => {
+        let isComplete = false;
+        let sub: Subscription | void;
+        let result: OperationResult | void;
 
-      Promise.resolve().then(() => {
-        if (isComplete) return;
+        Promise.resolve().then(() => {
+          if (isComplete) return;
 
-        sub = observableish.subscribe({
-          next(nextResult) {
-            next(
-              (result = result
-                ? mergeResultPatch(result, nextResult)
-                : makeResult(operation, nextResult))
-            );
-          },
-          error(error) {
-            next(makeErrorResult(operation, error));
-          },
-          complete() {
-            if (!isComplete) {
-              isComplete = true;
-              if (operation.kind === 'subscription') {
-                client.reexecuteOperation(
-                  makeOperation('teardown', operation, operation.context)
-                );
+          sub = observableish.subscribe({
+            next(nextResult) {
+              next(
+                (result = result
+                  ? mergeResultPatch(result, nextResult)
+                  : makeResult(operation, nextResult))
+              );
+            },
+            error(error) {
+              next(makeErrorResult(operation, error));
+            },
+            complete() {
+              if (!isComplete) {
+                isComplete = true;
+                if (operation.kind === 'subscription') {
+                  client.reexecuteOperation(
+                    makeOperation('teardown', operation, operation.context)
+                  );
+                }
+
+                if (result && result.hasNext)
+                  next(mergeResultPatch(result, { hasNext: false }));
+                complete();
               }
-
-              if (result && result.hasNext)
-                next(mergeResultPatch(result, { hasNext: false }));
-              complete();
-            }
-          },
+            },
+          });
         });
+
+        return () => {
+          isComplete = true;
+          if (sub) sub.unsubscribe();
+        };
+      });
+    };
+    const isSubscriptionOperationFn =
+      isSubscriptionOperation ||
+      (operation => {
+        const { kind } = operation;
+        return (
+          kind === 'subscription' ||
+          (!!enableAllOperations && (kind === 'query' || kind === 'mutation'))
+        );
       });
 
-      return () => {
-        isComplete = true;
-        if (sub) sub.unsubscribe();
-      };
-    });
-  };
-  const isSubscriptionOperationFn =
-    isSubscriptionOperation ||
-    (operation => {
-      const { kind } = operation;
-      return (
-        kind === 'subscription' ||
-        (!!enableAllOperations && (kind === 'query' || kind === 'mutation'))
+    return ops$ => {
+      const sharedOps$ = share(ops$);
+      const subscriptionResults$ = pipe(
+        sharedOps$,
+        filter(isSubscriptionOperationFn),
+        mergeMap(operation => {
+          const { key } = operation;
+          const teardown$ = pipe(
+            sharedOps$,
+            filter(op => op.kind === 'teardown' && op.key === key)
+          );
+
+          return pipe(
+            createSubscriptionSource(operation),
+            takeUntil(teardown$)
+          );
+        })
       );
-    });
 
-  return ops$ => {
-    const sharedOps$ = share(ops$);
-    const subscriptionResults$ = pipe(
-      sharedOps$,
-      filter(isSubscriptionOperationFn),
-      mergeMap(operation => {
-        const { key } = operation;
-        const teardown$ = pipe(
-          sharedOps$,
-          filter(op => op.kind === 'teardown' && op.key === key)
-        );
+      const forward$ = pipe(
+        sharedOps$,
+        filter(op => !isSubscriptionOperationFn(op)),
+        forward
+      );
 
-        return pipe(createSubscriptionSource(operation), takeUntil(teardown$));
-      })
-    );
-
-    const forward$ = pipe(
-      sharedOps$,
-      filter(op => !isSubscriptionOperationFn(op)),
-      forward
-    );
-
-    return merge([subscriptionResults$, forward$]);
+      return merge([subscriptionResults$, forward$]);
+    };
   };
-};

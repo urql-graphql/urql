@@ -64,141 +64,141 @@ export interface OfflineExchangeOpts extends CacheExchangeOpts {
   ): boolean;
 }
 
-export const offlineExchange = <C extends OfflineExchangeOpts>(
-  opts: C
-): Exchange => input => {
-  const { storage } = opts;
+export const offlineExchange =
+  <C extends OfflineExchangeOpts>(opts: C): Exchange =>
+  input => {
+    const { storage } = opts;
 
-  const isOfflineError =
-    opts.isOfflineError ||
-    ((error: undefined | CombinedError) =>
-      error &&
-      error.networkError &&
-      !error.response &&
-      ((typeof navigator !== 'undefined' && navigator.onLine === false) ||
-        /request failed|failed to fetch|network\s?error/i.test(
-          error.networkError.message
-        )));
+    const isOfflineError =
+      opts.isOfflineError ||
+      ((error: undefined | CombinedError) =>
+        error &&
+        error.networkError &&
+        !error.response &&
+        ((typeof navigator !== 'undefined' && navigator.onLine === false) ||
+          /request failed|failed to fetch|network\s?error/i.test(
+            error.networkError.message
+          )));
 
-  if (
-    storage &&
-    storage.onOnline &&
-    storage.readMetadata &&
-    storage.writeMetadata
-  ) {
-    const { forward: outerForward, client, dispatchDebug } = input;
-    const { source: reboundOps$, next } = makeSubject<Operation>();
-    const optimisticMutations = opts.optimistic || {};
-    const failedQueue: Operation[] = [];
+    if (
+      storage &&
+      storage.onOnline &&
+      storage.readMetadata &&
+      storage.writeMetadata
+    ) {
+      const { forward: outerForward, client, dispatchDebug } = input;
+      const { source: reboundOps$, next } = makeSubject<Operation>();
+      const optimisticMutations = opts.optimistic || {};
+      const failedQueue: Operation[] = [];
 
-    const updateMetadata = () => {
-      const requests: SerializedRequest[] = [];
-      for (let i = 0; i < failedQueue.length; i++) {
-        const operation = failedQueue[i];
-        if (operation.kind === 'mutation') {
-          requests.push({
-            query: print(operation.query),
-            variables: operation.variables,
-          });
-        }
-      }
-      storage.writeMetadata!(requests);
-    };
-
-    let isFlushingQueue = false;
-    const flushQueue = () => {
-      if (!isFlushingQueue) {
-        isFlushingQueue = true;
-
+      const updateMetadata = () => {
+        const requests: SerializedRequest[] = [];
         for (let i = 0; i < failedQueue.length; i++) {
           const operation = failedQueue[i];
           if (operation.kind === 'mutation') {
-            next(makeOperation('teardown', operation));
+            requests.push({
+              query: print(operation.query),
+              variables: operation.variables,
+            });
           }
         }
+        storage.writeMetadata!(requests);
+      };
 
-        for (let i = 0; i < failedQueue.length; i++)
-          client.reexecuteOperation(failedQueue[i]);
+      let isFlushingQueue = false;
+      const flushQueue = () => {
+        if (!isFlushingQueue) {
+          isFlushingQueue = true;
 
-        failedQueue.length = 0;
-        isFlushingQueue = false;
-        updateMetadata();
-      }
-    };
-
-    const forward: ExchangeIO = ops$ => {
-      return pipe(
-        outerForward(ops$),
-        filter(res => {
-          if (
-            res.operation.kind === 'mutation' &&
-            isOfflineError(res.error, res) &&
-            isOptimisticMutation(optimisticMutations, res.operation)
-          ) {
-            failedQueue.push(res.operation);
-            updateMetadata();
-            return false;
+          for (let i = 0; i < failedQueue.length; i++) {
+            const operation = failedQueue[i];
+            if (operation.kind === 'mutation') {
+              next(makeOperation('teardown', operation));
+            }
           }
 
-          return true;
+          for (let i = 0; i < failedQueue.length; i++)
+            client.reexecuteOperation(failedQueue[i]);
+
+          failedQueue.length = 0;
+          isFlushingQueue = false;
+          updateMetadata();
+        }
+      };
+
+      const forward: ExchangeIO = ops$ => {
+        return pipe(
+          outerForward(ops$),
+          filter(res => {
+            if (
+              res.operation.kind === 'mutation' &&
+              isOfflineError(res.error, res) &&
+              isOptimisticMutation(optimisticMutations, res.operation)
+            ) {
+              failedQueue.push(res.operation);
+              updateMetadata();
+              return false;
+            }
+
+            return true;
+          })
+        );
+      };
+
+      storage
+        .readMetadata()
+        .then(mutations => {
+          if (mutations) {
+            for (let i = 0; i < mutations.length; i++) {
+              failedQueue.push(
+                client.createRequestOperation(
+                  'mutation',
+                  createRequest(mutations[i].query, mutations[i].variables)
+                )
+              );
+            }
+
+            flushQueue();
+          }
         })
-      );
-    };
+        .finally(() => storage.onOnline!(flushQueue));
 
-    storage
-      .readMetadata()
-      .then(mutations => {
-        if (mutations) {
-          for (let i = 0; i < mutations.length; i++) {
-            failedQueue.push(
-              client.createRequestOperation(
-                'mutation',
-                createRequest(mutations[i].query, mutations[i].variables)
-              )
-            );
-          }
-
-          flushQueue();
-        }
-      })
-      .finally(() => storage.onOnline!(flushQueue));
-
-    const cacheResults$ = cacheExchange({
-      ...opts,
-      storage: {
-        ...storage,
-        readData() {
-          return storage.readData().finally(flushQueue);
+      const cacheResults$ = cacheExchange({
+        ...opts,
+        storage: {
+          ...storage,
+          readData() {
+            return storage.readData().finally(flushQueue);
+          },
         },
-      },
-    })({
-      client,
-      dispatchDebug,
-      forward,
-    });
+      })({
+        client,
+        dispatchDebug,
+        forward,
+      });
 
-    return ops$ => {
-      const sharedOps$ = pipe(ops$, share);
+      return ops$ => {
+        const sharedOps$ = pipe(ops$, share);
 
-      const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
+        const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
 
-      return pipe(
-        cacheResults$(opsAndRebound$),
-        filter(res => {
-          if (
-            res.operation.kind === 'query' &&
-            isOfflineError(res.error, res)
-          ) {
-            next(toRequestPolicy(res.operation, 'cache-only'));
-            failedQueue.push(res.operation);
-            return false;
-          }
+        return pipe(
+          cacheResults$(opsAndRebound$),
+          filter(res => {
+            if (
+              res.operation.kind === 'query' &&
+              isOfflineError(res.error, res)
+            ) {
+              next(toRequestPolicy(res.operation, 'cache-only'));
+              failedQueue.push(res.operation);
+              return false;
+            }
 
-          return true;
-        })
-      );
-    };
-  }
+            return true;
+          })
+        );
+      };
+    }
 
-  return cacheExchange(opts)(input);
-};
+    return cacheExchange(opts)(input);
+  };

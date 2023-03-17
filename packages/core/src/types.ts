@@ -755,9 +755,8 @@ export type DebugEventArg<T extends keyof DebugEventTypes | string> = {
  * which this type defines.
  * @internal
  */
-export type DebugEvent<
-  T extends keyof DebugEventTypes | string = string
-> = DebugEventArg<T> & {
-  timestamp: number;
-  source: string;
-};
+export type DebugEvent<T extends keyof DebugEventTypes | string = string> =
+  DebugEventArg<T> & {
+    timestamp: number;
+    source: string;
+  };

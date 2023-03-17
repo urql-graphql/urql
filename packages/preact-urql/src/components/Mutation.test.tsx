@@ -35,9 +35,8 @@ describe('Mutation', () => {
       return h(Provider, {
         value: client,
         children: [
-          // @ts-ignore
           h(
-            Mutation,
+            Mutation as any,
             { query },
             ({ data, fetching, error, executeMutation }) => {
               execute = executeMutation;

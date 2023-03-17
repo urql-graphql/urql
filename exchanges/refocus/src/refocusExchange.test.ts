@@ -47,15 +47,13 @@ beforeEach(() => {
 });
 
 it(`attaches a listener and redispatches queries on call`, () => {
-  const response = vi.fn(
-    (forwardOp: Operation): OperationResult => {
-      return {
-        ...queryResponse,
-        operation: forwardOp,
-        data: queryOneData,
-      };
-    }
-  );
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    return {
+      ...queryResponse,
+      operation: forwardOp,
+      data: queryOneData,
+    };
+  });
 
   let listener;
   const spy = vi

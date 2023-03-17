@@ -849,4 +849,4 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
  * @param opts - A {@link ClientOptions} objects with options for the `Client`.
  * @returns A {@link Client} instantiated with `opts`.
  */
-export const createClient = (Client as any) as (opts: ClientOptions) => Client;
+export const createClient = Client as any as (opts: ClientOptions) => Client;

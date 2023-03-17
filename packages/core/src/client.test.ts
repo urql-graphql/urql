@@ -355,33 +355,35 @@ describe('queuing behavior', () => {
   it('queues reexecuteOperation, which dispatchOperation consumes', () => {
     const output: Array<Operation | OperationResult> = [];
 
-    const exchange: Exchange = ({ client }) => ops$ => {
-      return pipe(
-        ops$,
-        filter(op => op.kind !== 'teardown'),
-        tap(op => {
-          output.push(op);
-          if (
-            op.key === queryOperation.key &&
-            op.context.requestPolicy === 'cache-first'
-          ) {
-            client.reexecuteOperation({
-              ...op,
-              context: {
-                ...op.context,
-                requestPolicy: 'network-only',
-              },
-            });
-          }
-        }),
-        map(op => ({
-          stale: false,
-          hasNext: false,
-          data: op.key,
-          operation: op,
-        }))
-      );
-    };
+    const exchange: Exchange =
+      ({ client }) =>
+      ops$ => {
+        return pipe(
+          ops$,
+          filter(op => op.kind !== 'teardown'),
+          tap(op => {
+            output.push(op);
+            if (
+              op.key === queryOperation.key &&
+              op.context.requestPolicy === 'cache-first'
+            ) {
+              client.reexecuteOperation({
+                ...op,
+                context: {
+                  ...op.context,
+                  requestPolicy: 'network-only',
+                },
+              });
+            }
+          }),
+          map(op => ({
+            stale: false,
+            hasNext: false,
+            data: op.key,
+            operation: op,
+          }))
+        );
+      };
 
     const client = createClient({
       url: 'test',

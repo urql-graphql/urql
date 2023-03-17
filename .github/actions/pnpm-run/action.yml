@@ -6,4 +6,4 @@ inputs:
     default: 'help'
 runs:
   using: 'node16'
-  main: 'action.js'
+  main: 'action.mjs'

@@ -186,11 +186,9 @@ export type UpdatesConfig = {
 };
 
 export type MakeFunctional<T> = T extends { __typename: string }
-  ? WithTypename<
-      {
-        [P in keyof T]?: MakeFunctional<T[P]>;
-      }
-    >
+  ? WithTypename<{
+      [P in keyof T]?: MakeFunctional<T[P]>;
+    }>
   : OptimisticMutationResolver<Variables, T> | T;
 
 export type OptimisticMutationResolver<

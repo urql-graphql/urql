@@ -77,16 +77,14 @@ describe('storage', () => {
       variables: {},
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        expect(forwardOp.key).toBe(op.key);
-        return {
-          ...queryResponse,
-          operation: forwardOp,
-          data: mutationOneData,
-        };
-      }
-    );
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      return {
+        ...queryResponse,
+        operation: forwardOp,
+        data: mutationOneData,
+      };
+    });
 
     const { source: ops$ } = makeSubject<Operation>();
     const result = vi.fn();
@@ -126,22 +124,20 @@ describe('offline', () => {
       variables: {},
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === queryOp.key) {
-          onlineSpy.mockReturnValueOnce(true);
-          return { ...queryResponse, operation: forwardOp, data: queryOneData };
-        } else {
-          onlineSpy.mockReturnValueOnce(false);
-          return {
-            ...queryResponse,
-            operation: forwardOp,
-            // @ts-ignore
-            error: { networkError: new Error('failed to fetch') },
-          };
-        }
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === queryOp.key) {
+        onlineSpy.mockReturnValueOnce(true);
+        return { ...queryResponse, operation: forwardOp, data: queryOneData };
+      } else {
+        onlineSpy.mockReturnValueOnce(false);
+        return {
+          ...queryResponse,
+          operation: forwardOp,
+          // @ts-ignore
+          error: { networkError: new Error('failed to fetch') },
+        };
       }
-    );
+    });
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
@@ -204,16 +200,14 @@ describe('offline', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        onlineSpy.mockReturnValueOnce(false);
-        return {
-          operation: forwardOp,
-          // @ts-ignore
-          error: { networkError: new Error('failed to fetch') },
-        };
-      }
-    );
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      onlineSpy.mockReturnValueOnce(false);
+      return {
+        operation: forwardOp,
+        // @ts-ignore
+        error: { networkError: new Error('failed to fetch') },
+      };
+    });
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
@@ -273,16 +267,14 @@ describe('offline', () => {
       variables: {},
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        onlineSpy.mockReturnValueOnce(false);
-        return {
-          operation: forwardOp,
-          // @ts-ignore
-          error: { networkError: new Error('failed to fetch') },
-        };
-      }
-    );
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      onlineSpy.mockReturnValueOnce(false);
+      return {
+        operation: forwardOp,
+        // @ts-ignore
+        error: { networkError: new Error('failed to fetch') },
+      };
+    });
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();

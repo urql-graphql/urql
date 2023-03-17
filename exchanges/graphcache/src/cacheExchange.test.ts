@@ -79,12 +79,10 @@ describe('data dependencies', () => {
       },
     };
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        expect(forwardOp.key).toBe(op.key);
-        return { ...queryResponse, operation: forwardOp, data: expected };
-      }
-    );
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      return { ...queryResponse, operation: forwardOp, data: expected };
+    });
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
@@ -132,12 +130,10 @@ describe('data dependencies', () => {
       }
     );
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        expect(forwardOp.key).toBe(op.key);
-        return { ...queryResponse, operation: forwardOp, data: queryOneData };
-      }
-    );
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      return { ...queryResponse, operation: forwardOp, data: queryOneData };
+    });
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
@@ -204,21 +200,19 @@ describe('data dependencies', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: opMultiple,
-            data: queryMultipleData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMultiple,
+          data: queryMultipleData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
     const result = vi.fn();
@@ -259,7 +253,7 @@ describe('data dependencies', () => {
     `;
 
     const queryById = gql`
-      query($id: ID!) {
+      query ($id: ID!) {
         author(id: $id) {
           id
           name
@@ -297,7 +291,7 @@ describe('data dependencies', () => {
     };
 
     const mutation = gql`
-      mutation($userId: ID!, $amount: Int!) {
+      mutation ($userId: ID!, $amount: Int!) {
         updateBalance(userId: $userId, amount: $amount) {
           userId
           balance {
@@ -347,23 +341,21 @@ describe('data dependencies', () => {
       variables: { userId: '1', amount: 1000 },
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryByIdDataA };
-        } else if (forwardOp.key === 2) {
-          return { ...queryResponse, operation: opTwo, data: queryByIdDataB };
-        } else if (forwardOp.key === 3) {
-          return {
-            ...queryResponse,
-            operation: opMutation,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryByIdDataA };
+      } else if (forwardOp.key === 2) {
+        return { ...queryResponse, operation: opTwo, data: queryByIdDataB };
+      } else if (forwardOp.key === 3) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -453,21 +445,19 @@ describe('data dependencies', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: opUnrelated,
-            data: queryUnrelatedData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opUnrelated,
+          data: queryUnrelatedData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
     const result = vi.fn();
@@ -516,19 +506,17 @@ describe('data dependencies', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return {
-            ...queryResponse,
-            operation: opMutation,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -580,19 +568,17 @@ describe('data dependencies', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return {
-            ...queryResponse,
-            operation: opMutation,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -669,12 +655,10 @@ describe('data dependencies', () => {
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) return queryResult;
-        return undefined as any;
-      }
-    );
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) return queryResult;
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
@@ -749,21 +733,19 @@ describe('optimistic updates', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: opMutation,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -855,27 +837,25 @@ describe('optimistic updates', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: opMutationOne,
-            data: mutationData,
-          };
-        } else if (forwardOp.key === 3) {
-          return {
-            ...queryResponse,
-            operation: opMutationTwo,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMutationOne,
+          data: mutationData,
+        };
+      } else if (forwardOp.key === 3) {
+        return {
+          ...queryResponse,
+          operation: opMutationTwo,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(3), map(response));
@@ -963,15 +943,13 @@ describe('optimistic updates', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ =>
@@ -1077,22 +1055,20 @@ describe('optimistic updates', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: authorsQueryData };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: opMutation,
-            error: 'error' as any,
-            data: { __typename: 'Mutation', addAuthor: null },
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: authorsQueryData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          error: 'error' as any,
+          data: { __typename: 'Mutation', addAuthor: null },
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -1154,15 +1130,13 @@ describe('custom resolvers', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
       }
-    );
+
+      return undefined as any;
+    });
 
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
@@ -1236,21 +1210,19 @@ describe('custom resolvers', () => {
       variables: undefined,
     });
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return { ...queryResponse, operation: opOne, data: queryOneData };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: opMutation,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryOneData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -1386,25 +1358,23 @@ describe('custom resolvers', () => {
       ],
     };
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return {
-            ...queryResponse,
-            operation: queryOperation,
-            data: queryData,
-          };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: mutationOperation,
-            data: mutationData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return {
+          ...queryResponse,
+          operation: queryOperation,
+          data: queryData,
+        };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: mutationOperation,
+          data: mutationData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -1551,25 +1521,23 @@ describe('schema awareness', () => {
       ],
     };
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return {
-            ...queryResponse,
-            operation: initialQueryOperation,
-            data: queryData,
-          };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: queryOperation,
-            data: queryData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return {
+          ...queryResponse,
+          operation: initialQueryOperation,
+          data: queryData,
+        };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: queryOperation,
+          data: queryData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
@@ -1696,25 +1664,23 @@ describe('schema awareness', () => {
       ],
     };
 
-    const response = vi.fn(
-      (forwardOp: Operation): OperationResult => {
-        if (forwardOp.key === 1) {
-          return {
-            ...queryResponse,
-            operation: initialQueryOperation,
-            data: queryData,
-          };
-        } else if (forwardOp.key === 2) {
-          return {
-            ...queryResponse,
-            operation: queryOperation,
-            data: queryData,
-          };
-        }
-
-        return undefined as any;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return {
+          ...queryResponse,
+          operation: initialQueryOperation,
+          data: queryData,
+        };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: queryOperation,
+          data: queryData,
+        };
       }
-    );
+
+      return undefined as any;
+    });
 
     const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));

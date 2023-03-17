@@ -47,9 +47,8 @@ export function useMutation<
   const isMounted = useRef(true);
   const client = useClient();
 
-  const [state, setState] = useState<UseMutationState<Data, Variables>>(
-    initialState
-  );
+  const [state, setState] =
+    useState<UseMutationState<Data, Variables>>(initialState);
 
   const executeMutation = useCallback(
     (variables: Variables, context?: Partial<OperationContext>) => {

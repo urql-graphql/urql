@@ -51,11 +51,11 @@ const response = JSON.stringify({
 const exchangeArgs = {
   dispatchDebug: vi.fn(),
   forward: () => empty as Source<OperationResult>,
-  client: ({
+  client: {
     debugTarget: {
       dispatchEvent: vi.fn(),
     },
-  } as any) as Client,
+  } as any as Client,
 };
 
 describe('on success', () => {
