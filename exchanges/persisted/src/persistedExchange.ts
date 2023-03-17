@@ -29,13 +29,89 @@ const isPersistedMiss = (error: CombinedError): boolean =>
 const isPersistedUnsupported = (error: CombinedError): boolean =>
   error.graphQLErrors.some(x => x.message === 'PersistedQueryNotSupported');
 
+/** Input parameters for the {@link persistedExchange}. */
 export interface PersistedExchangeOptions {
+  /** Enforces GET method requests to be made for Persisted Queries.
+   *
+   * @remarks
+   * When enabled, the `persistedExchange` will set
+   * `OperationContext.preferGetMethod` to `'force'` on persisted queries,
+   * which will force requests to be made using a GET request.
+   *
+   * This is frequently used to make GraphQL requests more cacheable
+   * on CDNs.
+   *
+   * @defaultValue `true` - enabled
+   */
   preferGetForPersistedQueries?: boolean;
+  /** Enforces non-automatic persisted queries by ignoring APQ errors.
+   *
+   * @remarks
+   * When enabled, the `persistedExchange` will ignore `PersistedQueryNotFound`
+   * and `PersistedQueryNotSupported` errors and assume that all persisted
+   * queries are already known to the API.
+   *
+   * This is used to switch from Automatic Persisted Queries to
+   * Persisted Queries. This is commonly used to obfuscate GraphQL
+   * APIs.
+   */
   enforcePersistedQueries?: boolean;
-  generateHash?: (query: string, document: DocumentNode) => Promise<string>;
+  /** Custom hashing function for persisted queries.
+   *
+   * @remarks
+   * By default, `persistedExchange` will create a SHA-256 hash for
+   * persisted queries automatically. If you're instead generating
+   * hashes at compile-time, or need to use a custom SHA-256 function,
+   * you may pass one here.
+   *
+   * Hint: The default SHA-256 function uses the WebCrypto API. This
+   * API is unavailable on React Native, which may require you to
+   * pass a custom function here.
+   */
+  generateHash?(query: string, document: DocumentNode): Promise<string>;
+  /** Enables persisted queries to be used for mutations.
+   *
+   * @remarks
+   * When enabled, the `persistedExchange` will also use the persisted queries
+   * logic for mutation operations.
+   *
+   * This is disabled by default, but often used on APIs that obfuscate
+   * their GraphQL APIs.
+   */
   enableForMutation?: boolean;
 }
 
+/** Exchange factory that adds support for Persisted Queries.
+ *
+ * @param options - A {@link PersistedExchangeOptions} configuration object.
+ * @returns the created persisted queries {@link Exchange}.
+ *
+ * @remarks
+ * The `persistedExchange` adds support for (Automatic) Persisted Queries
+ * to any `fetchExchange`, `subscriptionExchange`, or other API exchanges
+ * following it.
+ *
+ * It does so by adding the `persistedQuery` extensions field to GraphQL
+ * requests and handles `PersistedQueryNotFound` and
+ * `PersistedQueryNotSupported` errors.
+ *
+ * @example
+ * ```ts
+ * import { Client, cacheExchange, fetchExchange } from '@urql/core';
+ * import { persistedExchange } from '@urql/exchange-persisted';
+ *
+ * const client = new Client({
+ *   url: 'URL',
+ *   exchanges: [
+ *     cacheExchange,
+ *     persistedExchange({
+ *       preferGetForPersistedQueries: true,
+ *     }),
+ *     fetchExchange
+ *   ],
+ * });
+ * ```
+ */
 export const persistedExchange =
   (options?: PersistedExchangeOptions): Exchange =>
   ({ forward }) => {

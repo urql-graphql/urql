@@ -26,6 +26,7 @@ import {
   OptimisticMutationConfig,
   Variables,
   CacheExchangeOpts,
+  StorageAdapter,
 } from './types';
 
 import { cacheExchange } from './cacheExchange';
@@ -57,13 +58,49 @@ const isOptimisticMutation = <T extends OptimisticMutationConfig>(
   return false;
 };
 
+/** Input parameters for the {@link offlineExchange}.
+ * @remarks
+ * This configuration object extends the {@link CacheExchangeOpts}
+ * as the `offlineExchange` extends the regular {@link cacheExchange}.
+ */
 export interface OfflineExchangeOpts extends CacheExchangeOpts {
+  /** Configures an offline storage adapter for Graphcache.
+   *
+   * @remarks
+   * A {@link StorageAdapter} allows Graphcache to write data to an external,
+   * asynchronous storage, and hydrate data from it when it first loads.
+   * This allows you to preserve normalized data between restarts/reloads.
+   *
+   * @see {@link https://urql.dev/goto/docs/graphcache/offline} for the full Offline Support docs.
+   */
+  storage: StorageAdapter;
+  /** Predicate function to determine whether a {@link CombinedError} hints at a network error.
+   *
+   * @remarks
+   * Not ever {@link CombinedError} means that the device is offline and by default
+   * the `offlineExchange` will check for common network error messages and check
+   * `navigator.onLine`. However, when `isOfflineError` is passed it can replace
+   * the default offline detection.
+   */
   isOfflineError?(
     error: undefined | CombinedError,
     result: OperationResult
   ): boolean;
 }
 
+/** Exchange factory that creates a normalized cache exchange in Offline Support mode.
+ *
+ * @param opts - A {@link OfflineExchangeOpts} configuration object.
+ * @returns the created normalized, offline cache {@link Exchange}.
+ *
+ * @remarks
+ * The `offlineExchange` is a wrapper around the regular {@link cacheExchange}
+ * which adds logic via the {@link OfflineExchangeOpts.storage} adapter to
+ * recognize when it’s offline, when to retry failed mutations, and how
+ * to handle longer periods of being offline.
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache/offline} for the full Offline Support docs.
+ */
 export const offlineExchange =
   <C extends OfflineExchangeOpts>(opts: C): Exchange =>
   input => {

@@ -37,6 +37,9 @@ import {
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
+/** Implementation of the {@link Cache} interface as created internally by the {@link cacheExchange}.
+ * @internal
+ */
 export class Store<
   C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
 > implements Cache

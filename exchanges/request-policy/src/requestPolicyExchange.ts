@@ -11,24 +11,25 @@ const defaultTTL = 5 * 60 * 1000;
 /** Input parameters for the {@link requestPolicyExchange}. */
 export interface Options {
   /** Predicate allowing you to selectively not upgrade `Operation`s.
-  
-  @remarks
-  When `shouldUpgrade` is set, it may be used to selectively return a boolean
-  per `Operation`. This allows certain `Operation`s to not be upgraded to a
-  `cache-and-network` policy, when `false` is returned.
-  
-  By default, all `Operation`s are subject to be upgraded.
-   * operation to "cache-and-network". */
+   *
+   * @remarks
+   * When `shouldUpgrade` is set, it may be used to selectively return a boolean
+   * per `Operation`. This allows certain `Operation`s to not be upgraded to a
+   * `cache-and-network` policy, when `false` is returned.
+   *
+   * By default, all `Operation`s are subject to be upgraded.
+   * operation to "cache-and-network".
+   */
   shouldUpgrade?: (op: Operation) => boolean;
   /** The time-to-live (TTL) for which a request policy won't be upgraded.
-  
-  @remarks
-  The `ttl` defines the time frame in which the `Operation` won't be updated
-  with a `cache-and-network` request policy. If an `Operation` is sent again
-  and the `ttl` time period has expired, the policy is upgraded.
-  
-  @defaultValue `300_000` - 5min
-  */
+   *
+   * @remarks
+   * The `ttl` defines the time frame in which the `Operation` won't be updated
+   * with a `cache-and-network` request policy. If an `Operation` is sent again
+   * and the `ttl` time period has expired, the policy is upgraded.
+   *
+   * @defaultValue `300_000` - 5min
+   */
   ttl?: number;
 }
 
@@ -48,10 +49,10 @@ export interface Options {
  * @example
  * ```ts
  * requestPolicyExchange({
- *  // Upgrade when we haven't seen this operation for 1 second
- *  ttl: 1000,
- *  // and only upgrade operations that query the `todos` field.
- *  shouldUpgrade: op => op.kind === 'query' && op.query.definitions[0].name?.value === 'todos'
+ *   // Upgrade when we haven't seen this operation for 1 second
+ *   ttl: 1000,
+ *   // and only upgrade operations that query the `todos` field.
+ *   shouldUpgrade: op => op.kind === 'query' && op.query.definitions[0].name?.value === 'todos'
  * });
  * ```
  */
