@@ -38,6 +38,23 @@ type ResultMap = Map<number, Data | null>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Map<string, Operations>;
 
+/** Exchange factory that creates a normalized cache exchange.
+ *
+ * @param opts - A {@link CacheExchangeOpts} configuration object.
+ * @returns the created normalized cache {@link Exchange}.
+ *
+ * @remarks
+ * Graphcache is a normalized cache, enabled by using the `cacheExchange`
+ * in place of `@urql/core`’s. A normalized GraphQL cache uses typenames
+ * and key fields in the result to share a single copy for each unique
+ * entity across all queries.
+ *
+ * The `cacheExchange` may be passed a {@link CacheExchangeOpts} object
+ * to define custom resolvers, custom updates for mutations,
+ * optimistic updates, or to add custom key fields per type.
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache} for the full Graphcache docs.
+ */
 export const cacheExchange =
   <C extends Partial<CacheExchangeOpts>>(opts?: C): Exchange =>
   ({ forward, client, dispatchDebug }) => {
