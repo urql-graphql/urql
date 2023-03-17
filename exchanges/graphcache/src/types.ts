@@ -411,7 +411,42 @@ export type CacheExchangeOpts = {
   storage?: StorageAdapter;
 };
 
-// Cache resolvers are user-defined to overwrite an entity field result
+/** Cache Resolver, which may resolve or replace data during cache reads.
+ *
+ * @param parent - The GraphQL object that is currently being constructed from cache data.
+ * @param args - This field’s arguments.
+ * @param cache - {@link Cache} interface.
+ * @param info - {@link ResolveInfo} interface.
+ * @returns a {@link ResolverResult}, which is an updated value, partial entity, or entity key
+ *
+ * @remarks
+ * A `Resolver`, as defined on the {@link ResolverConfig}, is called for
+ * a field’s type during cache reads, and can be used to deserialize or replace
+ * scalar values, or to resolve an entity from cached data, even if the
+ * current field hasn’t been cached from an API response yet.
+ *
+ * For instance, if you have a `Query.picture(id: ID!)` field, you may define
+ * a resolver that returns `{ __typename: 'Picture', id: args.id }`, since you
+ * know the key fields of the GraphQL object.
+ *
+ * @example
+ * ```ts
+ * cacheExchange({
+ *   resolvers: {
+ *     Query: {
+ *       // resolvers can be used to resolve cached entities without API requests
+ *       todo: (_parent, args) => ({ __typename: 'Todo', id: args.id }),
+ *     },
+ *     Todo: {
+ *       // resolvers can also be used to replace/deserialize scalars
+ *       updatedAt: parent => new Date(parent.updatedAt),
+ *     },
+ *   },
+ * });
+ * ```
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache/local-resolvers} for the full resolvers docs.
+ */
 export type Resolver<
   ParentData = DataFields,
   Args = Variables,
@@ -442,6 +477,38 @@ export type ResolverConfig = {
   } | void;
 };
 
+/** Cache Updater, which defines additional cache updates after cache writes.
+ *
+ * @param parent - The GraphQL object that is currently being written to the cache.
+ * @param args - This field’s arguments.
+ * @param cache - {@link Cache} interface.
+ * @param info - {@link ResolveInfo} interface.
+ *
+ * @remarks
+ * An `UpdateResolver` (“updater”), as defined on the {@link UpdatesConfig}, is
+ * called for a field’s type during cache writes, and can be used to instruct
+ * the {@link Cache} to perform other cache updates at the same time.
+ *
+ * This is often used, for instance, to update lists or invalidate entities
+ * after a mutation response has come back from the API.
+ *
+ * @example
+ * ```ts
+ * cacheExchange({
+ *   updates: {
+ *     Mutation: {
+ *       // updaters can invalidate data from the cache
+ *       deleteAuthor: (_parent, args, cache) => {
+ *         cache.invalidate({ __typename: 'Author', id: args.id });
+ *       },
+ *     },
+ *   },
+ * });
+ * ```
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache/cache-updates} for the
+ * full cache updates docs.
+ */
 export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
   bivarianceHack(
     parent: ParentData,
@@ -451,6 +518,36 @@ export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
   ): void;
 }['bivarianceHack'];
 
+/** A key functon, which is called to create a cache key for a GraphQL object (“entity”).
+ *
+ * @param data - The GraphQL object that a key is generated for.
+ * @returns a key `string` or `null` or unkeyable objects.
+ *
+ * @remarks
+ * By default, Graphcache will use an object’s `__typename`, and `id` or `_id` fields
+ * to generate a key for an object. However, not all GraphQL objects will have a unique
+ * field, and some objects don’t have a key at all.
+ *
+ * When one of your GraphQL object types has a different key field, you may define a
+ * function on the {@link KeyingConfig} to return its key field.
+ * You may also have objects that don’t have keys, like “Edge” objects, or scalar-like
+ * objects. For these, you can define a function that returns `null`, which tells
+ * Graphcache that it’s an embedded object, which only occurs on its parent and is
+ * globally unique.
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache/normalized-caching/#custom-keys-and-non-keyable-entities} for
+ * the full keys docs.
+ *
+ * @example
+ * ```ts
+ * cacheExchange({
+ *   keys: {
+ *     Image: data => data.url,
+ *     LatLng: () => null,
+ *   },
+ * });
+ * ```
+ */
 export type KeyGenerator = {
   bivarianceHack(data: Data): string | null;
 }['bivarianceHack'];
@@ -500,6 +597,26 @@ export type MakeFunctional<T> = T extends { __typename: string }
     }>
   : OptimisticMutationResolver<Variables, T> | T;
 
+/** Optimistic mutation resolver, which may return data that a mutation response will return.
+ *
+ * @param args - This field’s arguments.
+ * @param cache - {@link Cache} interface.
+ * @param info - {@link ResolveInfo} interface.
+ * @returns the field’s optimistic data
+ *
+ * @remarks
+ * Graphcache can update its cache optimistically via the {@link OptimisticMutationConfig}.
+ * An `OptimisticMutationResolver` should return partial data that a mutation will return
+ * once it completes and we receive its result.
+ *
+ * For instance, it could return the data that a deletion mutation may return
+ * optimistically, which might allow an updater to run early and your UI to update
+ * instantly.
+ *
+ * The result that this function returns may miss some fields that your mutation may return,
+ * especially if it contains GraphQL object that are already cached. It may also contain
+ * other, nested resolvers, which allows you to handle fields that accept arguments.
+ */
 export type OptimisticMutationResolver<
   Args = Variables,
   Result = Link<Data> | Scalar
