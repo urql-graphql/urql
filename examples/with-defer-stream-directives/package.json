@@ -8,21 +8,28 @@
     "client": "vite",
     "start": "run-p client server:yoga"
   },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "graphql": "17"
+      }
+    }
+  },
   "dependencies": {
-    "@apollo/server": "^4.4.1",
     "@graphql-yoga/plugin-defer-stream": "^1.7.1",
     "@urql/core": "^3.1.1",
     "@urql/exchange-graphcache": "^5.0.9",
     "graphql": "17.0.0-alpha.2",
-    "graphql-yoga": "^3.7.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "urql": "^3.0.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-react-refresh": "^1.3.6",
+    "@apollo/server": "^4.4.1",
+    "@vitejs/plugin-react": "^3.1.0",
     "graphql-helix": "^1.13.0",
+    "graphql-yoga": "^3.7.1",
     "npm-run-all": "^4.1.5",
-    "vite": "^2.9.15"
+    "vite": "^4.2.0"
   }
 }
