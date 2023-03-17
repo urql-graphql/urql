@@ -1,4 +1,4 @@
-import { Source, fromAsyncIterable } from 'wonka';
+import { Source, fromAsyncIterable, filter, pipe } from 'wonka';
 import { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
@@ -116,7 +116,7 @@ async function* fetchOperation(
 
     // Delay for a tick to give the Client a chance to cancel the request
     // if a teardown comes in immediately
-    await Promise.resolve();
+    yield await Promise.resolve();
 
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
     const contentType = response.headers.get('Content-Type') || '';
@@ -194,5 +194,8 @@ export function makeFetchSource(
   url: string,
   fetchOptions: RequestInit
 ): Source<OperationResult> {
-  return fromAsyncIterable(fetchOperation(operation, url, fetchOptions));
+  return pipe(
+    fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
+    filter((result): result is OperationResult => !!result)
+  );
 }
