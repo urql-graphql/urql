@@ -3,7 +3,17 @@ import { Cache, Resolver, Variables, NullArray } from '../types';
 
 export type MergeMode = 'outwards' | 'inwards';
 
+/** Input parameters for the {@link relayPagination} factory. */
 export interface PaginationParams {
+  /** Flip between inwards and outwards pagination.
+   *
+   * @remarks
+   * This is only relevant if you’re querying pages using forwards and
+   * backwards pagination at the same time.
+   * When set to `'inwards'`, its default, pages that have been queried
+   * forward are placed in front of all pages that were queried backwards.
+   * When set to `'outwards'`, the two sets are merged in reverse.
+   */
   mergeMode?: MergeMode;
 }
 
@@ -182,6 +192,25 @@ const getPage = (
   return page;
 };
 
+/** Creates a {@link Resolver} that combines pages that comply to the Relay pagination spec.
+ *
+ * @param params - A {@link PaginationParams} configuration object.
+ * @returns the created Relay pagination {@link Resolver}.
+ *
+ * @remarks
+ * `relayPagination` is a factory that creates a {@link Resolver} that can combine
+ * multiple pages on a field that complies to the Relay pagination spec into a single,
+ * combined list for infinite scrolling.
+ *
+ * This resolver will only work on fields that return a `Connection` GraphQL object
+ * type, according to the Relay pagination spec.
+ *
+ * Hint: It's not recommended to use this when you can handle infinite scrolling
+ * in your UI code instead.
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache/local-resolvers#relay-pagination} for more information.
+ * @see {@link https://urql.dev/goto/docs/basics/ui-patterns/#infinite-scrolling} for an alternate approach.
+ */
 export const relayPagination = (
   params: PaginationParams = {}
 ): Resolver<any, any, any> => {
