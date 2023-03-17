@@ -35,7 +35,7 @@ const shouldSkip = ({ kind }: Operation) =>
  * {@link OperationContext.additionalTypenames} for queries and mutations that
  * should invalidate one another.
  *
- * @see {@link https://formidable.com/open-source/urql/docs/basics/document-caching/} for more information on this cache.
+ * @see {@link https://urql.dev/goto/docs/basics/document-caching} for more information on this cache.
  */
 export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache: ResultCache = new Map();

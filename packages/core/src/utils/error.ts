@@ -44,7 +44,7 @@ const rehydrateGraphQlError = (error: any): GraphQLError => {
  * is set to this error, the `CombinedError` abstracts all errors, making it easier to handle only
  * a subset of error cases.
  *
- * @see {@link https://formidable.com/open-source/urql/docs/basics/errors/} for more information on handling
+ * @see {@link https://urql.dev/goto/docs/basics/errors} for more information on handling
  * GraphQL errors and the `CombinedError`.
  */
 export class CombinedError extends Error {

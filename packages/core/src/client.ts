@@ -115,7 +115,7 @@ export interface ClientOptions {
    * To easily get started you should consider using the {@link dedupExchange}, {@link cacheExchange} and {@link fetchExchange}
    * these are all exported from the core package.
    *
-   * @see {@link https://formidable.com/open-source/urql/docs/architecture/#the-client-and-exchanges} for more information
+   * @see {@link https://urql.dev/goto/docs/architecture/#the-client-and-exchanges} for more information
    * on what `Exchange`s are and how they work.
    */
   exchanges: Exchange[];
@@ -198,7 +198,7 @@ export interface ClientOptions {
  * creating operations, managing consumers of active operations, sharing results for operations,
  * and more tasks as a “central hub”.
  *
- * @see {@link https://formidable.com/open-source/urql/docs/architecture/#requests-and-operations-on-the-client} for more information
+ * @see {@link https://urql.dev/goto/docs/architecture/#requests-and-operations-on-the-client} for more information
  * on what the `Client` is and does.
  */
 export interface Client {

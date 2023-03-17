@@ -515,7 +515,7 @@ export interface OperationContext {
  * The {@link ExchangeIO} type describes how {@link Exchange | Exchanges} receive `Operation`s and return
  * `OperationResults`, using `teardown` `Operation`s to cancel ongoing operations.
  *
- * @see {@link https://formidable.com/open-source/urql/docs/architecture/#the-client-and-exchanges} for more information
+ * @see {@link https://urql.dev/goto/docs/architecture/#the-client-and-exchanges} for more information
  * on the flow of Exchanges.
  */
 export interface Operation<
@@ -668,8 +668,8 @@ export interface ExchangeInput {
  * Like middleware, exchanges are composed, calling each other in a pipeline-like fashion, which is facilitated by exchanges
  * calling {@link ExchangeInput.forward}, which is set to the next exchange's {@link ExchangeIO} function in the pipeline.
  *
- * @see {@link https://formidable.com/open-source/urql/docs/architecture/#the-client-and-exchanges} for more information on Exchanges.
- * @see {@link https://formidable.com/open-source/urql/docs/advanced/authoring-exchanges/} on how Exchanges are authored.
+ * @see {@link https://urql.dev/goto/docs/architecture/#the-client-and-exchanges} for more information on Exchanges.
+ * @see {@link https://urql.dev/goto/docs/advanced/authoring-exchanges} on how Exchanges are authored.
  */
 export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
@@ -686,7 +686,7 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
  * Generally, the stream of `OperationResult` returned by {@link ExchangeInput.forward} is always merged and combined with
  * the `Exchange`'s own stream of results if the `Exchange` creates and delivers results of its own.
  *
- * @see {@link https://formidable.com/open-source/urql/docs/advanced/authoring-exchanges/} on how Exchanges are authored.
+ * @see {@link https://urql.dev/goto/docs/advanced/authoring-exchanges} on how Exchanges are authored.
  */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 
