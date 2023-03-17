@@ -147,37 +147,49 @@ describe('on teardown', () => {
     expect(true).toEqual(false);
   };
 
-  it('does not start the outgoing request on immediate teardowns', () => {
-    fetch.mockResolvedValue(new Response('text', { status: 200 }));
+  it('does not start the outgoing request on immediate teardowns', async () => {
+    fetch.mockImplementation(async () => {
+      await new Promise(() => {
+        /*noop*/
+      });
+    });
 
     const { unsubscribe } = pipe(
       fromValue(queryOperation),
       fetchExchange(exchangeArgs),
       subscribe(fail)
     );
-
-    unsubscribe();
-    expect(fetch).toHaveBeenCalledTimes(0);
-    expect(abort).toHaveBeenCalledTimes(0);
-  });
-
-  it('aborts the outgoing request', async () => {
-    fetch.mockResolvedValue(new Response('text', { status: 200 }));
-
-    const { unsubscribe } = pipe(
-      fromValue(queryOperation),
-      fetchExchange(exchangeArgs),
-      subscribe(fail)
-    );
-
-    await Promise.resolve();
 
     unsubscribe();
 
     // NOTE: We can only observe the async iterator's final run after a macro tick
     await new Promise(resolve => setTimeout(resolve));
+    expect(fetch).toHaveBeenCalledTimes(0);
+    expect(abort).toHaveBeenCalledTimes(1);
+  });
+
+  it('aborts the outgoing request', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: new Map([['Content-Type', 'application/json']]),
+      text: vi.fn().mockResolvedValue('{ "data": null }'),
+    });
+
+    const { unsubscribe } = pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      subscribe(() => {
+        /*noop*/
+      })
+    );
+
+    await new Promise(resolve => setTimeout(resolve));
+    unsubscribe();
+
+    // NOTE: We can only observe the async iterator's final run after a macro tick
+    await new Promise(resolve => setTimeout(resolve));
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(abort).toHaveBeenCalled();
+    expect(abort).toHaveBeenCalledTimes(1);
   });
 
   it('does not call the query', () => {
