@@ -156,18 +156,52 @@ const minifyIntrospectionType = (
   }
 };
 
+/** Input parameters for the {@link minifyIntrospectionQuery} function. */
 export interface MinifySchemaOptions {
-  /** Includes scalar names (instead of an `Any` replacement) in the output when enabled. */
+  /** Includes scalars instead of removing them.
+   *
+   * @remarks
+   * By default, all scalars will be replaced by a single scalar called `Any`
+   * in the output, unless this option is set to `true`.
+   */
   includeScalars?: boolean;
-  /** Includes enums (instead of an `Any` replacement) in the output when enabled. */
+  /** Includes enums instead of removing them.
+   *
+   * @remarks
+   * By default, all enums will be replaced by a single scalar called `Any`
+   * in the output, unless this option is set to `true`.
+   */
   includeEnums?: boolean;
-  /** Includes all input objects (instead of an `Any` replacement) in the output when enabled. */
+  /** Includes inputs instead of removing them.
+   *
+   * @remarks
+   * By default, all inputs will be replaced by a single scalar called `Any`
+   * in the output, unless this option is set to `true`.
+   */
   includeInputs?: boolean;
-  /** Includes all directives in the output when enabled. */
+  /** Includes directives instead of removing them. */
   includeDirectives?: boolean;
 }
 
-/** Removes extraneous information from introspected schema data to minify it and prepare it for use on the client-side. */
+/** Minifies an {@link IntrospectionQuery} for use with Graphcache or the `populateExchange`.
+ *
+ * @param schema - An {@link IntrospectionQuery} object to be minified.
+ * @param opts - An optional {@link MinifySchemaOptions} configuration object.
+ * @returns the minified {@link IntrospectionQuery} object.
+ *
+ * @remarks
+ * `minifyIntrospectionQuery` reduces the size of an {@link IntrospectionQuery} by
+ * removing data and information that a client-side consumer, like Graphcache or the
+ * `populateExchange`, may not require.
+ *
+ * At the very least, it will remove system types, descriptions, depreactions,
+ * and source locations. Unless disabled via the options passed, it will also
+ * by default remove all scalars, enums, inputs, and directives.
+ *
+ * @throws
+ * If `schema` receives an object that isn’t an {@link IntrospectionQuery}, a
+ * {@link TypeError} will be thrown.
+ */
 export const minifyIntrospectionQuery = (
   schema: IntrospectionQuery,
   opts: MinifySchemaOptions = {}
