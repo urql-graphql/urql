@@ -20,13 +20,43 @@ import { Exchange, Operation, stringifyVariables } from '@urql/core';
 import { getName, GraphQLFlatType, unwrapType } from './helpers/node';
 import { traverse } from './helpers/traverse';
 
-interface Options {
+/** Configuration options for the {@link populateExchange}'s behaviour */
+export interface Options {
+  /** Prevents populating fields for matching types.
+   *
+   * @remarks
+   * `skipType` may be set to a regular expression that, when matching,
+   * prevents fields to be added automatically for the given type by the
+   * `populateExchange`.
+   *
+   * @defaultValue `/^PageInfo|(Connection|Edge)$/` - Omit Relay pagination fields
+   */
   skipType?: RegExp;
+  /** Specifies a maximum depth for populated fields.
+   *
+   * @remarks
+   * `maxDepth` may be set to a maximum depth at which fields are populated.
+   * This may prevent the `populateExchange` from adding infinitely deep
+   * recursive fields or simply too many fields.
+   *
+   * @defaultValue `2` - Omit fields past a depth of 2.
+   */
   maxDepth?: number;
 }
 
-interface PopulateExchangeOpts {
+/** Input parameters for the {@link populateExchange}. */
+export interface PopulateExchangeOpts {
+  /** Introspection data for an API’s schema.
+   *
+   * @remarks
+   * `schema` must be passed Schema Introspection data for the GraphQL API
+   * this exchange is applied for.
+   * You may use the `@urql/introspection` package to generate this data.
+   *
+   * @see {@link https://spec.graphql.org/October2021/#sec-Schema-Introspection} for the Schema Introspection spec.
+   */
   schema: IntrospectionQuery;
+  /** Configuration options for the {@link populateExchange}'s behaviour */
   options?: Options;
 }
 
@@ -50,6 +80,8 @@ const SKIP_COUNT_TYPE = /^PageInfo|(Connection|Edge)$/;
 /** Creates an `Exchange` handing automatic mutation selection-set population based on the
  * query selection-sets seen.
  *
+ * @param options - A {@link PopulateExchangeOpts} configuration object.
+ * @returns the created populate {@link Exchange}.
  *
  * @remarks
  * The `populateExchange` will create an exchange that monitors queries and
@@ -62,11 +94,17 @@ const SKIP_COUNT_TYPE = /^PageInfo|(Connection|Edge)$/;
  *
  * @example
  * ```ts
- * populateExchange({ schema, options: { maxDepth: 3, skipType: /Todo/ }})
+ * populateExchange({
+ *   schema,
+ *   options: {
+ *     maxDepth: 3,
+ *     skipType: /Todo/
+ *   },
+ * });
  *
  * const query = gql`
  *   mutation { addTodo @popualte }
- * `
+ * `;
  * ```
  */
 export const populateExchange =
