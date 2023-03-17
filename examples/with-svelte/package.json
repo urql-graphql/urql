@@ -8,7 +8,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@urql/svelte": "^2.0.0",
+    "@urql/svelte": "^3.0.4",
     "graphql": "^16.6.0",
     "svelte": "^3.57.0"
   },

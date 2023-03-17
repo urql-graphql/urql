@@ -17,12 +17,12 @@
   },
   "dependencies": {
     "@graphql-yoga/plugin-defer-stream": "^1.7.1",
-    "@urql/core": "^3.1.1",
-    "@urql/exchange-graphcache": "^5.0.9",
+    "@urql/core": "^3.2.2",
+    "@urql/exchange-graphcache": "^5.2.0",
     "graphql": "17.0.0-alpha.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "urql": "^3.0.3"
+    "urql": "^3.0.4"
   },
   "devDependencies": {
     "@apollo/server": "^4.4.1",
