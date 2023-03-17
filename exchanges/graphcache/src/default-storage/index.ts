@@ -23,14 +23,34 @@ const getTransactionPromise = (transaction: IDBTransaction): Promise<any> => {
 };
 
 export interface StorageOptions {
+  /** Name of the IndexedDB database that will be used.
+   * @defaultValue `'graphcache-v4'`
+   */
   idbName?: string;
+  /** Maximum age of cache entries (in days) after which data is discarded.
+   * @defaultValue `7` days
+   */
   maxAge?: number;
 }
 
+/** Sample storage adapter persisting to IndexedDB. */
 export interface DefaultStorage extends StorageAdapter {
+  /** Clears the entire IndexedDB storage. */
   clear(): Promise<any>;
 }
 
+/** Creates a default {@link StorageAdapter} which uses IndexedDB for storage.
+ *
+ * @param opts - A {@link StorageOptions} configuration object.
+ * @returns the created {@link StorageAdapter}.
+ *
+ * @remarks
+ * The default storage uses IndexedDB to persist the normalized cache for
+ * offline use. It demonstrates that the cache can be chunked by timestamps.
+ *
+ * Note: We have no data on stability of this storage and our Offline Support
+ * for large APIs or longterm use. Proceed with caution.
+ */
 export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
   if (!opts) opts = {};
 
