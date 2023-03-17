@@ -7,7 +7,7 @@
     "build": "node ./scripts/actions/build-all.mjs",
     "postinstall": "node ./scripts/prepare/postinstall.js",
     "pack": "node ./scripts/actions/pack-all.mjs",
-    "changeset:version": "changeset version && pnpm install --lockfile-only",
+    "changeset:version": "node ./scripts/changesets/version.mjs",
     "changeset:publish": "changeset publish"
   },
   "eslintConfig": {
