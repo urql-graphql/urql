@@ -1,12 +1,6 @@
 import { initUrqlClient } from 'next-urql';
-import {
-  ssrExchange,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-  useQuery,
-  gql,
-} from 'urql';
+
+import { ssrExchange, cacheExchange, fetchExchange, useQuery, gql } from 'urql';
 
 const POKEMONS_QUERY = gql`
   query {
@@ -37,7 +31,7 @@ export async function getServerSideProps() {
   const client = initUrqlClient(
     {
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
-      exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
+      exchanges: [cacheExchange, ssrCache, fetchExchange],
     },
     false
   );
