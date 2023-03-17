@@ -114,19 +114,22 @@ retry logic and assumes that persisted queries will be handled like regular Grap
 
 ## File Uploads
 
-Many GraphQL server frameworks and APIs support the ["GraphQL Multipart Request
-Spec](https://github.com/jaydenseric/graphql-multipart-request-spec) to allow files to be uploaded.
-Often, this is defined in schemas using a `File` or `Upload` input.
-This allows us to pass a `File` or `Blob` directly to our GraphQL requests as variables, and the
-spec requires us to perform this request as a multipart upload.
+GraphQL server APIs commonly support the [GraphQL Multipart Request
+spec](https://github.com/jaydenseric/graphql-multipart-request-spec) to allow for File Uploads
+directly with a GraphQL API.
 
-Files are often handled in the browser via the [File API](https://developer.mozilla.org/en-US/docs/Web/API/File),
-which we may typically get to via a [file input](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications)
+If a GraphQL API supports this, we can pass a [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File)
+or a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) directly into our variables and
+define the corresponding scalar for our variable, which is often called `File` or `Upload`.
+
+In a browser, the `File` object may often be retrieved via a
+[file input](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications),
 for example.
 
-In `urql`, these are supported natively, so as long as your JS environment supports either `File` or
-`Blob`s, you can pass these directly to any `urql` API via your `variables`, and the default
-`fetchExchange` will swich to using a multipart request instead.
+The `@urql/core@4` package supports File Uploads natively, so we won't have to do any installation
+or setup work. When `urql` sees a `File` or a `Blob` anywhere in your `variables`, it switches to
+a `multipart/form-data` request, converts the request to a `FormData` object, according to the
+GraphQL Multipart Request specification, and sends it off to the API.
 
 > **Note:** Previously, this worked by installing the `@urql/multipart-fetch-exchange` package.
 > however, this package has been deprecated and file uploads are now built into `@urql/core@4`.
