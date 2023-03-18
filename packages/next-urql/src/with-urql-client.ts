@@ -6,17 +6,18 @@ import {
   ReactNode,
   ReactElement,
 } from 'react';
-import ssrPrepass from 'react-ssr-prepass';
-import { NextComponentType, NextPage, NextPageContext } from 'next';
-import NextApp, { AppContext } from 'next/app';
 
 import {
   Provider,
+  SSRExchange,
   ssrExchange,
-  dedupExchange,
   cacheExchange,
   fetchExchange,
 } from 'urql';
+
+import ssrPrepass from 'react-ssr-prepass';
+import { NextComponentType, NextPage, NextPageContext } from 'next';
+import NextApp, { AppContext } from 'next/app';
 
 import { initUrqlClient, resetClient } from './init-urql-client';
 
@@ -25,7 +26,6 @@ import {
   NextUrqlContext,
   WithUrqlProps,
   WithUrqlClientOptions,
-  SSRExchange,
 } from './types';
 
 let ssr: SSRExchange;
@@ -33,6 +33,39 @@ type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
 
+/** Creates a wrapper for Next.js Page, App, or Document components that rehydrates `urql` state.
+ *
+ * @param getClientConfig - function used to create the {@link Client}
+ * @param options - optional {@link WithUrqlClientOptions} configuration options
+ * @returns a higher-order component function, which you can pass a Next.js page or app component.
+ *
+ * @remarks
+ * Used to wrap a Next.js page or app component. It will create a {@link Client} and passes
+ * it on to the child component and adds a React Provider for it.
+ *
+ * It will restore any page’s `pageProps.urqlState` with the {@link SSRExchange} and also
+ * supports doing this automatically when the {@link WithUrqlClientOptions.ssr} option
+ * is enabled.
+ *
+ * If you don’t define the above option, you will have to write `getServerSideProps` or
+ * `getStaticProps` methods on your component manually.
+ *
+ * @see {@link https://urql.dev/goto/docs/advanced/server-side-rendering/#nextjs} for more documentation.
+ *
+ * @example
+ * ```ts
+ * import { cacheExchange, fetchExchange } from '@urql/core';
+ * import { withUrqlClient } from 'next-urql';
+ *
+ * const WrappedPage = withUrqlClient(
+ *   (ssrExchange) => ({
+ *     url: 'https://YOUR_API',
+ *     exchanges: [cacheExchange, ssrExchange, fetchExchange],
+ *   }),
+ *   { ssr: true },
+ * )(Page);
+ * ```
+ */
 export function withUrqlClient(
   getClientConfig: NextUrqlClientConfig,
   options?: WithUrqlClientOptions
@@ -77,12 +110,7 @@ export function withUrqlClient(
         const clientConfig = getClientConfig(ssr);
         if (!clientConfig.exchanges) {
           // When the user does not provide exchanges we make the default assumption.
-          clientConfig.exchanges = [
-            dedupExchange,
-            cacheExchange,
-            ssr,
-            fetchExchange,
-          ];
+          clientConfig.exchanges = [cacheExchange, ssr, fetchExchange];
         }
 
         return initUrqlClient(clientConfig, shouldEnableSuspense)!;
@@ -129,12 +157,7 @@ export function withUrqlClient(
         const clientConfig = getClientConfig(ssrCache, ctx);
         if (!clientConfig.exchanges) {
           // When the user does not provide exchanges we make the default assumption.
-          clientConfig.exchanges = [
-            dedupExchange,
-            cacheExchange,
-            ssrCache,
-            fetchExchange,
-          ];
+          clientConfig.exchanges = [cacheExchange, ssrCache, fetchExchange];
         }
 
         const urqlClient = initUrqlClient(clientConfig, !options!.neverSuspend);
