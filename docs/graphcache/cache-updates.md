@@ -543,31 +543,8 @@ variables using our query document definitions, which means that our API will ne
 variables other than the ones we've defined.
 
 However, we're able to pass additional variables to our mutation, e.g. `{ extra }`, and since
-`$extra` isn't defined it will be filtered once the mutation is sent to the API.
-
-```jsx
-const MyComponent = () => {
-  const [_, executeMutation] = useMutation(UpdateTodo);
-
-  return (
-    <button
-      type="button"
-      onClick={() =>
-        executeMutation({
-          id: 'anId',
-          text: 'New value',
-          // Let's pass an extra variable
-          extra: 'An extra value',
-        })
-      }
-    >
-      Update todo
-    </button>
-  );
-};
-```
-
-An optimistic mutation however will still be able to access this variable, like so:
+`$extra` isn't defined it will be filtered once the mutation is sent to the API. An optimistic
+mutation however will still be able to access this variable, like so:
 
 ```js
 cacheExchange({
