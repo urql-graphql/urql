@@ -29,6 +29,30 @@ import {
   fromStore,
 } from './common';
 
+/** Combines previous data with an incoming subscription result’s data.
+ *
+ * @remarks
+ * A `SubscriptionHandler` may be passed to {@link subscriptionStore} to
+ * aggregate subscription results into a combined `data` value on the
+ * {@link OperationResultStore}.
+ *
+ * This is useful when a subscription event delivers a single item, while
+ * you’d like to display a list of events.
+ *
+ * @example
+ * ```ts
+ * const NotificationsSubscription = gql`
+ *   subscription { newNotification { id, text } }
+ * `;
+ *
+ * subscriptionStore(
+ *   { query: NotificationsSubscription },
+ *   function combineNotifications(notifications = [], data) {
+ *     return [...notifications, data.newNotification];
+ *   },
+ * );
+ * ```
+ */
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 /** Input arguments for the {@link subscriptionStore} function.
@@ -78,6 +102,7 @@ export type SubscriptionArgs<
 /** Function to create a `subscriptionStore` that starts a GraphQL subscription.
  *
  * @param args - a {@link QueryArgs} object, to pass a `query`, `variables`, and options.
+ * @param handler - optionally, a {@link SubscriptionHandler} function to combine multiple subscription results.
  * @returns a {@link OperationResultStore} of subscription results, which implements {@link Pausable}.
  *
  * @remarks
@@ -102,6 +127,9 @@ export type SubscriptionArgs<
  *       newNotification { id, text }
  *     }
  *   `,
+ *   function combineNotifications(notifications = [], data) {
+ *     return [...notifications, data.newNotification];
+ *   },
  * });
  * ```
  */
