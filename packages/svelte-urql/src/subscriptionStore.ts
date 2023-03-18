@@ -29,6 +29,8 @@ import {
   fromStore,
 } from './common';
 
+export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
+
 export type SubscriptionArgs<
   Data = any,
   Variables extends AnyVariables = AnyVariables
@@ -40,10 +42,12 @@ export type SubscriptionArgs<
 
 export function subscriptionStore<
   Data,
+  Result = Data,
   Variables extends AnyVariables = AnyVariables
 >(
-  args: SubscriptionArgs<Data, Variables>
-): OperationResultStore<Data, Variables> & Pausable {
+  args: SubscriptionArgs<Data, Variables>,
+  handler?: SubscriptionHandler<Data, Result>
+): OperationResultStore<Result, Variables> & Pausable {
   const request = createRequest(args.query, args.variables as Variables);
 
   const operation = args.client.createRequestOperation(
@@ -51,9 +55,10 @@ export function subscriptionStore<
     request,
     args.context
   );
-  const initialState: OperationResultState<Data, Variables> = {
+  const initialState: OperationResultState<Result, Variables> = {
     ...initialResult,
     operation,
+    fetching: true,
   };
   const result$ = writable(initialState, () => {
     return subscription.unsubscribe;
@@ -85,13 +90,19 @@ export function subscriptionStore<
         ]);
       }
     ),
-    scan(
-      (result: OperationResultState<Data, Variables>, partial) => ({
+    scan((result: OperationResultState<Result, Variables>, partial) => {
+      const data =
+        partial.data !== undefined
+          ? typeof handler === 'function'
+            ? handler(result.data, partial.data)
+            : partial.data
+          : result.data;
+      return {
         ...result,
         ...partial,
-      }),
-      initialState
-    ),
+        data,
+      } as OperationResultState<Result, Variables>;
+    }, initialState),
     subscribe(result => {
       result$.set(result);
     })
