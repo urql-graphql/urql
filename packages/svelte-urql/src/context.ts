@@ -3,7 +3,20 @@ import { Client, ClientOptions } from '@urql/core';
 
 const _contextKey = '$$_urql';
 
-/** Retrieves a Client from Svelte's context */
+/** Returns a provided {@link Client}.
+ *
+ * @remarks
+ * `getContextClient` returns the {@link Client} that’s previously
+ * been provided on Svelte’s context with {@link setContextClient}.
+ *
+ * This is useful to create a `Client` on Svelte’s context once, and
+ * then pass it to all GraphQL store functions without importing it
+ * from a singleton export.
+ *
+ * @throws
+ * In development, if `getContextClient` can’t get a {@link Client}
+ * from Svelte’s context, an error will be thrown.
+ */
 export const getContextClient = (): Client => {
   const client = getContext(_contextKey);
   if (process.env.NODE_ENV !== 'production' && !client) {
@@ -15,12 +28,28 @@ export const getContextClient = (): Client => {
   return client as Client;
 };
 
-/** Sets a Client on Svelte's context */
+/** Provides a {@link Client} to a component’s children.
+ *
+ * @remarks
+ * `setContextClient` updates the Svelte context to provide
+ * a {@link Client} to be later retrieved using the
+ * {@link getContextClient} function.
+ */
 export const setContextClient = (client: Client): void => {
   setContext(_contextKey, client);
 };
 
-/** Creates Client and adds it to Svelte's context */
+/** Creates a {@link Client} and provides it to a component’s children.
+ *
+ * @param args - a {@link ClientOptions} object to create a `Client` with.
+ * @returns the created {@link Client}.
+ *
+ * @remarks
+ * `initContextClient` is a convenience wrapper around
+ * `setContextClient` that accepts {@link ClientOptions},
+ * creates a {@link Client} and provides it to be later
+ * retrieved using the {@link getContextClient} function.
+ */
 export const initContextClient = (args: ClientOptions): Client => {
   const client = new Client(args);
   setContextClient(client);

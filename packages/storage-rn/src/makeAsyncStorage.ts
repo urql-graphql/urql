@@ -2,11 +2,20 @@ import { StorageAdapter } from '@urql/exchange-graphcache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
-export type StorageOptions = {
+export interface StorageOptions {
+  /** Name of the `AsyncStorage` key that’s used for persisted data.
+   * @defaultValue `'graphcache-data'`
+   */
   dataKey?: string;
+  /** Name of the `AsyncStorage` key that’s used for persisted metadata.
+   * @defaultValue `'graphcache-metadata'`
+   */
   metadataKey?: string;
-  maxAge?: number; // Number of days
-};
+  /** Maximum age of cache entries (in days) after which data is discarded.
+   * @defaultValue `7` days
+   */
+  maxAge?: number;
+}
 
 const parseData = (persistedData: any, fallback: any) => {
   try {
@@ -20,10 +29,25 @@ const parseData = (persistedData: any, fallback: any) => {
 
 let disconnect;
 
+/** React Native storage adapter persisting to `AsyncStorage`. */
 export interface DefaultAsyncStorage extends StorageAdapter {
+  /** Clears the entire `AsyncStorage`. */
   clear(): Promise<any>;
 }
 
+/** Creates a {@link StorageAdapter} which uses React Native’s `AsyncStorage`.
+ *
+ * @param opts - A {@link StorageOptions} configuration object.
+ * @returns the created {@link DefaultAsyncStorage} adapter.
+ *
+ * @remarks
+ * `makeAsyncStorage` creates a storage adapter for React Native,
+ * which persisted to `AsyncStorage` via the `@react-native-async-storage/async-storage`
+ * package.
+ *
+ * Note: We have no data on stability of this storage and our Offline Support
+ * for large APIs or longterm use. Proceed with caution.
+ */
 export const makeAsyncStorage: (
   ops?: StorageOptions
 ) => DefaultAsyncStorage = ({
