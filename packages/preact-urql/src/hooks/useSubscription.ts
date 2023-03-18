@@ -104,10 +104,9 @@ export interface UseSubscriptionState<
    *
    * @remarks
    * When `useSubscription` starts a subscription, the `fetching` flag
-   * is set to `true` and will remain `true` until
-   * start executing the new query operation and `fetching` is set to
-   * `true` until the subscription completes on the API, or the
-   * {@link UseSubscriptionArgs.pause} flag is set to `true`.
+   * is set to `true` and will remain `true` until the subscription
+   * completes on the API, or the {@link UseSubscriptionArgs.pause}
+   * flag is set to `true`.
    */
   fetching: boolean;
   /** Indicates that the subscription result is not fresh.
@@ -137,7 +136,7 @@ export interface UseSubscriptionState<
    *
    * @remarks
    * This is the subscription {@link Operation} that is currently active.
-   * When {@link UseQueryState.fetching} is `true`, this is the
+   * When {@link UseSubscriptionState.fetching} is `true`, this is the
    * last `Operation` that the current state was for.
    */
   operation?: Operation<Data, Variables>;

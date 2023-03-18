@@ -12,14 +12,13 @@ export { useSubscription } from './useSubscription';
 export type {
   UseSubscriptionArgs,
   UseSubscriptionResponse,
-  UseSubscriptionState,
   SubscriptionHandlerArg,
   SubscriptionHandler,
 } from './useSubscription';
 
 export { useMutation } from './useMutation';
 
-export type { UseMutationResponse, UseMutationState } from './useMutation';
+export type { UseMutationResponse } from './useMutation';
 
 import { install } from './useClient';
 
