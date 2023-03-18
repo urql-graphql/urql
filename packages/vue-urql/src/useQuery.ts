@@ -133,7 +133,7 @@ export interface UseQueryState<T = any, V extends AnyVariables = AnyVariables> {
    * @remarks
    * When `useQuery` has been paused, it will stop receiving updates
    * from the {@link Client} and won’t execute query operations, until
-   * {@link UseQueryArgs.pause} becomes true or {@link UseQueryState.resume}
+   * {@link UseQueryArgs.pause} becomes `true` or {@link UseQueryState.resume}
    * is called.
    *
    * @see {@link https://urql.dev/goto/docs/basics/vue#pausing-usequery} for
@@ -153,7 +153,7 @@ export interface UseQueryState<T = any, V extends AnyVariables = AnyVariables> {
    *
    * @remarks
    * Pauses {@link useQuery}’s query, which stops it from receiving updates
-   * from the {@link Client} and to stop ongoing the query operation.
+   * from the {@link Client} and to stop the ongoing query operation.
    *
    * @see {@link https://urql.dev/goto/docs/basics/vue#pausing-usequery} for
    * documentation on the `pause` option.
@@ -216,7 +216,7 @@ const watchOptions = {
  * Additionally, `useQuery` may also be awaited inside an `async setup()`
  * function to use Vue’s Suspense feature.
  *
- * @see {@link https://urql.dev/goto/urql/docs/basics/vue#queries} for `useQuery` docs.
+ * @see {@link https://urql.dev/goto/docs/basics/vue#queries} for `useQuery` docs.
  *
  * @example
  * ```ts

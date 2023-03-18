@@ -98,7 +98,7 @@ export interface UseMutationResponse<T, V extends AnyVariables = AnyVariables> {
  * The returned result updates when a mutation is executed and keeps
  * track of the last mutation result.
  *
- * @see {@link https://urql.dev/goto/urql/docs/basics/vue#mutations} for `useMutation` docs.
+ * @see {@link https://urql.dev/goto/docs/basics/vue#mutations} for `useMutation` docs.
  *
  * @example
  * ```ts
