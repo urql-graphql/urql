@@ -66,7 +66,7 @@ export type UseQueryArgs<
    *
    * @remarks
    * `pause` may be set to `true` to stop {@link useQuery} from executing
-   * automatically. The hook will stop receiving to updates from the {@link Client}
+   * automatically. The hook will stop receiving updates from the {@link Client}
    * and won’t execute the query operation, until either it’s set to `false`
    * or the {@link UseQueryExecute} function is called.
    *
