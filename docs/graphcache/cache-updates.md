@@ -544,7 +544,19 @@ variables other than the ones we've defined.
 
 However, we're able to pass additional variables to our mutation, e.g. `{ extra }`, and since
 `$extra` isn't defined it will be filtered once the mutation is sent to the API. An optimistic
-mutation however will still be able to access this variable.
+mutation however will still be able to access this variable, like so:
+
+```js
+cacheExchange({
+  updates: {
+    Mutation: {
+      updateTodo(_result, _args, _cache, info) {
+        const extraVariable = info.variables.extra;
+      },
+    },
+  },
+});
+```
 
 ### Reading on
 
