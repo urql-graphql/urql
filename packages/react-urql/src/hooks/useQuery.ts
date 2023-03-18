@@ -132,6 +132,9 @@ export interface UseQueryState<
 
 /** Triggers {@link useQuery} to execute a new GraphQL query operation.
  *
+ * @param opts - optionally, context options that will be merged with the hook's
+ * {@link UseQueryArgs.context} options and the `Client`’s options.
+ *
  * @remarks
  * When called, {@link useQuery} will re-execute the GraphQL query operation
  * it currently holds, even if {@link UseQueryArgs.pause} is set to `true`.
