@@ -118,7 +118,7 @@ export type UseMutationResponse<
  * Once called, the mutation executes and the state will be updated with
  * the mutation’s result.
  *
- * @see {@link https://urql.dev/goto/urql/docs/basics/react-preact/#mutations} for `useMutation` docs.
+ * @see {@link https://urql.dev/goto/docs/basics/react-preact/#mutations} for `useMutation` docs.
  *
  * @example
  * ```ts

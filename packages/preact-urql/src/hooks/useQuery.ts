@@ -233,7 +233,7 @@ const sources = new Map<number, Source<OperationResult>>();
  * the `useQuery` hook will suspend instead of indicating that it’s
  * waiting for a result via {@link UseQueryState.fetching}.
  *
- * @see {@link https://urql.dev/goto/urql/docs/basics/react-preact/#queries} for `useQuery` docs.
+ * @see {@link https://urql.dev/goto/docs/basics/react-preact/#queries} for `useQuery` docs.
  *
  * @example
  * ```ts
