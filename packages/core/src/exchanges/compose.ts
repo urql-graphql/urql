@@ -1,3 +1,4 @@
+import { share } from 'wonka';
 import type { ExchangeIO, Exchange, ExchangeInput } from '../types';
 
 /** Composes an array of Exchanges into a single one.
@@ -21,7 +22,9 @@ export const composeExchanges =
       (forward, exchange) =>
         exchange({
           client,
-          forward,
+          forward(operations$) {
+            return share(forward(share(operations$)));
+          },
           dispatchDebug(event) {
             dispatchDebug({
               timestamp: Date.now(),
