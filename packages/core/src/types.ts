@@ -670,6 +670,21 @@ export interface ExchangeInput {
  *
  * @see {@link https://urql.dev/goto/docs/architecture/#the-client-and-exchanges} for more information on Exchanges.
  * @see {@link https://urql.dev/goto/docs/advanced/authoring-exchanges} on how Exchanges are authored.
+ *
+ * @example
+ * ```ts
+ * import { pipe, onPush } from 'wonka';
+ * import { Exchange } from '@urql/core';
+ *
+ * const debugExchange: Exchange => {
+ *   return ops$ => pipe(
+ *     ops$,
+ *     onPush(operation => console.log(operation)),
+ *     forward,
+ *     onPush(result => console.log(result)),
+ *   );
+ * };
+ * ```
  */
 export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
