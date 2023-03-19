@@ -54,13 +54,12 @@ function makeOperation(kind, request, context) {
   return {
     ...request,
     kind,
-    context:
-      context && request.kind
-        ? {
-            ...request.context,
-            ...context,
-          }
-        : context || request.context,
+    context: request.context
+      ? {
+          ...request.context,
+          ...context,
+        }
+      : context || request.context,
   };
 }
 
