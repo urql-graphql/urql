@@ -152,70 +152,6 @@ const client = new Client({
 });
 ```
 
-### Only One Operations Stream
-
-When writing an Exchange we have to be careful not to _split_ the stream into multiple ones by
-subscribing multiple times. Streams are lazy and immutable by default. Every time you use them,
-a new chain of streaming operators is created; since Exchanges are technically side effects, we don't
-want to accidentally have multiple instances of them in parallel.
-
-The `ExchangeIO` function receives an `operations$` stream. It's important to be careful to either only
-use it once, or to _share_ its subscription.
-
-```js
-import { pipe, filter, merge, share } from 'wonka';
-
-// DON'T: split use operations$ twice
-({ forward }) => operations$ => {
-  // <-- The ExchangeIO function (inline)
-  const queries = pipe(
-    operations$,
-    filter(op => op.kind === 'query')
-  );
-  const others = pipe(
-    operations$,
-    filter(op => op.kind !== 'query')
-  );
-  return forward(merge([queries, others]));
-};
-
-// DO: share operations$ if you have to use it twice
-({ forward }) => operations$ => {
-  // <-- The ExchangeIO function (inline)
-  const shared = pipe(operations$, share);
-  const queries = pipe(
-    shared,
-    filter(op => op.kind === 'query')
-  );
-  const others = pipe(
-    shared,
-    filter(op => op.kind !== 'query')
-  );
-  return forward(merge([queries, others]));
-};
-
-// DO: use operations$ only once alternatively
-({ forward }) => (
-  operations$ // <-- The ExchangeIO function (inline)
-) =>
-  pipe(
-    operations$,
-    map(op => {
-      if (op.kind === 'query') {
-        /* ... */
-      } else {
-        /* ... */
-      }
-      return op;
-    }),
-    forward
-  );
-```
-
-So if you see the `operations$` stream twice in your exchange code, make sure to
-use Wonka's [`share`](https://wonka.kitten.sh/api/operators#share) operator, to share the underlying
-subscription between all your streams.
-
 ### How to Avoid Accidentally Dropping Operations
 
 Typically the `operations$` stream will send you `query`, `mutation`,
@@ -226,31 +162,32 @@ This means that you have to take "unknown" operations into account and
 not `filter` operations too aggressively.
 
 ```js
-import { pipe, filter, merge, share } from 'wonka';
+import { pipe, filter, merge } from 'wonka';
 
 // DON'T: drop unknown operations
-({ forward }) => operations$ => {
-  // This doesn't handle operations that aren't queries
-  const queries = pipe(
-    operations$,
-    filter(op => op.kind === 'query')
-  );
-  return forward(queries);
-};
+({ forward }) =>
+  operations$ => {
+    // This doesn't handle operations that aren't queries
+    const queries = pipe(
+      operations$,
+      filter(op => op.kind === 'query')
+    );
+    return forward(queries);
+  };
 
 // DO: forward operations that you don't handle
-({ forward }) => operations$ => {
-  const shared = pipe(operations$, share);
-  const queries = pipe(
-    shared,
-    filter(op => op.kind === 'query')
-  );
-  const rest = pipe(
-    shared,
-    filter(op => op.kind !== 'query')
-  );
-  return forward(merge([queries, rest]));
-};
+({ forward }) =>
+  operations$ => {
+    const queries = pipe(
+      operations$,
+      filter(op => op.kind === 'query')
+    );
+    const rest = pipe(
+      operations$,
+      filter(op => op.kind !== 'query')
+    );
+    return forward(merge([queries, rest]));
+  };
 ```
 
 If operations are grouped and/or filtered by what the exchange is handling, then it's also important to
