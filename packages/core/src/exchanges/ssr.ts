@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { pipe, share, filter, merge, map, tap } from 'wonka';
+import { pipe, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
 import { addMetadata, CombinedError } from '../utils';
 import { reexecuteOperation } from './cache';
@@ -218,10 +218,8 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
           ? !!params.isClient
           : !client.suspense;
 
-      const sharedOps$ = share(ops$);
-
       let forwardedOps$ = pipe(
-        sharedOps$,
+        ops$,
         filter(
           operation =>
             !data[operation.key] ||
@@ -234,7 +232,7 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
       // NOTE: Since below we might delete the cached entry after accessing
       // it once, cachedOps$ needs to be merged after forwardedOps$
       let cachedOps$ = pipe(
-        sharedOps$,
+        ops$,
         filter(
           operation =>
             !!data[operation.key] &&

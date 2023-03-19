@@ -4,7 +4,6 @@ import {
   merge,
   mergeMap,
   pipe,
-  share,
   Subscription,
   Source,
   takeUntil,
@@ -198,14 +197,13 @@ export const subscriptionExchange =
       });
 
     return ops$ => {
-      const sharedOps$ = share(ops$);
       const subscriptionResults$ = pipe(
-        sharedOps$,
+        ops$,
         filter(isSubscriptionOperationFn),
         mergeMap(operation => {
           const { key } = operation;
           const teardown$ = pipe(
-            sharedOps$,
+            ops$,
             filter(op => op.kind === 'teardown' && op.key === key)
           );
 
@@ -217,7 +215,7 @@ export const subscriptionExchange =
       );
 
       const forward$ = pipe(
-        sharedOps$,
+        ops$,
         filter(op => !isSubscriptionOperationFn(op)),
         forward
       );

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { filter, merge, mergeMap, pipe, share, takeUntil, onPush } from 'wonka';
+import { filter, merge, mergeMap, pipe, takeUntil, onPush } from 'wonka';
 
 import { Exchange } from '../types';
 import {
@@ -28,9 +28,8 @@ import {
  */
 export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
   return ops$ => {
-    const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
-      sharedOps$,
+      ops$,
       filter(operation => {
         return operation.kind === 'query' || operation.kind === 'mutation';
       }),
@@ -53,7 +52,7 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
           makeFetchSource(operation, url, fetchOptions),
           takeUntil(
             pipe(
-              sharedOps$,
+              ops$,
               filter(op => op.kind === 'teardown' && op.key === operation.key)
             )
           )
@@ -86,7 +85,7 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
     );
 
     const forward$ = pipe(
-      sharedOps$,
+      ops$,
       filter(operation => {
         return operation.kind !== 'query' && operation.kind !== 'mutation';
       }),
