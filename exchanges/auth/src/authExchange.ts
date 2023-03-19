@@ -8,7 +8,6 @@ import {
   makeSubject,
   toPromise,
   merge,
-  share,
 } from 'wonka';
 
 import {
@@ -300,15 +299,13 @@ export function authExchange(
         return config ? config.addAuthToOperation(operation) : operation;
       }
 
-      const sharedOps$ = pipe(operations$, share);
-
       const teardownOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(operation => operation.kind === 'teardown')
       );
 
       const pendingOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(operation => operation.kind !== 'teardown')
       );
 
@@ -337,7 +334,7 @@ export function authExchange(
         filter(Boolean)
       ) as Source<Operation>;
 
-      const result$ = pipe(merge([opsWithAuth$, teardownOps$]), forward, share);
+      const result$ = pipe(merge([opsWithAuth$, teardownOps$]), forward);
 
       return pipe(
         result$,

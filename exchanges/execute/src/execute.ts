@@ -1,13 +1,4 @@
-import {
-  Source,
-  pipe,
-  share,
-  filter,
-  takeUntil,
-  mergeMap,
-  merge,
-  make,
-} from 'wonka';
+import { Source, pipe, filter, takeUntil, mergeMap, merge, make } from 'wonka';
 
 import {
   GraphQLSchema,
@@ -131,11 +122,9 @@ const makeExecuteSource = (
 export const executeExchange =
   (options: ExecuteExchangeArgs): Exchange =>
   ({ forward }) => {
-    return ops$ => {
-      const sharedOps$ = share(ops$);
-
+    return operations$ => {
       const executedOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter((operation: Operation) => {
           return (
             operation.kind === 'query' ||
@@ -146,7 +135,7 @@ export const executeExchange =
         mergeMap((operation: Operation) => {
           const { key } = operation;
           const teardown$ = pipe(
-            sharedOps$,
+            operations$,
             filter(op => op.kind === 'teardown' && op.key === key)
           );
 
@@ -192,7 +181,7 @@ export const executeExchange =
       );
 
       const forwardedOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(operation => operation.kind === 'teardown'),
         forward
       );

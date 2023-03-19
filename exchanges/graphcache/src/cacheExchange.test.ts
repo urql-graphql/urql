@@ -12,6 +12,7 @@ import { vi, expect, it, describe } from 'vitest';
 import {
   Source,
   pipe,
+  share,
   map,
   merge,
   mergeMap,
@@ -86,7 +87,7 @@ describe('data dependencies', () => {
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     pipe(
       cacheExchange({})({ forward, client, dispatchDebug })(ops$),
@@ -137,7 +138,7 @@ describe('data dependencies', () => {
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     pipe(
       cacheExchange({})({ forward, client, dispatchDebug })(ops$),
@@ -214,7 +215,7 @@ describe('data dependencies', () => {
       return undefined as any;
     });
 
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
     const result = vi.fn();
 
     pipe(
@@ -358,7 +359,8 @@ describe('data dependencies', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const updates = {
       Mutation: {
@@ -459,7 +461,7 @@ describe('data dependencies', () => {
       return undefined as any;
     });
 
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
     const result = vi.fn();
 
     pipe(
@@ -519,7 +521,8 @@ describe('data dependencies', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const updates = {
       Mutation: {
@@ -581,7 +584,8 @@ describe('data dependencies', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const updates = {
       Mutation: {
@@ -661,7 +665,7 @@ describe('data dependencies', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     pipe(
       cacheExchange({})({ forward, client, dispatchDebug })(ops$),
@@ -748,7 +752,8 @@ describe('optimistic updates', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const optimistic = {
       concealAuthor: vi.fn(() => optimisticMutationData.concealAuthor) as any,
@@ -858,7 +863,8 @@ describe('optimistic updates', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(3), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(3), map(response), share);
 
     const optimistic = {
       concealAuthor: vi.fn(() => optimisticMutationData.concealAuthor) as any,
@@ -957,7 +963,8 @@ describe('optimistic updates', () => {
         ops$,
         delay(1),
         filter(x => x.kind !== 'mutation'),
-        map(response)
+        map(response),
+        share
       );
 
     const optimistic = {
@@ -1071,7 +1078,8 @@ describe('optimistic updates', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const optimistic = {
       addAuthor: vi.fn(() => optimisticMutationData.addAuthor) as any,
@@ -1138,7 +1146,7 @@ describe('custom resolvers', () => {
       return undefined as any;
     });
 
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     const result = vi.fn();
     const fakeResolver = vi.fn();
@@ -1225,7 +1233,8 @@ describe('custom resolvers', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const fakeResolver = vi.fn();
 
@@ -1377,7 +1386,8 @@ describe('custom resolvers', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     const fakeResolver = vi.fn();
     const called: any[] = [];
@@ -1540,7 +1550,8 @@ describe('schema awareness', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     pipe(
       cacheExchange({
@@ -1683,7 +1694,8 @@ describe('schema awareness', () => {
     });
 
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
 
     pipe(
       cacheExchange({
@@ -1859,13 +1871,15 @@ describe('commutativity', () => {
     `;
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
-      merge([
-        pipe(
-          ops$,
-          filter(() => false)
-        ) as any,
-        res$,
-      ]);
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
 
     const optimistic = {
       node: () => ({
@@ -1953,13 +1967,15 @@ describe('commutativity', () => {
     `;
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
-      merge([
-        pipe(
-          ops$,
-          filter(() => false)
-        ) as any,
-        res$,
-      ]);
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
 
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),
@@ -2074,13 +2090,15 @@ describe('commutativity', () => {
     `;
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
-      merge([
-        pipe(
-          ops$,
-          filter(() => false)
-        ) as any,
-        res$,
-      ]);
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
 
     const optimistic = {
       node: () => ({
@@ -2177,13 +2195,15 @@ describe('commutativity', () => {
     `;
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
-      merge([
-        pipe(
-          ops$,
-          filter(() => false)
-        ) as any,
-        res$,
-      ]);
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
 
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),
@@ -2286,13 +2306,15 @@ describe('commutativity', () => {
     `;
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
-      merge([
-        pipe(
-          ops$,
-          filter(() => false)
-        ) as any,
-        res$,
-      ]);
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
 
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),
@@ -2438,13 +2460,15 @@ describe('commutativity', () => {
     `;
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
-      merge([
-        pipe(
-          ops$,
-          filter(() => false)
-        ) as any,
-        res$,
-      ]);
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
 
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),

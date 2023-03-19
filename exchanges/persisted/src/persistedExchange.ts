@@ -6,7 +6,6 @@ import {
   merge,
   mergeMap,
   pipe,
-  share,
 } from 'wonka';
 
 import {
@@ -131,15 +130,14 @@ export const persistedExchange =
 
     return operations$ => {
       const retries = makeSubject<Operation>();
-      const sharedOps$ = share(operations$);
 
       const forwardedOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(operation => !operationFilter(operation))
       );
 
       const persistedOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(operationFilter),
         map(async operation => {
           const persistedOperation = makeOperation(operation.kind, operation, {

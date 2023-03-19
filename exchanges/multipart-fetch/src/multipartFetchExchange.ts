@@ -1,4 +1,4 @@
-import { filter, merge, mergeMap, pipe, share, takeUntil, onPush } from 'wonka';
+import { filter, merge, mergeMap, pipe, takeUntil, onPush } from 'wonka';
 import { extractFiles } from 'extract-files';
 import { Exchange } from '@urql/core';
 
@@ -15,16 +15,15 @@ import {
  */
 export const multipartFetchExchange: Exchange =
   ({ forward, dispatchDebug }) =>
-  ops$ => {
-    const sharedOps$ = share(ops$);
+  operations$ => {
     const fetchResults$ = pipe(
-      sharedOps$,
+      operations$,
       filter(operation => {
         return operation.kind === 'query' || operation.kind === 'mutation';
       }),
       mergeMap(operation => {
         const teardown$ = pipe(
-          sharedOps$,
+          operations$,
           filter(op => op.kind === 'teardown' && op.key === operation.key)
         );
 
@@ -100,7 +99,7 @@ export const multipartFetchExchange: Exchange =
     );
 
     const forward$ = pipe(
-      sharedOps$,
+      operations$,
       filter(operation => {
         return operation.kind !== 'query' && operation.kind !== 'mutation';
       }),

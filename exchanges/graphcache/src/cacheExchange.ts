@@ -295,12 +295,10 @@ export const cacheExchange =
       };
     };
 
-    return ops$ => {
-      const sharedOps$ = pipe(ops$, share);
-
+    return operations$ => {
       // Filter by operations that are cacheable and attempt to query them from the cache
       const cacheOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(
           op =>
             op.kind === 'query' && op.context.requestPolicy !== 'network-only'
@@ -310,7 +308,7 @@ export const cacheExchange =
       );
 
       const nonCacheOps$ = pipe(
-        sharedOps$,
+        operations$,
         filter(
           op =>
             op.kind !== 'query' || op.context.requestPolicy === 'network-only'
@@ -402,8 +400,7 @@ export const cacheExchange =
       const result$ = pipe(
         merge([nonCacheOps$, cacheMissOps$]),
         map(prepareForwardedOperation),
-        forward,
-        share
+        forward
       );
 
       // Results that can immediately be resolved
