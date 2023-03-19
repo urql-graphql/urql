@@ -170,7 +170,6 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
 export const reexecuteOperation = (client: Client, operation: Operation) => {
   return client.reexecuteOperation(
     makeOperation(operation.kind, operation, {
-      ...operation.context,
       requestPolicy: 'network-only',
     })
   );
