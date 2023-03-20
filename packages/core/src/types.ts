@@ -1,4 +1,4 @@
-import type { GraphQLError, DocumentNode } from 'graphql';
+import type { GraphQLError, DocumentNode, DefinitionNode } from 'graphql';
 import { Subscription, Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -26,10 +26,16 @@ export interface TypedDocumentNode<
   Result = { [key: string]: any },
   Variables = { [key: string]: any }
 > extends DocumentNode {
-  /** Type to check whether `Variables` and `Result` are assignable types.
+  /** GraphQL.js Definition Nodes of the `DocumentNode`. */
+  readonly definitions: ReadonlyArray<DefinitionNode>;
+  /** Type to support `@graphql-typed-document-node/core`
    * @internal
    */
   __apiType?: (variables: Variables) => Result;
+  /** Type to support `TypedQueryDocumentNode` from `graphql`
+   * @internal
+   */
+  __ensureTypesOfVariablesAndResultMatching?: (variables: Variables) => Result;
 }
 
 /** A list of errors on {@link ExecutionResult | ExecutionResults}.
