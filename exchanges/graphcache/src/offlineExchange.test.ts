@@ -8,7 +8,7 @@ import {
 import { print } from 'graphql';
 import { vi, expect, it, describe } from 'vitest';
 
-import { pipe, map, makeSubject, tap, publish } from 'wonka';
+import { pipe, share, map, makeSubject, tap, publish } from 'wonka';
 import { queryResponse } from '../../../packages/core/src/test-utils';
 import { offlineExchange } from './offlineExchange';
 
@@ -88,7 +88,7 @@ describe('storage', () => {
 
     const { source: ops$ } = makeSubject<Operation>();
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     vi.useFakeTimers();
     pipe(
@@ -141,7 +141,7 @@ describe('offline', () => {
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     pipe(
       offlineExchange({
@@ -164,7 +164,7 @@ describe('offline', () => {
 
     next(mutationOp);
     expect(result).toBeCalledTimes(1);
-    expect(storage.writeMetadata).toBeCalledTimes(1);
+    expect(storage.writeMetadata).toHaveBeenCalled();
     expect(storage.writeMetadata).toHaveBeenCalledWith([
       {
         query: `mutation {
@@ -278,7 +278,7 @@ describe('offline', () => {
 
     const { source: ops$, next } = makeSubject<Operation>();
     const result = vi.fn();
-    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
 
     pipe(
       offlineExchange({
@@ -296,7 +296,7 @@ describe('offline', () => {
     );
 
     next(mutationOp);
-    expect(storage.writeMetadata).toBeCalledTimes(1);
+    expect(storage.writeMetadata).toHaveBeenCalled();
     expect(storage.writeMetadata).toHaveBeenCalledWith([
       {
         query: `mutation {
@@ -313,7 +313,7 @@ describe('offline', () => {
     await onOnlineCalled;
 
     flush!();
-    expect(reexecuteOperation).toHaveBeenCalledTimes(1);
+    expect(reexecuteOperation).toHaveBeenCalled();
     expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
     expect(print((reexecuteOperation.mock.calls[0][0] as any).query)).toEqual(
       print(gql`

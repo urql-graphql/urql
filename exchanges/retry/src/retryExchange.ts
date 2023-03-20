@@ -1,7 +1,5 @@
 import {
-  Source,
   makeSubject,
-  share,
   pipe,
   merge,
   filter,
@@ -11,13 +9,7 @@ import {
   takeUntil,
 } from 'wonka';
 
-import {
-  makeOperation,
-  Exchange,
-  Operation,
-  CombinedError,
-  OperationResult,
-} from '@urql/core';
+import { makeOperation, Exchange, Operation, CombinedError } from '@urql/core';
 
 /** Input parameters for the {@link retryExchange}. */
 export interface RetryExchangeOptions {
@@ -119,8 +111,7 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
     options.randomDelay != null ? !!options.randomDelay : true;
 
   return ({ forward, dispatchDebug }) =>
-    ops$ => {
-      const sharedOps$ = pipe(ops$, share);
+    operations$ => {
       const { source: retry$, next: nextRetryOperation } =
         makeSubject<Operation>();
 
@@ -142,7 +133,7 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
           // But if this event comes through regularly we also stop the retries, since it's
           // basically the query retrying itself, no backoff should be added!
           const teardown$ = pipe(
-            sharedOps$,
+            operations$,
             filter(op => {
               return (
                 (op.kind === 'query' || op.kind === 'teardown') &&
@@ -176,10 +167,9 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
         })
       );
 
-      const result$ = pipe(
-        merge([sharedOps$, retryWithBackoff$]),
+      return pipe(
+        merge([operations$, retryWithBackoff$]),
         forward,
-        share,
         filter(res => {
           // Only retry if the error passes the conditional retryIf function (if passed)
           // or if the error contains a networkError
@@ -216,8 +206,6 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
 
           return true;
         })
-      ) as Source<OperationResult>;
-
-      return result$;
+      );
     };
 };

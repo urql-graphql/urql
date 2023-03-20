@@ -1,4 +1,4 @@
-import { pipe, merge, makeSubject, share, filter } from 'wonka';
+import { pipe, merge, makeSubject, filter } from 'wonka';
 import { print, SelectionNode } from 'graphql';
 
 import {
@@ -214,10 +214,8 @@ export const offlineExchange =
         forward,
       });
 
-      return ops$ => {
-        const sharedOps$ = pipe(ops$, share);
-
-        const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
+      return operations$ => {
+        const opsAndRebound$ = merge([reboundOps$, operations$]);
 
         return pipe(
           cacheResults$(opsAndRebound$),

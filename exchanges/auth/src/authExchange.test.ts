@@ -5,6 +5,7 @@ import {
   toPromise,
   take,
   makeSubject,
+  share,
   publish,
   scan,
   tap,
@@ -41,7 +42,8 @@ const makeExchangeArgs = () => {
         pipe(
           op$,
           tap(op => operations.push(op)),
-          map(result)
+          map(result),
+          share
         ),
       client: new Client({
         url: '/api',

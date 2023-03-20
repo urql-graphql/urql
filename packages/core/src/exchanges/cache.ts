@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { filter, map, merge, pipe, share, tap } from 'wonka';
+import { filter, map, merge, pipe, tap } from 'wonka';
 
 import { Client } from '../client';
 import { Exchange, Operation, OperationResult } from '../types';
@@ -55,10 +55,8 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
       resultCache.has(operation.key));
 
   return ops$ => {
-    const sharedOps$ = share(ops$);
-
     const cachedOps$ = pipe(
-      sharedOps$,
+      ops$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
@@ -98,12 +96,12 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
     const forwardedOps$ = pipe(
       merge([
         pipe(
-          sharedOps$,
+          ops$,
           filter(op => !shouldSkip(op) && !isOperationCached(op)),
           map(mapTypeNames)
         ),
         pipe(
-          sharedOps$,
+          ops$,
           filter(op => shouldSkip(op))
         ),
       ]),

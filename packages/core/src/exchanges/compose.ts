@@ -1,3 +1,4 @@
+import { share } from 'wonka';
 import type { ExchangeIO, Exchange, ExchangeInput } from '../types';
 
 /** Composes an array of Exchanges into a single one.
@@ -13,22 +14,35 @@ import type { ExchangeIO, Exchange, ExchangeInput } from '../types';
  *
  * This simply merges all exchanges into one and is used by the {@link Client}
  * to merge the `exchanges` option it receives.
+ *
+ * @throws
+ * In development, if {@link ExchangeInput.forward} is called repeatedly
+ * by an {@link Exchange} an error is thrown, since `forward()` must only
+ * be called once per `Exchange`.
  */
 export const composeExchanges =
   (exchanges: Exchange[]): Exchange =>
   ({ client, forward, dispatchDebug }: ExchangeInput): ExchangeIO =>
-    exchanges.reduceRight(
-      (forward, exchange) =>
-        exchange({
-          client,
-          forward,
-          dispatchDebug(event) {
-            dispatchDebug({
-              timestamp: Date.now(),
-              source: exchange.name,
-              ...event,
-            });
-          },
-        }),
-      forward
-    );
+    exchanges.reduceRight((forward, exchange) => {
+      let forwarded = false;
+      return exchange({
+        client,
+        forward(operations$) {
+          if (process.env.NODE_ENV !== 'production') {
+            if (forwarded)
+              throw new Error(
+                'forward() must only be called once in each Exchange.'
+              );
+            forwarded = true;
+          }
+          return share(forward(share(operations$)));
+        },
+        dispatchDebug(event) {
+          dispatchDebug({
+            timestamp: Date.now(),
+            source: exchange.name,
+            ...event,
+          });
+        },
+      });
+    }, forward);
