@@ -16,7 +16,11 @@ const generateErrorMessage = (
 };
 
 const rehydrateGraphQlError = (error: any): GraphQLError => {
-  if (error instanceof GraphQLError) {
+  if (
+    error &&
+    error.message &&
+    (error.extensions || error.name === 'GraphQLError')
+  ) {
     return error;
   } else if (typeof error === 'object' && error.message) {
     return new GraphQLError(
