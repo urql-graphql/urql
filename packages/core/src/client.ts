@@ -783,13 +783,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       return client.executeRequestOperation(operation);
     },
 
-    query(query, variables, context) {
-      if (!context || typeof context.suspense !== 'boolean') {
-        context = { ...context, suspense: false };
-      }
-      return client.executeQuery(createRequest(query, variables), context);
-    },
-
     readQuery(query, variables, context) {
       let result: OperationResult | null = null;
 
@@ -801,6 +794,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       ).unsubscribe();
 
       return result;
+    },
+
+    query(query, variables, context) {
+      return client.executeQuery(createRequest(query, variables), context);
     },
 
     subscription(query, variables, context) {
