@@ -1,10 +1,6 @@
-import {
-  DocumentNode,
-  FieldNode,
-  InlineFragmentNode,
-  Kind,
-  visit,
-} from 'graphql';
+import { Kind, visit } from '@0no-co/graphql.web';
+
+import type { DocumentNode, FieldNode, InlineFragmentNode } from './graphql';
 
 import { KeyedDocumentNode, keyDocument } from './request';
 

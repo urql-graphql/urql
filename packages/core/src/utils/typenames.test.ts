@@ -1,4 +1,4 @@
-import { parse, print } from 'graphql';
+import { parse, print } from '@0no-co/graphql.web';
 import { describe, it, expect } from 'vitest';
 import { collectTypesFromResponse, formatDocument } from './typenames';
 import { createRequest } from './request';

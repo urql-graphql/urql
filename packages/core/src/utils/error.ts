@@ -1,4 +1,5 @@
-import { GraphQLError } from 'graphql';
+import { GraphQLError } from '@0no-co/graphql.web';
+import { ErrorLike } from '../types';
 
 const generateErrorMessage = (
   networkErr?: Error,
@@ -93,7 +94,7 @@ export class CombinedError extends Error {
 
   constructor(input: {
     networkError?: Error;
-    graphQLErrors?: Array<string | Partial<GraphQLError> | Error>;
+    graphQLErrors?: Array<string | ErrorLike>;
     response?: any;
   }) {
     const normalizedGraphQLErrors = (input.graphQLErrors || []).map(
