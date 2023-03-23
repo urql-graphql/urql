@@ -1,8 +1,4 @@
-import type {
-  GraphQLError,
-  DocumentNode,
-  DefinitionNode,
-} from './utils/graphql';
+import type { GraphQLError, DocumentNode } from './utils/graphql';
 import { Subscription, Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -30,8 +26,6 @@ export type TypedDocumentNode<
   Result = { [key: string]: any },
   Variables = { [key: string]: any }
 > = DocumentNode & {
-  /** GraphQL.js Definition Nodes of the `DocumentNode`. */
-  readonly definitions: ReadonlyArray<DefinitionNode>;
   /** Type to support `@graphql-typed-document-node/core`
    * @internal
    */

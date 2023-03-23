@@ -1,5 +1,5 @@
-import { Kind } from '@0no-co/graphql.web';
-import type { DocumentNode, SelectionNode, DefinitionNode } from './graphql';
+import { Kind, SelectionNode, DefinitionNode } from '@0no-co/graphql.web';
+import type { DocumentNode } from './graphql';
 import { KeyedDocumentNode, keyDocument } from './request';
 
 interface EntityLike {
