@@ -253,12 +253,11 @@ importers:
 
   packages/core:
     specifiers:
-      graphql: ^16.6.0
+      '@0no-co/graphql.web': ^0.1.6
       wonka: ^6.2.4
     dependencies:
+      '@0no-co/graphql.web': 0.1.6
       wonka: 6.2.4
-    devDependencies:
-      graphql: 16.6.0
 
   packages/introspection:
     specifiers:
@@ -467,6 +466,10 @@ importers:
       vue: 3.2.47
 
 packages:
+
+  /@0no-co/graphql.web/0.1.6:
+    resolution: {integrity: sha512-HUFsLTSjX6sTdK+CyoHNs71h0HneugTO6nQS8WwxFGarmAh3doKwZRVY39xLkdOmneSKJZIHRysjf+odHHBFhw==}
+    dev: false
 
   /@actions/artifact/1.1.1:
     resolution: {integrity: sha512-Vv4y0EW0ptEkU+Pjs5RGS/0EryTvI6s79LjSV9Gg/h+O3H/ddpjhuX/Bi/HZE4pbNPyjGtQjbdFWphkZhmgabA==}
@@ -9702,6 +9705,8 @@ packages:
 
   /match-sorter/3.1.1:
     resolution: {integrity: sha512-Qlox3wRM/Q4Ww9rv1cBmYKNJwWVX/WC+eA3+1S3Fv4EOhrqyp812ZEfVFKQk0AP6RfzmPUUOwEZBbJ8IRt8SOw==}
+    dependencies:
+      remove-accents: 0.4.2
     bundledDependencies:
       - remove-accents
 
@@ -12695,6 +12700,9 @@ packages:
       remark-stringify: 7.0.4
       unified: 8.4.2
     dev: false
+
+  /remove-accents/0.4.2:
+    resolution: {integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==}
 
   /remove-trailing-separator/1.1.0:
     resolution: {integrity: sha512-/hS+Y0u3aOfIETiaiirUFwDBDzmXPvO+jAfKTitUngIPzdKc6Z0LoFjM/CK5PL4C+eKwHohlHAb6H0VFfmmUsw==}
