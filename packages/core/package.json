@@ -52,13 +52,8 @@
     "prepare": "node ../../scripts/prepare/index.js",
     "prepublishOnly": "run-s clean build"
   },
-  "devDependencies": {
-    "graphql": "^16.0.0"
-  },
-  "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0"
-  },
   "dependencies": {
+    "@0no-co/graphql.web": "^0.1.6",
     "wonka": "^6.1.2"
   },
   "publishConfig": {
