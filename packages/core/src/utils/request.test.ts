@@ -1,6 +1,6 @@
 import { expect, it, describe } from 'vitest';
 
-import { parse, print } from 'graphql';
+import { parse, print } from '@0no-co/graphql.web';
 import { gql } from '../gql';
 import { createRequest, stringifyDocument } from './request';
 import { formatDocument } from './typenames';

@@ -1,4 +1,4 @@
-import { parse, print } from 'graphql';
+import { parse, print } from '@0no-co/graphql.web';
 import { vi, expect, it, beforeEach, SpyInstance } from 'vitest';
 
 import { gql } from './gql';
