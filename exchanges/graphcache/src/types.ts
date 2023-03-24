@@ -889,7 +889,7 @@ export interface SerializedEntries {
 export interface SerializedRequest {
   query: string;
   variables: AnyVariables | undefined;
-  extensions: RequestExtensions | undefined;
+  extensions?: RequestExtensions | undefined;
 }
 
 /** Interface for a storage adapter, used by the {@link offlineExchange} for Offline Support.
