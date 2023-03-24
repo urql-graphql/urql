@@ -1,4 +1,3 @@
-import { DocumentNode } from 'graphql';
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
 import {
@@ -35,6 +34,7 @@ import {
   expectValidOptimisticMutationsConfig,
 } from '../ast';
 
+type DocumentNode = TypedDocumentNode<any, any>;
 type RootField = 'query' | 'mutation' | 'subscription';
 
 /** Implementation of the {@link Cache} interface as created internally by the {@link cacheExchange}.

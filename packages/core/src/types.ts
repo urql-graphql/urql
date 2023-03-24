@@ -311,7 +311,7 @@ export type GraphQLRequestParams<
   Variables extends AnyVariables = AnyVariables
 > =
   | ({
-      query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+      query: DocumentInput<Data, Variables>;
     } & (Variables extends void
       ? {
           variables?: Variables;
@@ -332,7 +332,7 @@ export type GraphQLRequestParams<
           variables?: Variables;
         }))
   | {
-      query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+      query: DocumentInput<Data, Variables>;
       variables: Variables;
     };
 

@@ -158,6 +158,7 @@ importers:
 
   exchanges/graphcache:
     specifiers:
+      '@0no-co/graphql.web': ^0.1.6
       '@cypress/react': ^7.0.2
       '@urql/core': '>=3.2.2'
       '@urql/exchange-execute': workspace:*
@@ -169,6 +170,7 @@ importers:
       urql: workspace:*
       wonka: ^6.2.4
     dependencies:
+      '@0no-co/graphql.web': 0.1.6
       '@urql/core': link:../../packages/core
       wonka: 6.2.4
     devDependencies:

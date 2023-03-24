@@ -1,6 +1,5 @@
-import { DocumentNode } from 'graphql';
 import { ReactElement } from 'react';
-import { AnyVariables, TypedDocumentNode } from '@urql/core';
+import { AnyVariables, DocumentInput } from '@urql/core';
 
 import { useMutation, UseMutationState, UseMutationExecute } from '../hooks';
 
@@ -18,7 +17,7 @@ export interface MutationProps<
   Variables extends AnyVariables = AnyVariables
 > {
   /* The GraphQL mutation document that {@link useMutation} will execute. */
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
+  query: DocumentInput<Data, Variables>;
   children(arg: MutationState<Data, Variables>): ReactElement<any>;
 }
 
