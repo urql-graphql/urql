@@ -12,13 +12,12 @@ import {
   makeOperation,
   stringifyDocument,
   PersistedRequestExtensions,
+  TypedDocumentNode,
   OperationResult,
   CombinedError,
   Exchange,
   Operation,
 } from '@urql/core';
-
-import type { DocumentNode } from 'graphql';
 
 import { hash } from './sha256';
 
@@ -67,7 +66,10 @@ export interface PersistedExchangeOptions {
    * API is unavailable on React Native, which may require you to
    * pass a custom function here.
    */
-  generateHash?(query: string, document: DocumentNode): Promise<string>;
+  generateHash?(
+    query: string,
+    document: TypedDocumentNode<any, any>
+  ): Promise<string>;
   /** Enables persisted queries to be used for mutations.
    *
    * @remarks
