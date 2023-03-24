@@ -1,4 +1,4 @@
-import { AnyVariables, TypedDocumentNode } from '@urql/core';
+import { AnyVariables, TypedDocumentNode, RequestExtensions } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 import { IntrospectionData } from './ast';
 
@@ -888,7 +888,8 @@ export interface SerializedEntries {
 /** A serialized GraphQL request for offline storage. */
 export interface SerializedRequest {
   query: string;
-  variables: AnyVariables;
+  variables: AnyVariables | undefined;
+  extensions: RequestExtensions | undefined;
 }
 
 /** Interface for a storage adapter, used by the {@link offlineExchange} for Offline Support.

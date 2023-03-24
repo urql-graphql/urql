@@ -135,8 +135,9 @@ export const offlineExchange =
           const operation = failedQueue[i];
           if (operation.kind === 'mutation') {
             requests.push({
-              query: stringifyDocument(ooperation.query),
+              query: stringifyDocument(operation.query),
               variables: operation.variables,
+              extensions: operation.extensions,
             });
           }
         }
@@ -191,7 +192,8 @@ export const offlineExchange =
               failedQueue.push(
                 client.createRequestOperation(
                   'mutation',
-                  createRequest(mutations[i].query, mutations[i].variables)
+                  createRequest(mutations[i].query, mutations[i].variables),
+                  mutations[i].extensions
                 )
               );
             }
