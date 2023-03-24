@@ -13,7 +13,7 @@ import {
 } from '@urql/core';
 
 import { useClient } from '../context';
-import { initialState } from './state';
+import { deferDispatch, initialState } from './state';
 
 /** State of the last mutation executed by your {@link useMutation} hook.
  *
@@ -155,7 +155,7 @@ export function useMutation<
 
   const executeMutation = useCallback(
     (variables: Variables, context?: Partial<OperationContext>) => {
-      setState({ ...initialState, fetching: true });
+      deferDispatch(setState, { ...initialState, fetching: true });
 
       return pipe(
         client.executeMutation<Data, Variables>(
@@ -165,7 +165,7 @@ export function useMutation<
         toPromise
       ).then(result => {
         if (isMounted.current) {
-          setState({
+          deferDispatch(setState, {
             fetching: false,
             stale: !!result.stale,
             data: result.data,

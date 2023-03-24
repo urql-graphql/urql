@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 export const initialState = {
   fetching: false,
   stale: false,
@@ -41,3 +43,21 @@ export const hasDepsChanged = <T extends { length: number }>(a: T, b: T) => {
   for (let i = 0, l = b.length; i < l; i++) if (a[i] !== b[i]) return true;
   return false;
 };
+
+const reactSharedInternals = (React as any)
+  .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+
+export function deferDispatch<Dispatch extends React.Dispatch<any>>(
+  setState: Dispatch,
+  value: Dispatch extends React.Dispatch<infer State> ? State : void
+) {
+  if (
+    !!reactSharedInternals &&
+    !!reactSharedInternals.ReactCurrentOwner &&
+    !!reactSharedInternals.ReactCurrentOwner.current
+  ) {
+    Promise.resolve(value).then(setState);
+  } else {
+    setState(value);
+  }
+}

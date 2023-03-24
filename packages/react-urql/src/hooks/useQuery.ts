@@ -17,7 +17,13 @@ import {
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { getCacheForClient } from './cache';
-import { initialState, computeNextState, hasDepsChanged } from './state';
+
+import {
+  deferDispatch,
+  initialState,
+  computeNextState,
+  hasDepsChanged,
+} from './state';
 
 /** Input arguments for the {@link useQuery} hook.
  *
@@ -317,7 +323,7 @@ export function useQuery<
 
     const updateResult = (result: Partial<UseQueryState<Data, Variables>>) => {
       hasResult = true;
-      setState(state => {
+      deferDispatch(setState, state => {
         const nextResult = computeNextState(state[1], result);
         return state[1] !== nextResult
           ? [state[0], nextResult, state[2]]
@@ -353,7 +359,7 @@ export function useQuery<
         ...opts,
       };
 
-      setState(state => {
+      deferDispatch(setState, state => {
         const source = suspense
           ? pipe(
               client.executeQuery(request, context),

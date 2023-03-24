@@ -13,7 +13,13 @@ import {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { initialState, computeNextState, hasDepsChanged } from './state';
+
+import {
+  deferDispatch,
+  initialState,
+  computeNextState,
+  hasDepsChanged,
+} from './state';
 
 /** Input arguments for the {@link useSubscription} hook.
  *
@@ -257,7 +263,7 @@ export function useSubscription<
     const updateResult = (
       result: Partial<UseSubscriptionState<Data, Variables>>
     ) => {
-      setState(state => {
+      deferDispatch(setState, state => {
         const nextResult = computeNextState(state[1], result);
         if (state[1] === nextResult) return state;
         if (handlerRef.current && state[1].data !== nextResult.data) {
@@ -292,7 +298,7 @@ export function useSubscription<
         ...opts,
       });
 
-      setState(state => [source, state[1], deps]);
+      deferDispatch(setState, state => [source, state[1], deps]);
     },
     [client, args.context, request]
   );
