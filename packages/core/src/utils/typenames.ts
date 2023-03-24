@@ -1,6 +1,6 @@
 import { Kind, SelectionNode, DefinitionNode } from '@0no-co/graphql.web';
-import type { DocumentNode } from './graphql';
 import { KeyedDocumentNode, keyDocument } from './request';
+import { TypedDocumentNode } from '../types';
 
 interface EntityLike {
   [key: string]: EntityLike | EntityLike[] | any;
@@ -33,7 +33,9 @@ export const collectTypesFromResponse = (response: object): string[] => [
   ...collectTypes(response as EntityLike, new Set()),
 ];
 
-const formatNode = <T extends SelectionNode | DefinitionNode | DocumentNode>(
+const formatNode = <
+  T extends SelectionNode | DefinitionNode | TypedDocumentNode<any, any>
+>(
   node: T
 ): T => {
   let hasChanged = false;
@@ -98,7 +100,9 @@ const formattedDocs = new Map<number, KeyedDocumentNode>();
  * @see {@link https://spec.graphql.org/October2021/#sec-Type-Name-Introspection} for more information
  * on typename introspection via the `__typename` field.
  */
-export const formatDocument = <T extends DocumentNode>(node: T): T => {
+export const formatDocument = <T extends TypedDocumentNode<any, any>>(
+  node: T
+): T => {
   const query = keyDocument(node);
 
   let result = formattedDocs.get(query.__key);
