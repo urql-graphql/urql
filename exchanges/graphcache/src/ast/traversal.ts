@@ -6,7 +6,7 @@ import {
   InlineFragmentNode,
   valueFromASTUntyped,
   Kind,
-} from 'graphql';
+} from '@0no-co/graphql.web';
 
 import { getName } from './node';
 

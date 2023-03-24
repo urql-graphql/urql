@@ -3,7 +3,11 @@
 // Every warning and error comes with a number that uniquely identifies them.
 // You can read more about the messages themselves in `docs/graphcache/errors.md`
 
-import { Kind, ExecutableDefinitionNode, InlineFragmentNode } from 'graphql';
+import {
+  Kind,
+  ExecutableDefinitionNode,
+  InlineFragmentNode,
+} from '@0no-co/graphql.web';
 
 export type ErrorCode =
   | 1

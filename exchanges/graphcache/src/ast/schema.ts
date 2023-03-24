@@ -1,10 +1,9 @@
-import {
+import type {
   IntrospectionQuery,
-  IntrospectionSchema,
-  IntrospectionInputValue,
   IntrospectionTypeRef,
+  IntrospectionInputValue,
   IntrospectionType,
-} from 'graphql';
+} from './graphql';
 
 export interface SchemaField {
   name: string;
@@ -37,7 +36,7 @@ export interface PartialIntrospectionSchema {
   queryType: { name: string; kind?: any };
   mutationType?: { name: string; kind?: any } | null;
   subscriptionType?: { name: string; kind?: any } | null;
-  types?: IntrospectionSchema['types'];
+  types?: readonly any[];
 }
 
 export type IntrospectionData =

@@ -2,7 +2,7 @@ import {
   FieldNode,
   OperationDefinitionNode,
   valueFromASTUntyped,
-} from 'graphql';
+} from '@0no-co/graphql.web';
 
 import { getName } from './node';
 

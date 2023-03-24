@@ -1,5 +1,5 @@
 import { pipe, merge, makeSubject, filter } from 'wonka';
-import { SelectionNode } from 'graphql';
+import { SelectionNode } from '@0no-co/graphql.web';
 
 import {
   Operation,
