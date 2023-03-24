@@ -72,7 +72,7 @@ export const buildClientSchema = ({
           kind: type.kind as 'OBJECT' | 'INTERFACE',
           interfaces: buildNameMap(type.interfaces || []),
           fields: buildNameMap(
-            type.fields.map(field => ({
+            type.fields!.map((field: any) => ({
               name: field.name,
               type: field.type,
               args: buildNameMap(field.args),
