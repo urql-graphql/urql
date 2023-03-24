@@ -52,6 +52,7 @@ export function deferDispatch<Dispatch extends React.Dispatch<any>>(
   value: Dispatch extends React.Dispatch<infer State> ? State : void
 ) {
   if (
+    process.env.NODE_ENV !== 'production' &&
     !!reactSharedInternals &&
     !!reactSharedInternals.ReactCurrentOwner &&
     !!reactSharedInternals.ReactCurrentOwner.current
