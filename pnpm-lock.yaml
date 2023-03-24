@@ -14,6 +14,7 @@ importers:
 
   .:
     specifiers:
+      '@0no-co/graphql.web': ^1.0.0
       '@actions/artifact': ^1.1.1
       '@actions/core': ^1.10.0
       '@actions/github': ^5.1.1
@@ -71,6 +72,7 @@ importers:
       '@actions/github': 5.1.1
       node-fetch: 3.3.1
     devDependencies:
+      '@0no-co/graphql.web': 1.0.0_graphql@16.6.0
       '@actions/artifact': 1.1.1
       '@actions/core': 1.10.0
       '@babel/core': 7.21.3
@@ -158,7 +160,7 @@ importers:
 
   exchanges/graphcache:
     specifiers:
-      '@0no-co/graphql.web': ^0.1.6
+      '@0no-co/graphql.web': ^1.0.0
       '@cypress/react': ^7.0.2
       '@urql/core': '>=3.2.2'
       '@urql/exchange-execute': workspace:*
@@ -170,7 +172,7 @@ importers:
       urql: workspace:*
       wonka: ^6.2.4
     dependencies:
-      '@0no-co/graphql.web': 0.1.6
+      '@0no-co/graphql.web': 1.0.0_graphql@16.6.0
       '@urql/core': link:../../packages/core
       wonka: 6.2.4
     devDependencies:
@@ -255,10 +257,10 @@ importers:
 
   packages/core:
     specifiers:
-      '@0no-co/graphql.web': ^0.1.6
+      '@0no-co/graphql.web': ^1.0.0
       wonka: ^6.2.4
     dependencies:
-      '@0no-co/graphql.web': 0.1.6
+      '@0no-co/graphql.web': 1.0.0
       wonka: 6.2.4
 
   packages/introspection:
@@ -469,9 +471,24 @@ importers:
 
 packages:
 
-  /@0no-co/graphql.web/0.1.6:
-    resolution: {integrity: sha512-HUFsLTSjX6sTdK+CyoHNs71h0HneugTO6nQS8WwxFGarmAh3doKwZRVY39xLkdOmneSKJZIHRysjf+odHHBFhw==}
+  /@0no-co/graphql.web/1.0.0:
+    resolution: {integrity: sha512-JBq2pWyDchE1vVjj/+c4dzZ8stbpew4RrzpZ3vYdn1WJFGHfYg6YIX1fDdMKtSXJJM9FUlsoDOxemr9WMM2p+A==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+    peerDependenciesMeta:
+      graphql:
+        optional: true
     dev: false
+
+  /@0no-co/graphql.web/1.0.0_graphql@16.6.0:
+    resolution: {integrity: sha512-JBq2pWyDchE1vVjj/+c4dzZ8stbpew4RrzpZ3vYdn1WJFGHfYg6YIX1fDdMKtSXJJM9FUlsoDOxemr9WMM2p+A==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+    peerDependenciesMeta:
+      graphql:
+        optional: true
+    dependencies:
+      graphql: 16.6.0
 
   /@actions/artifact/1.1.1:
     resolution: {integrity: sha512-Vv4y0EW0ptEkU+Pjs5RGS/0EryTvI6s79LjSV9Gg/h+O3H/ddpjhuX/Bi/HZE4pbNPyjGtQjbdFWphkZhmgabA==}
@@ -7894,7 +7911,6 @@ packages:
   /graphql/16.6.0:
     resolution: {integrity: sha512-KPIBPDlW7NxrbT/eh4qPXz5FiFdL5UbaA0XUNz2Rp3Z3hqBSkbj0GVjwFDztsWVauZUWsbKHgMg++sk8UX0bkw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
-    dev: true
 
   /gud/1.0.0:
     resolution: {integrity: sha512-zGEOVKFM5sVPPrYs7J5/hYEw2Pof8KCyOwyhG8sAF26mCAeUFAcYPu1mwB7hhpIP29zOIBaDqwuHdLp0jvZXjw==}
@@ -9707,8 +9723,6 @@ packages:
 
   /match-sorter/3.1.1:
     resolution: {integrity: sha512-Qlox3wRM/Q4Ww9rv1cBmYKNJwWVX/WC+eA3+1S3Fv4EOhrqyp812ZEfVFKQk0AP6RfzmPUUOwEZBbJ8IRt8SOw==}
-    dependencies:
-      remove-accents: 0.4.2
     bundledDependencies:
       - remove-accents
 
@@ -12702,9 +12716,6 @@ packages:
       remark-stringify: 7.0.4
       unified: 8.4.2
     dev: false
-
-  /remove-accents/0.4.2:
-    resolution: {integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==}
 
   /remove-trailing-separator/1.1.0:
     resolution: {integrity: sha512-/hS+Y0u3aOfIETiaiirUFwDBDzmXPvO+jAfKTitUngIPzdKc6Z0LoFjM/CK5PL4C+eKwHohlHAb6H0VFfmmUsw==}
