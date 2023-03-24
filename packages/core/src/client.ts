@@ -22,13 +22,11 @@ import {
   Subscription,
 } from 'wonka';
 
-import { DocumentNode } from 'graphql';
-
 import { composeExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
 import {
-  TypedDocumentNode,
+  DocumentInput,
   AnyVariables,
   Exchange,
   ExchangeInput,
@@ -358,7 +356,7 @@ export interface Client {
    * ```
    */
   query<Data = any, Variables extends AnyVariables = AnyVariables>(
-    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    query: DocumentInput<Data, Variables>,
     variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResultSource<OperationResult<Data, Variables>>;
@@ -384,7 +382,7 @@ export interface Client {
    * or asynchronously.
    */
   readQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
-    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    query: DocumentInput<Data, Variables>,
     variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResult<Data, Variables> | null;
@@ -450,7 +448,7 @@ export interface Client {
    * ```
    */
   subscription<Data = any, Variables extends AnyVariables = AnyVariables>(
-    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    query: DocumentInput<Data, Variables>,
     variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResultSource<OperationResult<Data, Variables>>;
@@ -519,7 +517,7 @@ export interface Client {
    * ```
    */
   mutation<Data = any, Variables extends AnyVariables = AnyVariables>(
-    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    query: DocumentInput<Data, Variables>,
     variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResultSource<OperationResult<Data, Variables>>;

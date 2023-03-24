@@ -1,12 +1,6 @@
-import {
-  DocumentNode,
-  FieldNode,
-  InlineFragmentNode,
-  Kind,
-  visit,
-} from 'graphql';
-
+import { Kind, SelectionNode, DefinitionNode } from '@0no-co/graphql.web';
 import { KeyedDocumentNode, keyDocument } from './request';
+import { TypedDocumentNode } from '../types';
 
 interface EntityLike {
   [key: string]: EntityLike | EntityLike[] | any;
@@ -39,32 +33,51 @@ export const collectTypesFromResponse = (response: object): string[] => [
   ...collectTypes(response as EntityLike, new Set()),
 ];
 
-const formatNode = (node: FieldNode | InlineFragmentNode) => {
-  if (!node.selectionSet) return node;
-  for (const selection of node.selectionSet.selections)
-    if (
-      selection.kind === Kind.FIELD &&
-      selection.name.value === '__typename' &&
-      !selection.alias
-    )
-      return node;
+const formatNode = <
+  T extends SelectionNode | DefinitionNode | TypedDocumentNode<any, any>
+>(
+  node: T
+): T => {
+  let hasChanged = false;
 
-  return {
-    ...node,
-    selectionSet: {
-      ...node.selectionSet,
-      selections: [
-        ...node.selectionSet.selections,
-        {
+  if ('definitions' in node) {
+    const definitions: DefinitionNode[] = [];
+    for (const definition of node.definitions) {
+      const newDefinition = formatNode(definition);
+      hasChanged = hasChanged || newDefinition !== definition;
+      definitions.push(newDefinition);
+    }
+    if (hasChanged) return { ...node, definitions };
+  } else if ('selectionSet' in node) {
+    const selections: SelectionNode[] = [];
+    let hasTypename = node.kind === Kind.OPERATION_DEFINITION;
+    if (node.selectionSet) {
+      for (const selection of node.selectionSet.selections || []) {
+        hasTypename =
+          hasTypename ||
+          (selection.kind === Kind.FIELD &&
+            selection.name.value === '__typename' &&
+            !selection.alias);
+        const newSelection = formatNode(selection);
+        hasChanged = hasChanged || newSelection !== selection;
+        selections.push(newSelection);
+      }
+      if (!hasTypename) {
+        hasChanged = true;
+        selections.push({
           kind: Kind.FIELD,
           name: {
             kind: Kind.NAME,
             value: '__typename',
           },
-        },
-      ],
-    },
-  };
+        });
+      }
+      if (hasChanged)
+        return { ...node, selectionSet: { ...node.selectionSet, selections } };
+    }
+  }
+
+  return node;
 };
 
 const formattedDocs = new Map<number, KeyedDocumentNode>();
@@ -87,16 +100,17 @@ const formattedDocs = new Map<number, KeyedDocumentNode>();
  * @see {@link https://spec.graphql.org/October2021/#sec-Type-Name-Introspection} for more information
  * on typename introspection via the `__typename` field.
  */
-export const formatDocument = <T extends DocumentNode>(node: T): T => {
+export const formatDocument = <T extends TypedDocumentNode<any, any>>(
+  node: T
+): T => {
   const query = keyDocument(node);
 
   let result = formattedDocs.get(query.__key);
   if (!result) {
-    result = visit(query, {
-      Field: formatNode,
-      InlineFragment: formatNode,
-    }) as KeyedDocumentNode;
-
+    formattedDocs.set(
+      query.__key,
+      (result = formatNode(query) as KeyedDocumentNode)
+    );
     // Ensure that the hash of the resulting document won't suddenly change
     // we are marking __key as non-enumerable so when external exchanges use visit
     // to manipulate a document we won't restore the previous query due to the __key
@@ -105,8 +119,6 @@ export const formatDocument = <T extends DocumentNode>(node: T): T => {
       value: query.__key,
       enumerable: false,
     });
-
-    formattedDocs.set(query.__key, result);
   }
 
   return result as unknown as T;

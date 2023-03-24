@@ -1,10 +1,9 @@
-import { DocumentNode } from 'graphql';
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { pipe, toPromise } from 'wonka';
 
 import {
   AnyVariables,
-  TypedDocumentNode,
+  DocumentInput,
   OperationResult,
   OperationContext,
   CombinedError,
@@ -144,9 +143,7 @@ export type UseMutationResponse<
 export function useMutation<
   Data = any,
   Variables extends AnyVariables = AnyVariables
->(
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string
-): UseMutationResponse<Data, Variables> {
+>(query: DocumentInput<Data, Variables>): UseMutationResponse<Data, Variables> {
   const isMounted = useRef(true);
   const client = useClient();
 

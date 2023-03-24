@@ -7,7 +7,7 @@ import {
   FieldNode,
   FragmentDefinitionNode,
   Kind,
-} from 'graphql';
+} from '@0no-co/graphql.web';
 
 export type SelectionSet = ReadonlyArray<SelectionNode>;
 

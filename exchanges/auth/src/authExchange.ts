@@ -18,11 +18,9 @@ import {
   OperationResult,
   CombinedError,
   Exchange,
-  TypedDocumentNode,
+  DocumentInput,
   AnyVariables,
 } from '@urql/core';
-
-import { DocumentNode } from 'graphql';
 
 /** Utilities to use while refreshing authentication tokens. */
 export interface AuthUtilities {
@@ -43,7 +41,7 @@ export interface AuthUtilities {
    * options, so you may have to pass them again, if needed.
    */
   mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
-    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    query: DocumentInput<Data, Variables>,
     variables: Variables,
     context?: Partial<OperationContext>
   ): Promise<OperationResult<Data>>;
@@ -222,7 +220,7 @@ export function authExchange(
         .then(() =>
           init({
             mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
-              query: DocumentNode | string,
+              query: DocumentInput<Data, Variables>,
               variables: Variables,
               context?: Partial<OperationContext>
             ): Promise<OperationResult<Data>> {

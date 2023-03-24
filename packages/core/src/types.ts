@@ -1,4 +1,4 @@
-import type { GraphQLError, DocumentNode, DefinitionNode } from 'graphql';
+import type { GraphQLError, DocumentNode } from './utils/graphql';
 import { Subscription, Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -22,12 +22,10 @@ import { CombinedError } from './utils/error';
  *
  * @see {@link https://github.com/dotansimha/graphql-typed-document-node} for more information.
  */
-export interface TypedDocumentNode<
+export type TypedDocumentNode<
   Result = { [key: string]: any },
   Variables = { [key: string]: any }
-> extends DocumentNode {
-  /** GraphQL.js Definition Nodes of the `DocumentNode`. */
-  readonly definitions: ReadonlyArray<DefinitionNode>;
+> = DocumentNode & {
   /** Type to support `@graphql-typed-document-node/core`
    * @internal
    */
@@ -36,12 +34,24 @@ export interface TypedDocumentNode<
    * @internal
    */
   __ensureTypesOfVariablesAndResultMatching?: (variables: Variables) => Result;
-}
+};
+
+/** Any GraphQL `DocumentNode` or query string input.
+ *
+ * @remarks
+ * Wherever any `urql` bindings or API expect a query, it accepts either a query string,
+ * a `DocumentNode`, or a {@link TypedDocumentNode}.
+ */
+export type DocumentInput<
+  Result = { [key: string]: any },
+  Variables = { [key: string]: any }
+> = string | DocumentNode | TypedDocumentNode<Result, Variables>;
 
 /** A list of errors on {@link ExecutionResult | ExecutionResults}.
  * @see {@link https://spec.graphql.org/draft/#sec-Errors.Error-Result-Format} for the GraphQL Error Result format spec.
  */
-type ErrorLike = Partial<GraphQLError> | Error;
+export type ErrorLike = Partial<GraphQLError> | Error;
+
 /** Extensions which may be placed on {@link ExecutionResult | ExecutionResults}.
  * @see {@link https://spec.graphql.org/draft/#sel-EAPHJCAACCoGu9J} for the GraphQL Error Result format spec.
  */
@@ -301,7 +311,7 @@ export type GraphQLRequestParams<
   Variables extends AnyVariables = AnyVariables
 > =
   | ({
-      query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+      query: DocumentInput<Data, Variables>;
     } & (Variables extends void
       ? {
           variables?: Variables;
@@ -322,7 +332,7 @@ export type GraphQLRequestParams<
           variables?: Variables;
         }))
   | {
-      query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+      query: DocumentInput<Data, Variables>;
       variables: Variables;
     };
 

@@ -24,6 +24,7 @@ function removeEmptyImports({ types: t }) {
 
 function cleanup() {
   const emptyImportRe = /import\s+(?:'[^']+'|"[^"]+")\s*;?/g;
+  const gqlImportRe = /(import\s+(?:[*\s{}\w\d]+)\s*from\s*'graphql';?)/g;
   const jsFilter = createFilter(/.m?js$/, null, { resolve: false });
   const dtsFilter = createFilter(/\.d\.ts(\.map)?$/, null, { resolve: false });
 
@@ -37,7 +38,9 @@ function cleanup() {
           babelrc: false
         });
       } else if (dtsFilter(chunk.fileName)) {
-        return code.replace(emptyImportRe, '');
+        return code
+          .replace(emptyImportRe, '')
+          .replace(gqlImportRe, x => '/*!@ts-ignore*/\n' + x);
       }
     },
   };

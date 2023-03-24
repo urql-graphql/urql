@@ -62,11 +62,9 @@
     "prepublishOnly": "run-s clean build"
   },
   "dependencies": {
+    "@0no-co/graphql.web": "^1.0.0",
     "@urql/core": ">=3.2.2",
     "wonka": "^6.0.0"
-  },
-  "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0"
   },
   "devDependencies": {
     "@cypress/react": "^7.0.2",

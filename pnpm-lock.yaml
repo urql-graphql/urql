@@ -14,6 +14,7 @@ importers:
 
   .:
     specifiers:
+      '@0no-co/graphql.web': ^1.0.0
       '@actions/artifact': ^1.1.1
       '@actions/core': ^1.10.0
       '@actions/github': ^5.1.1
@@ -71,6 +72,7 @@ importers:
       '@actions/github': 5.1.1
       node-fetch: 3.3.1
     devDependencies:
+      '@0no-co/graphql.web': 1.0.0_graphql@16.6.0
       '@actions/artifact': 1.1.1
       '@actions/core': 1.10.0
       '@babel/core': 7.21.3
@@ -158,6 +160,7 @@ importers:
 
   exchanges/graphcache:
     specifiers:
+      '@0no-co/graphql.web': ^1.0.0
       '@cypress/react': ^7.0.2
       '@urql/core': '>=3.2.2'
       '@urql/exchange-execute': workspace:*
@@ -169,6 +172,7 @@ importers:
       urql: workspace:*
       wonka: ^6.2.4
     dependencies:
+      '@0no-co/graphql.web': 1.0.0_graphql@16.6.0
       '@urql/core': link:../../packages/core
       wonka: 6.2.4
     devDependencies:
@@ -253,12 +257,11 @@ importers:
 
   packages/core:
     specifiers:
-      graphql: ^16.6.0
+      '@0no-co/graphql.web': ^1.0.0
       wonka: ^6.2.4
     dependencies:
+      '@0no-co/graphql.web': 1.0.0
       wonka: 6.2.4
-    devDependencies:
-      graphql: 16.6.0
 
   packages/introspection:
     specifiers:
@@ -467,6 +470,25 @@ importers:
       vue: 3.2.47
 
 packages:
+
+  /@0no-co/graphql.web/1.0.0:
+    resolution: {integrity: sha512-JBq2pWyDchE1vVjj/+c4dzZ8stbpew4RrzpZ3vYdn1WJFGHfYg6YIX1fDdMKtSXJJM9FUlsoDOxemr9WMM2p+A==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+    peerDependenciesMeta:
+      graphql:
+        optional: true
+    dev: false
+
+  /@0no-co/graphql.web/1.0.0_graphql@16.6.0:
+    resolution: {integrity: sha512-JBq2pWyDchE1vVjj/+c4dzZ8stbpew4RrzpZ3vYdn1WJFGHfYg6YIX1fDdMKtSXJJM9FUlsoDOxemr9WMM2p+A==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+    peerDependenciesMeta:
+      graphql:
+        optional: true
+    dependencies:
+      graphql: 16.6.0
 
   /@actions/artifact/1.1.1:
     resolution: {integrity: sha512-Vv4y0EW0ptEkU+Pjs5RGS/0EryTvI6s79LjSV9Gg/h+O3H/ddpjhuX/Bi/HZE4pbNPyjGtQjbdFWphkZhmgabA==}
@@ -7889,7 +7911,6 @@ packages:
   /graphql/16.6.0:
     resolution: {integrity: sha512-KPIBPDlW7NxrbT/eh4qPXz5FiFdL5UbaA0XUNz2Rp3Z3hqBSkbj0GVjwFDztsWVauZUWsbKHgMg++sk8UX0bkw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
-    dev: true
 
   /gud/1.0.0:
     resolution: {integrity: sha512-zGEOVKFM5sVPPrYs7J5/hYEw2Pof8KCyOwyhG8sAF26mCAeUFAcYPu1mwB7hhpIP29zOIBaDqwuHdLp0jvZXjw==}

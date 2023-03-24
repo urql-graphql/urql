@@ -1,4 +1,7 @@
-import { InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
+import {
+  InlineFragmentNode,
+  FragmentDefinitionNode,
+} from '@0no-co/graphql.web';
 
 import { warn, invariant } from '../helpers/help';
 import { getTypeCondition } from './node';

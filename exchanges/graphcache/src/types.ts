@@ -1,5 +1,12 @@
-import { AnyVariables, TypedDocumentNode, RequestExtensions } from '@urql/core';
-import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import {
+  AnyVariables,
+  DocumentInput,
+  RequestExtensions,
+  TypedDocumentNode,
+  ErrorLike,
+} from '@urql/core';
+
+import { FragmentDefinitionNode } from '@0no-co/graphql.web';
 import { IntrospectionData } from './ast';
 
 /** Nullable GraphQL list types of `T`.
@@ -177,7 +184,7 @@ export interface KeyInfo {
  * GraphQL operation: its query document and variables.
  */
 export interface OperationRequest {
-  query: DocumentNode | TypedDocumentNode<any, any>;
+  query: Exclude<DocumentInput<any, any>, string>;
   variables?: any;
 }
 
@@ -209,7 +216,7 @@ export interface ResolveInfo {
   parentFieldKey: string;
   /** Current field that the resolver has been called on. */
   fieldName: string;
-  /** Map of fragment definitions from the {@link DocumentNode}. */
+  /** Map of fragment definitions from the query document. */
   fragments: Fragments;
   /** Full original {@link Variables} object on the {@link OperationRequest}. */
   variables: Variables;
@@ -220,7 +227,7 @@ export interface ResolveInfo {
    * will be set and provided here. This can be useful to recover from an
    * error on a specific field.
    */
-  error: GraphQLError | undefined;
+  error: ErrorLike | undefined;
   /** Flag used to indicate whether the current GraphQL query is only partially cached.
    *
    * @remarks
@@ -257,7 +264,7 @@ export interface ResolveInfo {
  * cached data, as accepted by {@link cache.readQuery}.
  */
 export interface QueryInput<T = Data, V = Variables> {
-  query: string | DocumentNode | TypedDocumentNode<T, V>;
+  query: DocumentInput<T, V>;
   variables?: V;
 }
 
@@ -443,7 +450,7 @@ export interface Cache {
    * ```
    */
   readFragment<T = Data, V = Variables>(
-    fragment: DocumentNode | TypedDocumentNode<T, V>,
+    fragment: TypedDocumentNode<any, any> | TypedDocumentNode<T, V>,
     entity: string | Data | T,
     variables?: V
   ): T | null;
@@ -473,7 +480,7 @@ export interface Cache {
    * ```
    */
   writeFragment<T = Data, V = Variables>(
-    fragment: DocumentNode | TypedDocumentNode<T, V>,
+    fragment: TypedDocumentNode<any, any> | TypedDocumentNode<T, V>,
     data: T,
     variables?: V
   ): void;

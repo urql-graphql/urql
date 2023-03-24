@@ -1,32 +1,22 @@
-import {
-  Location,
-  DefinitionNode,
-  DocumentNode,
-  Kind,
-  parse,
-  print,
-} from 'graphql';
-
+import { Kind, parse, print } from '@0no-co/graphql.web';
+import type { DocumentNode, DefinitionNode } from './graphql';
 import { HashValue, phash } from './hash';
 import { stringifyVariables } from './variables';
 
 import type {
+  DocumentInput,
   TypedDocumentNode,
   AnyVariables,
   GraphQLRequest,
   RequestExtensions,
 } from '../types';
 
-interface WritableLocation {
-  loc: Location | undefined;
-}
-
 /** A `DocumentNode` annotated with its hashed key.
  * @internal
  */
-export interface KeyedDocumentNode extends DocumentNode {
+export type KeyedDocumentNode = TypedDocumentNode & {
   __key: HashValue;
-}
+};
 
 const SOURCE_NAME = 'gql';
 const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
@@ -70,7 +60,7 @@ export const stringifyDocument = (
   }
 
   if (typeof node !== 'string' && !node.loc) {
-    (node as WritableLocation).loc = {
+    (node as any).loc = {
       start: 0,
       end: printed.length,
       source: {
@@ -78,7 +68,7 @@ export const stringifyDocument = (
         name: SOURCE_NAME,
         locationOffset: { line: 1, column: 1 },
       },
-    } as Location;
+    };
   }
 
   return printed;
@@ -157,7 +147,7 @@ export const createRequest = <
   Data = any,
   Variables extends AnyVariables = AnyVariables
 >(
-  _query: string | DocumentNode | TypedDocumentNode<Data, Variables>,
+  _query: DocumentInput<Data, Variables>,
   _variables: Variables,
   extensions?: RequestExtensions | undefined
 ): GraphQLRequest<Data, Variables> => {

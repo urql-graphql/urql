@@ -1,5 +1,10 @@
-import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
 import { CombinedError } from '@urql/core';
+
+import {
+  FieldNode,
+  DocumentNode,
+  FragmentDefinitionNode,
+} from '@0no-co/graphql.web';
 
 import {
   getSelectionSet,

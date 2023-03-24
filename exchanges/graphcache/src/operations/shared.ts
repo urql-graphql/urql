@@ -1,10 +1,10 @@
-import { CombinedError } from '@urql/core';
+import { CombinedError, ErrorLike } from '@urql/core';
+
 import {
-  GraphQLError,
   FieldNode,
   InlineFragmentNode,
   FragmentDefinitionNode,
-} from 'graphql';
+} from '@0no-co/graphql.web';
 
 import {
   isDeferred,
@@ -41,12 +41,12 @@ export interface Context {
   parentFieldKey: string;
   parent: Data;
   fieldName: string;
-  error: GraphQLError | undefined;
+  error: ErrorLike | undefined;
   partial: boolean;
   optimistic: boolean;
   __internal: {
     path: Array<string | number>;
-    errorMap: { [path: string]: GraphQLError } | undefined;
+    errorMap: { [path: string]: ErrorLike } | undefined;
   };
 }
 
@@ -54,7 +54,7 @@ export const contextRef: { current: Context | null } = { current: null };
 export const deferRef: { current: boolean } = { current: false };
 
 // Checks whether the current data field is a cache miss because of a GraphQLError
-export const getFieldError = (ctx: Context): GraphQLError | undefined =>
+export const getFieldError = (ctx: Context): ErrorLike | undefined =>
   ctx.__internal.path.length > 0 && ctx.__internal.errorMap
     ? ctx.__internal.errorMap[ctx.__internal.path.join('.')]
     : undefined;

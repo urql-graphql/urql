@@ -1,8 +1,7 @@
-import { DocumentNode } from 'graphql';
 import { useRef, useMemo } from 'react';
 import {
   AnyVariables,
-  TypedDocumentNode,
+  DocumentInput,
   GraphQLRequest,
   createRequest,
 } from '@urql/core';
@@ -14,7 +13,7 @@ export function useRequest<
   Data = any,
   Variables extends AnyVariables = AnyVariables
 >(
-  query: string | DocumentNode | TypedDocumentNode<Data, Variables>,
+  query: DocumentInput<Data, Variables>,
   variables: Variables
 ): GraphQLRequest<Data, Variables> {
   const prev = useRef<undefined | GraphQLRequest<Data, Variables>>(undefined);
