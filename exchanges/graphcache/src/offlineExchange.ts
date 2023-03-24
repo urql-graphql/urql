@@ -1,5 +1,5 @@
 import { pipe, merge, makeSubject, filter } from 'wonka';
-import { print, SelectionNode } from 'graphql';
+import { SelectionNode } from 'graphql';
 
 import {
   Operation,
@@ -7,6 +7,7 @@ import {
   Exchange,
   ExchangeIO,
   CombinedError,
+  stringifyDocument,
   createRequest,
   makeOperation,
 } from '@urql/core';
@@ -134,7 +135,7 @@ export const offlineExchange =
           const operation = failedQueue[i];
           if (operation.kind === 'mutation') {
             requests.push({
-              query: print(operation.query),
+              query: stringifyDocument(ooperation.query),
               variables: operation.variables,
             });
           }
