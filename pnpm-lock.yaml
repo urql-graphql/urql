@@ -170,10 +170,10 @@ importers:
       urql: workspace:*
       wonka: ^6.2.4
     dependencies:
+      '@0no-co/graphql.web': 0.1.6
       '@urql/core': link:../../packages/core
       wonka: 6.2.4
     devDependencies:
-      '@0no-co/graphql.web': 0.1.6
       '@cypress/react': 7.0.2_kxqn2c7raunyx4zfzvxjupflne
       '@urql/exchange-execute': link:../execute
       '@urql/introspection': link:../../packages/introspection
@@ -471,6 +471,7 @@ packages:
 
   /@0no-co/graphql.web/0.1.6:
     resolution: {integrity: sha512-HUFsLTSjX6sTdK+CyoHNs71h0HneugTO6nQS8WwxFGarmAh3doKwZRVY39xLkdOmneSKJZIHRysjf+odHHBFhw==}
+    dev: false
 
   /@actions/artifact/1.1.1:
     resolution: {integrity: sha512-Vv4y0EW0ptEkU+Pjs5RGS/0EryTvI6s79LjSV9Gg/h+O3H/ddpjhuX/Bi/HZE4pbNPyjGtQjbdFWphkZhmgabA==}
