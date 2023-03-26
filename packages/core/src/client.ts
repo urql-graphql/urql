@@ -553,6 +553,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
   const replays = new Map<number, OperationResult>();
   const active: Map<number, Source<OperationResult>> = new Map();
+  const dispatched = new Set<number>();
   const queue: Operation[] = [];
 
   const baseOpts = {
@@ -569,8 +570,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
   function nextOperation(operation: Operation) {
     const prevReplay = replays.get(operation.key);
-    if (operation.kind === 'mutation' || !prevReplay || !prevReplay.hasNext)
+    if (
+      operation.kind === 'mutation' ||
+      operation.kind === 'teardown' ||
+      (prevReplay ? !prevReplay.hasNext : !dispatched.has(operation.key))
+    ) {
+      if (operation.kind === 'teardown') {
+        dispatched.delete(operation.key);
+      } else if (operation.kind !== 'mutation') {
+        dispatched.add(operation.key);
+      }
       operations.next(operation);
+    }
   }
 
   // We define a queued dispatcher on the subject, which empties the queue when it's
@@ -660,10 +671,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         ]);
       }),
       onPush(result => {
+        dispatched.delete(operation.key);
         replays.set(operation.key, result);
       }),
       onEnd(() => {
         // Delete the active operation handle
+        dispatched.delete(operation.key);
         replays.delete(operation.key);
         active.delete(operation.key);
         // Delete all queued up operations of the same key on end

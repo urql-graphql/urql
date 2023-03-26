@@ -365,7 +365,7 @@ describe('queuing behavior', () => {
             output.push(op);
             if (
               op.key === queryOperation.key &&
-              op.context.requestPolicy === 'cache-first'
+              op.context.requestPolicy !== 'network-only'
             ) {
               client.reexecuteOperation({
                 ...op,
@@ -840,10 +840,15 @@ describe('shared sources behavior', () => {
   });
 
   it('does nothing when no operation result has been emitted yet', () => {
+    const dispatched = vi.fn();
+
     const exchange: Exchange = () => ops$ => {
       return pipe(
         ops$,
-        map(op => ({ hasNext: false, stale: false, data: 1, operation: op })),
+        map(op => {
+          dispatched(op);
+          return { hasNext: false, stale: false, data: 1, operation: op };
+        }),
         filter(() => false)
       );
     };
@@ -862,6 +867,7 @@ describe('shared sources behavior', () => {
 
     expect(resultOne).toHaveBeenCalledTimes(0);
     expect(resultTwo).toHaveBeenCalledTimes(0);
+    expect(dispatched).toHaveBeenCalledTimes(1);
   });
 
   it('skips replaying results when a result is emitted immediately (network-only)', () => {
