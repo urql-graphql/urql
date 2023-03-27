@@ -13,12 +13,11 @@ APIs and ability to handle GraphQL subscriptions.
 To add support for subscriptions we need to add the `subscriptionExchange` to our `Client`.
 
 ```js
-import { Client, dedupExchange, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
 
 const client = new Client({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     fetchExchange,
     subscriptionExchange({
@@ -47,17 +46,16 @@ object with a `.subscribe()` method accepting an observer.
 For backends supporting `graphql-ws`, we recommend using the [graphql-ws](https://github.com/enisdenjo/graphql-ws) client.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
 import { createClient as createWSClient } from 'graphql-ws';
 
 const wsClient = createWSClient({
   url: 'ws://localhost/graphql',
 });
 
-const client = createClient({
+const client = new Client({
   url: '/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     fetchExchange,
     subscriptionExchange({
@@ -85,7 +83,7 @@ package](https://github.com/apollographql/subscriptions-transport-ws) can be use
 > The `subscriptions-transport-ws` package isn't actively maintained. If your API supports the new protocol or you can swap the package out, consider using [`graphql-ws`](#setting-up-graphql-ws) instead.
 
 ```js
-import { Client, dedupExchange, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
 const subscriptionClient = new SubscriptionClient('ws://localhost/graphql', { reconnect: true });
@@ -93,7 +91,6 @@ const subscriptionClient = new SubscriptionClient('ws://localhost/graphql', { re
 const client = new Client({
   url: '/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     fetchExchange,
     subscriptionExchange({

@@ -22,7 +22,7 @@ npm install --save @urql/exchange-retry
 You'll then need to add the `retryExchange`, exposed by this package, to your `urql` Client:
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 import { retryExchange } from '@urql/exchange-retry';
 
 // None of these options have to be added, these are the default values.
@@ -36,10 +36,9 @@ const options = {
 
 // Note the position of the retryExchange - it should be placed prior to the
 // fetchExchange and after the cacheExchange for it to function correctly
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     retryExchange(options), // Use the retryExchange factory to add a new exchange
     fetchExchange,
@@ -69,17 +68,16 @@ We can introduce specific triggers for the `retryExchange` to start retrying ope
 let's look at an example:
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 import { retryExchange } from '@urql/exchange-retry';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     retryExchange({
       retryIf: error => {
-        return !!(error.graphQLErrors.length > 0 || error.networkError);
+        return !!(error.graphQLErrors.length > 0 || error.networkError);
       },
     }),
     fetchExchange,

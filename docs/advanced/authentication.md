@@ -51,13 +51,12 @@ You'll then need to add the `authExchange`, that this package exposes to your `C
 in front of all `fetchExchange`s but after all other synchronous exchanges, like the `cacheExchange`.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 import { authExchange } from '@urql/exchange-auth';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     authExchange(async utils => {
       return {

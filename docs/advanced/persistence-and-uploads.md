@@ -48,13 +48,12 @@ You'll then need to add the `persistedExchange` function, that this package expo
 to your `exchanges`.
 
 ```js
-import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
+import { Client, fetchExchange, cacheExchange } from 'urql';
 import { persistedExchange } from '@urql/exchange-persisted-fetch';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     persistedExchange({
       preferGetForPersistedQueries: true,
@@ -129,5 +128,5 @@ In `urql`, these are supported natively, so as long as your JS environment suppo
 `Blob`s, you can pass these directly to any `urql` API via your `variables`, and the default
 `fetchExchange` will swich to using a multipart request instead.
 
-Previously, this worked by installing the [`@urql/multipart-fetch-exchange` package](../api/multipart-fetch-exchange.md),
-however, this package has been deprecated and file uploads are now built into `@urql/core`.
+> **Note:** Previously, this worked by installing the `@urql/multipart-fetch-exchange` package.
+> however, this package has been deprecated and file uploads are now built into `@urql/core@4`.
