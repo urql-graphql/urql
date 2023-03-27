@@ -112,7 +112,7 @@ export function mutationStore<
       args.client.executeRequestOperation(operation),
       map(({ stale, data, error, extensions, operation }) => ({
         fetching: false,
-        stale: !!stale,
+        stale,
         data,
         error,
         operation,
