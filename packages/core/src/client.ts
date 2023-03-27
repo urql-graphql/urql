@@ -622,21 +622,11 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     if (operation.kind !== 'query') {
       result$ = pipe(
         result$,
+        takeWhile(result => !!result.hasNext, true),
+        // TODO: Remove manual onStart here
         onStart(() => {
-          nextOperation(operation);
+          dispatchOperation(operation);
         })
-      );
-    }
-
-    // A mutation is always limited to just a single result and is never shared
-    if (operation.kind === 'mutation') {
-      return pipe(result$, take(1));
-    }
-
-    if (operation.kind === 'subscription') {
-      result$ = pipe(
-        result$,
-        takeWhile(result => !!result.hasNext)
       );
     }
 
