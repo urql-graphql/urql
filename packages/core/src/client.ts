@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 import {
+  lazy,
   filter,
-  make,
   makeSubject,
   onEnd,
   onPush,
@@ -744,40 +744,49 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       }
 
       return withPromise(
-        make<OperationResult>(observer => {
+        lazy<OperationResult>(() => {
           let source = active.get(operation.key);
           if (!source) {
             active.set(operation.key, (source = makeResultSource(operation)));
           }
 
-          return pipe(
-            source,
-            onStart(() => {
-              const prevReplay = replays.get(operation.key);
-              const isNetworkOperation =
-                operation.context.requestPolicy === 'cache-and-network' ||
-                operation.context.requestPolicy === 'network-only';
-              if (operation.kind !== 'query') {
-                return dispatchOperation(operation);
-              } else if (isNetworkOperation) {
+          const isNetworkOperation =
+            operation.context.requestPolicy === 'cache-and-network' ||
+            operation.context.requestPolicy === 'network-only';
+          const replay =
+            operation.kind === 'query' ? replays.get(operation.key) : undefined;
+          if (replay) {
+            return merge([
+              pipe(
+                source,
+                onStart(() => {
+                  if (isNetworkOperation) {
+                    dispatchOperation(operation);
+                  }
+                })
+              ),
+              pipe(
+                fromValue(replay),
+                filter(replay => {
+                  if (replay === replays.get(operation.key)) {
+                    if (isNetworkOperation && !replay.hasNext)
+                      replay.stale = true;
+                    return true;
+                  } else {
+                    if (!isNetworkOperation) dispatchOperation(operation);
+                    return false;
+                  }
+                })
+              ),
+            ]);
+          } else {
+            return pipe(
+              source,
+              onStart(() => {
                 dispatchOperation(operation);
-                if (prevReplay && !prevReplay.hasNext) prevReplay.stale = true;
-              }
-
-              if (
-                prevReplay != null &&
-                prevReplay === replays.get(operation.key)
-              ) {
-                observer.next(prevReplay);
-              } else if (!isNetworkOperation) {
-                dispatchOperation(operation);
-              }
-            }),
-            onEnd(() => {
-              observer.complete();
-            }),
-            subscribe(observer.next)
-          ).unsubscribe;
+              })
+            );
+          }
         })
       );
     },
