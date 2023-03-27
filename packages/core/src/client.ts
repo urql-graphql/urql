@@ -640,7 +640,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
                   // React only to matching operations, excluding the one that this stream dispatches
                   filter(
                     op =>
-                      op !== operation &&
                       op.key === operation.key &&
                       op.context.requestPolicy !== 'cache-only'
                   ),
@@ -768,24 +767,32 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             );
           }
 
-          return operation.kind !== 'query' || !replay
-            ? source
-            : merge([
+          if (operation.kind !== 'query' || !replay) {
+            return source;
+          } else {
+            let hasResult = false;
+            return merge([
+              pipe(
                 source,
-                pipe(
-                  fromValue(replay),
-                  filter(replay => {
-                    if (replay === replays.get(operation.key)) {
-                      if (isNetworkOperation && !replay.hasNext)
-                        replay.stale = true;
-                      return true;
-                    } else {
-                      if (!isNetworkOperation) dispatchOperation(operation);
-                      return false;
-                    }
-                  })
-                ),
-              ]);
+                onPush(() => {
+                  hasResult = true;
+                })
+              ),
+              pipe(
+                fromValue(replay),
+                filter(replay => {
+                  if (!hasResult && replay === replays.get(operation.key)) {
+                    if (isNetworkOperation && !replay.hasNext)
+                      replay.stale = true;
+                    return true;
+                  } else {
+                    if (!isNetworkOperation) dispatchOperation(operation);
+                    return false;
+                  }
+                })
+              ),
+            ]);
+          }
         })
       );
     },
