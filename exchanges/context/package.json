@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@urql/core": ">=3.2.2",
-    "wonka": "^6.2.6"
+    "wonka": "^6.3.0"
   },
   "devDependencies": {
     "@urql/core": "workspace:*",
