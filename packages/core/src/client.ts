@@ -623,11 +623,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       // Interrupt subscriptions and mutations when they have no more results
       result$ = pipe(
         result$,
-        takeWhile(result => !!result.hasNext, true),
-        // TODO: Remove manual onStart here
-        onStart(() => {
-          dispatchOperation(operation);
-        })
+        takeWhile(result => !!result.hasNext, true)
       );
     } else {
       result$ = pipe(
@@ -669,6 +665,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           dispatched.delete(operation.key);
           replays.delete(operation.key);
           active.delete(operation.key);
+          // Interrupt active queue
+          isOperationBatchActive = false;
           // Delete all queued up operations of the same key on end
           for (let i = queue.length - 1; i >= 0; i--)
             if (queue[i].key === operation.key) queue.splice(i, 1);
@@ -676,6 +674,14 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           nextOperation(
             makeOperation('teardown', operation, operation.context)
           );
+        })
+      );
+    } else {
+      result$ = pipe(
+        result$,
+        // Send mutation operation on start
+        onStart(() => {
+          nextOperation(operation);
         })
       );
     }
@@ -752,7 +758,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
                 operation.context.requestPolicy === 'cache-and-network' ||
                 operation.context.requestPolicy === 'network-only';
               if (operation.kind !== 'query') {
-                return;
+                return dispatchOperation(operation);
               } else if (isNetworkOperation) {
                 dispatchOperation(operation);
                 if (prevReplay && !prevReplay.hasNext) prevReplay.stale = true;
@@ -768,7 +774,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               }
             }),
             onEnd(() => {
-              isOperationBatchActive = false;
               observer.complete();
             }),
             subscribe(observer.next)
