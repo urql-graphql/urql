@@ -753,8 +753,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           const isNetworkOperation =
             operation.context.requestPolicy === 'cache-and-network' ||
             operation.context.requestPolicy === 'network-only';
-          const replay =
-            operation.kind === 'query' ? replays.get(operation.key) : undefined;
+          const replay = replays.get(operation.key);
+
           if (operation.kind !== 'query' || !replay || isNetworkOperation) {
             source = pipe(
               source,
@@ -764,7 +764,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             );
           }
 
-          if (replay) {
+          if (operation.kind === 'query' && replay) {
             return merge([
               source,
               pipe(
