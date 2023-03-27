@@ -557,6 +557,107 @@ describe('queuing behavior', () => {
   });
 });
 
+describe('deduplication behavior', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('deduplicates operations when no result has been sent yet', () => {
+    const onOperation = vi.fn();
+
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        onPush(onOperation),
+        map(op => ({
+          hasNext: false,
+          stale: false,
+          data: ++i,
+          operation: op,
+        })),
+        delay(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = vi.fn();
+    const resultTwo = vi.fn();
+    const operationOne = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+    const operationTwo = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    pipe(client.executeRequestOperation(operationOne), subscribe(resultOne));
+    pipe(client.executeRequestOperation(operationTwo), subscribe(resultTwo));
+    expect(resultOne).toHaveBeenCalledTimes(0);
+    expect(resultTwo).toHaveBeenCalledTimes(0);
+
+    vi.advanceTimersByTime(1);
+
+    expect(resultOne).toHaveBeenCalledTimes(1);
+    expect(resultTwo).toHaveBeenCalledTimes(1);
+    expect(onOperation).toHaveBeenCalledTimes(1);
+  });
+
+  it('deduplicates operations when hasNext: true is set', () => {
+    const onOperation = vi.fn();
+
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        onPush(onOperation),
+        map(op => ({
+          hasNext: true,
+          stale: false,
+          data: ++i,
+          operation: op,
+        }))
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = vi.fn();
+    const resultTwo = vi.fn();
+    const operationOne = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+    const operationTwo = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    pipe(client.executeRequestOperation(operationOne), subscribe(resultOne));
+    pipe(client.executeRequestOperation(operationTwo), subscribe(resultTwo));
+    expect(resultOne).toHaveBeenCalledTimes(1);
+    expect(resultTwo).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(1);
+
+    expect(resultOne).toHaveBeenCalledTimes(1);
+    expect(resultTwo).toHaveBeenCalledTimes(1);
+    expect(onOperation).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('shared sources behavior', () => {
   beforeEach(() => {
     vi.useFakeTimers();
