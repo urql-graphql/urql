@@ -8,7 +8,7 @@ overrides:
   react-is: ^17.0.2
   styled-components: ^5.2.3
   vite: ^3.2.4
-  wonka: ^6.2.6
+  wonka: ^6.3.0
 
 importers:
 
@@ -129,10 +129,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -140,10 +140,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -151,10 +151,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -170,11 +170,11 @@ importers:
       react: ^17.0.2
       react-dom: ^17.0.2
       urql: workspace:*
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@0no-co/graphql.web': 1.0.0_graphql@16.6.0
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       '@cypress/react': 7.0.2_kxqn2c7raunyx4zfzvxjupflne
       '@urql/exchange-execute': link:../execute
@@ -190,11 +190,11 @@ importers:
       '@urql/core': '>=3.2.2'
       extract-files: ^11.0.0
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
       extract-files: 11.0.0
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -202,10 +202,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -213,10 +213,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -225,10 +225,10 @@ importers:
       '@types/react': ^17.0.39
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       '@types/react': 17.0.52
       graphql: 16.6.0
@@ -237,10 +237,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
@@ -248,20 +248,20 @@ importers:
     specifiers:
       '@urql/core': '>=3.2.2'
       graphql: ^16.6.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
 
   packages/core:
     specifiers:
       '@0no-co/graphql.web': ^1.0.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@0no-co/graphql.web': 1.0.0
-      wonka: 6.2.6
+      wonka: 6.3.0
 
   packages/introspection:
     specifiers:
@@ -310,10 +310,10 @@ importers:
       '@urql/core': ^3.2.2
       graphql: ^16.6.0
       preact: ^10.13.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       '@testing-library/preact': 2.0.1_preact@10.13.1
       graphql: 16.6.0
@@ -336,10 +336,10 @@ importers:
       react-ssr-prepass: ^1.1.2
       react-test-renderer: ^17.0.1
       vite: ^3.2.4
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       '@cypress/react': 7.0.2_omnm57pgrvq3mbg7qqmuk7p7le
       '@cypress/vite-dev-server': 5.0.4
@@ -446,10 +446,10 @@ importers:
       '@urql/core': ^3.2.2
       graphql: ^16.6.0
       svelte: ^3.20.0
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       graphql: 16.6.0
       svelte: 3.37.0
@@ -460,10 +460,10 @@ importers:
       '@vue/test-utils': ^2.3.0
       graphql: ^16.6.0
       vue: ^3.2.47
-      wonka: ^6.2.6
+      wonka: ^6.3.0
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.2.6
+      wonka: 6.3.0
     devDependencies:
       '@vue/test-utils': 2.3.0_vue@3.2.47
       graphql: 16.6.0
@@ -15636,8 +15636,8 @@ packages:
       execa: 1.0.0
     dev: true
 
-  /wonka/6.2.6:
-    resolution: {integrity: sha512-ExUBenRwEyf8YswAVOFZDmAdiUMgpnuyDV28G9bF+73o2hnhAG9tLqnn7LmtWgB2KCFQdWywbUfvUW3UgxARew==}
+  /wonka/6.3.0:
+    resolution: {integrity: sha512-7np+Kj4OnDQeEN0kafYLkPFKj1Qo+k7mNgyMHSgOeg+9AEvJbL8ipTBgSCTQfGcgVo6TPNU4T5+AZ2rAOyVrAw==}
     dev: false
 
   /word-wrap/1.2.3:
