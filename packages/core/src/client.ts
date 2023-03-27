@@ -748,23 +748,19 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             active.set(operation.key, (source = makeResultSource(operation)));
           }
 
-          const isNetworkOperation =
-            operation.context.requestPolicy === 'cache-and-network' ||
-            operation.context.requestPolicy === 'network-only';
+          source = pipe(
+            source,
+            onStart(() => {
+              dispatchOperation(operation);
+            })
+          );
+
           const replay = replays.get(operation.key);
-
-          if (operation.kind !== 'query' || !replay || isNetworkOperation) {
-            source = pipe(
-              source,
-              onStart(() => {
-                dispatchOperation(operation);
-              })
-            );
-          }
-
-          if (operation.kind !== 'query' || !replay) {
-            return source;
-          } else {
+          if (
+            operation.kind === 'query' &&
+            replay &&
+            (replay.stale || replay.hasNext)
+          ) {
             let hasResult = false;
             return merge([
               pipe(
@@ -776,17 +772,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               pipe(
                 fromValue(replay),
                 filter(replay => {
-                  if (!hasResult && replay === replays.get(operation.key)) {
-                    if (isNetworkOperation && !replay.hasNext)
-                      replay.stale = true;
-                    return true;
-                  } else {
-                    if (!isNetworkOperation) dispatchOperation(operation);
-                    return false;
-                  }
+                  return !hasResult && replay === replays.get(operation.key);
                 })
               ),
             ]);
+          } else {
+            return source;
           }
         })
       );

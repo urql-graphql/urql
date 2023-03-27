@@ -709,14 +709,14 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 1,
       operation: queryOperation,
-      stale: false,
+      stale: true,
       hasNext: false,
     });
 
     vi.advanceTimersByTime(1);
 
     // With cache-first we don't expect a new operation to be issued
-    expect(resultTwo).toHaveBeenCalledTimes(1);
+    expect(resultTwo).toHaveBeenCalledTimes(2);
   });
 
   it('dispatches the correct request policy on subsequent sources', async () => {
