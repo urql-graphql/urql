@@ -761,21 +761,16 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             replay &&
             (replay.stale || replay.hasNext)
           ) {
-            let hasResult = false;
-            return merge([
-              pipe(
+            return pipe(
+              merge([
                 source,
-                onPush(() => {
-                  hasResult = true;
-                })
-              ),
-              pipe(
-                fromValue(replay),
-                filter(replay => {
-                  return !hasResult && replay === replays.get(operation.key);
-                })
-              ),
-            ]);
+                pipe(
+                  fromValue(replay),
+                  filter(replay => replay === replays.get(operation.key))
+                ),
+              ]),
+              switchMap(fromValue)
+            );
           } else {
             return source;
           }
