@@ -631,20 +631,24 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         // Add `stale: true` flag when a new operation is sent for queries
         switchMap(result => {
           const value$ = fromValue(result);
-          return result.stale
+          return result.stale || result.hasNext
             ? value$
             : merge([
                 value$,
                 pipe(
                   operations.source,
+                  // React only to matching operations, excluding the one that this stream dispatches
                   filter(
                     op =>
-                      op.kind === 'query' &&
+                      op !== operation &&
                       op.key === operation.key &&
                       op.context.requestPolicy !== 'cache-only'
                   ),
                   take(1),
-                  map(() => ({ ...result, stale: true }))
+                  map(() => {
+                    result.stale = true;
+                    return result;
+                  })
                 ),
               ]);
         })
@@ -764,26 +768,24 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             );
           }
 
-          if (operation.kind === 'query' && replay) {
-            return merge([
-              source,
-              pipe(
-                fromValue(replay),
-                filter(replay => {
-                  if (replay === replays.get(operation.key)) {
-                    if (isNetworkOperation && !replay.hasNext)
-                      replay.stale = true;
-                    return true;
-                  } else {
-                    if (!isNetworkOperation) dispatchOperation(operation);
-                    return false;
-                  }
-                })
-              ),
-            ]);
-          } else {
-            return source;
-          }
+          return operation.kind !== 'query' || !replay
+            ? source
+            : merge([
+                source,
+                pipe(
+                  fromValue(replay),
+                  filter(replay => {
+                    if (replay === replays.get(operation.key)) {
+                      if (isNetworkOperation && !replay.hasNext)
+                        replay.stale = true;
+                      return true;
+                    } else {
+                      if (!isNetworkOperation) dispatchOperation(operation);
+                      return false;
+                    }
+                  })
+                ),
+              ]);
         })
       );
     },
