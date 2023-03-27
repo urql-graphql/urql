@@ -58,7 +58,7 @@ describe('useMutation', () => {
 
     expect(clientMutation).toHaveBeenCalledTimes(1);
 
-    subject.next({ data: { test: true } });
+    subject.next({ data: { test: true }, stale: false });
     await promise.then(function () {
       expect(mutation.fetching).toBe(false);
       expect(mutation.stale).toBe(false);
