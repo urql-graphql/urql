@@ -755,16 +755,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             operation.context.requestPolicy === 'network-only';
           const replay =
             operation.kind === 'query' ? replays.get(operation.key) : undefined;
+          if (operation.kind !== 'query' || !replay || isNetworkOperation) {
+            source = pipe(
+              source,
+              onStart(() => {
+                dispatchOperation(operation);
+              })
+            );
+          }
+
           if (replay) {
             return merge([
-              pipe(
-                source,
-                onStart(() => {
-                  if (isNetworkOperation) {
-                    dispatchOperation(operation);
-                  }
-                })
-              ),
+              source,
               pipe(
                 fromValue(replay),
                 filter(replay => {
@@ -780,12 +782,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               ),
             ]);
           } else {
-            return pipe(
-              source,
-              onStart(() => {
-                dispatchOperation(operation);
-              })
-            );
+            return source;
           }
         })
       );
