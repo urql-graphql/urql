@@ -100,6 +100,16 @@ export interface ClientOptions {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} for the Fetch API spec.
    */
   fetch?: typeof fetch;
+  /** Allows a subscription to be executed using a `fetch` API request.
+   *
+   * @remarks
+   * If your API supports the `text/event-stream` and/or `multipart/mixed` response protocol, and you use
+   * this protocol to handle subscriptions, then you may switch this flag to `true`.
+   *
+   * This means you won’t have to create a {@link subscriptionExchange} to handle subscriptions with an
+   * external transport, and will instead be able to use GraphQL over HTTP transports.
+   */
+  fetchSubscriptions?: boolean;
   /** A list of `Exchange`s that will be used to create the `Client`'s execution pipeline.
    *
    * @remarks

@@ -31,7 +31,11 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
     const fetchResults$ = pipe(
       ops$,
       filter(operation => {
-        return operation.kind === 'query' || operation.kind === 'mutation';
+        return (
+          operation.kind !== 'teardown' &&
+          (operation.kind !== 'subscription' ||
+            !!operation.context.fetchSubscriptions)
+        );
       }),
       mergeMap(operation => {
         const body = makeFetchBody(operation);
@@ -87,7 +91,11 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
     const forward$ = pipe(
       ops$,
       filter(operation => {
-        return operation.kind !== 'query' && operation.kind !== 'mutation';
+        return (
+          operation.kind === 'teardown' ||
+          (operation.kind === 'subscription' &&
+            !operation.context.fetchSubscriptions)
+        );
       }),
       forward
     );

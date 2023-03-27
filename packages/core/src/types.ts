@@ -473,6 +473,16 @@ export interface OperationContext {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/fetch} for a description of this object.
    */
   fetchOptions?: RequestInit | (() => RequestInit);
+  /** Allows the `fetchExchange` to handle subscriptions.
+   *
+   * @remarks
+   * When set to `true`, subscriptions are allowed to be handled by the {@link fetchExchange} and will
+   * be sent using a `fetch` call as GraphQL over HTTP requests.
+   * This may be enabled on {@link ClientOptions.fetchSubscriptions} when your API supports the
+   * `text/event-stream` and `multipart/mixed` response protocols and is able to use them to
+   * respond with subscription results.
+   */
+  fetchSubscriptions?: boolean;
   /** The request and caching strategy instructing cache exchanges how to treat cached results.
    *
    * @remarks

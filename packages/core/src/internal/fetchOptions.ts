@@ -121,7 +121,9 @@ export const makeFetchOptions = (
 ): RequestInit => {
   const headers: HeadersInit = {
     accept:
-      'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
+      operation.kind === 'subscription'
+        ? 'text/event-stream, multipart/mixed'
+        : 'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
   };
   const extraOptions =
     (typeof operation.context.fetchOptions === 'function'
