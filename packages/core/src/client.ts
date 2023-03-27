@@ -602,14 +602,83 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const makeResultSource = (operation: Operation) => {
     let result$ = pipe(
       results$,
+      // Filter by matching key (or _instance if it’s set)
       filter(
         (res: OperationResult) =>
           res.operation.kind === operation.kind &&
           res.operation.key === operation.key &&
           (!res.operation.context._instance ||
             res.operation.context._instance === operation.context._instance)
+      ),
+      // End the results stream when an active teardown event is sent
+      takeUntil(
+        pipe(
+          operations.source,
+          filter(op => op.kind === 'teardown' && op.key === operation.key)
+        )
       )
     );
+
+    if (operation.kind !== 'query') {
+      // Interrupt subscriptions and mutations when they have no more results
+      result$ = pipe(
+        result$,
+        takeWhile(result => !!result.hasNext, true),
+        // TODO: Remove manual onStart here
+        onStart(() => {
+          dispatchOperation(operation);
+        })
+      );
+    } else {
+      result$ = pipe(
+        result$,
+        // Add `stale: true` flag when a new operation is sent for queries
+        switchMap(result => {
+          const value$ = fromValue(result);
+          return result.stale
+            ? value$
+            : merge([
+                value$,
+                pipe(
+                  operations.source,
+                  filter(
+                    op =>
+                      op.kind === 'query' &&
+                      op.key === operation.key &&
+                      op.context.requestPolicy !== 'cache-only'
+                  ),
+                  take(1),
+                  map(() => ({ ...result, stale: true }))
+                ),
+              ]);
+        })
+      );
+    }
+
+    if (operation.kind !== 'mutation') {
+      result$ = pipe(
+        result$,
+        // Store replay result
+        onPush(result => {
+          dispatched.delete(operation.key);
+          replays.set(operation.key, result);
+        }),
+        // Cleanup active states on end of source
+        onEnd(() => {
+          // Delete the active operation handle
+          dispatched.delete(operation.key);
+          replays.delete(operation.key);
+          active.delete(operation.key);
+          // Delete all queued up operations of the same key on end
+          for (let i = queue.length - 1; i >= 0; i--)
+            if (queue[i].key === operation.key) queue.splice(i, 1);
+          // Dispatch a teardown signal for the stopped operation
+          nextOperation(
+            makeOperation('teardown', operation, operation.context)
+          );
+        })
+      );
+    }
 
     // Mask typename properties if the option for it is turned on
     if (opts.maskTypename) {
@@ -619,64 +688,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       );
     }
 
-    if (operation.kind !== 'query') {
-      result$ = pipe(
-        result$,
-        takeWhile(result => !!result.hasNext, true),
-        // TODO: Remove manual onStart here
-        onStart(() => {
-          dispatchOperation(operation);
-        })
-      );
-    }
-
-    return pipe(
-      result$,
-      // End the results stream when an active teardown event is sent
-      takeUntil(
-        pipe(
-          operations.source,
-          filter(op => op.kind === 'teardown' && op.key === operation.key)
-        )
-      ),
-      switchMap(result => {
-        if (operation.kind !== 'query' || result.stale) {
-          return fromValue(result);
-        }
-
-        return merge([
-          fromValue(result),
-          // Mark a result as stale when a new operation is sent for it
-          pipe(
-            operations.source,
-            filter(
-              op =>
-                op.kind === 'query' &&
-                op.key === operation.key &&
-                op.context.requestPolicy !== 'cache-only'
-            ),
-            take(1),
-            map(() => ({ ...result, stale: true }))
-          ),
-        ]);
-      }),
-      onPush(result => {
-        dispatched.delete(operation.key);
-        replays.set(operation.key, result);
-      }),
-      onEnd(() => {
-        // Delete the active operation handle
-        dispatched.delete(operation.key);
-        replays.delete(operation.key);
-        active.delete(operation.key);
-        // Delete all queued up operations of the same key on end
-        for (let i = queue.length - 1; i >= 0; i--)
-          if (queue[i].key === operation.key) queue.splice(i, 1);
-        // Dispatch a teardown signal for the stopped operation
-        nextOperation(makeOperation('teardown', operation, operation.context));
-      }),
-      share
-    );
+    return share(result$);
   };
 
   const instance: Client =
