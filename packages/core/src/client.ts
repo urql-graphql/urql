@@ -637,12 +637,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
                 value$,
                 pipe(
                   operations.source,
-                  // React only to matching operations, excluding the one that this stream dispatches
-                  filter(
-                    op =>
-                      op.key === operation.key &&
-                      op.context.requestPolicy !== 'cache-only'
-                  ),
+                  filter(op => op.key === operation.key),
                   take(1),
                   map(() => {
                     result.stale = true;
