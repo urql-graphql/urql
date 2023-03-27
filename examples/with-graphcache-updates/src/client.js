@@ -1,5 +1,4 @@
-import { createClient, dedupExchange, fetchExchange, gql } from 'urql';
-import { makeOperation } from '@urql/core';
+import { Client, fetchExchange, gql } from 'urql';
 import { authExchange } from '@urql/exchange-auth';
 import { cacheExchange } from '@urql/exchange-graphcache';
 
@@ -40,78 +39,56 @@ const cache = cacheExchange({
   },
 });
 
-const client = createClient({
-  url: 'https://trygql.formidable.dev/graphql/web-collections',
-  exchanges: [
-    dedupExchange,
-    cache,
-    authExchange({
-      getAuth: async ({ authState }) => {
-        if (!authState) {
-          const token = localStorage.getItem('authToken');
+const auth = authExchange(async utilities => {
+  let token = localStorage.getItem('authToken');
 
-          if (token) {
-            return { token };
-          }
-
-          return null;
-        }
-
+  return {
+    addAuthToOperation(operation) {
+      if (!token) return operation;
+      return token
+        ? utilities.appendHeaders(operation, {
+            Authorization: `Bearer ${token}`,
+          })
+        : operation;
+    },
+    didAuthError(error) {
+      return error.graphQLErrors.some(
+        e => e.extensions?.code === 'UNAUTHORIZED'
+      );
+    },
+    willAuthError(operation) {
+      if (!token) {
+        // Detect our login mutation and let this operation through:
+        return (
+          operation.kind !== 'mutation' ||
+          // Here we find any mutation definition with the "signin" field
+          !operation.query.definitions.some(definition => {
+            return (
+              definition.kind === 'OperationDefinition' &&
+              definition.selectionSet.selections.some(node => {
+                // The field name is just an example, since register may also be an exception
+                return node.kind === 'Field' && node.name.value === 'signin';
+              })
+            );
+          })
+        );
+      }
+      return false;
+    },
+    async refreshAuth() {
+      token = localStorage.getItem('authToken');
+      if (!token) {
         // This is where auth has gone wrong and we need to clean up and redirect to a login page
         localStorage.clear();
         window.location.reload();
+      }
+    },
+  };
+});
 
-        return null;
-      },
-      addAuthToOperation: ({ authState, operation }) => {
-        if (!authState || !authState.token) {
-          return operation;
-        }
-
-        const fetchOptions =
-          typeof operation.context.fetchOptions === 'function'
-            ? operation.context.fetchOptions()
-            : operation.context.fetchOptions || {};
-
-        return makeOperation(operation.kind, operation, {
-          ...operation.context,
-          fetchOptions: {
-            ...fetchOptions,
-            headers: {
-              ...fetchOptions.headers,
-              Authorization: `Bearer ${authState.token}`,
-            },
-          },
-        });
-      },
-      didAuthError: ({ error }) => {
-        return error.graphQLErrors.some(
-          e => e.extensions?.code === 'UNAUTHORIZED'
-        );
-      },
-      willAuthError: ({ operation, authState }) => {
-        if (!authState) {
-          // Detect our login mutation and let this operation through:
-          return (
-            operation.kind !== 'mutation' ||
-            // Here we find any mutation definition with the "signin" field
-            !operation.query.definitions.some(definition => {
-              return (
-                definition.kind === 'OperationDefinition' &&
-                definition.selectionSet.selections.some(node => {
-                  // The field name is just an example, since register may also be an exception
-                  return node.kind === 'Field' && node.name.value === 'signin';
-                })
-              );
-            })
-          );
-        }
-
-        return false;
-      },
-    }),
-    fetchExchange,
-  ],
+const client = new Client({
+  url: 'https://trygql.formidable.dev/graphql/web-collections',
+  exchanges: [cache, auth, fetchExchange],
 });
 
 export default client;

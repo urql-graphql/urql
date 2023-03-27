@@ -17,8 +17,13 @@ exchanges/*/LICENSE
 # TODO: Figure out how to remove these:
 tmp/
 dist/
+examples/yarn.lock
+examples/pnpm-lock.yaml
+examples/package-lock.json
 examples/*/public
 examples/*/yarn.lock
+examples/*/pnpm-lock.yaml
+examples/*/package-lock.json
 examples/*/ios/
 examples/*/android/
 examples/*/.watchmanconfig

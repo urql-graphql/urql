@@ -1,12 +1,11 @@
 import React from 'react';
-import { createClient, Provider } from 'urql';
-import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
+import { Client, Provider, fetchExchange } from 'urql';
 
 import FileUpload from './FileUpload';
 
-const client = createClient({
+const client = new Client({
   url: 'https://trygql.formidable.dev/graphql/uploads-mock',
-  exchanges: [multipartFetchExchange],
+  exchanges: [fetchExchange],
 });
 
 function App() {

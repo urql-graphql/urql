@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  createClient,
-  Provider,
-  dedupExchange,
-  debugExchange,
-  fetchExchange,
-} from 'urql';
+import { Client, Provider, fetchExchange } from 'urql';
 
 import { cacheExchange } from '@urql/exchange-graphcache';
 
@@ -18,9 +12,9 @@ const cache = cacheExchange({
   },
 });
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3004/graphql',
-  exchanges: [dedupExchange, cache, debugExchange, fetchExchange],
+  exchanges: [cache, fetchExchange],
 });
 
 function App() {

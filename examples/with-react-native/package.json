@@ -8,15 +8,16 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "graphql": "^15.5.0",
-    "react": "17.0.1",
-    "react-native": "0.64.0",
-    "urql": "^2.0.2"
+    "@urql/core": "^3.2.2",
+    "graphql": "^16.6.0",
+    "react": "18.2.0",
+    "react-native": "0.71.4",
+    "urql": "^3.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.20.2",
     "@babel/runtime": "^7.12.5",
-    "babel-jest": "^26.6.3",
-    "metro-react-native-babel-preset": "^0.64.0"
+    "metro-react-native-babel-preset": "^0.76.0"
   }
 }

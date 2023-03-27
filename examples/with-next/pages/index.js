@@ -1,5 +1,5 @@
 import { withUrqlClient } from 'next-urql';
-import { useQuery, gql } from 'urql';
+import { useQuery, cacheExchange, fetchExchange, gql } from 'urql';
 
 const POKEMONS_QUERY = gql`
   query {
@@ -26,8 +26,9 @@ function Index() {
 }
 
 export default withUrqlClient(
-  () => ({
+  ssrExchange => ({
     url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+    exchanges: [cacheExchange, ssrExchange, fetchExchange],
   }),
   { ssr: true }
 )(Index);

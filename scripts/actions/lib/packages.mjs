@@ -1,10 +1,35 @@
 import * as path from 'path';
+import * as fs from 'fs/promises';
 import glob from 'glob';
 
 import { workspaceRoot, workspaces, require } from './constants.mjs';
 
 const getPackageManifest = (cwd) =>
   require(path.resolve(cwd, 'package.json'));
+
+const updatePackageManifest = async (cwd, manifest) => {
+  const sortDependencies = (dependencies) => {
+    if (dependencies == null)
+      return undefined;
+    return Object.keys(dependencies).sort().reduce((acc, key) => {
+      acc[key] = dependencies[key];
+      return acc;
+    }, {});
+  };
+
+  try {
+    if (!!getPackageManifest(cwd)) {
+      manifest.dependencies = sortDependencies(manifest.dependencies);
+      manifest.devDependencies = sortDependencies(manifest.devDependencies);
+      await fs.writeFile(
+        path.resolve(cwd, 'package.json'),
+        JSON.stringify(manifest, null, 2) + '\n',
+      );
+    }
+  } catch (_error) {
+    throw new Error('package.json does not exist in: ' + cwd);
+  }
+};
 
 const getPackageArtifact = (cwd) => {
   const pkg = getPackageManifest(cwd);
@@ -48,6 +73,7 @@ const listArtifacts = async () => {
 
 export {
   getPackageManifest,
+  updatePackageManifest,
   getPackageArtifact,
   listPackages,
   listArtifacts,

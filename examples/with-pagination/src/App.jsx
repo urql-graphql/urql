@@ -1,10 +1,11 @@
 import React from 'react';
-import { createClient, Provider } from 'urql';
+import { Client, Provider, cacheExchange, fetchExchange } from 'urql';
 
 import PaginatedNpmSearch from './PaginatedNpmSearch';
 
-const client = createClient({
+const client = new Client({
   url: 'https://trygql.formidable.dev/graphql/relay-npm',
+  exchanges: [cacheExchange, fetchExchange],
 });
 
 function App() {

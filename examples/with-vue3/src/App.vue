@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { provideClient } from '@urql/vue';
+import { provideClient, cacheExchange, fetchExchange } from '@urql/vue';
 import PokemonList from './PokemonList.vue'
 
 export default {
@@ -18,6 +18,7 @@ export default {
   setup() {
     provideClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+      exchanges: [cacheExchange, fetchExchange],
     });
   },
   components: {
