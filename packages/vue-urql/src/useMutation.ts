@@ -2,7 +2,7 @@
 
 import { ref, Ref } from 'vue';
 import { DocumentNode } from 'graphql';
-import { pipe, toPromise, take } from 'wonka';
+import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
 import {
   Client,
@@ -158,17 +158,18 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
           createRequest<T, V>(query, unwrapPossibleProxy(variables)),
           context || {}
         ),
+        onPush(result => {
+          data.value = result.data;
+          stale.value = result.stale;
+          fetching.value = false;
+          error.value = result.error;
+          operation.value = result.operation;
+          extensions.value = result.extensions;
+        }),
+        filter(result => !result.hasNext),
         take(1),
         toPromise
-      ).then((res: OperationResult<T, V>) => {
-        data.value = res.data;
-        stale.value = !!res.stale;
-        fetching.value = false;
-        error.value = res.error;
-        operation.value = res.operation;
-        extensions.value = res.extensions;
-        return res;
-      });
+      );
     },
   };
 }
