@@ -631,20 +631,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         // Add `stale: true` flag when a new operation is sent for queries
         switchMap(result => {
           const value$ = fromValue(result);
-          return result.stale
+          return result.stale || result.hasNext
             ? value$
             : merge([
                 value$,
                 pipe(
                   operations.source,
-                  filter(
-                    op =>
-                      op.kind === 'query' &&
-                      op.key === operation.key &&
-                      op.context.requestPolicy !== 'cache-only'
-                  ),
+                  filter(op => op.key === operation.key),
                   take(1),
-                  map(() => ({ ...result, stale: true }))
+                  map(() => {
+                    result.stale = true;
+                    return result;
+                  })
                 ),
               ]);
         })
@@ -750,37 +748,29 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             active.set(operation.key, (source = makeResultSource(operation)));
           }
 
-          const isNetworkOperation =
-            operation.context.requestPolicy === 'cache-and-network' ||
-            operation.context.requestPolicy === 'network-only';
+          source = pipe(
+            source,
+            onStart(() => {
+              dispatchOperation(operation);
+            })
+          );
+
           const replay = replays.get(operation.key);
-
-          if (operation.kind !== 'query' || !replay || isNetworkOperation) {
-            source = pipe(
-              source,
-              onStart(() => {
-                dispatchOperation(operation);
-              })
+          if (
+            operation.kind === 'query' &&
+            replay &&
+            (replay.stale || replay.hasNext)
+          ) {
+            return pipe(
+              merge([
+                source,
+                pipe(
+                  fromValue(replay),
+                  filter(replay => replay === replays.get(operation.key))
+                ),
+              ]),
+              switchMap(fromValue)
             );
-          }
-
-          if (operation.kind === 'query' && replay) {
-            return merge([
-              source,
-              pipe(
-                fromValue(replay),
-                filter(replay => {
-                  if (replay === replays.get(operation.key)) {
-                    if (isNetworkOperation && !replay.hasNext)
-                      replay.stale = true;
-                    return true;
-                  } else {
-                    if (!isNetworkOperation) dispatchOperation(operation);
-                    return false;
-                  }
-                })
-              ),
-            ]);
           } else {
             return source;
           }

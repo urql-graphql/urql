@@ -709,14 +709,14 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledWith({
       data: 1,
       operation: queryOperation,
-      stale: false,
+      stale: true,
       hasNext: false,
     });
 
     vi.advanceTimersByTime(1);
 
     // With cache-first we don't expect a new operation to be issued
-    expect(resultTwo).toHaveBeenCalledTimes(1);
+    expect(resultTwo).toHaveBeenCalledTimes(2);
   });
 
   it('dispatches the correct request policy on subsequent sources', async () => {
@@ -834,12 +834,30 @@ describe('shared sources behavior', () => {
       hasNext: false,
     });
 
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation,
+      stale: true,
+      hasNext: false,
+    });
+
+    expect(resultTwo).toHaveBeenCalledTimes(1);
+    expect(resultOne).toHaveBeenCalledTimes(2);
+
     vi.advanceTimersByTime(1);
 
     // With network-only we expect a new operation to be issued, hence a new result
     expect(resultTwo).toHaveBeenCalledTimes(2);
+    expect(resultOne).toHaveBeenCalledTimes(3);
 
     expect(resultTwo).toHaveBeenCalledWith({
+      data: 2,
+      operation,
+      stale: false,
+      hasNext: false,
+    });
+
+    expect(resultOne).toHaveBeenCalledWith({
       data: 2,
       operation,
       stale: false,
