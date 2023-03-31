@@ -27,9 +27,9 @@ regardless of which bindings we've installed. However, it's also possible to exp
 `@urql/core` or use it standalone, e.g. in a Node.js environment.
 
 ```sh
-yarn add @urql/core graphql
+yarn add @urql/core
 # or
-npm install --save @urql/core graphql
+npm install --save @urql/core
 ```
 
 Since all bindings and all exchanges depend on `@urql/core`, we may sometimes run into problems
@@ -39,9 +39,12 @@ different versions of the package or use slightly different utilities. We can fi
 deduplicating our dependencies.
 
 ```sh
-npx yarn-deduplicate && yarn
-# or
+# npm
 npm dedupe
+# pnpm
+pnpm dedupe
+# yarn
+npx yarn-deduplicate && yarn
 ```
 
 ## GraphQL Tags

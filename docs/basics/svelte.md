@@ -17,9 +17,9 @@ function differently from `@urql/preact` or `urql` and uses the same [Core Packa
 Installing `@urql/svelte` is quick and no other packages are immediately necessary.
 
 ```sh
-yarn add @urql/svelte graphql
+yarn add @urql/svelte
 # or
-npm install --save @urql/svelte graphql
+npm install --save @urql/svelte
 ```
 
 Most libraries related to GraphQL also need the `graphql` package to be installed as a peer
@@ -401,7 +401,7 @@ example! We'll set up a mutation that _updates_ a todo item's title.
     result = mutationStore({
       client,
       query: gql`
-        mutation($id: ID!, $title: String!) {
+        mutation ($id: ID!, $title: String!) {
           updateTodo(id: $id, title: $title) {
             id
             title

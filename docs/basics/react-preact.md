@@ -18,9 +18,9 @@ Installing `urql` is as quick as you'd expect, and you won't need any other pack
 with at first. We'll install the package with our package manager of choice.
 
 ```sh
-yarn add urql graphql
+yarn add urql
 # or
-npm install --save urql graphql
+npm install --save urql
 ```
 
 To use `urql` with Preact, we have to install `@urql/preact` instead of `urql` and import from
@@ -156,7 +156,7 @@ to supply variables to our query.
 
 ```jsx
 const TodosListQuery = gql`
-  query($from: Int!, $limit: Int!) {
+  query ($from: Int!, $limit: Int!) {
     todos(from: $from, limit: $limit) {
       id
       title
