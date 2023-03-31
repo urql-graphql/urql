@@ -173,22 +173,12 @@ import { pipe, filter, merge } from 'wonka';
 // DO: forward operations that you don't handle
 ({ forward }) =>
   operations$ => {
-<<<<<<< HEAD
     const queries = pipe(
       operations$,
       filter(op => op.kind === 'query')
     );
     const rest = pipe(
       operations$,
-=======
-    const shared = pipe(operations$, share);
-    const queries = pipe(
-      shared,
-      filter(op => op.kind === 'query')
-    );
-    const rest = pipe(
-      shared,
->>>>>>> 8291d646 (Update "Advanced" docs)
       filter(op => op.kind !== 'query')
     );
     return forward(merge([queries, rest]));
