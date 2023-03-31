@@ -473,7 +473,8 @@ export const writeLink = (
     : currentData!.links.base;
   // Update the reference count for the link
   if (!currentOptimisticKey) {
-    updateRCForLink(links?.get(entityKey)?.[fieldKey], -1);
+    const entityLinks = links && links.get(entityKey);
+    updateRCForLink(entityLinks && entityLinks[fieldKey], -1);
     updateRCForLink(link, 1);
   }
   // Update persistence batch and dependencies
