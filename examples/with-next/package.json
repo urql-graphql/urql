@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@urql/core": "^3.2.2",
+    "@urql/core": "^4.0.0",
     "graphql": "^16.6.0",
     "next": "13.2.4",
-    "next-urql": "^4.0.3",
+    "next-urql": "^5.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "urql": "^3.0.4"
+    "urql": "^4.0.0"
   },
   "scripts": {
     "dev": "next dev",

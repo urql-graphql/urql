@@ -1,6 +1,6 @@
 {
   "name": "@urql/vue",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A highly customizable and versatile GraphQL client for vue",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -57,7 +57,7 @@
     "vue": "^2.7.0 || ^3.0.0"
   },
   "dependencies": {
-    "@urql/core": "^3.2.2",
+    "@urql/core": "^4.0.0",
     "wonka": "^6.3.0"
   },
   "publishConfig": {

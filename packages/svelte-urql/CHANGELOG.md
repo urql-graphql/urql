@@ -1,5 +1,30 @@
 # @urql/svelte
 
+## 4.0.0
+
+### Major Changes
+
+- Update `OperationResult.hasNext` and `OperationResult.stale` to be required fields. If you have a custom exchange creating results, you'll have to add these fields or use the `makeResult`, `mergeResultPatch`, or `makeErrorResult` helpers
+  Submitted by [@kitten](https://github.com/kitten) (See [#3061](https://github.com/urql-graphql/urql/pull/3061))
+- Move `handler`, which combines subscription events, from `mutationStore` to `subscriptionStore`. It’s accidentally been defined and implemented on the wrong store and was meant to be on `subscriptionStore`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3078](https://github.com/urql-graphql/urql/pull/3078))
+
+### Minor Changes
+
+- Allow mutations to update their results in bindings when `hasNext: true` is set, which indicates deferred or streamed results
+  Submitted by [@kitten](https://github.com/kitten) (See [#3103](https://github.com/urql-graphql/urql/pull/3103))
+
+### Patch Changes
+
+- ⚠️ Fix source maps included with recently published packages, which lost their `sourcesContent`, including additional source files, and had incorrect paths in some of them
+  Submitted by [@kitten](https://github.com/kitten) (See [#3053](https://github.com/urql-graphql/urql/pull/3053))
+- Upgrade to `wonka@^6.3.0`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3104](https://github.com/urql-graphql/urql/pull/3104))
+- Add TSDocs to all `urql` bindings packages
+  Submitted by [@kitten](https://github.com/kitten) (See [#3079](https://github.com/urql-graphql/urql/pull/3079))
+- Updated dependencies (See [#3101](https://github.com/urql-graphql/urql/pull/3101), [#3033](https://github.com/urql-graphql/urql/pull/3033), [#3054](https://github.com/urql-graphql/urql/pull/3054), [#3053](https://github.com/urql-graphql/urql/pull/3053), [#3060](https://github.com/urql-graphql/urql/pull/3060), [#3081](https://github.com/urql-graphql/urql/pull/3081), [#3039](https://github.com/urql-graphql/urql/pull/3039), [#3104](https://github.com/urql-graphql/urql/pull/3104), [#3082](https://github.com/urql-graphql/urql/pull/3082), [#3097](https://github.com/urql-graphql/urql/pull/3097), [#3061](https://github.com/urql-graphql/urql/pull/3061), [#3055](https://github.com/urql-graphql/urql/pull/3055), [#3085](https://github.com/urql-graphql/urql/pull/3085), [#3079](https://github.com/urql-graphql/urql/pull/3079), [#3087](https://github.com/urql-graphql/urql/pull/3087), [#3059](https://github.com/urql-graphql/urql/pull/3059), [#3055](https://github.com/urql-graphql/urql/pull/3055), [#3057](https://github.com/urql-graphql/urql/pull/3057), [#3050](https://github.com/urql-graphql/urql/pull/3050), [#3062](https://github.com/urql-graphql/urql/pull/3062), [#3051](https://github.com/urql-graphql/urql/pull/3051), [#3043](https://github.com/urql-graphql/urql/pull/3043), [#3063](https://github.com/urql-graphql/urql/pull/3063), [#3054](https://github.com/urql-graphql/urql/pull/3054), [#3102](https://github.com/urql-graphql/urql/pull/3102), [#3097](https://github.com/urql-graphql/urql/pull/3097), [#3106](https://github.com/urql-graphql/urql/pull/3106), [#3058](https://github.com/urql-graphql/urql/pull/3058), and [#3062](https://github.com/urql-graphql/urql/pull/3062))
+  - @urql/core@4.0.0
+
 ## 3.0.4
 
 ### Patch Changes

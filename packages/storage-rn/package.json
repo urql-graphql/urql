@@ -1,6 +1,6 @@
 {
   "name": "@urql/storage-rn",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "sideEffects": false,
   "description": "Graphcache offline storage for React Native",
   "homepage": "https://formidable.com/open-source/urql/docs/",

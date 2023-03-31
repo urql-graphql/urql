@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.0.0
+
+### Patch Changes
+
+- Add TSDocs to `@urql/*` packages
+  Submitted by [@kitten](https://github.com/kitten) (See [#3079](https://github.com/urql-graphql/urql/pull/3079))
+- Updated dependencies (See [#3053](https://github.com/urql-graphql/urql/pull/3053), [#3104](https://github.com/urql-graphql/urql/pull/3104), [#3095](https://github.com/urql-graphql/urql/pull/3095), [#3033](https://github.com/urql-graphql/urql/pull/3033), [#3103](https://github.com/urql-graphql/urql/pull/3103), and [#3079](https://github.com/urql-graphql/urql/pull/3079))
+  - urql@4.0.0
+
 ## 4.0.3
 
 ### Patch Changes
