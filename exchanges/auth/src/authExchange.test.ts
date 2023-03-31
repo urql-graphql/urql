@@ -158,7 +158,7 @@ it('supports calls to the mutate() method in refreshAuth()', async () => {
     },
   });
 
-  expect(res.operation.context.authAttempt).toBe(false);
+  expect(res.operation.context.authAttempt).toBe(true);
   expect(res.operation.context.fetchOptions).toEqual({
     method: 'POST',
     headers: {
@@ -380,6 +380,63 @@ it('calls willAuthError on queued operations', async () => {
     'final-token'
   );
 
+  expect(operations[1]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'final-token'
+  );
+});
+
+it('does not infinitely retry authentication when an operation did error', async () => {
+  const { exchangeArgs, result, operations } = makeExchangeArgs();
+  const { source, next } = makeSubject<any>();
+
+  const didAuthError = vi.fn().mockReturnValue(true);
+
+  pipe(
+    source,
+    authExchange(async utils => {
+      let token = 'initial-token';
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError,
+        async refreshAuth() {
+          token = 'final-token';
+        },
+      };
+    })(exchangeArgs),
+    publish
+  );
+
+  await new Promise(resolve => setTimeout(resolve));
+
+  result.mockImplementation(x => ({
+    ...queryResponse,
+    operation: {
+      ...queryResponse.operation,
+      ...x,
+    },
+    data: undefined,
+    error: new CombinedError({
+      graphQLErrors: [{ message: 'Oops' }],
+    }),
+  }));
+
+  next(queryOperation);
+  expect(result).toHaveBeenCalledTimes(1);
+  expect(didAuthError).toHaveBeenCalledTimes(1);
+
+  await new Promise(resolve => setTimeout(resolve));
+
+  expect(result).toHaveBeenCalledTimes(2);
+  expect(operations.length).toBe(2);
+  expect(operations[0]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'initial-token'
+  );
   expect(operations[1]).toHaveProperty(
     'context.fetchOptions.headers.Authorization',
     'final-token'
