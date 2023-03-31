@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-context",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An exchange for setting (a)synchronous operation-context in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -47,7 +47,7 @@
     "prepublishOnly": "run-s clean build"
   },
   "dependencies": {
-    "@urql/core": ">=3.2.2",
+    "@urql/core": ">=4.0.0",
     "wonka": "^6.3.0"
   },
   "devDependencies": {

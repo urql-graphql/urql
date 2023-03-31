@@ -1,5 +1,93 @@
 # @urql/core
 
+## 4.0.0
+
+### Major Changes
+
+- Remove `defaultExchanges` from `@urql/core` and make `exchanges` a required property on `Client` construction.
+  In doing so we make the `urql` package more tree-shakeable as the three default exchanges are in no code paths
+  meaning they can be removed if not used.
+  A migration would look as follows if you are currently creating a client without exchanges
+  ```js
+  import { createClient, cacheExchange, fetchExchange } from '@urql/core';
+
+  const client = createClient({
+    url: '',
+    exchanges: [cacheExchange, fetchExchange],
+  });
+  ```
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3033](https://github.com/urql-graphql/urql/pull/3033))
+- Update `subscriptionExchange` to receive `FetchBody` instead. In the usual usage of `subscriptionExchange` (for instance with `graphql-ws`) you can expect no breaking changes. However, the `key` and `extensions` field has been removed and instead the `forwardSubscription` function receives the full `Operation` as a second argument
+  Submitted by [@kitten](https://github.com/kitten) (See [#3054](https://github.com/urql-graphql/urql/pull/3054))
+- Remove dependence on `graphql` package and replace it with `@0no-co/graphql.web`, which reduces the default bundlesize impact of `urql` packages to a minimum. All types should remain compatible, even if you use `graphql` elsewhere in your app, and if other dependencies are using `graphql` you may alias it to `graphql-web-lite`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3097](https://github.com/urql-graphql/urql/pull/3097))
+- Update `OperationResult.hasNext` and `OperationResult.stale` to be required fields. If you have a custom exchange creating results, you'll have to add these fields or use the `makeResult`, `mergeResultPatch`, or `makeErrorResult` helpers
+  Submitted by [@kitten](https://github.com/kitten) (See [#3061](https://github.com/urql-graphql/urql/pull/3061))
+- Remove `getOperationName` export from `@urql/core`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3062](https://github.com/urql-graphql/urql/pull/3062))
+
+### Minor Changes
+
+- Return a new `OperationResultSource` from all `Client` methods (which replaces `PromisifiedSource` on shortcut methods). This allows not only `toPromise()` to be called, but it can also be used as an awaitable `PromiseLike` and has a `.subscribe(onResult)` method aliasing the subscribe utility from `wonka`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3060](https://github.com/urql-graphql/urql/pull/3060))
+- Update `subscriptionExchange` to support incremental results out of the box. If a subscription proactively completes, results are also now updated with `hasNext: false`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3055](https://github.com/urql-graphql/urql/pull/3055))
+- Implement `text/event-stream` response support. This generally adheres to the GraphQL SSE protocol and GraphQL Yoga push responses, and is an alternative to `multipart/mixed`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3050](https://github.com/urql-graphql/urql/pull/3050))
+- Implement GraphQL Multipart Request support in `@urql/core`. This adds the File/Blob upload support to `@urql/core`, which effectively deprecates `@urql/exchange-multipart-fetch`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3051](https://github.com/urql-graphql/urql/pull/3051))
+- Support `GraphQLRequest.extensions` as spec-extensions input to GraphQL requests
+  Submitted by [@kitten](https://github.com/kitten) (See [#3054](https://github.com/urql-graphql/urql/pull/3054))
+- Allow subscriptions to be handled by the `fetchExchange` when `fetchSubscriptions` is turned on
+  Submitted by [@kitten](https://github.com/kitten) (See [#3106](https://github.com/urql-graphql/urql/pull/3106))
+- Deprecate the `dedupExchange`. The functionality of deduplicating queries and subscriptions has now been moved into and absorbed by the `Client`.
+  Previously, the `Client` already started doing some work to share results between
+  queries, and to avoid dispatching operations as needed. It now only dispatches operations
+  strictly when the `dedupExchange` would allow so as well, moving its logic into the
+  `Client`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3058](https://github.com/urql-graphql/urql/pull/3058))
+
+### Patch Changes
+
+- Deduplicate operations as the `dedupExchange` did; by filtering out duplicate operations until either the original operation has been cancelled (teardown) or a first result (without `hasNext: true`) has come in
+  Submitted by [@kitten](https://github.com/kitten) (See [#3101](https://github.com/urql-graphql/urql/pull/3101))
+- ⚠️ Fix source maps included with recently published packages, which lost their `sourcesContent`, including additional source files, and had incorrect paths in some of them
+  Submitted by [@kitten](https://github.com/kitten) (See [#3053](https://github.com/urql-graphql/urql/pull/3053))
+- Allow `makeOperation` to be called with a partial `OperationContext` when it’s called to copy an operation. When it receives an `Operation` as a second argument now, the third argument, the context, will be spread into the prior `operation.context`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3081](https://github.com/urql-graphql/urql/pull/3081))
+- Move `multipart/mixed` to end of `Accept` header to avoid cauing Yoga to unnecessarily use it
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3039](https://github.com/urql-graphql/urql/pull/3039))
+- Upgrade to `wonka@^6.3.0`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3104](https://github.com/urql-graphql/urql/pull/3104))
+- Update `Exchange` contract and `composeExchanges` utility to remove the need to manually call `share` on either incoming `Source<Operation>` or `forward()`’s `Source<OperationResult>`. This is now taken care of internally in `composeExchanges` and should make it easier for you to create custom exchanges and for us to explain them
+  Submitted by [@kitten](https://github.com/kitten) (See [#3082](https://github.com/urql-graphql/urql/pull/3082))
+- Add support for `graphql`’s built-in `TypedQueryDocumentNode` typings for type inference
+  Submitted by [@kitten](https://github.com/kitten) (See [#3085](https://github.com/urql-graphql/urql/pull/3085))
+- Add missing type exports of SSR-related types (`SerializedResult`, `SSRExchangeParams`, `SSRExchange`, and `SSRData`) to `@urql/core`'s type exports
+  Submitted by [@kitten](https://github.com/kitten) (See [#3079](https://github.com/urql-graphql/urql/pull/3079))
+- Allow any object fitting the `GraphQLError` shape to rehydrate without passing through a `GraphQLError` constructor in `CombinedError`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3087](https://github.com/urql-graphql/urql/pull/3087))
+- Add missing `hasNext` and `stale` passthroughs on caching exchanges
+  Submitted by [@kitten](https://github.com/kitten) (See [#3059](https://github.com/urql-graphql/urql/pull/3059))
+- ⚠️ Fix incremental results not merging `errors` from subsequent non-incremental results
+  Submitted by [@kitten](https://github.com/kitten) (See [#3055](https://github.com/urql-graphql/urql/pull/3055))
+- Add logic for `request.extensions.persistedQuery` to `@urql/core` to omit sending `query` as needed
+  Submitted by [@kitten](https://github.com/kitten) (See [#3057](https://github.com/urql-graphql/urql/pull/3057))
+- ⚠️ Fix incorrect operation name being picked from queries that contain multiple operations
+  Submitted by [@kitten](https://github.com/kitten) (See [#3062](https://github.com/urql-graphql/urql/pull/3062))
+- Replace fetch source implementation with async generator implementation, based on Wonka's `fromAsyncIterable`.
+  This also further hardens our support for the "Incremental Delivery" specification and
+  refactors its implementation and covers more edge cases
+  Submitted by [@kitten](https://github.com/kitten) (See [#3043](https://github.com/urql-graphql/urql/pull/3043))
+- Ensure network errors are always issued with `CombinedError`s, while downstream errors are re-thrown
+  Submitted by [@kitten](https://github.com/kitten) (See [#3063](https://github.com/urql-graphql/urql/pull/3063))
+- Refactor `Client` result source construction code and allow multiple mutation
+  results, if `result.hasNext` on a mutation result is set to `true`, indicating
+  deferred or streamed results
+  Submitted by [@kitten](https://github.com/kitten) (See [#3102](https://github.com/urql-graphql/urql/pull/3102))
+- Remove dependence on `import { visit } from 'graphql';` with smaller but functionally equivalent alternative
+  Submitted by [@kitten](https://github.com/kitten) (See [#3097](https://github.com/urql-graphql/urql/pull/3097))
+
 ## 3.2.2
 
 ### Patch Changes

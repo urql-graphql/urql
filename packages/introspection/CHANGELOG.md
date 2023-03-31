@@ -1,5 +1,12 @@
 # @urql/introspection
 
+## 1.0.1
+
+### Patch Changes
+
+- Add TSDocs to `@urql/*` packages
+  Submitted by [@kitten](https://github.com/kitten) (See [#3079](https://github.com/urql-graphql/urql/pull/3079))
+
 ## 1.0.0
 
 ### Major Changes

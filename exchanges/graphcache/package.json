@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "5.2.0",
+  "version": "6.0.0",
   "description": "A normalized and configurable cache exchange for urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/graphcache",
@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.0.0",
-    "@urql/core": ">=3.2.2",
+    "@urql/core": ">=4.0.0",
     "wonka": "^6.3.0"
   },
   "devDependencies": {
