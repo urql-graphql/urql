@@ -87,15 +87,15 @@ const serializeBody = (
     const files = extractFiles(body.variables);
     if (files.size) {
       const form = new FormData();
-
       form.append('operations', json);
-      form.append('map', stringifyVariables({ ...[...files.keys()] }));
-
+      form.append(
+        'map',
+        stringifyVariables({
+          ...[...files.keys()].map(value => [value]),
+        })
+      );
       let index = 0;
-      for (const file of files.values()) {
-        form.append(`${index++}`, file);
-      }
-
+      for (const file of files.values()) form.append(`${index++}`, file);
       return form;
     }
     return json;
