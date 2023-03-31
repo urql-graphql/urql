@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.0.1
+
+### Patch Changes
+
+- Remove inclusion and usage of optional chaining operator
+  Submitted by [@kitten](https://github.com/kitten) (See [#3116](https://github.com/urql-graphql/urql/pull/3116))
+
 ## 6.0.0
 
 ### Major Changes
