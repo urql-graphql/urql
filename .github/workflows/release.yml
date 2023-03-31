@@ -58,7 +58,7 @@ jobs:
         if: steps.changesets.outputs.published == 'true'
         uses: ./.github/actions/discord-message
         with:
-          publishedPackages: steps.changesets.outputs.publishedPackages
+          publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
