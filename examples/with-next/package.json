@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@urql/core": "^4.0.0",
+    "@urql/core": "^4.0.1",
     "graphql": "^16.6.0",
     "next": "13.2.4",
     "next-urql": "^5.0.0",

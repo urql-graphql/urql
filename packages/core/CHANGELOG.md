@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.0.1
+
+### Patch Changes
+
+- ⚠️ Fix format of `map` form data field on multipart upload requests. This was erroneously set to a string rather than a string tuple
+  Submitted by [@kitten](https://github.com/kitten) (See [#3118](https://github.com/urql-graphql/urql/pull/3118))
+
 ## 4.0.0
 
 ### Major Changes
@@ -8,6 +15,7 @@
   In doing so we make the `urql` package more tree-shakeable as the three default exchanges are in no code paths
   meaning they can be removed if not used.
   A migration would look as follows if you are currently creating a client without exchanges
+
   ```js
   import { createClient, cacheExchange, fetchExchange } from '@urql/core';
 
@@ -16,7 +24,9 @@
     exchanges: [cacheExchange, fetchExchange],
   });
   ```
+
   Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3033](https://github.com/urql-graphql/urql/pull/3033))
+
 - Update `subscriptionExchange` to receive `FetchBody` instead. In the usual usage of `subscriptionExchange` (for instance with `graphql-ws`) you can expect no breaking changes. However, the `key` and `extensions` field has been removed and instead the `forwardSubscription` function receives the full `Operation` as a second argument
   Submitted by [@kitten](https://github.com/kitten) (See [#3054](https://github.com/urql-graphql/urql/pull/3054))
 - Remove dependence on `graphql` package and replace it with `@0no-co/graphql.web`, which reduces the default bundlesize impact of `urql` packages to a minimum. All types should remain compatible, even if you use `graphql` elsewhere in your app, and if other dependencies are using `graphql` you may alias it to `graphql-web-lite`
