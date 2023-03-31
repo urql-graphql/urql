@@ -270,6 +270,7 @@ export function authExchange(
           operation.key,
           addAuthAttemptToOperation(operation, true)
         );
+
         // check that another operation isn't already doing refresh
         if (config && !authPromise) {
           authPromise = config.refreshAuth().finally(flushQueue);
@@ -310,7 +311,9 @@ export function authExchange(
       const opsWithAuth$ = pipe(
         merge([retries.source, pendingOps$]),
         map(operation => {
-          if (bypassQueue.has(operation)) {
+          if (operation.context.authAttempt) {
+            return addAuthToOperation(operation);
+          } else if (bypassQueue.has(operation)) {
             return operation;
           } else if (authPromise) {
             if (!retryQueue.has(operation.key)) {
