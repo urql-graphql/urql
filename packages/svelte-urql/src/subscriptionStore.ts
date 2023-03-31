@@ -127,7 +127,7 @@ export type SubscriptionArgs<
  *       newNotification { id, text }
  *     }
  *   `,
- *   }
+ *   },
  *   function combineNotifications(notifications = [], data) {
  *     return [...notifications, data.newNotification];
  *   },
