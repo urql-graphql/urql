@@ -192,8 +192,9 @@ In the following example, we create a subscription that informs us of new messag
           from
           text
         }
-      }`
-    });
+      }
+    `,
+  });
 </script>
 
 {#if !$messages.data}
@@ -264,7 +265,7 @@ export default {
             text
           }
         }
-      `
+      `,
     }, handleSubscription)
 
     return {
@@ -295,9 +296,9 @@ subscription may deliver. Let's convert the above example to one without framewo
 use subscriptions in a Node.js environment.
 
 ```js
-import { pipe, subscribe } from 'wonka';
+import { gql } from '@urql/core';
 
-const MessageSub = `
+const MessageSub = gql`
   subscription MessageSub {
     newMessages {
       id
@@ -307,10 +308,7 @@ const MessageSub = `
   }
 `;
 
-const { unsubscribe } = pipe(
-  client.subscription(MessageSub),
-  subscribe(result => {
-    console.log(result); // { data: ... }
-  })
-);
+const { unsubscribe } = client.subscription(MessageSub).subscribe(result => {
+  console.log(result); // { data: ... }
+});
 ```

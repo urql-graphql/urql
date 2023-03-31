@@ -5,6 +5,11 @@ order: 11
 
 # Refocus Exchange
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 `@urql/exchange-refocus` is an exchange for the `urql` that tracks currently active operations and redispatches them when the
 window regains focus
 

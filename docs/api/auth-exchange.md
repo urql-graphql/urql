@@ -5,6 +5,11 @@ order: 10
 
 # Authentication Exchange
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 The `@urql/exchange-auth` package contains an addon `authExchange` for `urql` that aims to make it
 easy to implement complex authentication and reauthentication flows as are typically found with JWT
 token based API authentication.

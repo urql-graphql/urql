@@ -5,6 +5,11 @@ order: 6
 
 # Execute Exchange
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 The `@urql/exchange-execute` package contains an addon `executeExchange` for `urql` that may be used to
 execute queries against a local schema. It is therefore a drop-in replacement for the default
 _fetchExchange_ and useful for the server-side, debugging, or testing.
