@@ -32,7 +32,7 @@ To actually now set up offline support, we'll swap out the `cacheExchange` with 
 `offlineExchange` that's also exported by `@urql/exchange-graphcache`.
 
 ```js
-import { createClient, dedupExchange, fetchExchange } from 'urql';
+import { Client, fetchExchange } from 'urql';
 import { offlineExchange } from '@urql/exchange-graphcache';
 
 const cache = offlineExchange({
@@ -45,9 +45,9 @@ const cache = offlineExchange({
   },
 });
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cache, fetchExchange],
+  exchanges: [cache, fetchExchange],
 });
 ```
 
@@ -61,7 +61,7 @@ persist the cache's data. We can use this default storage by importing the `make
 function from `@urql/exchange-graphcache/default-storage`.
 
 ```js
-import { createClient, dedupExchange, fetchExchange } from 'urql';
+import { Client, fetchExchange } from 'urql';
 import { offlineExchange } from '@urql/exchange-graphcache';
 import { makeDefaultStorage } from '@urql/exchange-graphcache/default-storage';
 
@@ -81,9 +81,9 @@ const cache = offlineExchange({
   },
 });
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cache, fetchExchange],
+  exchanges: [cache, fetchExchange],
 });
 ```
 

@@ -46,7 +46,7 @@ build custom debugging tools, it's also possible to call this function directly 
 
 ```
 const { unsubscribe } = client.subscribeToDebugTarget(event => {
-  if (event.source === 'dedupExchange')
+  if (event.source === 'cacheExchange')
     return;
   console.log(event); // { type, message, operation, data, source, timestamp }
 });

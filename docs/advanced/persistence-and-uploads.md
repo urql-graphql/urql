@@ -5,12 +5,9 @@ order: 1
 
 # Persisted Queries and Uploads
 
-`urql` supports both [Automatic Persisted
-Queries](https://www.apollographql.com/docs/apollo-server/performance/apq/), Persisted Queries, and
-[File Uploads](https://www.apollographql.com/docs/apollo-server/data/file-uploads/).
-
-While File Uploads should work without any modifications, an additional exchange must be installed
-and added for Persisted Queries to work.
+`urql` supports (Automatic) Persisted Queries, and File Uploads via GraphQL
+Multipart requests. For persisted queries to work, some setup work is needed,
+while File Upload support is built into `@urql/core@4`.
 
 ## Automatic Persisted Queries
 
@@ -31,8 +28,9 @@ requests. If we only send the persisted queries with hashes as GET requests then
 easier for a CDN to cache, as by default most caches would not cache POST requests automatically.
 
 In `urql`, we may use the `@urql/exchange-persisted` package's `persistedExchange` to
-implement Automatic Persisted Queries. This exchange works alongside the default `fetchExchange`
-and other exchanges by adding the `extensions.persistedQuery` parameters to a GraphQL request.
+enable support for Automatic Persisted Queries. This exchange works alongside other fetch or
+subscription exchanges by adding metadata for persisted queries to each GraphQL
+request by modifying the `extensions` object of operations.
 
 ### Installation & Setup
 
@@ -45,16 +43,15 @@ npm install --save @urql/exchange-persisted
 ```
 
 You'll then need to add the `persistedExchange` function, that this package exposes,
-to your `exchanges`.
+to your `exchanges`, in front of exchanges that communicate with the API:
 
 ```js
-import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
-import { persistedExchange } from '@urql/exchange-persisted-fetch';
+import { Client, fetchExchange, cacheExchange } from 'urql';
+import { persistedExchange } from '@urql/exchange-persisted';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     persistedExchange({
       preferGetForPersistedQueries: true,
@@ -66,13 +63,13 @@ const client = createClient({
 
 As we can see, typically it's recommended to set `preferGetForPersistedQueries` to `true` to force
 all persisted queries to use GET requests instead of POST so that CDNs can do their job.
-We also added the `persistedExchange` in front of the usual `fetchExchange`, since it has to
-update operations before they reach an exchange that talks to an API.
+It does so by setting the `preferGetMethod` option to `'force'` when it's
+updating operations.
 
-The `preferGetForPersistedQueries` is similar to the [`Client`'s
-`preferGetMethod`](../api/core.md#client) but only switches persisted queries to use GET requests
-instead. This is preferable since sometimes the GraphQL query can grow too large for a simple GET
-query to handle, while the `persistedExchange`'s SHA256 hashes will remain predictably small.
+The `fetchExchange` can see the modifications that the `persistedExchange` is
+making to operations, and understands to leave out the `query` from any request
+as needed. The same should be happening to the `subscriptionExchange`, if you're
+using it for queries.
 
 ### Customizing Hashing
 
@@ -89,7 +86,7 @@ out the `generateHash` function with a much simpler one that uses the `generateH
 second argument, a GraphQL `DocumentNode` object.
 
 ```js
-persistedFetchExchange({
+persistedExchange({
   generateHash: (_, document) => document.documentId,
 });
 ```
@@ -101,8 +98,8 @@ so easily by using the first argument `generateHash` receives, a GraphQL query a
 ```js
 import sha256 from 'hash.js/lib/hash/sha/256';
 
-persistedFetchExchange({
-  generateHash: async query => {
+persistedExchange({
+  async generateHash(query) {
     return sha256().update(query).digest('hex');
   },
 });
@@ -115,19 +112,22 @@ retry logic and assumes that persisted queries will be handled like regular Grap
 
 ## File Uploads
 
-Many GraphQL server frameworks and APIs support the ["GraphQL Multipart Request
-Spec](https://github.com/jaydenseric/graphql-multipart-request-spec) to allow files to be uploaded.
-Often, this is defined in schemas using a `File` or `Upload` input.
-This allows us to pass a `File` or `Blob` directly to our GraphQL requests as variables, and the
-spec requires us to perform this request as a multipart upload.
+GraphQL server APIs commonly support the [GraphQL Multipart Request
+spec](https://github.com/jaydenseric/graphql-multipart-request-spec) to allow for File Uploads
+directly with a GraphQL API.
 
-Files are often handled in the browser via the [File API](https://developer.mozilla.org/en-US/docs/Web/API/File),
-which we may typically get to via a [file input](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications)
+If a GraphQL API supports this, we can pass a [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File)
+or a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) directly into our variables and
+define the corresponding scalar for our variable, which is often called `File` or `Upload`.
+
+In a browser, the `File` object may often be retrieved via a
+[file input](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications),
 for example.
 
-In `urql`, these are supported natively, so as long as your JS environment supports either `File` or
-`Blob`s, you can pass these directly to any `urql` API via your `variables`, and the default
-`fetchExchange` will swich to using a multipart request instead.
+The `@urql/core@4` package supports File Uploads natively, so we won't have to do any installation
+or setup work. When `urql` sees a `File` or a `Blob` anywhere in your `variables`, it switches to
+a `multipart/form-data` request, converts the request to a `FormData` object, according to the
+GraphQL Multipart Request specification, and sends it off to the API.
 
-Previously, this worked by installing the [`@urql/multipart-fetch-exchange` package](../api/multipart-fetch-exchange.md),
-however, this package has been deprecated and file uploads are now built into `@urql/core`.
+> **Note:** Previously, this worked by installing the `@urql/multipart-fetch-exchange` package.
+> however, this package has been deprecated and file uploads are now built into `@urql/core@4`.

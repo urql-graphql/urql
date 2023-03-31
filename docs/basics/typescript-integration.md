@@ -14,11 +14,9 @@ URQL, with the help of [GraphQL Code Generator](https://www.the-guild.dev/graphq
 To get and running, install the following packages:
 
 ```sh
-yarn add graphql
-yarn add -D typescript @graphql-codegen/cli @graphql-codegen/client-preset
+yarn add -D graphql typescript @graphql-codegen/cli @graphql-codegen/client-preset
 # or
-npm install graphql
-npm install -D typescript @graphql-codegen/cli @graphql-codegen/client-preset
+npm install -D graphql typescript @graphql-codegen/cli @graphql-codegen/client-preset
 ```
 
 Then, add the following script to your `package.json`:
@@ -140,7 +138,10 @@ const allFilmsWithVariablesQueryDocument = graphql(/* GraphQL */ `
 
 function App() {
   // `data` is typed!
-  const [{ data }] = useQuery({ query: allFilmsWithVariablesQueryDocument, variables: { first: 10 } });
+  const [{ data }] = useQuery({
+    query: allFilmsWithVariablesQueryDocument,
+    variables: { first: 10 },
+  });
   return (
     <div className="App">
       {data && (

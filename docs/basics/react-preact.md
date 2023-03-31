@@ -18,9 +18,9 @@ Installing `urql` is as quick as you'd expect, and you won't need any other pack
 with at first. We'll install the package with our package manager of choice.
 
 ```sh
-yarn add urql graphql
+yarn add urql
 # or
-npm install --save urql graphql
+npm install --save urql
 ```
 
 To use `urql` with Preact, we have to install `@urql/preact` instead of `urql` and import from
@@ -37,19 +37,20 @@ out of the defined peer dependency range.
 
 ### Setting up the `Client`
 
-The `urql` and `@urql/preact` packages export a method called `createClient` which we can use to
+The `urql` and `@urql/preact` packages export a `Client` class, which we can use to
 create the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
 });
 ```
 
-At the bare minimum we'll need to pass an API's `url` when we create a `Client` to get started.
+At the bare minimum we'll need to pass an API's `url` and `exchanges` when we create a `Client`
+to get started.
 
 Another common option is `fetchOptions`. This option allows us to customize the options that will be
 passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object, or
@@ -59,9 +60,9 @@ In the following example we'll add a token to each `fetch` request that our `Cli
 GraphQL API.
 
 ```js
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getToken();
     return {
@@ -78,11 +79,11 @@ To make use of the `Client` in React & Preact we will have to provide it via the
 the `Provider` export.
 
 ```jsx
-import { createClient, Provider, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, Provider, cacheExchange, fetchExchange } from 'urql';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
 });
 
 const App = () => (
@@ -107,9 +108,9 @@ For the following examples, we'll imagine that we're querying data from a GraphQ
 todo items. Let's dive right into it!
 
 ```jsx
-import { useQuery } from 'urql';
+import { gql, useQuery } from 'urql';
 
-const TodosQuery = `
+const TodosQuery = gql`
   query {
     todos {
       id
@@ -154,9 +155,9 @@ pagination. For this purpose the `useQuery` hook also accepts a `variables` opti
 to supply variables to our query.
 
 ```jsx
-const TodosListQuery = `
+const TodosListQuery = gql`
   query ($from: Int!, $limit: Int!) {
-    todos (from: $from, limit: $limit) {
+    todos(from: $from, limit: $limit) {
       id
       title
     }
@@ -198,8 +199,7 @@ executed. We can do this by setting the `pause` option to `true`:
 
 ```jsx
 const Todos = ({ from, limit }) => {
-  const shouldPause = from === undefined || from === null ||
-                      limit === undefined || limit === null;
+  const shouldPause = from === undefined || from === null || limit === undefined || limit === null;
   const [result, reexecuteQuery] = useQuery({
     query: TodosListQuery,
     variables: { from, limit },
@@ -244,11 +244,11 @@ provides metadata apart from the usual `query` and `variables` we may pass. This
 we may also change the `Client`'s default `requestPolicy` by passing it there.
 
 ```js
-import { createClient } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
   // every operation will by default use cache-and-network rather
   // than cache-first now:
   requestPolicy: 'cache-and-network',

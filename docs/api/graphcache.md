@@ -5,6 +5,11 @@ order: 4
 
 # @urql/exchange-graphcache
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 The `@urql/exchange-graphcache` package contains an addon `cacheExchange` for `urql` that may be
 used to replace the default [`cacheExchange`](./core.md#cacheexchange), which switches `urql` from
 using ["Document Caching"](../basics/document-caching.md) to ["Normalized

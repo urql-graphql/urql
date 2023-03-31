@@ -28,18 +28,18 @@ Afterwards we can set the `populateExchange` up by adding it to our list of `exc
 client options.
 
 ```ts
-import { createClient, dedupExchange, fetchExchange } from '@urql/core';
+import { Client, fetchExchange } from '@urql/core';
 import { populateExchange } from '@urql/exchange-populate';
 
-const client = createClient({
+const client = new Client({
   // ...
-  exchanges: [dedupExchange, populateExchange({ schema }), cacheExchange, fetchExchange],
+  exchanges: [populateExchange({ schema }), cacheExchange, fetchExchange],
 });
 ```
 
 The `populateExchange` should be placed in front of the `cacheExchange`, especially if you're using
 [Graphcache](../graphcache/README.md), since it won't understand the `@populate` directive on its
-own. It should also be placed after the `dedupExchange` to avoid unnecessary work.
+own. It should also be placed in front the `cacheExchange` to avoid unnecessary work.
 
 Adding the `populateExchange` now enables us to use the `@populate` directive in our mutations.
 

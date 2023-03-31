@@ -41,23 +41,19 @@ Results_](../api/core.md#operationresult).
 
 ## Using Exchanges
 
-The `Client` accepts an `exchanges` option that defaults to the three default exchanges mentioned above. When we pass a custom list of exchanges the `Client` uses the `composeExchanges`
-utility, which starts chaining these exchanges.
+The `Client` accepts an `exchanges` option that. Initially, we may choose to just
+set this to two very standard exchanges — `cacheExchange` and `fetchExchange`.
 
 In essence these exchanges build a pipeline that runs in the order they're passed; _Operations_ flow
 in from the start to the end, and _Results_ are returned through the chain in reverse.
 
-If we look at our list of default exchanges — `dedupExchange`, `cacheExchange`, and then
-`fetchExchange` — an incoming operation is treated as follows:
+Suppose we pass the `cacheExchange` and then the `fetchExchange` to the `exchanges`.
 
-**First,** ongoing operations are deduplicated. It wouldn't make sense to send the
-same operation / request twice in parallel.
-
-**Second,** operations are checked against the cache. Depending on the `requestPolicy`,
+**First,** operations are checked against the cache. Depending on the `requestPolicy`,
 cached results can be resolved from here instead, which would mean that the cache sends back the
 result, and the operation doesn't travel any further in the chain.
 
-**Third,** operations are sent to the API, and the result is turned into an `OperationResult`.
+**Second,** operations are sent to the API, and the result is turned into an `OperationResult`.
 
 **Lastly,** operation results then travel through the exchanges in _reverse order_, which is because
 exchanges are a pipeline where all operations travel forward deeper into the exchange chain, and
@@ -65,26 +61,25 @@ then backwards. When these results pass through the cache then the `cacheExchang
 result.
 
 ```js
-import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
+import { Client, fetchExchange, cacheExchange } from 'urql';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
 });
 ```
 
-We can add more exchanges to this chain, for instance, we can add the `errorExchange`, which calls a
-global callback whenever it sees [a `CombinedError`](../basics/errors.md) on an `OperationResult`.
+We can add more exchanges to this chain, for instance, we can add the `mapExchange`, which can call a
+callback whenever it sees [a `CombinedError`](../basics/errors.md) occur on a result.
 
 ```js
-import { createClient, dedupExchange, fetchExchange, cacheExchange, errorExchange } from 'urql';
+import { Client, fetchExchange, cacheExchange, mapExchange } from 'urql';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
-    errorExchange({
+    mapExchange({
       onError(error) {
         console.error(error);
       },
@@ -123,15 +118,15 @@ called a `noopExchange` — an exchange that doesn't do anything.
 ### Forward and Return Composition
 
 When you create a `Client` and pass it an array of exchanges, `urql` composes them left-to-right.
-If we look at our previous `noopExchange` example in context, we can track what it does if it is located between the `dedupExchange` and the `fetchExchange`.
+If we look at our previous `noopExchange` example in context, we can track what it does if it is located between the `cacheExchange` and the `fetchExchange`.
 
 ```js
-import { Client, dedupExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 
 const noopExchange = ({ client, forward }) => {
   return operations$ => {
     // <-- The ExchangeIO function
-    // We receive a stream of Operations from `dedupExchange` which
+    // We receive a stream of Operations from `cacheExchange` which
     // we can modify before...
     const forwardOperations$ = operations$;
 
@@ -141,14 +136,14 @@ const noopExchange = ({ client, forward }) => {
     const operationResult$ = forward(operations$);
 
     // We get back `fetchExchange`'s stream of results, which we can
-    // also change before returning, which is what `dedupExchange`
+    // also change before returning, which is what `cacheExchange`
     // will receive when calling `forward`.
     return operationResult$;
   };
 };
 
 const client = new Client({
-  exchanges: [dedupExchange, noopExchange, fetchExchange],
+  exchanges: [cacheExchange, noopExchange, fetchExchange],
 });
 ```
 
@@ -215,17 +210,22 @@ mount without rerendering.
 This why **all exchanges should be ordered synchronous first and
 asynchronous last**.
 
-The default order of exchanges is:
+What we for instance repeat as the default setup in our docs is this:
 
 ```js
-import { dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 
-[dedupExchange, cacheExchange, fetchExchange];
+new Client({
+  // ...
+  exchanges: [cacheExchange, fetchExchange];
+});
 ```
 
-Both the `dedupExchange` and `cacheExchange` are completely
-synchronous. The `fetchExchange` is asynchronous since
-it makes a `fetch` request and waits for a server response.
+The `cacheExchange` is completely synchronous.
+The `fetchExchange` is asynchronous since it makes a `fetch` request and waits for a server response.
+If we put an asynchronous exchange in front of the `cacheExchange`, that would be unexpected, and
+since all results would then be delayed, nothing would ever be "cached" and instead always take some
+amount of time to be returned.
 
 When you're adding more exchanges, it's often crucial
 to put them in a specific order. For instance, an authentication exchange

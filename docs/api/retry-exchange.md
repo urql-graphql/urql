@@ -5,6 +5,11 @@ order: 5
 
 # Retry Exchange
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 The `@urql/exchange-retry` package contains an addon `retryExchange` for `urql` that may be used to
 let failed operations be retried, typically when a previous operation has failed with a network
 error.

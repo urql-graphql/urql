@@ -18,7 +18,7 @@ use these serialized results to rehydrate and render the application without ref
 To start out with the `ssrExchange` we have to add the exchange to our `Client`:
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange, ssrExchange } from '@urql/core';
+import { Client, cacheExchange, fetchExchange, ssrExchange } from '@urql/core';
 
 const isServerSide = typeof window === 'undefined';
 
@@ -28,9 +28,8 @@ const ssr = ssrExchange({
   initialState: !isServerSide ? window.__URQL_DATA__ : undefined,
 });
 
-const client = createClient({
+const client = new Client({
   exchanges: [
-    dedupExchange,
     cacheExchange,
     ssr, // Add `ssr` in front of the `fetchExchange`
     fetchExchange,
@@ -113,8 +112,7 @@ import { renderToString } from 'react-dom/server';
 import prepass from 'react-ssr-prepass';
 
 import {
-  createClient,
-  dedupExchange,
+  Client,
   cacheExchange,
   fetchExchange,
   ssrExchange,
@@ -125,9 +123,10 @@ const handleRequest = async (req, res) => {
   // ...
   const ssr = ssrExchange({ isClient: false });
 
-  const client createClient({
+  const client new Client({
+    url: 'https://??',
     suspense: true, // This activates urql's Suspense mode on the server-side
-    exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange]
+    exchanges: [cacheExchange, ssr, fetchExchange]
   });
 
   const element = (

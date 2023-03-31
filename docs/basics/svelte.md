@@ -17,9 +17,9 @@ function differently from `@urql/preact` or `urql` and uses the same [Core Packa
 Installing `@urql/svelte` is quick and no other packages are immediately necessary.
 
 ```sh
-yarn add @urql/svelte graphql
+yarn add @urql/svelte
 # or
-npm install --save @urql/svelte graphql
+npm install --save @urql/svelte
 ```
 
 Most libraries related to GraphQL also need the `graphql` package to be installed as a peer
@@ -44,19 +44,20 @@ Note: if using Vite as your bundler, you might stumble upon the error `Function 
 
 ### Setting up the `Client`
 
-The `@urql/svelte` package exports a method called `createClient` which we can use to create
+The `@urql/svelte` package exports a `Client` class, which we can use to create
 the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/svelte';
+import { Client, cacheExchange, fetchExchange } from '@urql/svelte';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
 });
 ```
 
-At the bare minimum we'll need to pass an API's `url` when we create a `Client` to get started.
+At the bare minimum we'll need to pass an API's `url` and `exchanges`
+when we create a `Client` to get started.
 
 Another common option is `fetchOptions`. This option allows us to customize the options that will be
 passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object or
@@ -66,9 +67,9 @@ In the following example we'll add a token to each `fetch` request that our `Cli
 GraphQL API.
 
 ```js
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getToken();
     return {
@@ -87,11 +88,11 @@ components. This will share one `Client` with the rest of our app, if we for ins
 
 ```html
 <script>
-  import { createClient, setContextClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/svelte';
+  import { Client, setContextClient, cacheExchange, fetchExchange } from '@urql/svelte';
 
-  const client = createClient({
+  const client = new Client({
     url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    exchanges: [cacheExchange, fetchExchange],
   });
 
   setContextClient(client);
@@ -291,11 +292,11 @@ provides metadata apart from the usual `query` and `variables` we may pass. This
 we may also change the `Client`'s default `requestPolicy` by passing it there.
 
 ```js
-import { createClient } from '@urql/svelte';
+import { Client, cacheExchange, fetchExchange } from '@urql/svelte';
 
-const client = createClient({
+const client = new Client({
   url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
   // every operation will by default use cache-and-network rather
   // than cache-first now:
   requestPolicy: 'cache-and-network',
@@ -400,7 +401,7 @@ example! We'll set up a mutation that _updates_ a todo item's title.
     result = mutationStore({
       client,
       query: gql`
-        mutation($id: ID!, $title: String!) {
+        mutation ($id: ID!, $title: String!) {
           updateTodo(id: $id, title: $title) {
             id
             title

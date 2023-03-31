@@ -5,6 +5,11 @@ order: 0
 
 # @urql/core
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 The `@urql/core` package is the basis of all framework bindings. Each bindings-package,
 like [`urql` for React](./urql.md) or [`@urql/preact`](./preact.md), will reuse the core logic and
 reexport all exports from `@urql/core`.
@@ -22,7 +27,7 @@ It accepts several options on creation.
 
 | Input             | Type                                        | Description                                                                                                                                                                                                                                                                                                    |
 | ----------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `exchanges`       | `Exchange[]`                                | An array of `Exchange`s that the client should use                                                                                                                                                                                                                   |
+| `exchanges`       | `Exchange[]`                                | An array of `Exchange`s that the client should use                                                                                                                                                                                                                                                             |
 | `url`             | `string`                                    | The GraphQL API URL as used by `fetchExchange`                                                                                                                                                                                                                                                                 |
 | `fetchOptions`    | `RequestInit \| () => RequestInit`          | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                                                                                                                                         |
 | `fetch`           | `typeof fetch`                              | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                                                                                                                                                    |

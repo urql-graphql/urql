@@ -5,8 +5,14 @@ order: 3
 
 # Architecture
 
-`urql` is a highly customizable and flexible GraphQL client, that happens to come with some default
-[core behavior in the core package](./basics/core.md).
+`urql` is a highly customizable and flexible GraphQL client.
+As you use it in your app, it's split into three parts:
+
+- Bindings — such as for React, Preact, Vue, or Svelte — which interact with `@urql/core`'s
+  `Client`.
+- The Client — as created [with the core `@urql/core` package](./basics/code.md), which interacts with "exchanges" to execute GraphQL
+  operations, and which you can also use directly.
+- Exchanges, which provide functionality like fetching or caching to the `Client`.
 
 By default, `urql` aims to provide the minimal amount of features that allow us to build an app
 quickly. However, `urql` has also been designed to be a GraphQL Client
@@ -34,54 +40,86 @@ In the following sections we'll talk about the way that `urql` solves these thre
 ## Requests and Operations on the Client
 
 If `urql` was a train it would take several stops to arrive at its terminus, our API. It starts with us
-defining queries or mutations. Any GraphQL request can be abstracted into their query documents and
-their variables. In `urql`, these GraphQL requests are treated as unique objects, which are uniquely
-identified by the query document and variables (which is why a `key` is generated from the two). This
-`key` is a hash number of the query document and variables and uniquely identifies our
-[`GraphQLRequest`](./api/core.md#graphqlrequest).
+defining queries or mutations by writing in GraphQL's query language.
 
-Whenever we decide to send a request to our API we start by using `urql`'s
-[`Client`](./api/core.md#client). It accepts several options like `url` or `requestPolicy` which are
-extra information on how the GraphQL requests are executed.
+Any GraphQL request can be abstracted into its query documents and its variables.
 
 ```js
-import { Client, dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+import { gql } from '@urql/core';
 
-new Client({
-  url: 'http://localhost:3000/graphql',
-  requestPolicy: 'cache-first',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange]
+const query = gql`
+  query($name: String!) {
+    helloWorld(name: $name)
+  }
+`;
+
+const request = createRequest(query, {
+  name: 'Urkel',
 });
 ```
 
-The bindings that we've seen in [the "Basics" section](./basics/README.md) interact with [the
-`Client`](./api/core.md#client) directly and are a thin abstraction on top of it. Though some methods can be called on it directly, as seen [on the "Core Usage"
+In `urql`, these GraphQL requests are treated as unique objects and each GraphQL request will have
+a `key` generated for them. This `key` is a hash of the query document and the variables you provide
+and are set on the `key` property of a [`GraphQLRequest`](./api/core.md#graphqlrequest).
+
+Whenever we decide to send our GraphQL requests to a GraphQL API we start by using `urql`'s
+[`Client`](./api/core.md#client).
+The `Client` accepts several options to configure its behaviour and the behaviour of exchanges,
+like the `fetchExchange`. For instance, we can pass it a `url` which the `fetchExchange` will
+use to make a `fetch` call to our GraphQL API.
+
+```js
+import { Client, cacheExchange, fetchExchange } from '@urql/core';
+
+const client = new Client({
+  url: 'http://localhost:3000/graphql',
+  exchanges: [cacheExchange, fetchExchange],
+});
+```
+
+Above, we're defining a `Client` that is ready to accept our requests. It will apply basic
+document caching and will send uncached requests to the `url` we pass it.
+The bindings that we've seen in [the "Basics" section](./basics/README.md), like `useQuery` for
+React for example, interact with [the `Client`](./api/core.md#client) directly and are a thin
+abstraction.
+
+Some methods can be called on it directly however, as seen [on the "Core Usage"
 page](./basics/core.md#one-off-queries-and-mutations).
 
-When we send our queries or mutations to the `Client`, internally they will be managed as
-[`Operation`](./api/core.md#operation)s. An "Operation" is an extension of `GraphQLRequest`s. Not
-only do they carry the `query`, `variables`, and a `key` property, they will also identify the
-`kind` of operation that is executed, like `"query"` or `"mutation"`. We can also find the
-`Client`'s options on `operation.context` which carries an operation's metadata.
+```js
+// Given our request and client defined above, we can call
+const subscription = client.executeQuery(request).subscribe(result => {
+  console.log(result.data);
+});
+```
+
+As we've seen, `urql` defines our query documents and variables as
+[`GraphQLRequest`s](./api/core.md#graphqlrequest). However, since we have more metadata that is
+needed, like our `url` option on the `Client`, `urql` internally creates [`Operation`s](./api/core.md#operation)
+each time a request is executed. The operations are then forwarded to the exchanges, like the
+`cacheExchange` and `fetchExchange`.
+
+An "Operation" is an extension of `GraphQLRequest`s. Not only do they carry the `query`, `variables`,
+and a `key` property, they will also identify the `kind` of operation that is executed, like
+`"query"` or `"mutation"`, and they contain the `Client`'s options on `operation.context`.
 
 ![Operations and Results](./assets/urql-event-hub.png)
 
-It's the `Client`s responsibility to accept an `Operation` and execute it. The bindings internally
-call the `client.executeQuery`, `client.executeMutation`, or `client.executeSubscription` methods,
-and we'll get a "stream" of results. This "stream" allows us to register a callback with it to
-receive results.
+This means, once we hand over a GraphQL request to the `Client`, it will create an `Operation`,
+and then hand it over to the exchanges until a result comes back.
 
-In the diagram we can see that each operation is a signal for our request to start at which point
-we can expect to receive our results eventually on a callback. Once we're not interested in results
-anymore a special "teardown" signal is issued on the `Client`. While we don't see operations outside
-the `Client`, they're what travel through the "Exchanges" on the `Client`.
+As shown in the diagram, each operation is like an event or signal for a GraphQL request to start,
+and the exchanges will eventually send back a corresponding result.
+However, because the cache can send updates to us whenever it detects a change, or you could cancel
+a GraphQL request before it finishes, a special "teardown" `Operation` also exists, which cancels
+ongoing requests.
 
 ## The Client and Exchanges
 
 To reiterate, when we use `urql`'s bindings for our framework of choice, methods are called on the
 `Client`, but we never see the operations that are created in the background from our bindings. We
 call a method like `client.executeQuery` (or it's called for us in the bindings), an operation is
-issued internally when we subscribe with a callback, and later our callback is called with results.
+issued internally when we subscribe with a callback, and later, we're given results.
 
 ![Operations stream and results stream](./assets/urql-client-architecture.png)
 
@@ -126,31 +164,39 @@ travelling the same line in reverse.
 
 ### The Exchanges
 
-The default set of exchanges that `@urql/core` contains and applies to a `Client` are:
+By default, the `Client` doesn't do anything with GraphQL requests. It contains only the logic to
+manage and differentiate between active and inactive requests and converts them to operations.
+To actually do something with our GraphQL requests, it needs _exchanges_, which are like plugins
+that you can pass to create a pipeline of how GraphQL operations are executed.
 
-- `dedupExchange`: Deduplicates pending operations (pending = waiting for a result)
-- `cacheExchange`: The default caching logic with ["Document Caching"](./basics/document-caching.md)
-- `fetchExchange`: Sends an operation to the API using `fetch` and adds results to the output stream
+By default, you may want to add the `cacheExchange` and the `fetchExchange` from `@urql/core`:
 
-When we don't pass the `exchanges` option manually to our `Client` then these are the ones that will
-be applied. As we can see, an exchange exerts a lot of power over our operations and results. They
-determine a lot of the logic of the `Client`, taking care of things like deduplication, caching, and
-sending requests to our API.
+- `cacheExchange`: Caches GraphQL results with ["Document Caching"](./basics/document-caching.md)
+- `fetchExchange`: Executes GraphQL requests with a `fetch` HTTP call
 
-Some of the exchanges that are available to us are:
+```js
+import { Client, cacheExchange, fetchExchange } from '@urql/core';
 
-- [`mapExchange`](./api/core.md#mapexchange): Allows reacting to operations, results, and errors
+const client = new Client({
+  url: 'http://localhost:3000/graphql',
+  exchanges: [cacheExchange, fetchExchange],
+});
+```
+
+As we can tell, exchanges define not only how GraphQL requests are executed and handled, but also
+get control over caching. Exchanges can be used to change almost any behaviour in the `Client`,
+although internally they only handle incoming & outgoing requests and incoming & outgoing results.
+
+Some more exchanges that we can use with our `Client` are:
+
+- [`mapExchange`](./api/core.md#mapexchange): Allows changing and reacting to operations, results, and errors
 - [`ssrExchange`](./advanced/server-side-rendering.md): Allows for a server-side renderer to
   collect results for client-side rehydration.
-- [`retryExchange`](./advanced/retry-operations.md): Allows operations to be retried
-- [`multipartFetchExchange`](./advanced/persistence-and-uploads.md#file-uploads): Provides multipart file upload capability
+- [`retryExchange`](./advanced/retry-operations.md): Allows operations to be retried on errors
 - [`persistedFetchExchange`](./advanced/persistence-and-uploads.md#automatic-persisted-queries): Provides support for Automatic
   Persisted Queries
-- [`authExchange`](./advanced/authentication.md): Allows complex authentication flows to be implemented
-  easily.
-- [`requestPolicyExchange`](./api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
-- [`refocusExchange`](./api/refocus-exchange.md): Tracks open queries and refetches them
-  when the window regains focus.
+- [`authExchange`](./advanced/authentication.md): Allows refresh authentication to be implemented easily.
+- [`requestPolicyExchange`](./api/request-policy-exchange.md): Automatically refreshes results given a TTL.
 - `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/urql-graphql/urql-devtools)
 
 We can even swap out our [document cache](./basics/document-caching.md), which is implemented by
@@ -182,51 +228,22 @@ since the bindings internally use them for us. But if we [use the `Client`
 directly](./basics/core.md#one-off-queries-and-mutations) or write exchanges then we'll see streams
 and will have to deal with their API.
 
-### The Wonka library
-
-`urql` utilises the [Wonka](https://github.com/kitten/wonka) library for its streams. It has a
-few advantages that are specifically tailored for the `urql` library and ecosystem:
-
-- It is extremely lightweight and treeshakeable, with a size of around 3.7kB minzipped.
-- It's cross-platform and cross-language compatible, having been written in
-  [Reason](https://reasonml.github.io/) and provides support for [Flow](https://flow.org/)
-  and [TypeScript](https://www.typescriptlang.org/v2/).
-- It's a predictable and iterable toolchain, emitting synchronous events whenever possible.
-
-Typical usage of Wonka will involve creating a _source_ of some values and a _sink_.
-
-```js
-import { fromArray, map, subscribe, pipe } from 'wonka';
-
-const { unsubscribe } = pipe(
-  fromArray([1, 2, 3]),
-  map(x => x * 2),
-  subscribe(x => {
-    console.log(x); // 2, 4, 6
-  })
-);
-```
-
-In Wonka, like with Observables, streams are cancellable by calling the `unsubscribe` method that a
-subscription returns.
-
-[Read more about Wonka in its documentation](https://wonka.kitten.sh/basics/background).
-
 ### Stream patterns with the client
 
 When we call methods on the `Client` like [`client.executeQuery`](./api/core.md#clientexecutequery)
-or [`client.query`](./api/core.md#clientquery) then these will return a Wonka stream. Those are
-essentially just a bunch of callbacks.
+or [`client.query`](./api/core.md#clientquery) then these will return a "stream" of results.
 
-We can use [`wonka`'s `subscribe`](https://wonka.kitten.sh/api/sinks#subscribe) function to start
-this stream. We pass this function a callback and will receive results back from the `Client`, as it
-starts our operation. When we unsubscribe then the `Client` will stop this operation by sending a
-special "teardown" operation to our exchanges.
+It's normal for GraphQL subscriptions to deliver multiple results, however, even GraphQL queries can
+give you multiple results in `urql`. This is because operations influence one another. When a cache
+invalidates a query, this query may refetch, and a new result is delivered to your application.
+
+Multiple results mean that once you subscribe to a GraphQL query via the `Client`, you may receive
+new results in the future.
 
 ```js
-import { pipe, subscribe } from 'wonka';
+import { gql } from '@urql/core';
 
-const QUERY = `
+const QUERY = gql`
   query Test($id: ID!) {
     getUser(id: $id) {
       id
@@ -235,12 +252,14 @@ const QUERY = `
   }
 `;
 
-const { unsubscribe } = pipe(
-  client.query(QUERY, { id: 'test' }),
-  subscribe(result => {
-    console.log(result); // { data: ... }
-  })
-);
+client.query(QUERY, { id: 'test' }).subscribe(result => {
+  console.log(result); // { data: ... }
+});
 ```
 
 Read more about the available APIs on the `Client` in the [Core API docs](./api/core.md).
+
+Internally, these streams and all exchanges are written using a library called
+[`wonka`](https://wonka.kitten.sh/basics/background), which is a tiny Observable-like
+library. It is used to write exchanges and when we interact with the `Client` it is used internally
+as well.

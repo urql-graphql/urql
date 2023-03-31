@@ -5,6 +5,11 @@ order: 3
 
 # Vue API
 
+> **Note:** These API docs are deprecated as we now keep TSDocs in all published packages.
+> You can view TSDocs while using these packages in your editor, as long as it supports the
+> TypeScript Language Server.
+> We're planning to replace these API docs with a separate web app soon.
+
 ## useQuery
 
 Accepts a single required options object as an input with the following properties:
