@@ -53,7 +53,7 @@ const deepMerge = (target: any, source: any) => {
     if (
       !target.constructor ||
       target.constructor === Object ||
-      Array.isArray(source)
+      Array.isArray(target)
     ) {
       target = Array.isArray(target) ? [...target] : { ...target };
       for (const key of Object.keys(source))
