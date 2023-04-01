@@ -5,6 +5,7 @@ import {
   IncrementalPayload,
 } from '../types';
 import { CombinedError } from './error';
+import { dset, dset as merge } from 'dset/merge';
 
 /** Converts the `ExecutionResult` received for a given `Operation` to an `OperationResult`.
  *
@@ -109,29 +110,14 @@ export const mergeResultPatch = (
           part[startIndex + i] = patch.items[i];
       } else if (patch.data !== undefined) {
         if (prop) {
-          part[prop] =
-            part[prop] && patch.data
-              ? { ...part[prop], ...patch.data }
-              : patch.data;
+          merge(part, prop as string, patch.data)
         } else {
           if (part && patch.data) {
             data = Object.keys(patch.data).reduce((acc, key) => {
-              if (!patch.data || !patch.data[key]) {
-                acc[key] = patch.data![key]
-              } else if (Array.isArray(patch.data[key])) {
-                // TODO: this is most likely possible
-              } else if (typeof patch.data[key] === 'object') {
-                acc[key] = {
-                  ...acc[key],
-                  ...(patch.data[key] as object)
-                };
-              } else {
-                acc[key] = patch.data![key]
-              }
-
+              merge(acc, key, patch.data)
               return acc;
             }, part)
-          } else {
+          } else if (patch.data) {
             data = patch.data;
           }
         }

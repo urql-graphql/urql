@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.0.0",
+    "dset": "^3.1.2",
     "wonka": "^6.3.0"
   },
   "publishConfig": {

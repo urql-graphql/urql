@@ -185,19 +185,6 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       urql: link:../../packages/react-urql
 
-  exchanges/multipart-fetch:
-    specifiers:
-      '@urql/core': '>=4.0.0'
-      extract-files: ^11.0.0
-      graphql: ^16.6.0
-      wonka: ^6.3.0
-    dependencies:
-      '@urql/core': link:../../packages/core
-      extract-files: 11.0.0
-      wonka: 6.3.0
-    devDependencies:
-      graphql: 16.6.0
-
   exchanges/persisted:
     specifiers:
       '@urql/core': '>=4.0.0'
@@ -258,9 +245,11 @@ importers:
   packages/core:
     specifiers:
       '@0no-co/graphql.web': ^1.0.0
+      dset: ^3.1.2
       wonka: ^6.3.0
     dependencies:
       '@0no-co/graphql.web': 1.0.0
+      dset: 3.1.2
       wonka: 6.3.0
 
   packages/introspection:
@@ -6071,6 +6060,11 @@ packages:
       p-event: 2.3.1
       pify: 3.0.0
 
+  /dset/3.1.2:
+    resolution: {integrity: sha512-g/M9sqy3oHe477Ar4voQxWtaPIFw1jTdKZuomOjhCcBx9nHUNn0pu6NopuFFrTh/TRZIKEj+76vLWFu9BNKk+Q==}
+    engines: {node: '>=4'}
+    dev: false
+
   /duplexer/0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
@@ -7110,11 +7104,6 @@ packages:
       schema-utils: 1.0.0
       webpack: 4.46.0
       webpack-sources: 1.4.3
-
-  /extract-files/11.0.0:
-    resolution: {integrity: sha512-FuoE1qtbJ4bBVvv94CC7s0oTnKUGvQs+Rjf1L2SJFfS+HTVVjhPFtehPdQ0JiGPqVNfSSZvL5yzHHQq2Z4WNhQ==}
-    engines: {node: ^12.20 || >= 14.13}
-    dev: false
 
   /extract-zip/2.0.1_supports-color@8.1.1:
     resolution: {integrity: sha512-GDhU9ntwuKyGXdZBUgTIe+vXnWj0fppUEtMDL0+idd5Sta8TGpHssn/eusA9mrPr9qNDym6SxAYZjNvCn/9RBg==}
