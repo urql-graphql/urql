@@ -108,10 +108,33 @@ export const mergeResultPatch = (
         for (let i = 0, l = patch.items.length; i < l; i++)
           part[startIndex + i] = patch.items[i];
       } else if (patch.data !== undefined) {
-        part[prop] =
-          part[prop] && patch.data
-            ? { ...part[prop], ...patch.data }
-            : patch.data;
+        if (prop) {
+          part[prop] =
+            part[prop] && patch.data
+              ? { ...part[prop], ...patch.data }
+              : patch.data;
+        } else {
+          if (part && patch.data) {
+            data = Object.keys(patch.data).reduce((acc, key) => {
+              if (!patch.data || !patch.data[key]) {
+                acc[key] = patch.data![key]
+              } else if (Array.isArray(patch.data[key])) {
+                // TODO: this is most likely possible
+              } else if (typeof patch.data[key] === 'object') {
+                acc[key] = {
+                  ...acc[key],
+                  ...(patch.data[key] as object)
+                };
+              } else {
+                acc[key] = patch.data![key]
+              }
+
+              return acc;
+            }, part)
+          } else {
+            data = patch.data;
+          }
+        }
       }
     }
   } else {
