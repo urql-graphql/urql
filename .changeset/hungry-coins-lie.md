@@ -2,4 +2,5 @@
 '@urql/core': patch
 ---
 
-Fix defer specified on the root-type
+Fix incremental delivery payloads not merging data correctly, or not handling patches on root
+results.
