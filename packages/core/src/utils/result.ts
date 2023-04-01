@@ -99,15 +99,7 @@ export const mergeResultPatch = (
     incremental = [nextResult as IncrementalPayload];
   }
 
-  const result: OperationResult = {
-    operation: prevResult.operation,
-    data: prevResult.data,
-    error: undefined,
-    extensions: undefined,
-    hasNext: !!nextResult.hasNext,
-    stale: false,
-  };
-
+  const withData = { data: prevResult.data };
   if (incremental) {
     for (const patch of incremental) {
       if (Array.isArray(patch.errors)) {
@@ -120,7 +112,7 @@ export const mergeResultPatch = (
       }
 
       let prop: string | number = 'data';
-      let part: Record<string, any> | Array<any> = result;
+      let part: Record<string, any> | Array<any> = withData;
       for (let i = 0, l = patch.path.length; i < l; prop = patch.path[i++]) {
         part = part[prop] = Array.isArray(part[prop])
           ? [...part[prop]]
@@ -139,14 +131,20 @@ export const mergeResultPatch = (
       }
     }
   } else {
-    result.data = nextResult.data || prevResult.data;
+    withData.data = nextResult.data || prevResult.data;
     errors = (nextResult.errors as any[]) || errors;
   }
 
-  if (errors.length)
-    result.error = new CombinedError({ graphQLErrors: errors, response });
-  if (hasExtensions) result.extensions = extensions;
-  return result;
+  return {
+    operation: prevResult.operation,
+    data: withData.data,
+    error: errors.length
+      ? new CombinedError({ graphQLErrors: errors, response })
+      : undefined,
+    extensions: hasExtensions ? extensions : undefined,
+    hasNext: !!nextResult.hasNext,
+    stale: false,
+  };
 };
 
 /** Creates an `OperationResult` containing a network error for requests that encountered unexpected errors.
