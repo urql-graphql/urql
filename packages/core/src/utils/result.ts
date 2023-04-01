@@ -118,7 +118,7 @@ export const mergeResultPatch = (
           : { ...part[prop] };
       }
 
-      if (Array.isArray(patch.items)) {
+      if (patch.items) {
         const startIndex = +prop >= 0 ? (prop as number) : 0;
         for (let i = 0, l = patch.items.length; i < l; i++)
           part[startIndex + i] = deepMerge(
