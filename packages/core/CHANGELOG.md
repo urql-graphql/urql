@@ -1,5 +1,13 @@
 # @urql/core
 
+## 4.0.2
+
+### Patch Changes
+
+- ⚠️ Fix incremental delivery payloads not merging data correctly, or not handling patches on root
+  results
+  Submitted by [@kitten](https://github.com/kitten) (See [#3124](https://github.com/urql-graphql/urql/pull/3124))
+
 ## 4.0.1
 
 ### Patch Changes
