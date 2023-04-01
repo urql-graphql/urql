@@ -493,7 +493,7 @@ describe('on text/event-stream', () => {
                   incremental: [
                     {
                       path: [],
-                      data: { author: { name: 'Steve' }  },
+                      data: { author: { name: 'Steve' } },
                     },
                   ],
                   hasNext: true,
@@ -523,7 +523,9 @@ describe('on text/event-stream', () => {
 
     const AuthorFragment = gql`
       fragment authorFields on Query {
-        author { name }
+        author {
+          name
+        }
       }
     `;
 
