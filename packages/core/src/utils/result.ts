@@ -5,7 +5,6 @@ import {
   IncrementalPayload,
 } from '../types';
 import { CombinedError } from './error';
-import { dset as merge } from 'dset/merge';
 
 /** Converts the `ExecutionResult` received for a given `Operation` to an `OperationResult`.
  *
@@ -49,6 +48,23 @@ export const makeResult = (
   };
 };
 
+const deepMerge = (target: any, source: any) => {
+  if (typeof target !== 'object' || target == null) {
+    return source;
+  } else if (
+    !target.constructor ||
+    target.constructor === Object ||
+    Array.isArray(source)
+  ) {
+    target = Array.isArray(target) ? [...target] : { ...target };
+    for (const key of Object.keys(source))
+      target[key] = deepMerge(target[key], source[key]);
+    return target;
+  } else {
+    return source;
+  }
+};
+
 /** Merges an incrementally delivered `ExecutionResult` into a previous `OperationResult`.
  *
  * @param prevResult - The {@link OperationResult} that preceded this result.
@@ -72,7 +88,6 @@ export const mergeResultPatch = (
   nextResult: ExecutionResult,
   response?: any
 ): OperationResult => {
-  let data: ExecutionResult['data'];
   let errors = prevResult.error ? prevResult.error.graphQLErrors : [];
   let hasExtensions = !!prevResult.extensions || !!nextResult.extensions;
   const extensions = { ...prevResult.extensions, ...nextResult.extensions };
@@ -84,8 +99,16 @@ export const mergeResultPatch = (
     incremental = [nextResult as IncrementalPayload];
   }
 
+  const result: OperationResult = {
+    operation: prevResult.operation,
+    data: prevResult.data,
+    error: undefined,
+    extensions: undefined,
+    hasNext: !!nextResult.hasNext,
+    stale: false,
+  };
+
   if (incremental) {
-    data = { ...prevResult.data };
     for (const patch of incremental) {
       if (Array.isArray(patch.errors)) {
         errors.push(...(patch.errors as any));
@@ -96,9 +119,9 @@ export const mergeResultPatch = (
         hasExtensions = true;
       }
 
-      let prop: string | number = patch.path[0];
-      let part: Record<string, any> | Array<any> = data as object;
-      for (let i = 1, l = patch.path.length; i < l; prop = patch.path[i++]) {
+      let prop: string | number = 'data';
+      let part: Record<string, any> | Array<any> = result;
+      for (let i = 0, l = patch.path.length; i < l; prop = patch.path[i++]) {
         part = part[prop] = Array.isArray(part[prop])
           ? [...part[prop]]
           : { ...part[prop] };
@@ -107,48 +130,23 @@ export const mergeResultPatch = (
       if (Array.isArray(patch.items)) {
         const startIndex = +prop >= 0 ? (prop as number) : 0;
         for (let i = 0, l = patch.items.length; i < l; i++)
-          part[startIndex + i] = patch.items[i];
+          part[startIndex + i] = deepMerge(
+            part[startIndex + i],
+            patch.items[i]
+          );
       } else if (patch.data !== undefined) {
-        if (prop) {
-          if (part[prop]) {
-            part[prop] = { ...part[prop] };
-            merge(part, prop as string, patch.data);
-          } else {
-            part[prop] = patch.data;
-          }
-        } else {
-          if (part && patch.data) {
-            data = Object.keys(patch.data).reduce((acc, key) => {
-              if (acc[key]) {
-                acc[key] = { ...acc[key] };
-                merge(acc, key, patch.data![key]);
-              } else {
-                acc[key] = patch.data![key]
-              }
-
-              return acc;
-            }, part);
-          } else {
-            data = patch.data;
-          }
-        }
+        part[prop] = deepMerge(part[prop], patch.data);
       }
     }
   } else {
-    data = nextResult.data || prevResult.data;
+    result.data = nextResult.data || prevResult.data;
     errors = (nextResult.errors as any[]) || errors;
   }
 
-  return {
-    operation: prevResult.operation,
-    data,
-    error: errors.length
-      ? new CombinedError({ graphQLErrors: errors, response })
-      : undefined,
-    extensions: hasExtensions ? extensions : undefined,
-    hasNext: !!nextResult.hasNext,
-    stale: false,
-  };
+  if (errors.length)
+    result.error = new CombinedError({ graphQLErrors: errors, response });
+  if (hasExtensions) result.extensions = extensions;
+  return result;
 };
 
 /** Creates an `OperationResult` containing a network error for requests that encountered unexpected errors.
