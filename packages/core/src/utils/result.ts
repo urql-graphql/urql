@@ -49,20 +49,19 @@ export const makeResult = (
 };
 
 const deepMerge = (target: any, source: any) => {
-  if (typeof target !== 'object' || target == null) {
-    return source;
-  } else if (
-    !target.constructor ||
-    target.constructor === Object ||
-    Array.isArray(source)
-  ) {
-    target = Array.isArray(target) ? [...target] : { ...target };
-    for (const key of Object.keys(source))
-      target[key] = deepMerge(target[key], source[key]);
-    return target;
-  } else {
-    return source;
+  if (typeof target === 'object' && target != null) {
+    if (
+      !target.constructor ||
+      target.constructor === Object ||
+      Array.isArray(source)
+    ) {
+      target = Array.isArray(target) ? [...target] : { ...target };
+      for (const key of Object.keys(source))
+        target[key] = deepMerge(target[key], source[key]);
+      return target;
+    }
   }
+  return source;
 };
 
 /** Merges an incrementally delivered `ExecutionResult` into a previous `OperationResult`.
