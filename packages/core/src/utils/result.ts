@@ -48,6 +48,22 @@ export const makeResult = (
   };
 };
 
+const deepMerge = (target: any, source: any) => {
+  if (typeof target === 'object' && target != null) {
+    if (
+      !target.constructor ||
+      target.constructor === Object ||
+      Array.isArray(target)
+    ) {
+      target = Array.isArray(target) ? [...target] : { ...target };
+      for (const key of Object.keys(source))
+        target[key] = deepMerge(target[key], source[key]);
+      return target;
+    }
+  }
+  return source;
+};
+
 /** Merges an incrementally delivered `ExecutionResult` into a previous `OperationResult`.
  *
  * @param prevResult - The {@link OperationResult} that preceded this result.
@@ -71,7 +87,6 @@ export const mergeResultPatch = (
   nextResult: ExecutionResult,
   response?: any
 ): OperationResult => {
-  let data: ExecutionResult['data'];
   let errors = prevResult.error ? prevResult.error.graphQLErrors : [];
   let hasExtensions = !!prevResult.extensions || !!nextResult.extensions;
   const extensions = { ...prevResult.extensions, ...nextResult.extensions };
@@ -83,8 +98,8 @@ export const mergeResultPatch = (
     incremental = [nextResult as IncrementalPayload];
   }
 
+  const withData = { data: prevResult.data };
   if (incremental) {
-    data = { ...prevResult.data };
     for (const patch of incremental) {
       if (Array.isArray(patch.errors)) {
         errors.push(...(patch.errors as any));
@@ -95,33 +110,33 @@ export const mergeResultPatch = (
         hasExtensions = true;
       }
 
-      let prop: string | number = patch.path[0];
-      let part: Record<string, any> | Array<any> = data as object;
-      for (let i = 1, l = patch.path.length; i < l; prop = patch.path[i++]) {
+      let prop: string | number = 'data';
+      let part: Record<string, any> | Array<any> = withData;
+      for (let i = 0, l = patch.path.length; i < l; prop = patch.path[i++]) {
         part = part[prop] = Array.isArray(part[prop])
           ? [...part[prop]]
           : { ...part[prop] };
       }
 
-      if (Array.isArray(patch.items)) {
+      if (patch.items) {
         const startIndex = +prop >= 0 ? (prop as number) : 0;
         for (let i = 0, l = patch.items.length; i < l; i++)
-          part[startIndex + i] = patch.items[i];
+          part[startIndex + i] = deepMerge(
+            part[startIndex + i],
+            patch.items[i]
+          );
       } else if (patch.data !== undefined) {
-        part[prop] =
-          part[prop] && patch.data
-            ? { ...part[prop], ...patch.data }
-            : patch.data;
+        part[prop] = deepMerge(part[prop], patch.data);
       }
     }
   } else {
-    data = nextResult.data || prevResult.data;
+    withData.data = nextResult.data || prevResult.data;
     errors = (nextResult.errors as any[]) || errors;
   }
 
   return {
     operation: prevResult.operation,
-    data,
+    data: withData.data,
     error: errors.length
       ? new CombinedError({ graphQLErrors: errors, response })
       : undefined,

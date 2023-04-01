@@ -459,4 +459,124 @@ describe('on text/event-stream', () => {
       },
     });
   });
+
+  it('merges deferred results on the root-type', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'text/event-stream';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  hasNext: true,
+                  data: {
+                    author: {
+                      id: '1',
+                      __typename: 'Author',
+                    },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  incremental: [
+                    {
+                      path: [],
+                      data: { author: { name: 'Steve' } },
+                    },
+                  ],
+                  hasNext: true,
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false })),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const AuthorFragment = gql`
+      fragment authorFields on Query {
+        author {
+          name
+        }
+      }
+    `;
+
+    const streamedQueryOperation: Operation = makeOperation(
+      'query',
+      {
+        query: gql`
+          query {
+            author {
+              id
+              ...authorFields @defer
+            }
+          }
+
+          ${AuthorFragment}
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({
+      author: {
+        id: '1',
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[1].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[2].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+      },
+    });
+  });
 });

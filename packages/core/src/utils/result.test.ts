@@ -163,6 +163,43 @@ describe('mergeResultPatch', () => {
     });
   });
 
+  it('should apply incremental stream patches deeply', () => {
+    const prevResult: OperationResult = {
+      operation: queryOperation,
+      data: {
+        __typename: 'Query',
+        test: [
+          {
+            __typename: 'Test',
+          },
+        ],
+      },
+      stale: false,
+      hasNext: true,
+    };
+
+    const patch = { name: 'Test' };
+
+    const merged = mergeResultPatch(prevResult, {
+      incremental: [
+        {
+          items: [patch],
+          path: ['test', 0],
+        },
+      ],
+    });
+
+    expect(merged.data).toStrictEqual({
+      __typename: 'Query',
+      test: [
+        {
+          __typename: 'Test',
+          name: 'Test',
+        },
+      ],
+    });
+  });
+
   it('should handle null incremental stream patches', () => {
     const prevResult: OperationResult = {
       operation: queryOperation,
@@ -188,6 +225,37 @@ describe('mergeResultPatch', () => {
     expect(merged.data).toStrictEqual({
       __typename: 'Query',
       items: [{ __typename: 'Item' }],
+    });
+  });
+
+  it('should handle root incremental stream patches', () => {
+    const prevResult: OperationResult = {
+      operation: queryOperation,
+      data: {
+        __typename: 'Query',
+        item: {
+          test: true,
+        },
+      },
+      stale: false,
+      hasNext: true,
+    };
+
+    const merged = mergeResultPatch(prevResult, {
+      incremental: [
+        {
+          data: { item: { test2: false } },
+          path: [],
+        },
+      ],
+    });
+
+    expect(merged.data).toStrictEqual({
+      __typename: 'Query',
+      item: {
+        test: true,
+        test2: false,
+      },
     });
   });
 
