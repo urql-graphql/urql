@@ -27,7 +27,9 @@ async function main() {
     })
   })
 
-  const releases = await Promise.allSettled(releasePromises)
+  const releases = (await Promise.allSettled(releasePromises))
+    .map(x => x.status === 'fulfilled' && x.value.status === 200 ? x.value.data : undefined)
+    .filter(Boolean)
 
   // Construct message
   const text = releases.map((release) => {
