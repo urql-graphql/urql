@@ -34,8 +34,17 @@ page.](../architecture.md)
 In the above example, we add the `subscriptionExchange` to the `Client` with the default exchanges
 added before it. The `subscriptionExchange` is a factory that accepts additional options and returns
 the actual `Exchange` function. It does not make any assumption over the transport protocol and
-scheme that is used. Instead, we need to pass a `forwardSubscription` function, which is called with
-an "enriched" _Operation_ every time the `Client` attempts to execute a GraphQL Subscription.
+scheme that is used. Instead, we need to pass a `forwardSubscription` function.
+
+The `forwardSubscription` is called when the `subscriptionExchange` receives an `Operation`, so
+typically, when you’re executing a GraphQL subscription. This will call the `forwardSubscription`
+function with a GraphQL request body, in the same shape that a GraphQL HTTP API may receive it as
+JSON input.
+
+If you’re using TypeScript, you may notice that the input that `forwardSubscription` receives has
+an optional `query` property. This is because of persisted query support. For some transports, the
+`query` property may have to be defaulted to an empty string, which matches the GraphQL over HTTP
+specification more closely.
 
 When we define this function it must return an "Observable-like" object, which needs to follow the
 [Observable spec](https://github.com/tc39/proposal-observable), which comes down to having an
@@ -59,11 +68,15 @@ const client = new Client({
     cacheExchange,
     fetchExchange,
     subscriptionExchange({
-      forwardSubscription: request => ({
-        subscribe: sink => ({
-          unsubscribe: wsClient.subscribe(request, sink),
-        }),
-      }),
+      forwardSubscription(request) {
+        const input = { ...request, query: request.query || '' };
+        return {
+          subscribe(sink) {
+            const unsubscribe = wsClient.subscribe(input, sink);
+            return { unsubscribe };
+          },
+        };
+      },
     }),
   ],
 });
