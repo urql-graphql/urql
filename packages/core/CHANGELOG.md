@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.0.3
+
+### Patch Changes
+
+- Handle `fetch` rejections in `makeFetchSource` and properly hand them over to `CombinedError`s
+  Submitted by [@kitten](https://github.com/kitten) (See [#3131](https://github.com/urql-graphql/urql/pull/3131))
+
 ## 4.0.2
 
 ### Patch Changes
