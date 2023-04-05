@@ -1,4 +1,14 @@
-import { Source, fromAsyncIterable, filter, pipe } from 'wonka';
+import {
+  Source,
+  fromPromise,
+  fromAsyncIterable,
+  fromValue,
+  onEnd,
+  mergeAll,
+  pipe,
+  empty,
+} from 'wonka';
+
 import { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
@@ -45,10 +55,42 @@ async function* split(
   }
 }
 
-async function* parseJSON(
+function toErrorResult(
+  error: Error,
+  operation: Operation,
+  response: Response | void
+) {
+  return makeErrorResult(
+    operation,
+    response &&
+      (response.status < 200 || response.status >= 300) &&
+      response.statusText
+      ? new Error(response.statusText)
+      : error,
+    response
+  );
+}
+
+async function* scanToResults(
+  payloads: AsyncIterableIterator<ExecutionResult>,
+  operation: Operation,
   response: Response
-): AsyncIterableIterator<ExecutionResult> {
-  yield JSON.parse(await response.text());
+) {
+  let networkMode = true;
+  let result: OperationResult | null = null;
+  try {
+    for await (const payload of payloads) {
+      result = result
+        ? mergeResultPatch(result, payload, response)
+        : makeResult(operation, payload, response);
+      networkMode = false;
+      yield result;
+      networkMode = true;
+    }
+  } catch (error: any) {
+    if (!networkMode) throw error;
+    yield toErrorResult(error, operation, response);
+  }
 }
 
 async function* parseEventStream(
@@ -67,7 +109,7 @@ async function* parseEventStream(
       if (payload && !payload.hasNext) break;
     }
   }
-  if (payload && payload.hasNext) {
+  if (!payload || payload.hasNext) {
     yield { hasNext: false };
   }
 }
@@ -94,71 +136,51 @@ async function* parseMultipartMixed(
     }
     if (payload && !payload.hasNext) break;
   }
-  if (payload && payload.hasNext) {
+  if (!payload || payload.hasNext) {
     yield { hasNext: false };
   }
 }
 
-async function* fetchOperation(
+type AbortRef = { abort: boolean };
+
+async function fetchOperation(
   operation: Operation,
   url: string,
-  fetchOptions: RequestInit
-) {
-  let networkMode = true;
-  let abortController: AbortController | void;
-  let result: OperationResult | null = null;
-  let response: Response;
+  fetchOptions: RequestInit,
+  abortRef: AbortRef
+): Promise<Source<OperationResult>> {
+  // Delay for a tick to give the Client a chance to cancel the request
+  // if a teardown comes in immediately
+  await Promise.resolve();
+  if (abortRef.abort) return empty;
 
+  let response: Response | void;
   try {
-    if (typeof AbortController !== 'undefined') {
-      fetchOptions.signal = (abortController = new AbortController()).signal;
-    }
-
-    // Delay for a tick to give the Client a chance to cancel the request
-    // if a teardown comes in immediately
-    yield await Promise.resolve();
-
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
+
     const contentType = response.headers.get('Content-Type') || '';
-
-    let results: AsyncIterable<ExecutionResult>;
     if (/multipart\/mixed/i.test(contentType)) {
-      results = parseMultipartMixed(contentType, response);
+      return fromAsyncIterable(
+        scanToResults(
+          parseMultipartMixed(contentType, response),
+          operation,
+          response
+        )
+      );
     } else if (/text\/event-stream/i.test(contentType)) {
-      results = parseEventStream(response);
-    } else if (!/text\//i.test(contentType)) {
-      results = parseJSON(response);
+      return fromAsyncIterable(
+        scanToResults(parseEventStream(response), operation, response)
+      );
+    }
+
+    const text = await response.text();
+    if (!/text\//i.test(contentType)) {
+      return fromValue(makeResult(operation, JSON.parse(text), response));
     } else {
-      throw new Error(await response.text());
-    }
-
-    for await (const payload of results) {
-      result = result
-        ? mergeResultPatch(result, payload, response)
-        : makeResult(operation, payload, response);
-      networkMode = false;
-      yield result;
-      networkMode = true;
-    }
-
-    if (!result) {
-      yield (result = makeResult(operation, {}, response));
+      throw new Error(text);
     }
   } catch (error: any) {
-    if (!networkMode) {
-      throw error;
-    }
-
-    yield makeErrorResult(
-      operation,
-      (response!.status < 200 || response!.status >= 300) &&
-        response!.statusText
-        ? new Error(response!.statusText)
-        : error,
-      response!
-    );
-  } finally {
-    if (abortController) abortController.abort();
+    return fromValue(toErrorResult(error, operation, response));
   }
 }
 
@@ -194,8 +216,16 @@ export function makeFetchSource(
   url: string,
   fetchOptions: RequestInit
 ): Source<OperationResult> {
+  let abortController: AbortController | void;
+  if (typeof AbortController !== 'undefined')
+    fetchOptions.signal = (abortController = new AbortController()).signal;
+  const abortRef: AbortRef = { abort: false };
   return pipe(
-    fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
-    filter((result): result is OperationResult => !!result)
+    fromPromise(fetchOperation(operation, url, fetchOptions, abortRef)),
+    mergeAll,
+    onEnd(() => {
+      abortRef.abort = true;
+      if (abortController) abortController.abort();
+    })
   );
 }
