@@ -107,7 +107,7 @@ async function* fetchOperation(
   let networkMode = true;
   let abortController: AbortController | void;
   let result: OperationResult | null = null;
-  let response: Response;
+  let response: Response | void;
 
   try {
     if (typeof AbortController !== 'undefined') {
@@ -151,11 +151,12 @@ async function* fetchOperation(
 
     yield makeErrorResult(
       operation,
-      (response!.status < 200 || response!.status >= 300) &&
-        response!.statusText
-        ? new Error(response!.statusText)
+      response &&
+        (response.status < 200 || response.status >= 300) &&
+        response.statusText
+        ? new Error(response.statusText)
         : error,
-      response!
+      response
     );
   } finally {
     if (abortController) abortController.abort();
