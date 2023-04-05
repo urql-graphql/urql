@@ -154,16 +154,18 @@ async function* fetchOperation(
         operation,
         error
       ))
+    } else {
+      yield makeErrorResult(
+        operation,
+        (response!.status < 200 || response!.status >= 300) &&
+          response!.statusText
+          ? new Error(response!.statusText)
+          : error,
+        response!
+      );
     }
 
-    yield makeErrorResult(
-      operation,
-      (response!.status < 200 || response!.status >= 300) &&
-        response!.statusText
-        ? new Error(response!.statusText)
-        : error,
-      response!
-    );
+    
   } finally {
     if (abortController) abortController.abort();
   }
