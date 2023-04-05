@@ -149,6 +149,13 @@ async function* fetchOperation(
       throw error;
     }
 
+    if(!response){
+      yield makeErrorResult((
+        operation,
+        error
+      ))
+    }
+
     yield makeErrorResult(
       operation,
       (response!.status < 200 || response!.status >= 300) &&
