@@ -149,11 +149,11 @@ async function* fetchOperation(
       throw error;
     }
 
-    if(!response){
-      yield makeErrorResult((
+    if(!response!){
+      yield makeErrorResult(
         operation,
         error
-      ))
+      )
     } else {
       yield makeErrorResult(
         operation,
