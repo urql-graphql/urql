@@ -106,6 +106,19 @@ describe('on error', () => {
     });
   });
 
+  it('handles network errors', async () => {
+    const error = new Error('test');
+    fetch.mockRejectedValue(error);
+
+    const fetchOptions = {};
+    const data = await pipe(
+      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
+      toPromise
+    );
+
+    expect(data).toHaveProperty('error.networkError', error);
+  });
+
   it('returns error data', async () => {
     const fetchOptions = {};
     const data = await pipe(
