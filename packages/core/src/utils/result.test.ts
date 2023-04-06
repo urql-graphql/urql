@@ -1,11 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { OperationResult } from '../types';
-import { queryOperation } from '../test-utils';
+import { queryOperation, subscriptionOperation } from '../test-utils';
 import { makeResult, mergeResultPatch } from './result';
 
 describe('makeResult', () => {
   it('adds extensions and errors correctly', () => {
-    const response = {};
     const origResult = {
       data: undefined,
       errors: ['error message'],
@@ -14,8 +13,9 @@ describe('makeResult', () => {
       },
     };
 
-    const result = makeResult(queryOperation, origResult, response);
+    const result = makeResult(queryOperation, origResult);
 
+    expect(result.hasNext).toBe(false);
     expect(result.operation).toBe(queryOperation);
     expect(result.data).toBe(undefined);
     expect(result.extensions).toEqual(origResult.extensions);
@@ -23,9 +23,45 @@ describe('makeResult', () => {
       `[CombinedError: [GraphQL] error message]`
     );
   });
+
+  it('default hasNext to true for subscriptions', () => {
+    const origResult = {
+      data: undefined,
+      errors: ['error message'],
+      extensions: {
+        extensionKey: 'extensionValue',
+      },
+    };
+
+    const result = makeResult(subscriptionOperation, origResult);
+    expect(result.hasNext).toBe(true);
+  });
 });
 
 describe('mergeResultPatch', () => {
+  it('should default hasNext to true if the last result was set to true', () => {
+    const prevResult: OperationResult = {
+      operation: subscriptionOperation,
+      data: {
+        __typename: 'Subscription',
+        event: 1,
+      },
+      stale: false,
+      hasNext: true,
+    };
+
+    const merged = mergeResultPatch(prevResult, {
+      data: {
+        __typename: 'Subscription',
+        event: 2,
+      },
+    });
+
+    expect(merged.data).not.toBe(prevResult.data);
+    expect(merged.data.event).toBe(2);
+    expect(merged.hasNext).toBe(true);
+  });
+
   it('should ignore invalid patches', () => {
     const prevResult: OperationResult = {
       operation: queryOperation,
