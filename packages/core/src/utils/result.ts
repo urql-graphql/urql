@@ -141,7 +141,8 @@ export const mergeResultPatch = (
       ? new CombinedError({ graphQLErrors: errors, response })
       : undefined,
     extensions: hasExtensions ? extensions : undefined,
-    hasNext: !!nextResult.hasNext,
+    hasNext:
+      nextResult.hasNext != null ? nextResult.hasNext : prevResult.hasNext,
     stale: false,
   };
 };
