@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.0.4
+
+### Patch Changes
+
+- ⚠️ Fix `hasNext` being defaulted to `false` when a new subscription event is received on the `subscriptionExchange` that doesn't have `hasNext` set
+  Submitted by [@kitten](https://github.com/kitten) (See [#3137](https://github.com/urql-graphql/urql/pull/3137))
+
 ## 4.0.3
 
 ### Patch Changes
