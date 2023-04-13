@@ -5,7 +5,7 @@ import {
   extractFiles,
 } from '../utils';
 
-import { AnyVariables, GraphQLRequest, Operation } from '../types';
+import { AnyVariables, Operation } from '../types';
 
 /** Abstract definition of the JSON data sent during GraphQL HTTP POST requests. */
 export interface FetchBody {
@@ -24,7 +24,7 @@ export interface FetchBody {
 export function makeFetchBody<
   Data = any,
   Variables extends AnyVariables = AnyVariables
->(request: Omit<GraphQLRequest<Data, Variables>, 'key'>): FetchBody {
+>(request: Omit<Operation<Data, Variables>, 'key'>): FetchBody {
   const isAPQ =
     request.extensions &&
     request.extensions.persistedQuery &&
@@ -34,7 +34,7 @@ export function makeFetchBody<
     operationName: getOperationName(request.query),
     variables: request.variables || undefined,
     extensions: request.extensions,
-    context: request.context
+    context: request.context,
   };
 }
 
