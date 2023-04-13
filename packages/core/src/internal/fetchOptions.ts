@@ -13,6 +13,7 @@ export interface FetchBody {
   operationName: string | undefined;
   variables: undefined | Record<string, any>;
   extensions: undefined | Record<string, any>;
+  context: Record<string, any>;
 }
 
 /** Creates a GraphQL over HTTP compliant JSON request body.
@@ -33,6 +34,7 @@ export function makeFetchBody<
     operationName: getOperationName(request.query),
     variables: request.variables || undefined,
     extensions: request.extensions,
+    context: request.context
   };
 }
 
