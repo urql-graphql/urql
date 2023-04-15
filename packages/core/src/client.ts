@@ -583,7 +583,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     if (
       operation.kind === 'mutation' ||
       operation.kind === 'teardown' ||
-      (prevReplay ? !prevReplay.hasNext : !dispatched.has(operation.key))
+      ((!prevReplay || (!prevReplay.hasNext && !prevReplay.stale)) &&
+        !dispatched.has(operation.key))
     ) {
       if (operation.kind === 'teardown') {
         dispatched.delete(operation.key);
