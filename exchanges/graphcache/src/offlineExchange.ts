@@ -1,4 +1,4 @@
-import { pipe, merge, makeSubject, filter } from 'wonka';
+import { pipe, share, merge, makeSubject, filter } from 'wonka';
 import { SelectionNode } from '@0no-co/graphql.web';
 
 import {
@@ -180,7 +180,8 @@ export const offlineExchange =
             }
 
             return true;
-          })
+          }),
+          share
         );
       };
 
