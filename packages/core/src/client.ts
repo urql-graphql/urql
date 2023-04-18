@@ -716,10 +716,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       // operation's exchange results
       if (operation.kind === 'teardown') {
         dispatchOperation(operation);
-      } else if (
-        (operation.kind !== 'query' && operation.kind !== 'subscription') ||
-        active.has(operation.key)
-      ) {
+      } else if (operation.kind === 'mutation' || active.has(operation.key)) {
         queue.push(operation);
         Promise.resolve().then(dispatchOperation);
       }
