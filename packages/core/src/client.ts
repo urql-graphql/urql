@@ -579,11 +579,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const operations = makeSubject<Operation>();
 
   function nextOperation(operation: Operation) {
-    const prevReplay = replays.get(operation.key);
     if (
       operation.kind === 'mutation' ||
       operation.kind === 'teardown' ||
-      (prevReplay ? !prevReplay.hasNext : !dispatched.has(operation.key))
+      !dispatched.has(operation.key)
     ) {
       if (operation.kind === 'teardown') {
         dispatched.delete(operation.key);
@@ -664,7 +663,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         result$,
         // Store replay result
         onPush(result => {
-          dispatched.delete(operation.key);
+          if (!result.hasNext && !result.stale)
+            dispatched.delete(operation.key);
           replays.set(operation.key, result);
         }),
         // Cleanup active states on end of source

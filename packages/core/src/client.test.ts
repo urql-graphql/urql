@@ -497,64 +497,6 @@ describe('queuing behavior', () => {
 
     unsubscribe();
   });
-
-  it('does not reemit previous results as stale if it was marked as stale already', async () => {
-    const output: OperationResult[] = [];
-    const exchange: Exchange = () => ops$ => {
-      return pipe(
-        ops$,
-        filter(op => op.kind !== 'teardown'),
-        map(op => ({
-          data: 1,
-          operation: op,
-          stale: true,
-          hasNext: false,
-        })),
-        delay(1)
-      );
-    };
-
-    const client = createClient({
-      url: 'test',
-      exchanges: [exchange],
-    });
-
-    const { unsubscribe } = pipe(
-      client.executeRequestOperation(queryOperation),
-      subscribe(result => {
-        output.push(result);
-      })
-    );
-
-    vi.advanceTimersByTime(1);
-
-    expect(output.length).toBe(1);
-    expect(output[0]).toHaveProperty('operation.key', queryOperation.key);
-    expect(output[0]).toHaveProperty(
-      'operation.context.requestPolicy',
-      'cache-first'
-    );
-
-    client.reexecuteOperation(
-      makeOperation(queryOperation.kind, queryOperation, {
-        ...queryOperation.context,
-        requestPolicy: 'network-only',
-      })
-    );
-
-    await Promise.resolve();
-    vi.advanceTimersByTime(1);
-
-    expect(output.length).toBe(2);
-    expect(output[1]).toHaveProperty('stale', true);
-    expect(output[1]).toHaveProperty('operation.key', queryOperation.key);
-    expect(output[1]).toHaveProperty(
-      'operation.context.requestPolicy',
-      'network-only'
-    );
-
-    unsubscribe();
-  });
 });
 
 describe('deduplication behavior', () => {
@@ -655,6 +597,56 @@ describe('deduplication behavior', () => {
     expect(resultOne).toHaveBeenCalledTimes(1);
     expect(resultTwo).toHaveBeenCalledTimes(1);
     expect(onOperation).toHaveBeenCalledTimes(1);
+  });
+
+  it('deduplicates otherwise if operation has already been sent', () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let hasSent = false;
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        onPush(onOperation),
+        map(op => ({
+          hasNext: false,
+          stale: false,
+          data: 'test',
+          operation: op,
+        })),
+        filter(() => {
+          return hasSent ? false : (hasSent = true);
+        }),
+        delay(1)
+      );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operationOne = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    const operationTwo = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    const operationThree = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    pipe(client.executeRequestOperation(operationOne), subscribe(onResult));
+    pipe(client.executeRequestOperation(operationTwo), subscribe(onResult));
+    pipe(client.executeRequestOperation(operationThree), subscribe(onResult));
+    vi.advanceTimersByTime(1);
+
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(3);
   });
 });
 
