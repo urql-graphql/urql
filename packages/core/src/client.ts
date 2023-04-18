@@ -714,7 +714,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     reexecuteOperation(operation: Operation) {
       // Reexecute operation only if any subscribers are still subscribed to the
       // operation's exchange results
-      if (operation.kind === 'mutation' || active.has(operation.key)) {
+      if (operation.kind === 'teardown') {
+        dispatchOperation(operation);
+      } else if (operation.kind === 'mutation' || active.has(operation.key)) {
         queue.push(operation);
         Promise.resolve().then(dispatchOperation);
       }
