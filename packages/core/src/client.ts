@@ -579,12 +579,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const operations = makeSubject<Operation>();
 
   function nextOperation(operation: Operation) {
-    const prevReplay = replays.get(operation.key);
     if (
       operation.kind === 'mutation' ||
       operation.kind === 'teardown' ||
-      (!dispatched.has(operation.key) &&
-        (!prevReplay || (!prevReplay.hasNext && !prevReplay.stale)))
+      !dispatched.has(operation.key)
     ) {
       if (operation.kind === 'teardown') {
         dispatched.delete(operation.key);
