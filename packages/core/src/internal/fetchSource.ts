@@ -77,7 +77,7 @@ async function* parseMultipartMixed(
   response: Response
 ): AsyncIterableIterator<ExecutionResult> {
   const boundaryHeader = contentType.match(boundaryHeaderRe);
-  const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
+  const boundary = '\r\n--' + (boundaryHeader ? boundaryHeader[1] : '-');
   let isPreamble = true;
   let payload: any;
   for await (const chunk of split(streamBody(response), boundary)) {
