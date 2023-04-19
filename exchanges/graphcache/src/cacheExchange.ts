@@ -361,7 +361,10 @@ export const cacheExchange =
             /*noop*/
           } else if (!isBlockedByOptimisticUpdate(res.dependencies)) {
             client.reexecuteOperation(
-              toRequestPolicy(res.operation, 'network-only')
+              toRequestPolicy(
+                operations.get(res.operation.key) || res.operation,
+                'network-only'
+              )
             );
           } else if (requestPolicy === 'cache-and-network') {
             requestedRefetch.add(res.operation.key);
