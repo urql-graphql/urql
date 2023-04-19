@@ -200,7 +200,7 @@ export function authExchange(
   init: (utilities: AuthUtilities) => Promise<AuthConfig>
 ): Exchange {
   return ({ client, forward }) => {
-    const bypassQueue = new Set<OperationInstance>();
+    const bypassQueue = new Set<OperationInstance | undefined>();
     const retries = makeSubject<Operation>();
 
     let retryQueue = new Map<number, Operation>();
@@ -352,9 +352,7 @@ export function authExchange(
         result$,
         filter(result => {
           if (
-            ((result.operation.context._instance &&
-              !bypassQueue.has(result.operation.context._instance)) ||
-              !result.operation.context._instance) &&
+            !bypassQueue.has(result.operation.context._instance) &&
             result.error &&
             didAuthError(result) &&
             !result.operation.context.authAttempt
@@ -363,10 +361,7 @@ export function authExchange(
             return false;
           }
 
-          if (
-            result.operation.context._instance &&
-            bypassQueue.has(result.operation.context._instance)
-          ) {
+          if (bypassQueue.has(result.operation.context._instance)) {
             bypassQueue.delete(result.operation.context._instance);
           }
 
