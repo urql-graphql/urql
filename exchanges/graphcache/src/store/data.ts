@@ -72,7 +72,7 @@ export const makeData = (data?: Data): Data => {
   let newData: Data;
   if (data) {
     if (currentOwnership!.has(data)) return data;
-    newData = currentDataMapping!.get(data) || ({ ...data } as Data);
+    newData = currentDataMapping!.get(data) || ({} as Data);
     currentDataMapping!.set(data, newData);
   } else {
     newData = {} as Data;

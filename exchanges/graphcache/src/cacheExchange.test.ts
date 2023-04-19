@@ -100,13 +100,12 @@ describe('data dependencies', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(2);
 
-    expect(result.mock.calls[0][0].data).toEqual(expected);
+    expect(expected).toMatchObject(result.mock.calls[0][0].data);
     expect(result.mock.calls[1][0]).toHaveProperty(
       'operation.context.meta.cacheOutcome',
       'hit'
     );
-    expect(result.mock.calls[1][0].data).toEqual(expected);
-
+    expect(expected).toMatchObject(result.mock.calls[1][0].data);
     expect(result.mock.calls[1][0].data).toBe(result.mock.calls[0][0].data);
   });
 
@@ -771,7 +770,6 @@ describe('optimistic updates', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
 
     expect(result.mock.calls[1][0]?.data).toMatchObject({
-      __typename: 'Query',
       author: { name: '[REDACTED OFFLINE]' },
     });
 
@@ -1259,7 +1257,6 @@ describe('custom resolvers', () => {
 
     vi.runAllTimers();
     expect(result.mock.calls[1][0].data).toEqual({
-      __typename: 'Mutation',
       concealAuthor: {
         __typename: 'Author',
         id: '123',
@@ -1425,7 +1422,6 @@ describe('custom resolvers', () => {
     expect(response).toHaveBeenCalledTimes(2);
     expect(fakeResolver).toHaveBeenCalledTimes(6);
     expect(result.mock.calls[1][0].data).toEqual({
-      __typename: 'Mutation',
       concealAuthors: [
         {
           __typename: 'Author',
