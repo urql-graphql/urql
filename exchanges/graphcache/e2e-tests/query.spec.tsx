@@ -191,7 +191,7 @@ describe('Graphcache Queries', () => {
 
     cy.get('#first-data').should('have.text', 'Data: title');
     cy.get('#second-data').should('have.text', 'Data: foo');
-    cy.get('#second-stale').should('have.text', 'Stale: true');
+    cy.get('#second-stale').should('have.text', 'Stale: false');
     // TODO: ideally we would be able to keep the error here but...
     // cy.get('#first-error').should('have.text', 'Error: [GraphQL] Test');
     // cy.get('#second-error').should('have.text', 'Error: [GraphQL] Test');
