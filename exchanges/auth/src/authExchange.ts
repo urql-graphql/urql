@@ -225,7 +225,7 @@ export function authExchange(
               variables: Variables,
               context?: Partial<OperationContext>
             ): Promise<OperationResult<Data>> {
-              const baseOperation = client.createRequestOperation(
+              const operation = client.createRequestOperation(
                 'mutation',
                 createRequest(query, variables),
                 context
@@ -233,13 +233,16 @@ export function authExchange(
               return pipe(
                 result$,
                 onStart(() => {
-                  const operation = addAuthToOperation(baseOperation);
-                  bypassQueue.add(
-                    operation.context._instance as OperationInstance
-                  );
-                  retries.next(operation);
+                  const op = addAuthToOperation(operation);
+                  bypassQueue.add(op.context._instance as OperationInstance);
+                  retries.next(op);
                 }),
-                filter(result => result.operation.key === baseOperation.key),
+                filter(
+                  result =>
+                    result.operation.key === operation.key &&
+                    operation.context._instance ===
+                      result.operation.context._instance
+                ),
                 take(1),
                 toPromise
               );
@@ -347,8 +350,8 @@ export function authExchange(
         result$,
         filter(result => {
           if (
-            operation.context._instance &&
-            !bypassQueue.has(operation.context._instance) &&
+            result.operation.context._instance &&
+            !bypassQueue.has(result.operation.context._instance) &&
             result.error &&
             didAuthError(result) &&
             !result.operation.context.authAttempt
@@ -358,10 +361,10 @@ export function authExchange(
           }
 
           if (
-            operation.context._instance &&
-            !bypassQueue.has(operation.context._instance)
+            result.operation.context._instance &&
+            !bypassQueue.has(result.operation.context._instance)
           ) {
-            bypassQueue.delete(operation.context._instance);
+            bypassQueue.delete(result.operation.context._instance);
           }
 
           return true;
