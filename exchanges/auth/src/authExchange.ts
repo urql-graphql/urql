@@ -311,10 +311,10 @@ export function authExchange(
       const opsWithAuth$ = pipe(
         merge([retries.source, pendingOps$]),
         map(operation => {
-          if (operation.context.authAttempt) {
-            return addAuthToOperation(operation);
-          } else if (bypassQueue.has(operation)) {
+          if (bypassQueue.has(operation)) {
             return operation;
+          } else if (operation.context.authAttempt) {
+            return addAuthToOperation(operation);
           } else if (authPromise) {
             if (!retryQueue.has(operation.key)) {
               retryQueue.set(
@@ -341,6 +341,7 @@ export function authExchange(
         result$,
         filter(result => {
           if (
+            !bypassQueue.has(result.operation) &&
             result.error &&
             didAuthError(result) &&
             !result.operation.context.authAttempt
