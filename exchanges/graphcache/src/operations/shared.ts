@@ -18,7 +18,8 @@ import {
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField, isWriting, currentOptimistic } from '../store/data';
-import { Store, keyOfField } from '../store';
+import { keyOfField } from '../store/keys';
+import { Store } from '../store/store';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 

@@ -32,8 +32,8 @@ import {
   OptimisticMutationResolver,
 } from '../types';
 
-import { Store, joinKeys, keyOfField } from '../store';
-
+import { joinKeys, keyOfField } from '../store/keys';
+import { Store } from '../store/store';
 import * as InMemoryData from '../store/data';
 
 import {
