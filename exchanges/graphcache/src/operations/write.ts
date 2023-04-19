@@ -90,7 +90,7 @@ export const __initAnd_writeOptimistic = (
   }
 
   initDataState('write', store.data, key, true);
-  const result = _write(store, request, {} as Data, undefined, true);
+  const result = _write(store, request, {} as Data, undefined);
   clearDataState();
   return result;
 };
@@ -99,8 +99,7 @@ export const _write = (
   store: Store,
   request: OperationRequest,
   data?: Data,
-  error?: CombinedError | undefined,
-  isOptimistic?: boolean
+  error?: CombinedError | undefined
 ) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = {
@@ -115,7 +114,7 @@ export const _write = (
     getFragments(request.query),
     kind,
     kind,
-    !!isOptimistic,
+    InMemoryData.currentOptimistic,
     error
   );
 

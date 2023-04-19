@@ -166,14 +166,14 @@ export class Store<
     request.query = formatDocument(request.query);
     const output = updater(this.readQuery(request));
     if (output !== null) {
-      _write(this, request, output as any);
+      _write(this, request, output as any, undefined);
     }
   }
 
   readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null {
     const request = createRequest(input.query, input.variables!);
     request.query = formatDocument(request.query);
-    return _query(this, request).data as T | null;
+    return _query(this, request, undefined, undefined).data as T | null;
   }
 
   readFragment<T = Data, V = Variables>(

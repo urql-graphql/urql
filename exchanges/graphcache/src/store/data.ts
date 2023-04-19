@@ -65,7 +65,7 @@ let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
-let currentOptimistic = false;
+export let currentOptimistic = false;
 
 /** Creates a new data object unless it's been created in this data run */
 export const makeData = (data?: Data): Data => {

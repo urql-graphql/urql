@@ -210,7 +210,12 @@ export const cacheExchange =
       operation: Operation
     ): OperationResultWithMeta => {
       initDataState('read', store.data, undefined, false);
-      const result = _query(store, operation, results.get(operation.key));
+      const result = _query(
+        store,
+        operation,
+        results.get(operation.key),
+        undefined
+      );
       clearDataState();
       const cacheOutcome: CacheOutcome = result.data
         ? !result.partial && !result.hasNext
