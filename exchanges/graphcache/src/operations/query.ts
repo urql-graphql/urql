@@ -113,6 +113,7 @@ export const _query = (
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
+    InMemoryData.getCurrentDependencies();
   }
 
   return {
