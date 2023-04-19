@@ -17,7 +17,7 @@ import {
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
-import { hasField, isWriting, currentOptimistic } from '../store/data';
+import { hasField, currentOperation, currentOptimistic } from '../store/data';
 import { keyOfField } from '../store/keys';
 import { Store } from '../store/store';
 
@@ -144,7 +144,7 @@ const isFragmentHeuristicallyMatching = (
   );
 
   return (
-    isWriting() ||
+    currentOperation === 'write' ||
     !getSelectionSet(node).some(node => {
       if (!isFieldNode(node)) return false;
       const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));

@@ -81,8 +81,6 @@ export const makeData = (data?: Data): Data => {
   return newData;
 };
 
-export const isWriting = (): boolean => currentOperation === 'write';
-
 export const ownsData = (data?: Data): boolean =>
   !!data && currentOwnership!.has(data);
 
