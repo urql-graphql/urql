@@ -107,8 +107,7 @@ export class Store<
     // In resolvers and updaters we may have a specific parent
     // object available that can be used to skip to a specific parent
     // key directly without looking at its incomplete properties
-    if (contextRef.current && data === contextRef.current.parent)
-      return contextRef.current!.parentKey;
+    if (contextRef && data === contextRef.parent) return contextRef.parentKey;
 
     if (data == null || typeof data === 'string') return data || null;
     if (!data.__typename) return null;

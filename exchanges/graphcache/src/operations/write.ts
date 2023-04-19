@@ -245,7 +245,7 @@ const writeSelection = (
       if (
         rootField === 'query' &&
         fieldValue === undefined &&
-        !deferRef.current &&
+        !deferRef &&
         !ctx.optimistic
       ) {
         const expected =
@@ -274,7 +274,7 @@ const writeSelection = (
       // Fields marked as deferred that aren't defined must be skipped
       // Otherwise, we also ignore undefined values in optimistic updaters
       (fieldValue === undefined &&
-        (deferRef.current || (ctx.optimistic && rootField === 'query')))
+        (deferRef || (ctx.optimistic && rootField === 'query')))
     ) {
       continue;
     }

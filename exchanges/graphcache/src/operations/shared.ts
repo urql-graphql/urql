@@ -51,8 +51,8 @@ export interface Context {
   };
 }
 
-export const contextRef: { current: Context | null } = { current: null };
-export const deferRef: { current: boolean } = { current: false };
+export let contextRef: Context | null = null;
+export let deferRef = false;
 
 // Checks whether the current data field is a cache miss because of a GraphQLError
 export const getFieldError = (ctx: Context): ErrorLike | undefined =>
@@ -110,7 +110,7 @@ export const updateContext = (
   fieldKey: string,
   fieldName: string
 ) => {
-  contextRef.current = ctx;
+  contextRef = ctx;
   ctx.parent = data;
   ctx.parentTypeName = typename;
   ctx.parentKey = entityKey;
@@ -168,7 +168,7 @@ export const makeSelectionIterator = (
   let index = 0;
 
   return function next() {
-    if (!deferRef.current && childDeferred) deferRef.current = childDeferred;
+    if (!deferRef && childDeferred) deferRef = childDeferred;
 
     if (childIterator) {
       const node = childIterator();
@@ -208,8 +208,7 @@ export const makeSelectionIterator = (
             }
 
             childDeferred = !!isDeferred(node, ctx.variables);
-            if (!deferRef.current && childDeferred)
-              deferRef.current = childDeferred;
+            if (!deferRef && childDeferred) deferRef = childDeferred;
 
             return (childIterator = makeSelectionIterator(
               typename,

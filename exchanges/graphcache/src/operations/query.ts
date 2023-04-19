@@ -460,7 +460,7 @@ const readSelection = (
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
-    if (dataFieldValue === undefined && deferRef.current) {
+    if (dataFieldValue === undefined && deferRef) {
       // The field is undelivered and uncached, but is included in a deferred fragment
       hasNext = true;
     } else if (
