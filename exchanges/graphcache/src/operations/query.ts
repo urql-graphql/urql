@@ -37,6 +37,7 @@ import {
   keyOfField,
   makeData,
   ownsData,
+  foreignData,
 } from '../store';
 
 import * as InMemoryData from '../store/data';
@@ -105,15 +106,14 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  if (!input) input = makeData();
   // NOTE: This may reuse "previous result data" as indicated by the
   // `originalData` argument in readRoot(). This behaviour isn't used
   // for readSelection() however, which always produces results from
   // scratch
   const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, input)
-      : readSelection(ctx, rootKey, rootSelect, input);
+      ? readRoot(ctx, rootKey, rootSelect, input || makeData())
+      : readSelection(ctx, rootKey, rootSelect, input || makeData());
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -141,9 +141,10 @@ const readRoot = (
   }
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
+  const isForeignData = foreignData(input);
 
   let node: FieldNode | void;
-  let hasChanged = false;
+  let hasChanged = isForeignData;
   const output = makeData(input);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
@@ -157,7 +158,8 @@ const readRoot = (
       dataFieldValue = readRootField(
         ctx,
         getSelectionSet(node),
-        ensureData(fieldValue)
+        ensureData(fieldValue),
+        isForeignData
       );
     } else {
       dataFieldValue = fieldValue;
@@ -177,16 +179,17 @@ const readRoot = (
 const readRootField = (
   ctx: Context,
   select: SelectionSet,
-  originalData: Link<Data>
+  originalData: Link<Data>,
+  isForeignData: boolean
 ): Link<Data> => {
   if (Array.isArray(originalData)) {
     const newData = new Array(originalData.length);
-    let hasChanged = false;
+    let hasChanged = isForeignData;
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
       // Recursively read the root field's value
-      newData[i] = readRootField(ctx, select, originalData[i]);
+      newData[i] = readRootField(ctx, select, originalData[i], isForeignData);
       hasChanged = hasChanged || newData[i] !== originalData[i];
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -333,11 +336,12 @@ const readSelection = (
 
   const resolvers = store.resolvers[typename];
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
+  const isForeignData = foreignData(input);
 
   let hasFields = false;
   let hasPartials = false;
   let hasNext = false;
-  let hasChanged = typename !== input.__typename;
+  let hasChanged = isForeignData;
   let node: FieldNode | void;
   const output = makeData(input);
   while ((node = iterate()) !== undefined) {
@@ -500,7 +504,7 @@ const resolveResolverResult = (
   select: SelectionSet,
   prevData: void | null | Data | Data[],
   result: void | DataField,
-  skipNull: boolean
+  isOwnedData: boolean
 ): DataField | void => {
   if (Array.isArray(result)) {
     const { store } = ctx;
@@ -511,7 +515,9 @@ const resolveResolverResult = (
       : false;
     const data = new Array(result.length);
     let hasChanged =
-      !Array.isArray(prevData) || result.length !== prevData.length;
+      !isOwnedData ||
+      !Array.isArray(prevData) ||
+      result.length !== prevData.length;
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -524,7 +530,7 @@ const resolveResolverResult = (
         select,
         prevData != null ? prevData[i] : undefined,
         result[i],
-        skipNull
+        isOwnedData
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -542,7 +548,7 @@ const resolveResolverResult = (
     return hasChanged ? data : prevData;
   } else if (result === null || result === undefined) {
     return result;
-  } else if (skipNull && prevData === null) {
+  } else if (!isOwnedData && prevData === null) {
     return null;
   } else if (isDataOrKey(result)) {
     const data = (prevData || makeData()) as Data;
@@ -569,7 +575,7 @@ const resolveLink = (
   fieldName: string,
   select: SelectionSet,
   prevData: void | null | Data | Data[],
-  skipNull: boolean
+  isOwnedData: boolean
 ): DataField | undefined => {
   if (Array.isArray(link)) {
     const { store } = ctx;
@@ -578,7 +584,9 @@ const resolveLink = (
       : false;
     const newLink = new Array(link.length);
     let hasChanged =
-      !Array.isArray(prevData) || newLink.length !== prevData.length;
+      !isOwnedData ||
+      !Array.isArray(prevData) ||
+      newLink.length !== prevData.length;
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -590,7 +598,7 @@ const resolveLink = (
         fieldName,
         select,
         prevData != null ? prevData[i] : undefined,
-        skipNull
+        isOwnedData
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -606,7 +614,7 @@ const resolveLink = (
     }
 
     return hasChanged ? newLink : (prevData as Data[]);
-  } else if (link === null || (prevData === null && skipNull)) {
+  } else if (link === null || (prevData === null && isOwnedData)) {
     return null;
   }
 

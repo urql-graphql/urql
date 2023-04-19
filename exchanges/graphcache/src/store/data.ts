@@ -57,6 +57,8 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
+const globalOwnership = new WeakSet<Data>();
+
 let currentOwnership: null | WeakSet<Data> = null;
 let currentDataMapping: null | WeakMap<Data, Data> = null;
 let currentOperation: null | OperationType = null;
@@ -77,6 +79,7 @@ export const makeData = (data?: Data): Data => {
   }
 
   currentOwnership!.add(newData);
+  globalOwnership.add(newData);
   return newData;
 };
 
@@ -84,6 +87,8 @@ export const isWriting = (): boolean => currentOperation === 'write';
 
 export const ownsData = (data?: Data): boolean =>
   !!data && currentOwnership!.has(data);
+
+export const foreignData = (data: Data): boolean => !globalOwnership.has(data);
 
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
