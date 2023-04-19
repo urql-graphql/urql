@@ -348,7 +348,6 @@ export const cacheExchange =
         ),
         map((res: OperationResultWithMeta): OperationResult => {
           const { requestPolicy } = res.operation.context;
-          const isPartial = res.outcome === 'partial';
 
           // We reexecute requests marked as `cache-and-network`, and partial responses,
           // if we wouldn't cause a request loop
@@ -367,7 +366,7 @@ export const cacheExchange =
             data: res.data,
             error: res.error,
             extensions: res.extensions,
-            stale: shouldReexecute && isPartial,
+            stale: shouldReexecute && res.outcome === 'partial',
             hasNext: shouldReexecute && res.hasNext,
           };
 
