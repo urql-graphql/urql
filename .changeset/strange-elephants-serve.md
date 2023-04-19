@@ -2,4 +2,4 @@
 '@urql/exchange-auth': patch
 ---
 
-Fix case where we would retry the operation created by `mutate` when it failed auth
+Fix operations created by `utilities.mutate()` erroneously being retried and sent again like a regular operation
