@@ -5,7 +5,6 @@ export {
   makeData,
   ownsData,
   reserveLayer,
-  getCurrentOperation,
   getCurrentDependencies,
   hydrateData,
 } from './data';

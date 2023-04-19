@@ -27,7 +27,7 @@ import {
   Dependencies,
 } from '../types';
 
-import { Store, getCurrentOperation, joinKeys, keyOfField } from '../store';
+import { Store, joinKeys, keyOfField } from '../store';
 
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
@@ -368,7 +368,7 @@ const readSelection = (
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (
-      getCurrentOperation() === 'read' &&
+      InMemoryData.currentOperation === 'read' &&
       resolvers &&
       resolvers[fieldName]
     ) {

@@ -205,18 +205,6 @@ export const noopDataState = (
   clearDataState();
 };
 
-export const getCurrentOperation = (): OperationType => {
-  invariant(
-    currentOperation !== null,
-    'Invalid Cache call: The cache may only be accessed or mutated during' +
-      'operations like write or query, or as part of its resolvers, updaters, ' +
-      'or optimistic configs.',
-    2
-  );
-
-  return currentOperation;
-};
-
 /** As we're writing, we keep around all the records and links we've read or have written to */
 export const getCurrentDependencies = (): Dependencies => {
   invariant(
