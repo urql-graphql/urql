@@ -27,17 +27,7 @@ import {
   Dependencies,
 } from '../types';
 
-import {
-  Store,
-  getCurrentOperation,
-  getCurrentDependencies,
-  initDataState,
-  clearDataState,
-  joinKeys,
-  keyOfField,
-  makeData,
-  ownsData,
-} from '../store';
+import { Store, getCurrentOperation, joinKeys, keyOfField } from '../store';
 
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
@@ -75,9 +65,9 @@ export const __initAnd_query = (
   error?: CombinedError | undefined,
   key?: number
 ): QueryResult => {
-  initDataState('read', store.data, key);
+  InMemoryData.initDataState('read', store.data, key);
   const result = _query(store, request, data, error);
-  clearDataState();
+  InMemoryData.clearDataState();
   return result;
 };
 
@@ -113,15 +103,20 @@ export const _query = (
   // scratch
   const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, input || makeData())
-      : readSelection(ctx, rootKey, rootSelect, input || makeData());
+      ? readRoot(ctx, rootKey, rootSelect, input || InMemoryData.makeData())
+      : readSelection(
+          ctx,
+          rootKey,
+          rootSelect,
+          input || InMemoryData.makeData()
+        );
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
   }
 
   return {
-    dependencies: getCurrentDependencies(),
+    dependencies: InMemoryData.currentDependencies!,
     partial: ctx.partial || !data,
     hasNext: ctx.hasNext,
     data: data || null,
@@ -145,7 +140,7 @@ const readRoot = (
 
   let node: FieldNode | void;
   let hasChanged = InMemoryData.currentForeignData;
-  const output = makeData(input);
+  const output = InMemoryData.makeData(input);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = input[fieldAlias];
@@ -278,8 +273,12 @@ export const _queryFragment = (
   );
 
   const result =
-    readSelection(ctx, entityKey, getSelectionSet(fragment), makeData()) ||
-    null;
+    readSelection(
+      ctx,
+      entityKey,
+      getSelectionSet(fragment),
+      InMemoryData.makeData()
+    ) || null;
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -341,7 +340,7 @@ const readSelection = (
   let hasNext = false;
   let hasChanged = InMemoryData.currentForeignData;
   let node: FieldNode | void;
-  const output = makeData(input);
+  const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -403,7 +402,7 @@ const readSelection = (
             ? output[fieldAlias]
             : input[fieldAlias]) as Data,
           dataFieldValue,
-          ownsData(input)
+          InMemoryData.ownsData(input)
         );
       }
 
@@ -431,7 +430,7 @@ const readSelection = (
           ? output[fieldAlias]
           : input[fieldAlias]) as Data,
         resultValue,
-        ownsData(input)
+        InMemoryData.ownsData(input)
       );
     } else {
       // Otherwise we attempt to get the missing field from the cache
@@ -447,7 +446,7 @@ const readSelection = (
           (output[fieldAlias] !== undefined
             ? output[fieldAlias]
             : input[fieldAlias]) as Data,
-          ownsData(input)
+          InMemoryData.ownsData(input)
         );
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // The entity on the field was invalid but can still be recovered
@@ -549,7 +548,7 @@ const resolveResolverResult = (
   } else if (!isOwnedData && prevData === null) {
     return null;
   } else if (isDataOrKey(result)) {
-    const data = (prevData || makeData()) as Data;
+    const data = (prevData || InMemoryData.makeData()) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -616,7 +615,12 @@ const resolveLink = (
     return null;
   }
 
-  return readSelection(ctx, link, select, (prevData || makeData()) as Data);
+  return readSelection(
+    ctx,
+    link,
+    select,
+    (prevData || InMemoryData.makeData()) as Data
+  );
 };
 
 const isDataOrKey = (x: any): x is string | Data =>

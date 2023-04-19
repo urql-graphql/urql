@@ -32,15 +32,7 @@ import {
   OptimisticMutationResolver,
 } from '../types';
 
-import {
-  Store,
-  getCurrentDependencies,
-  initDataState,
-  clearDataState,
-  joinKeys,
-  keyOfField,
-  makeData,
-} from '../store';
+import { Store, joinKeys, keyOfField } from '../store';
 
 import * as InMemoryData from '../store/data';
 
@@ -69,9 +61,9 @@ export const __initAnd_write = (
   error?: CombinedError | undefined,
   key?: number
 ): WriteResult => {
-  initDataState('write', store.data, key || null);
+  InMemoryData.initDataState('write', store.data, key || null);
   const result = _write(store, request, data, error);
-  clearDataState();
+  InMemoryData.clearDataState();
   return result;
 };
 
@@ -89,9 +81,9 @@ export const __initAnd_writeOptimistic = (
     );
   }
 
-  initDataState('write', store.data, key, true);
+  InMemoryData.initDataState('write', store.data, key, true);
   const result = _write(store, request, {} as Data, undefined);
-  clearDataState();
+  InMemoryData.clearDataState();
   return result;
 };
 
@@ -101,10 +93,14 @@ export const _write = (
   data?: Data,
   error?: CombinedError | undefined
 ) => {
+  if (process.env.NODE_ENV !== 'production') {
+    InMemoryData.getCurrentDependencies();
+  }
+
   const operation = getMainOperation(request.query);
   const result: WriteResult = {
-    data: data || makeData(),
-    dependencies: getCurrentDependencies(),
+    data: data || InMemoryData.makeData(),
+    dependencies: InMemoryData.currentDependencies!,
   };
   const kind = store.rootFields[operation.operation];
 

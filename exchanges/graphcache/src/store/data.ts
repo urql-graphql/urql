@@ -59,10 +59,10 @@ export interface InMemoryData {
 
 let currentOwnership: null | WeakSet<Data> = null;
 let currentDataMapping: null | WeakMap<Data, Data> = null;
-let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
-let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
+export let currentOperation: null | OperationType = null;
+export let currentDependencies: null | Dependencies = null;
 export let currentForeignData = false;
 export let currentOptimistic = false;
 
