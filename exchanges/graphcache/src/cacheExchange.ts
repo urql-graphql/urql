@@ -366,7 +366,7 @@ export const cacheExchange =
             data: res.data,
             error: res.error,
             extensions: res.extensions,
-            stale: shouldReexecute && res.outcome === 'partial',
+            stale: shouldReexecute && !res.hasNext,
             hasNext: shouldReexecute && res.hasNext,
           };
 
