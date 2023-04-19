@@ -100,10 +100,6 @@ describe('data dependencies', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(2);
 
-    expect(result.mock.calls[0][0]).toHaveProperty(
-      'operation.context.meta.cacheOutcome',
-      'miss'
-    );
     expect(result.mock.calls[0][0].data).toEqual(expected);
     expect(result.mock.calls[1][0]).toHaveProperty(
       'operation.context.meta.cacheOutcome',
@@ -230,7 +226,7 @@ describe('data dependencies', () => {
 
     next(opMultiple);
     expect(response).toHaveBeenCalledTimes(2);
-    expect(reexec).toHaveBeenCalledWith(opOne);
+    expect(reexec.mock.calls[0][0]).toHaveProperty('key', opOne.key);
     expect(result).toHaveBeenCalledTimes(3);
 
     // test for reference reuse
@@ -1583,10 +1579,6 @@ describe('schema awareness', () => {
       ],
     });
 
-    expect(result.mock.calls[0][0]).not.toHaveProperty(
-      'operation.context.meta'
-    );
-
     next(queryOperation);
     vi.runAllTimers();
     expect(result).toHaveBeenCalledTimes(2);
@@ -1724,10 +1716,6 @@ describe('schema awareness', () => {
         },
       ],
     });
-
-    expect(result.mock.calls[0][0]).not.toHaveProperty(
-      'operation.context.meta'
-    );
 
     next(queryOperation);
     vi.runAllTimers();

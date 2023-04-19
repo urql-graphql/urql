@@ -110,7 +110,6 @@ export const cacheExchange =
           if (op) {
             // Collect all dependent operations if the reexecuting operation is a query
             if (operation.kind === 'query') dependentOperations.add(key);
-            operations.delete(key);
             let policy: RequestPolicy = 'cache-first';
             if (requestedRefetch.has(key)) {
               requestedRefetch.delete(key);
@@ -135,6 +134,7 @@ export const cacheExchange =
       if (operation.kind === 'query') {
         // Pre-reserve the position of the result layer
         reserveLayer(store.data, operation.key);
+        operations.set(operation.key, operation);
       } else if (operation.kind === 'teardown') {
         // Delete reference to operation if any exists to release it
         operations.delete(operation.key);
@@ -146,6 +146,7 @@ export const cacheExchange =
         operation.kind === 'mutation' &&
         operation.context.requestPolicy !== 'network-only'
       ) {
+        operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
         const { dependencies } = writeOptimistic(
           store,
@@ -178,7 +179,7 @@ export const cacheExchange =
               )
             : operation.variables,
         },
-        { ...operation.context, originalVariables: operation.variables }
+        operation.context
       );
     };
 
@@ -204,7 +205,6 @@ export const cacheExchange =
         : 'miss';
 
       results.set(operation.key, result.data);
-      operations.set(operation.key, operation);
       updateDependencies(operation, result.dependencies);
 
       return {
@@ -222,21 +222,9 @@ export const cacheExchange =
       pendingOperations: Operations
     ): OperationResult => {
       // Retrieve the original operation to remove changes made by formatDocument
-      const originalOperation = operations.get(result.operation.key);
-      const operation = originalOperation
-        ? makeOperation(
-            originalOperation.kind,
-            originalOperation,
-            result.operation.context
-          )
-        : result.operation;
-
+      const operation =
+        operations.get(result.operation.key) || result.operation;
       if (operation.kind === 'mutation') {
-        if (result.operation.context.originalVariables) {
-          operation.variables = result.operation.context.originalVariables;
-          delete result.operation.context.originalVariables;
-        }
-
         // Collect previous dependencies that have been written for optimistic updates
         const dependencies = optimisticKeysToDependencies.get(operation.key);
         collectPendingOperations(pendingOperations, dependencies);
@@ -283,7 +271,6 @@ export const cacheExchange =
 
       // Update this operation's dependencies if it's a query
       if (queryDependencies) {
-        operations.set(operation.key, operation);
         updateDependencies(result.operation, queryDependencies);
       }
 
