@@ -30,6 +30,7 @@ interface OperationResultWithMeta extends Partial<OperationResult> {
   operation: Operation;
   outcome: CacheOutcome;
   dependencies: Dependencies;
+  hasNext: boolean;
 }
 
 type Operations = Set<number>;
@@ -197,7 +198,7 @@ export const cacheExchange =
     ): OperationResultWithMeta => {
       const result = query(store, operation, results.get(operation.key));
       const cacheOutcome: CacheOutcome = result.data
-        ? !result.partial
+        ? !result.partial && !result.hasNext
           ? 'hit'
           : 'partial'
         : 'miss';
@@ -211,6 +212,7 @@ export const cacheExchange =
         operation,
         data: result.data,
         dependencies: result.dependencies,
+        hasNext: result.hasNext,
       };
     };
 
@@ -346,20 +348,17 @@ export const cacheExchange =
         ),
         map((res: OperationResultWithMeta): OperationResult => {
           const { requestPolicy } = res.operation.context;
-
-          // We don't mark cache-only responses as partial, as this would indicate
-          // that we expect a new result to come from the network, which cannot
-          // happen
-          const isPartial =
-            res.outcome === 'partial' && requestPolicy !== 'cache-only';
+          const isPartial = res.outcome === 'partial';
 
           // We reexecute requests marked as `cache-and-network`, and partial responses,
           // if we wouldn't cause a request loop
           const shouldReexecute =
-            requestPolicy === 'cache-and-network' ||
-            (requestPolicy === 'cache-first' &&
-              isPartial &&
-              !reexecutingOperations.has(res.operation.key));
+            requestPolicy !== 'cache-only' &&
+            (res.hasNext ||
+              requestPolicy === 'cache-and-network' ||
+              (requestPolicy === 'cache-first' &&
+                res.outcome === 'partial' &&
+                !reexecutingOperations.has(res.operation.key)));
 
           const result: OperationResult = {
             operation: addMetadata(res.operation, {
@@ -368,8 +367,8 @@ export const cacheExchange =
             data: res.data,
             error: res.error,
             extensions: res.extensions,
-            stale: shouldReexecute || isPartial,
-            hasNext: false,
+            stale: shouldReexecute && isPartial,
+            hasNext: shouldReexecute && res.hasNext,
           };
 
           if (!shouldReexecute) {

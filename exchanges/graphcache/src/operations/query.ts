@@ -61,6 +61,7 @@ import {
 export interface QueryResult {
   dependencies: Dependencies;
   partial: boolean;
+  hasNext: boolean;
   data: null | Data;
 }
 
@@ -121,6 +122,7 @@ export const read = (
   return {
     dependencies: getCurrentDependencies(),
     partial: ctx.partial || !data,
+    hasNext: ctx.hasNext,
     data: data || null,
   };
 };
@@ -334,6 +336,7 @@ const readSelection = (
 
   let hasFields = false;
   let hasPartials = false;
+  let hasNext = false;
   let hasChanged = typename !== input.__typename;
   let node: FieldNode | void;
   const output = makeData(input);
@@ -455,7 +458,7 @@ const readSelection = (
     // a partial query result
     if (dataFieldValue === undefined && deferRef.current) {
       // The field is undelivered and uncached, but is included in a deferred fragment
-      hasFields = true;
+      hasNext = true;
     } else if (
       dataFieldValue === undefined &&
       ((store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
@@ -481,6 +484,7 @@ const readSelection = (
   }
 
   ctx.partial = ctx.partial || hasPartials;
+  ctx.hasNext = ctx.hasNext || hasNext;
   return isQuery && hasPartials && !hasFields
     ? undefined
     : hasChanged

@@ -43,6 +43,7 @@ export interface Context {
   fieldName: string;
   error: ErrorLike | undefined;
   partial: boolean;
+  hasNext: boolean;
   optimistic: boolean;
   __internal: {
     path: Array<string | number>;
@@ -79,6 +80,7 @@ export const makeContext = (
     fieldName: '',
     error: undefined,
     partial: false,
+    hasNext: false,
     optimistic: !!optimistic,
     __internal: {
       path: [],
