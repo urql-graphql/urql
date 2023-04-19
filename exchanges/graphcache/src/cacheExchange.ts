@@ -209,7 +209,7 @@ export const cacheExchange =
     const operationResultFromCache = (
       operation: Operation
     ): OperationResultWithMeta => {
-      initDataState('read', store.data);
+      initDataState('read', store.data, undefined, false);
       const result = _query(store, operation, results.get(operation.key));
       clearDataState();
       const cacheOutcome: CacheOutcome = result.data
@@ -253,7 +253,7 @@ export const cacheExchange =
       if (data) {
         // Write the result to cache and collect all dependencies that need to be
         // updated
-        initDataState('write', store.data, operation.key);
+        initDataState('write', store.data, operation.key, false);
         const writeDependencies = _write(
           store,
           operation,
@@ -262,9 +262,9 @@ export const cacheExchange =
         ).dependencies;
         clearDataState();
         collectPendingOperations(pendingOperations, writeDependencies);
-        initDataState('read', store.data, operation.key);
         const prevData =
           operation.kind === 'query' ? results.get(operation.key) : null;
+        initDataState('read', store.data, operation.key, false);
         const queryResult = _query(
           store,
           operation,
