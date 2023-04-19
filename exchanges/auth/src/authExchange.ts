@@ -20,6 +20,7 @@ import {
   Exchange,
   DocumentInput,
   AnyVariables,
+  OperationInstance,
 } from '@urql/core';
 
 /** Utilities to use while refreshing authentication tokens. */
@@ -199,7 +200,7 @@ export function authExchange(
   init: (utilities: AuthUtilities) => Promise<AuthConfig>
 ): Exchange {
   return ({ client, forward }) => {
-    const bypassQueue = new WeakSet<Operation>();
+    const bypassQueue = new Set<OperationInstance>();
     const retries = makeSubject<Operation>();
 
     let retryQueue = new Map<number, Operation>();
@@ -233,7 +234,9 @@ export function authExchange(
                 result$,
                 onStart(() => {
                   const operation = addAuthToOperation(baseOperation);
-                  bypassQueue.add(operation);
+                  bypassQueue.add(
+                    operation.context._instance as OperationInstance
+                  );
                   retries.next(operation);
                 }),
                 filter(result => result.operation.key === baseOperation.key),
@@ -311,7 +314,10 @@ export function authExchange(
       const opsWithAuth$ = pipe(
         merge([retries.source, pendingOps$]),
         map(operation => {
-          if (bypassQueue.has(operation)) {
+          if (
+            operation.context._instance &&
+            bypassQueue.has(operation.context._instance)
+          ) {
             return operation;
           } else if (operation.context.authAttempt) {
             return addAuthToOperation(operation);
@@ -341,13 +347,21 @@ export function authExchange(
         result$,
         filter(result => {
           if (
-            !bypassQueue.has(result.operation) &&
+            operation.context._instance &&
+            !bypassQueue.has(operation.context._instance) &&
             result.error &&
             didAuthError(result) &&
             !result.operation.context.authAttempt
           ) {
             refreshAuth(result.operation);
             return false;
+          }
+
+          if (
+            operation.context._instance &&
+            !bypassQueue.has(operation.context._instance)
+          ) {
+            bypassQueue.delete(operation.context._instance);
           }
 
           return true;
