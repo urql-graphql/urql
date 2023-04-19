@@ -69,7 +69,7 @@ export interface QueryResult {
 /** Reads a GraphQL query from the cache.
  * @internal
  */
-export const query = (
+export const __initAnd_query = (
   store: Store,
   request: OperationRequest,
   data?: Data | null | undefined,
@@ -77,12 +77,15 @@ export const query = (
   key?: number
 ): QueryResult => {
   initDataState('read', store.data, key);
-  const result = read(store, request, data, error);
+  const result = _query(store, request, data, error);
   clearDataState();
   return result;
 };
 
-export const read = (
+/** Reads a GraphQL query from the cache.
+ * @internal
+ */
+export const _query = (
   store: Store,
   request: OperationRequest,
   input?: Data | null | undefined,
@@ -211,7 +214,7 @@ const readRootField = (
   }
 };
 
-export const readFragment = (
+export const _queryFragment = (
   store: Store,
   query: DocumentNode,
   entity: Partial<Data> | string,

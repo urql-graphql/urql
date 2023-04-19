@@ -5,8 +5,8 @@ import { minifyIntrospectionQuery } from '@urql/introspection';
 import { describe, it, beforeEach, beforeAll, expect } from 'vitest';
 
 import { Store } from '../store';
-import { write } from './write';
-import { query } from './query';
+import { __initAnd_write as write } from './write';
+import { __initAnd_query as query } from './query';
 
 const TODO_QUERY = gql`
   query Todos {

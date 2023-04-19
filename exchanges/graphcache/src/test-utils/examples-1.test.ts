@@ -1,6 +1,10 @@
 import { gql } from '@urql/core';
 import { it, expect, afterEach } from 'vitest';
-import { query, write, writeOptimistic } from '../operations';
+import { __initAnd_query as query } from '../operations/query';
+import {
+  __initAnd_write as write,
+  __initAnd_writeOptimistic as writeOptimistic,
+} from '../operations/write';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store';
 import { Data } from '../types';

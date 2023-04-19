@@ -12,11 +12,15 @@ import {
 
 import { Data, StorageAdapter } from '../types';
 import { makeContext, updateContext } from '../operations/shared';
-import { query } from '../operations/query';
-import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
 import { Store } from './store';
 import { noop } from '../test-utils/utils';
+
+import { __initAnd_query as query } from '../operations/query';
+import {
+  __initAnd_write as write,
+  __initAnd_writeOptimistic as writeOptimistic,
+} from '../operations/write';
 
 const mocked = (x: any): any => x;
 

@@ -20,10 +20,18 @@ import {
   Source,
 } from 'wonka';
 
-import { query, write, writeOptimistic } from './operations';
+import { _query } from './operations/query';
+import { _write } from './operations/write';
 import { addMetadata, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
-import { Store, noopDataState, hydrateData, reserveLayer } from './store';
+import {
+  Store,
+  initDataState,
+  clearDataState,
+  noopDataState,
+  hydrateData,
+  reserveLayer,
+} from './store';
 import { Data, Dependencies, CacheExchangeOpts } from './types';
 
 interface OperationResultWithMeta extends Partial<OperationResult> {
@@ -148,11 +156,15 @@ export const cacheExchange =
       ) {
         operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
-        const { dependencies } = writeOptimistic(
+        initDataState('write', store.data, operation.key, true);
+        const { dependencies } = _write(
           store,
           operation,
-          operation.key
+          undefined,
+          undefined,
+          true
         );
+        clearDataState();
         if (dependencies.size) {
           // Update blocked optimistic dependencies
           for (const dep of dependencies.values()) blockedDependencies.add(dep);
@@ -197,7 +209,9 @@ export const cacheExchange =
     const operationResultFromCache = (
       operation: Operation
     ): OperationResultWithMeta => {
-      const result = query(store, operation, results.get(operation.key));
+      initDataState('read', store.data);
+      const result = _query(store, operation, results.get(operation.key));
+      clearDataState();
       const cacheOutcome: CacheOutcome = result.data
         ? !result.partial && !result.hasNext
           ? 'hit'
@@ -239,25 +253,25 @@ export const cacheExchange =
       if (data) {
         // Write the result to cache and collect all dependencies that need to be
         // updated
-        const writeDependencies = write(
+        initDataState('write', store.data, operation.key);
+        const writeDependencies = _write(
           store,
           operation,
           data,
-          result.error,
-          operation.key
+          result.error
         ).dependencies;
+        clearDataState();
         collectPendingOperations(pendingOperations, writeDependencies);
-
-        const queryResult = query(
+        initDataState('read', store.data, operation.key);
+        const prevData =
+          operation.kind === 'query' ? results.get(operation.key) : null;
+        const queryResult = _query(
           store,
           operation,
-          operation.kind === 'query'
-            ? results.get(operation.key) || data
-            : data,
-          result.error,
-          operation.key
+          prevData || data,
+          result.error
         );
-
+        clearDataState();
         data = queryResult.data;
         if (operation.kind === 'query') {
           // Collect the query's dependencies for future pending operation updates
