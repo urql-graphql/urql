@@ -27,6 +27,7 @@ const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     // TODO: Fix use of act()
     vi.spyOn(global.console, 'error').mockImplementation(() => {
       // do nothing
@@ -37,7 +38,7 @@ describe('Mutation', () => {
     cleanup();
   });
 
-  it('Should execute the mutation', async () => {
+  it('Should execute the mutation', () => {
     let execute = () => {
         /* noop */
       },
@@ -70,11 +71,9 @@ describe('Mutation', () => {
       fetching: true,
       error: undefined,
     });
-    await new Promise(res => {
-      setTimeout(() => {
-        expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
     });
+    expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
   });
 });

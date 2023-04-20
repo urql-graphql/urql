@@ -1,4 +1,4 @@
-import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
+import { vi, expect, it, beforeEach, afterEach, describe, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', async () => {
@@ -52,14 +52,13 @@ const QueryUser = ({
   return <p>{s.data}</p>;
 };
 
-beforeAll(() => {
+beforeEach(() => {
+  vi.useFakeTimers();
   // TODO: Fix use of act()
   vi.spyOn(global.console, 'error').mockImplementation(() => {
     // do nothings
   });
-});
 
-beforeEach(() => {
   client.executeQuery.mockClear();
   state = undefined;
   execute = undefined;
@@ -101,7 +100,7 @@ describe('on subscription', () => {
 });
 
 describe('on subscription update', () => {
-  it('forwards data response', async () => {
+  it('forwards data response', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -109,64 +108,48 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    await new Promise(res => {
-      setTimeout(() => {
-        wrapper.update(<QueryUser {...props} />);
-        expect(state).toHaveProperty('data', 0);
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      wrapper.update(<QueryUser {...props} />);
     });
+
+    expect(state).toHaveProperty('data', 0);
   });
 
-  it('forwards error response', async () => {
+  it('forwards error response', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
-    /**
-     * Have to call update (without changes) in order to see the
-     * result of the state change.
-     */
     wrapper.update(<QueryUser {...props} />);
 
-    await new Promise(res => {
-      setTimeout(() => {
-        wrapper.update(<QueryUser {...props} />);
-        expect(state).toHaveProperty('error', 1);
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      wrapper.update(<QueryUser {...props} />);
     });
+
+    expect(state).toHaveProperty('error', 1);
   });
 
-  it('forwards extensions response', async () => {
+  it('forwards extensions response', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
-    /**
-     * Have to call update (without changes) in order to see the
-     * result of the state change.
-     */
     wrapper.update(<QueryUser {...props} />);
 
-    await new Promise(res => {
-      setTimeout(() => {
-        wrapper.update(<QueryUser {...props} />);
-        expect(state).toHaveProperty('extensions', { i: 1 });
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      wrapper.update(<QueryUser {...props} />);
     });
+
+    expect(state).toHaveProperty('extensions', { i: 1 });
   });
 
-  it('sets fetching to false', async () => {
+  it('sets fetching to false', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
-    /**
-     * Have to call update (without changes) in order to see the
-     * result of the state change.
-     */
     wrapper.update(<QueryUser {...props} />);
 
-    await new Promise(res => {
-      setTimeout(() => {
-        wrapper.update(<QueryUser {...props} />);
-        expect(state).toHaveProperty('fetching', false);
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      wrapper.update(<QueryUser {...props} />);
     });
+
+    expect(state).toHaveProperty('fetching', false);
   });
 });
 
@@ -175,14 +158,11 @@ describe('on change', () => {
 
   it('new query executes subscription', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
+    wrapper.update(<QueryUser {...props} query={q} />);
 
-    /**
-     * Have to call update twice for the change to be detected.
-     * Only a single change is detected (updating 5 times still only calls
-     * execute subscription twice).
-     */
-    wrapper.update(<QueryUser {...props} query={q} />);
-    wrapper.update(<QueryUser {...props} query={q} />);
+    act(() => {
+      wrapper.update(<QueryUser {...props} query={q} />);
+    });
 
     expect(client.executeQuery).toBeCalledTimes(2);
   });
@@ -222,12 +202,12 @@ describe('pause', () => {
 
   it('skips executing queries if pause updates to true', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
+    wrapper.update(<QueryUser {...props} pause={true} />);
 
-    /**
-     * Call update twice for the change to be detected.
-     */
-    wrapper.update(<QueryUser {...props} pause={true} />);
-    wrapper.update(<QueryUser {...props} pause={true} />);
+    act(() => {
+      wrapper.update(<QueryUser {...props} pause={true} />);
+    });
+
     expect(client.executeQuery).toBeCalledTimes(1);
   });
 });
