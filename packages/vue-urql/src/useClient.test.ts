@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { expect, it, describe } from 'vitest';
 import { defineComponent } from 'vue';
 import { mount } from '@vue/test-utils';

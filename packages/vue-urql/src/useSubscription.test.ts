@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { OperationResult, OperationResultSource } from '@urql/core';
 import { nextTick, reactive, ref } from 'vue';
 import { vi, expect, it, describe } from 'vitest';

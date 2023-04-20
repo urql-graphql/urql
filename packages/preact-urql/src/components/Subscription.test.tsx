@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { h } from 'preact';
 import { cleanup, render, act } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';

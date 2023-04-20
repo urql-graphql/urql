@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { OperationContext } from '@urql/core';

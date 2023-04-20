@@ -6,7 +6,7 @@ import {
   OperationResult,
 } from '@urql/core';
 import { print } from 'graphql';
-import { vi, expect, it, describe } from 'vitest';
+import { vi, expect, it, describe, beforeAll } from 'vitest';
 
 import { pipe, share, map, makeSubject, tap, publish } from 'wonka';
 import { queryResponse } from '../../../packages/core/src/test-utils';
@@ -104,6 +104,10 @@ describe('storage', () => {
 });
 
 describe('offline', () => {
+  beforeAll(() => {
+    global.navigator = { onLine: true } as any;
+  });
+
   it('should intercept errored mutations', () => {
     const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
 
