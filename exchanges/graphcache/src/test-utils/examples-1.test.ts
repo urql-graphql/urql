@@ -6,7 +6,7 @@ import {
   __initAnd_writeOptimistic as writeOptimistic,
 } from '../operations/write';
 import * as InMemoryData from '../store/data';
-import { Store } from '../store';
+import { Store } from '../store/store';
 import { Data } from '../types';
 
 const Todos = gql`

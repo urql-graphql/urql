@@ -1,6 +1,6 @@
 import * as InMemoryData from '../store/data';
+import { keyOfField } from '../store/keys';
 import { FieldArgs } from '../types';
-import { keyOfField } from '../store';
 
 interface PartialFieldInfo {
   fieldKey: string;

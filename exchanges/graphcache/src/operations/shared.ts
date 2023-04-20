@@ -17,8 +17,9 @@ import {
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
-import { hasField, isWriting } from '../store/data';
-import { Store, keyOfField } from '../store';
+import { hasField, currentOperation, currentOptimistic } from '../store/data';
+import { keyOfField } from '../store/keys';
+import { Store } from '../store/store';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
@@ -66,8 +67,7 @@ export const makeContext = (
   fragments: Fragments,
   typename: string,
   entityKey: string,
-  optimistic?: boolean,
-  error?: CombinedError | undefined
+  error: CombinedError | undefined
 ): Context => {
   const ctx: Context = {
     store,
@@ -81,7 +81,7 @@ export const makeContext = (
     error: undefined,
     partial: false,
     hasNext: false,
-    optimistic: !!optimistic,
+    optimistic: currentOptimistic,
     __internal: {
       path: [],
       errorMap: undefined,
@@ -144,7 +144,7 @@ const isFragmentHeuristicallyMatching = (
   );
 
   return (
-    isWriting() ||
+    currentOperation === 'write' ||
     !getSelectionSet(node).some(node => {
       if (!isFieldNode(node)) return false;
       const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));

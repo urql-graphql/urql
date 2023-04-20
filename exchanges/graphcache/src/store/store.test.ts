@@ -382,7 +382,7 @@ describe('Store with OptimisticMutationConfig', () => {
       },
     });
 
-    context = makeContext(store, {}, {}, 'Query', 'Query');
+    context = makeContext(store, {}, {}, 'Query', 'Query', undefined);
     write(store, { query: Todos }, todosData);
     InMemoryData.initDataState('read', store.data, null);
   });

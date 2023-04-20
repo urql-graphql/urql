@@ -4,7 +4,7 @@ import { gql } from '@urql/core';
 import { minifyIntrospectionQuery } from '@urql/introspection';
 import { describe, it, beforeEach, beforeAll, expect } from 'vitest';
 
-import { Store } from '../store';
+import { Store } from '../store/store';
 import { __initAnd_write as write } from './write';
 import { __initAnd_query as query } from './query';
 

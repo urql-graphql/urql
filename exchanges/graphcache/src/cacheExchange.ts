@@ -24,15 +24,16 @@ import { _query } from './operations/query';
 import { _write } from './operations/write';
 import { addMetadata, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
+import { Store } from './store/store';
+import { Data, Dependencies, CacheExchangeOpts } from './types';
+
 import {
-  Store,
   initDataState,
   clearDataState,
   noopDataState,
   hydrateData,
   reserveLayer,
-} from './store';
-import { Data, Dependencies, CacheExchangeOpts } from './types';
+} from './store/data';
 
 interface OperationResultWithMeta extends Partial<OperationResult> {
   operation: Operation;

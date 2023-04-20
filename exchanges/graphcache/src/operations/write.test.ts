@@ -6,7 +6,7 @@ import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
 import { __initAnd_write as write } from './write';
 import * as InMemoryData from '../store/data';
-import { Store } from '../store';
+import { Store } from '../store/store';
 
 const TODO_QUERY = gql`
   query todos {

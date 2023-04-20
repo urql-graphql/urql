@@ -59,10 +59,10 @@ export interface InMemoryData {
 
 let currentOwnership: null | WeakSet<Data> = null;
 let currentDataMapping: null | WeakMap<Data, Data> = null;
-let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
-let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
+export let currentOperation: null | OperationType = null;
+export let currentDependencies: null | Dependencies = null;
 export let currentForeignData = false;
 export let currentOptimistic = false;
 
@@ -80,8 +80,6 @@ export const makeData = (data?: Data): Data => {
   currentOwnership!.add(newData);
   return newData;
 };
-
-export const isWriting = (): boolean => currentOperation === 'write';
 
 export const ownsData = (data?: Data): boolean =>
   !!data && currentOwnership!.has(data);
@@ -203,18 +201,6 @@ export const noopDataState = (
   if (layerKey && !isOptimistic) data.deferredKeys.delete(layerKey);
   initDataState('write', data, layerKey, isOptimistic);
   clearDataState();
-};
-
-export const getCurrentOperation = (): OperationType => {
-  invariant(
-    currentOperation !== null,
-    'Invalid Cache call: The cache may only be accessed or mutated during' +
-      'operations like write or query, or as part of its resolvers, updaters, ' +
-      'or optimistic configs.',
-    2
-  );
-
-  return currentOperation;
 };
 
 /** As we're writing, we keep around all the records and links we've read or have written to */
