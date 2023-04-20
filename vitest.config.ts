@@ -14,9 +14,7 @@ export default defineConfig({
   },
   plugins: [tsconfigPaths()],
   test: {
-    environment: 'jsdom',
     globals: false,
-    maxConcurrency: 20,
     setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,
     exclude: [

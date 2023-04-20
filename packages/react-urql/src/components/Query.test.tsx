@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
 
 vi.mock('../context', async () => {

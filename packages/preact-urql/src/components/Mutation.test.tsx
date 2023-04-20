@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { h } from 'preact';
 import { act, cleanup, render } from '@testing-library/preact';
 import { pipe, fromValue, delay } from 'wonka';
@@ -16,6 +18,8 @@ const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
+
     vi.spyOn(global.console, 'error').mockImplementation(() => {
       // do nothing
     });
@@ -25,7 +29,7 @@ describe('Mutation', () => {
     cleanup();
   });
 
-  it('Should execute the mutation', async () => {
+  it('Should execute the mutation', () => {
     // eslint-disable-next-line
     let execute = () => {},
       props = {};
@@ -55,20 +59,21 @@ describe('Mutation', () => {
       fetching: false,
       error: undefined,
     });
+
     act(() => {
       execute();
     });
+
     expect(props).toStrictEqual({
       data: undefined,
       fetching: true,
       error: undefined,
     });
 
-    await new Promise(res => {
-      setTimeout(() => {
-        expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
     });
+
+    expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
   });
 });

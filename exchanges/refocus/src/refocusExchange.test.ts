@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { pipe, map, makeSubject, publish, tap } from 'wonka';
 import { vi, expect, it, beforeEach } from 'vitest';
 

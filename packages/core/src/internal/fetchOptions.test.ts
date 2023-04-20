@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { expect, describe, it } from 'vitest';
 import { makeOperation } from '../utils/operation';
 import { queryOperation, mutationOperation } from '../test-utils';

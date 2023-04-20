@@ -1,17 +1,11 @@
+// @vitest-environment jsdom
+
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { OperationContext } from '@urql/core';
 import { map, interval, pipe, never, onStart, onEnd, empty } from 'wonka';
-import {
-  vi,
-  expect,
-  it,
-  beforeEach,
-  describe,
-  beforeAll,
-  Mock,
-  afterEach,
-} from 'vitest';
+
+import { vi, expect, it, beforeEach, describe, afterEach, Mock } from 'vitest';
 
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { Provider } from '../context';
@@ -46,7 +40,8 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   return h('p', {}, state.data);
 };
 
-beforeAll(() => {
+beforeEach(() => {
+  vi.useFakeTimers();
   vi.spyOn(global.console, 'error');
 });
 
@@ -106,7 +101,7 @@ describe('useQuery', () => {
     expect(state).toHaveProperty('fetching', true);
   });
 
-  it('forwards data response', async () => {
+  it('forwards data response', () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -121,21 +116,20 @@ describe('useQuery', () => {
       })
     );
 
-    await new Promise(res => {
-      setTimeout(() => {
-        rerender(
-          h(Provider, {
-            value: client as any,
-            children: [h(QueryUser, { ...props })],
-          })
-        );
-        expect(state).toHaveProperty('data', 0);
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      rerender(
+        h(Provider, {
+          value: client as any,
+          children: [h(QueryUser, { ...props })],
+        })
+      );
     });
+
+    expect(state).toHaveProperty('data', 0);
   });
 
-  it('forwards error response', async () => {
+  it('forwards error response', () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -150,31 +144,27 @@ describe('useQuery', () => {
       })
     );
 
-    await new Promise(res => {
-      setTimeout(() => {
-        rerender(
-          h(Provider, {
-            value: client as any,
-            children: [h(QueryUser, { ...props })],
-          })
-        );
-        expect(state).toHaveProperty('error', 1);
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      rerender(
+        h(Provider, {
+          value: client as any,
+          children: [h(QueryUser, { ...props })],
+        })
+      );
     });
+
+    expect(state).toHaveProperty('error', 1);
   });
 
-  it('forwards extensions response', async () => {
+  it('forwards extensions response', () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
         children: [h(QueryUser, { ...props })],
       })
     );
-    /**
-     * Have to call update (without changes) in order to see the
-     * result of the state change.
-     */
+
     rerender(
       h(Provider, {
         value: client as any,
@@ -182,22 +172,20 @@ describe('useQuery', () => {
       })
     );
 
-    await new Promise(res => {
-      setTimeout(() => {
-        rerender(
-          h(Provider, {
-            value: client as any,
-            children: [h(QueryUser, { ...props })],
-          })
-        );
-
-        expect(state).toHaveProperty('extensions', { i: 1 });
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      rerender(
+        h(Provider, {
+          value: client as any,
+          children: [h(QueryUser, { ...props })],
+        })
+      );
     });
+
+    expect(state).toHaveProperty('extensions', { i: 1 });
   });
 
-  it('sets fetching to false', async () => {
+  it('sets fetching to false', () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -212,18 +200,17 @@ describe('useQuery', () => {
       })
     );
 
-    await new Promise(res => {
-      setTimeout(() => {
-        rerender(
-          h(Provider, {
-            value: client as any,
-            children: [h(QueryUser, { ...props })],
-          })
-        );
-        expect(state).toHaveProperty('fetching', false);
-        res(null);
-      }, 400);
+    act(() => {
+      vi.advanceTimersByTime(400);
+      rerender(
+        h(Provider, {
+          value: client as any,
+          children: [h(QueryUser, { ...props })],
+        })
+      );
     });
+
+    expect(state).toHaveProperty('fetching', false);
   });
 
   describe('on change', () => {
@@ -237,23 +224,21 @@ describe('useQuery', () => {
         })
       );
 
-      /**
-       * Have to call update twice for the change to be detected.
-       * Only a single change is detected (updating 5 times still only calls
-       * execute subscription twice).
-       */
       rerender(
         h(Provider, {
           value: client as any,
           children: [h(QueryUser, { ...props, query: q })],
         })
       );
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props, query: q })],
-        })
-      );
+
+      act(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props, query: q })],
+          })
+        );
+      });
 
       expect(client.executeQuery).toBeCalledTimes(2);
     });

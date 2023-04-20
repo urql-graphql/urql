@@ -106,7 +106,7 @@
     "typescript": "^4.9.5",
     "vite": "^3.2.4",
     "vite-tsconfig-paths": "^4.0.7",
-    "vitest": "^0.29.3"
+    "vitest": "^0.30.1"
   },
   "dependencies": {
     "@actions/github": "^5.1.1",

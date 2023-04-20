@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { stringifyVariables, extractFiles } from './variables';
 import { describe, it, expect } from 'vitest';
 
