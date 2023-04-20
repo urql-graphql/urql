@@ -77,20 +77,23 @@ async function* parseMultipartMixed(
   response: Response
 ): AsyncIterableIterator<ExecutionResult> {
   const boundaryHeader = contentType.match(boundaryHeaderRe);
-  const boundary = '\r\n--' + (boundaryHeader ? boundaryHeader[1] : '-');
+  const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
   let isPreamble = true;
   let payload: any;
-  for await (const chunk of split(streamBody(response), boundary)) {
+  for await (let chunk of split(streamBody(response), '\r\n' + boundary)) {
     if (isPreamble) {
       isPreamble = false;
-    } else {
-      try {
-        yield (payload = JSON.parse(
-          chunk.slice(chunk.indexOf('\r\n\r\n') + 4)
-        ));
-      } catch (error) {
-        if (!payload) throw error;
+      const preambleIndex = chunk.indexOf(boundary);
+      if (preambleIndex > -1) {
+        chunk = chunk.slice(preambleIndex + boundary.length);
+      } else {
+        continue;
       }
+    }
+    try {
+      yield (payload = JSON.parse(chunk.slice(chunk.indexOf('\r\n\r\n') + 4)));
+    } catch (error) {
+      if (!payload) throw error;
     }
     if (payload && !payload.hasNext) break;
   }
