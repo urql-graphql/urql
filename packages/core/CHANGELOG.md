@@ -1,5 +1,14 @@
 # @urql/core
 
+## 4.0.6
+
+### Patch Changes
+
+- Handle `multipart/mixed` variations starting with boundary rather than CRLF and a boundary
+  Submitted by [@kitten](https://github.com/kitten) (See [#3172](https://github.com/urql-graphql/urql/pull/3172))
+- ⚠️ Fix regression which would disallow `network-only` operations after `cache-and-network` completed
+  Submitted by [@kitten](https://github.com/kitten) (See [#3174](https://github.com/urql-graphql/urql/pull/3174))
+
 ## 4.0.5
 
 ### Patch Changes
