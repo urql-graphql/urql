@@ -137,7 +137,13 @@ const readRoot = (
     return input;
   }
 
-  const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
+  const iterate = makeSelectionIterator(
+    entityKey,
+    entityKey,
+    deferRef,
+    select,
+    ctx
+  );
 
   let node: FieldNode | void;
   let hasChanged = InMemoryData.currentForeignData;
@@ -334,7 +340,13 @@ const readSelection = (
   }
 
   const resolvers = store.resolvers[typename];
-  const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
+  const iterate = makeSelectionIterator(
+    typename,
+    entityKey,
+    deferRef,
+    select,
+    ctx
+  );
 
   let hasFields = false;
   let hasPartials = false;

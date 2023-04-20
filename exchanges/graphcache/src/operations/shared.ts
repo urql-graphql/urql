@@ -160,66 +160,60 @@ interface SelectionIterator {
 export const makeSelectionIterator = (
   typename: void | string,
   entityKey: string,
-  select: SelectionSet,
+  defer: boolean,
+  selectionSet: SelectionSet,
   ctx: Context
 ): SelectionIterator => {
-  let childDeferred = false;
-  let childIterator: SelectionIterator | void;
+  let child: SelectionIterator | void;
   let index = 0;
 
   return function next() {
-    if (!deferRef && childDeferred) deferRef = childDeferred;
-
-    if (childIterator) {
-      const node = childIterator();
-      if (node != null) {
-        return node;
-      }
-
-      childIterator = undefined;
-      childDeferred = false;
-      if (process.env.NODE_ENV !== 'production') {
-        popDebugNode();
-      }
-    }
-
-    while (index < select.length) {
-      const node = select[index++];
-      if (!shouldInclude(node, ctx.variables)) {
-        continue;
-      } else if (!isFieldNode(node)) {
-        // A fragment is either referred to by FragmentSpread or inline
-        const fragmentNode = !isInlineFragment(node)
-          ? ctx.fragments[getName(node)]
-          : node;
-
-        if (fragmentNode !== undefined) {
-          const isMatching = ctx.store.schema
-            ? isInterfaceOfType(ctx.store.schema, fragmentNode, typename)
-            : isFragmentHeuristicallyMatching(
-                fragmentNode,
-                typename,
-                entityKey,
-                ctx.variables
-              );
-          if (isMatching) {
-            if (process.env.NODE_ENV !== 'production') {
-              pushDebugNode(typename, fragmentNode);
-            }
-
-            childDeferred = !!isDeferred(node, ctx.variables);
-            if (!deferRef && childDeferred) deferRef = childDeferred;
-
-            return (childIterator = makeSelectionIterator(
-              typename,
-              entityKey,
-              getSelectionSet(fragmentNode)!,
-              ctx
-            ))();
-          }
+    let node: FieldNode | undefined;
+    while (child || index < selectionSet.length) {
+      node = undefined;
+      deferRef = defer;
+      if (child) {
+        if ((node = child())) {
+          return node;
+        } else {
+          child = undefined;
+          if (process.env.NODE_ENV !== 'production') popDebugNode();
         }
       } else {
-        return node;
+        const select = selectionSet[index++];
+        if (!shouldInclude(select, ctx.variables)) {
+          /*noop*/
+        } else if (!isFieldNode(select)) {
+          // A fragment is either referred to by FragmentSpread or inline
+          const fragment = !isInlineFragment(select)
+            ? ctx.fragments[getName(select)]
+            : select;
+          if (fragment) {
+            const isMatching =
+              !fragment.typeCondition ||
+              (ctx.store.schema
+                ? isInterfaceOfType(ctx.store.schema, fragment, typename)
+                : isFragmentHeuristicallyMatching(
+                    fragment,
+                    typename,
+                    entityKey,
+                    ctx.variables
+                  ));
+            if (isMatching) {
+              if (process.env.NODE_ENV !== 'production')
+                pushDebugNode(typename, fragment);
+              child = makeSelectionIterator(
+                typename,
+                entityKey,
+                defer || isDeferred(select, ctx.variables),
+                getSelectionSet(fragment),
+                ctx
+              );
+            }
+          }
+        } else {
+          return select;
+        }
       }
     }
   };
