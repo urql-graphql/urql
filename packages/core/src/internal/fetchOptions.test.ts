@@ -149,7 +149,7 @@ describe('makeFetchOptions', () => {
       ...body,
       variables: {
         ...body.variables,
-        file: { __key: expect.any(String) },
+        file: null,
       },
     });
 
