@@ -18,6 +18,11 @@ const stringify = (x: any): string => {
     }
     out += ']';
     return out;
+  } else if (
+    (FileConstructor !== NoopConstructor && x instanceof FileConstructor) ||
+    (BlobConstructor !== NoopConstructor && x instanceof BlobConstructor)
+  ) {
+    return 'null';
   }
 
   const keys = Object.keys(x).sort();
