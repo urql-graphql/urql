@@ -39,6 +39,7 @@ import {
   clearDataState,
   joinKeys,
   keyOfField,
+  makeData,
 } from '../store';
 
 import * as InMemoryData from '../store/data';
@@ -61,7 +62,7 @@ export interface WriteResult {
 /** Writes a GraphQL response to the cache.
  * @internal
  */
-export const write = (
+export const __initAnd_write = (
   store: Store,
   request: OperationRequest,
   data: Data,
@@ -69,12 +70,12 @@ export const write = (
   key?: number
 ): WriteResult => {
   initDataState('write', store.data, key || null);
-  const result = startWrite(store, request, data, error);
+  const result = _write(store, request, data, error);
   clearDataState();
   return result;
 };
 
-export const writeOptimistic = (
+export const __initAnd_writeOptimistic = (
   store: Store,
   request: OperationRequest,
   key: number
@@ -89,20 +90,22 @@ export const writeOptimistic = (
   }
 
   initDataState('write', store.data, key, true);
-  const result = startWrite(store, request, {} as Data, undefined, true);
+  const result = _write(store, request, {} as Data, undefined);
   clearDataState();
   return result;
 };
 
-export const startWrite = (
+export const _write = (
   store: Store,
   request: OperationRequest,
-  data: Data,
-  error?: CombinedError | undefined,
-  isOptimistic?: boolean
+  data?: Data,
+  error?: CombinedError | undefined
 ) => {
   const operation = getMainOperation(request.query);
-  const result: WriteResult = { data, dependencies: getCurrentDependencies() };
+  const result: WriteResult = {
+    data: data || makeData(),
+    dependencies: getCurrentDependencies(),
+  };
   const kind = store.rootFields[operation.operation];
 
   const ctx = makeContext(
@@ -111,7 +114,7 @@ export const startWrite = (
     getFragments(request.query),
     kind,
     kind,
-    !!isOptimistic,
+    InMemoryData.currentOptimistic,
     error
   );
 
@@ -119,7 +122,7 @@ export const startWrite = (
     pushDebugNode(kind, operation);
   }
 
-  writeSelection(ctx, kind, getSelectionSet(operation), data);
+  writeSelection(ctx, kind, getSelectionSet(operation), result.data!);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -128,7 +131,7 @@ export const startWrite = (
   return result;
 };
 
-export const writeFragment = (
+export const _writeFragment = (
   store: Store,
   query: DocumentNode,
   data: Partial<Data>,
@@ -245,7 +248,7 @@ const writeSelection = (
       if (
         rootField === 'query' &&
         fieldValue === undefined &&
-        !deferRef.current &&
+        !deferRef &&
         !ctx.optimistic
       ) {
         const expected =
@@ -274,7 +277,7 @@ const writeSelection = (
       // Fields marked as deferred that aren't defined must be skipped
       // Otherwise, we also ignore undefined values in optimistic updaters
       (fieldValue === undefined &&
-        (deferRef.current || (ctx.optimistic && rootField === 'query')))
+        (deferRef || (ctx.optimistic && rootField === 'query')))
     ) {
       continue;
     }

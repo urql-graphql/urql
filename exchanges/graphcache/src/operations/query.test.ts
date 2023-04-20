@@ -5,8 +5,8 @@ import { minifyIntrospectionQuery } from '@urql/introspection';
 import { describe, it, beforeEach, beforeAll, expect } from 'vitest';
 
 import { Store } from '../store';
-import { write } from './write';
-import { query } from './query';
+import { __initAnd_write as write } from './write';
+import { __initAnd_query as query } from './query';
 
 const TODO_QUERY = gql`
   query Todos {
@@ -363,7 +363,7 @@ describe('Query', () => {
     expect(previousData).toHaveProperty('todos.0.textB', 'old');
   });
 
-  it('should not keep references stable', () => {
+  it('should keep references stable', () => {
     const QUERY = gql`
       query todos {
         __typename
@@ -398,31 +398,32 @@ describe('Query', () => {
 
     write(store, { query: QUERY }, expected);
 
-    const prevData = {
-      todos: [
-        {
-          __typename: 'Todo',
-          id: 'prev-0',
-        },
-        {
-          __typename: 'Todo',
-          id: '1',
-        },
-        {
-          __typename: 'Todo',
-          id: '2',
-        },
-      ],
-      __typename: 'query_root',
-    };
+    const prevData = query(
+      store,
+      { query: QUERY },
+      {
+        todos: [
+          {
+            __typename: 'Todo',
+            id: 'prev-0',
+          },
+          {
+            __typename: 'Todo',
+            id: '1',
+          },
+          {
+            __typename: 'Todo',
+            id: '2',
+          },
+        ],
+        __typename: 'query_root',
+      }
+    ).data as any;
 
-    const data = query(store, { query: QUERY }, prevData)
-      .data as typeof expected;
+    const data = query(store, { query: QUERY }, prevData).data as any;
     expect(data).toEqual(expected);
 
-    expect(prevData.todos[0]).not.toEqual(data.todos[0]);
-    expect(prevData.todos[0]).not.toBe(data.todos[0]);
-    // unchanged references:
+    expect(prevData.todos[0]).toBe(data.todos[0]);
     expect(prevData.todos[1]).toBe(data.todos[1]);
     expect(prevData.todos[2]).toBe(data.todos[2]);
   });

@@ -19,8 +19,8 @@ import {
 
 import { invariant } from '../helpers/help';
 import { contextRef, ensureLink } from '../operations/shared';
-import { read, readFragment } from '../operations/query';
-import { writeFragment, startWrite } from '../operations/write';
+import { _query, _queryFragment } from '../operations/query';
+import { _write, _writeFragment } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
@@ -107,8 +107,7 @@ export class Store<
     // In resolvers and updaters we may have a specific parent
     // object available that can be used to skip to a specific parent
     // key directly without looking at its incomplete properties
-    if (contextRef.current && data === contextRef.current.parent)
-      return contextRef.current!.parentKey;
+    if (contextRef && data === contextRef.parent) return contextRef.parentKey;
 
     if (data == null || typeof data === 'string') return data || null;
     if (!data.__typename) return null;
@@ -167,14 +166,14 @@ export class Store<
     request.query = formatDocument(request.query);
     const output = updater(this.readQuery(request));
     if (output !== null) {
-      startWrite(this, request, output as any);
+      _write(this, request, output as any, undefined);
     }
   }
 
   readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null {
     const request = createRequest(input.query, input.variables!);
     request.query = formatDocument(request.query);
-    return read(this, request).data as T | null;
+    return _query(this, request, undefined, undefined).data as T | null;
   }
 
   readFragment<T = Data, V = Variables>(
@@ -183,7 +182,7 @@ export class Store<
     variables?: V,
     fragmentName?: string
   ): T | null {
-    return readFragment(
+    return _queryFragment(
       this,
       formatDocument(fragment),
       entity as Data,
@@ -198,7 +197,7 @@ export class Store<
     variables?: V,
     fragmentName?: string
   ): void {
-    writeFragment(
+    _writeFragment(
       this,
       formatDocument(fragment),
       data as Data,

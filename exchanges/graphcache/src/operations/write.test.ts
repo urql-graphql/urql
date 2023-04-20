@@ -4,7 +4,7 @@ import { gql, CombinedError } from '@urql/core';
 import { minifyIntrospectionQuery } from '@urql/introspection';
 import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
-import { write } from './write';
+import { __initAnd_write as write } from './write';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store';
 

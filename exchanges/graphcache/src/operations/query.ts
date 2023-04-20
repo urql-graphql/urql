@@ -68,7 +68,7 @@ export interface QueryResult {
 /** Reads a GraphQL query from the cache.
  * @internal
  */
-export const query = (
+export const __initAnd_query = (
   store: Store,
   request: OperationRequest,
   data?: Data | null | undefined,
@@ -76,12 +76,15 @@ export const query = (
   key?: number
 ): QueryResult => {
   initDataState('read', store.data, key);
-  const result = read(store, request, data, error);
+  const result = _query(store, request, data, error);
   clearDataState();
   return result;
 };
 
-export const read = (
+/** Reads a GraphQL query from the cache.
+ * @internal
+ */
+export const _query = (
   store: Store,
   request: OperationRequest,
   input?: Data | null | undefined,
@@ -105,15 +108,14 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  if (!input) input = makeData();
   // NOTE: This may reuse "previous result data" as indicated by the
   // `originalData` argument in readRoot(). This behaviour isn't used
   // for readSelection() however, which always produces results from
   // scratch
   const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, input)
-      : readSelection(ctx, rootKey, rootSelect, input);
+      ? readRoot(ctx, rootKey, rootSelect, input || makeData())
+      : readSelection(ctx, rootKey, rootSelect, input || makeData());
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -143,7 +145,7 @@ const readRoot = (
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
 
   let node: FieldNode | void;
-  let hasChanged = false;
+  let hasChanged = InMemoryData.currentForeignData;
   const output = makeData(input);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
@@ -181,7 +183,7 @@ const readRootField = (
 ): Link<Data> => {
   if (Array.isArray(originalData)) {
     const newData = new Array(originalData.length);
-    let hasChanged = false;
+    let hasChanged = InMemoryData.currentForeignData;
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -208,7 +210,7 @@ const readRootField = (
   }
 };
 
-export const readFragment = (
+export const _queryFragment = (
   store: Store,
   query: DocumentNode,
   entity: Partial<Data> | string,
@@ -337,7 +339,7 @@ const readSelection = (
   let hasFields = false;
   let hasPartials = false;
   let hasNext = false;
-  let hasChanged = typename !== input.__typename;
+  let hasChanged = InMemoryData.currentForeignData;
   let node: FieldNode | void;
   const output = makeData(input);
   while ((node = iterate()) !== undefined) {
@@ -456,7 +458,7 @@ const readSelection = (
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
-    if (dataFieldValue === undefined && deferRef.current) {
+    if (dataFieldValue === undefined && deferRef) {
       // The field is undelivered and uncached, but is included in a deferred fragment
       hasNext = true;
     } else if (
@@ -500,7 +502,7 @@ const resolveResolverResult = (
   select: SelectionSet,
   prevData: void | null | Data | Data[],
   result: void | DataField,
-  skipNull: boolean
+  isOwnedData: boolean
 ): DataField | void => {
   if (Array.isArray(result)) {
     const { store } = ctx;
@@ -511,7 +513,9 @@ const resolveResolverResult = (
       : false;
     const data = new Array(result.length);
     let hasChanged =
-      !Array.isArray(prevData) || result.length !== prevData.length;
+      !isOwnedData ||
+      !Array.isArray(prevData) ||
+      result.length !== prevData.length;
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -524,7 +528,7 @@ const resolveResolverResult = (
         select,
         prevData != null ? prevData[i] : undefined,
         result[i],
-        skipNull
+        isOwnedData
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -542,7 +546,7 @@ const resolveResolverResult = (
     return hasChanged ? data : prevData;
   } else if (result === null || result === undefined) {
     return result;
-  } else if (skipNull && prevData === null) {
+  } else if (!isOwnedData && prevData === null) {
     return null;
   } else if (isDataOrKey(result)) {
     const data = (prevData || makeData()) as Data;
@@ -569,7 +573,7 @@ const resolveLink = (
   fieldName: string,
   select: SelectionSet,
   prevData: void | null | Data | Data[],
-  skipNull: boolean
+  isOwnedData: boolean
 ): DataField | undefined => {
   if (Array.isArray(link)) {
     const { store } = ctx;
@@ -578,7 +582,9 @@ const resolveLink = (
       : false;
     const newLink = new Array(link.length);
     let hasChanged =
-      !Array.isArray(prevData) || newLink.length !== prevData.length;
+      !isOwnedData ||
+      !Array.isArray(prevData) ||
+      newLink.length !== prevData.length;
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -590,7 +596,7 @@ const resolveLink = (
         fieldName,
         select,
         prevData != null ? prevData[i] : undefined,
-        skipNull
+        isOwnedData
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -606,7 +612,7 @@ const resolveLink = (
     }
 
     return hasChanged ? newLink : (prevData as Data[]);
-  } else if (link === null || (prevData === null && skipNull)) {
+  } else if (link === null || (prevData === null && isOwnedData)) {
     return null;
   }
 

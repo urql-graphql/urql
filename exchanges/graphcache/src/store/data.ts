@@ -63,14 +63,15 @@ let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
-let currentOptimistic = false;
+export let currentForeignData = false;
+export let currentOptimistic = false;
 
 /** Creates a new data object unless it's been created in this data run */
 export const makeData = (data?: Data): Data => {
   let newData: Data;
   if (data) {
     if (currentOwnership!.has(data)) return data;
-    newData = currentDataMapping!.get(data) || ({ ...data } as Data);
+    newData = currentDataMapping!.get(data) || ({} as Data);
     currentDataMapping!.set(data, newData);
   } else {
     newData = {} as Data;
@@ -90,7 +91,8 @@ export const initDataState = (
   operationType: OperationType,
   data: InMemoryData,
   layerKey?: number | null,
-  isOptimistic?: boolean
+  isOptimistic?: boolean,
+  isForeignData?: boolean
 ) => {
   currentOwnership = new WeakSet();
   currentDataMapping = new WeakMap();
@@ -98,6 +100,7 @@ export const initDataState = (
   currentData = data;
   currentDependencies = new Set();
   currentOptimistic = !!isOptimistic;
+  currentForeignData = !!isForeignData;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
