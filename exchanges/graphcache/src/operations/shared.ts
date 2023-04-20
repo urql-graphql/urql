@@ -17,7 +17,7 @@ import {
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
-import { hasField, isWriting } from '../store/data';
+import { hasField, isWriting, currentOptimistic } from '../store/data';
 import { Store, keyOfField } from '../store';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
@@ -66,8 +66,7 @@ export const makeContext = (
   fragments: Fragments,
   typename: string,
   entityKey: string,
-  optimistic?: boolean,
-  error?: CombinedError | undefined
+  error: CombinedError | undefined
 ): Context => {
   const ctx: Context = {
     store,
@@ -81,7 +80,7 @@ export const makeContext = (
     error: undefined,
     partial: false,
     hasNext: false,
-    optimistic: !!optimistic,
+    optimistic: currentOptimistic,
     __internal: {
       path: [],
       errorMap: undefined,

@@ -100,7 +100,6 @@ export const _query = (
     getFragments(request.query),
     rootKey,
     rootKey,
-    false,
     error
   );
 
@@ -274,7 +273,8 @@ export const _queryFragment = (
     variables || {},
     fragments,
     typename,
-    entityKey
+    entityKey,
+    undefined
   );
 
   const result =

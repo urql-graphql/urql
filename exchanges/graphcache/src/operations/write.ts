@@ -114,7 +114,6 @@ export const _write = (
     getFragments(request.query),
     kind,
     kind,
-    InMemoryData.currentOptimistic,
     error
   );
 
