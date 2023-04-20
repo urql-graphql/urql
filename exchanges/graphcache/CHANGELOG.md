@@ -1,5 +1,18 @@
 # @urql/exchange-graphcache
 
+## 6.0.2
+
+### Patch Changes
+
+- Prevent reusal of incoming API data in Graphcache’s produced (“owned”) data. This prevents us from copying the `__typename` and other superfluous fields
+  Submitted by [@kitten](https://github.com/kitten) (See [#3165](https://github.com/urql-graphql/urql/pull/3165))
+- ⚠️ Fix regression which caused `@defer` directives from becoming “sticky” and causing every subsequent cache read to be treated as if the field was deferred
+  Submitted by [@kitten](https://github.com/kitten) (See [#3167](https://github.com/urql-graphql/urql/pull/3167))
+- Apply `hasNext: true` and fallthrough logic to cached queries that contain deferred, uncached fields. Deferred query results will now be fetched against the API correctly, even if prior requests have been incomplete
+  Submitted by [@kitten](https://github.com/kitten) (See [#3163](https://github.com/urql-graphql/urql/pull/3163))
+- ⚠️ Fix `offlineExchange` duplicating offline mutations in failed queue
+  Submitted by [@kitten](https://github.com/kitten) (See [#3158](https://github.com/urql-graphql/urql/pull/3158))
+
 ## 6.0.1
 
 ### Patch Changes

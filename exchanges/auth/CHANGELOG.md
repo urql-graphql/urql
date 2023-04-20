@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.1
+
+### Patch Changes
+
+- ⚠️ Fix operations created by `utilities.mutate()` erroneously being retried and sent again like a regular operation
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3164](https://github.com/urql-graphql/urql/pull/3164))
+
 ## 2.1.0
 
 ### Minor Changes
