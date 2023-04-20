@@ -648,6 +648,58 @@ describe('deduplication behavior', () => {
     expect(onOperation).toHaveBeenCalledTimes(1);
     expect(onResult).toHaveBeenCalledTimes(3);
   });
+
+  it('does not deduplicate cache-and-network’s follow-up operations', () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    const operationOne = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-and-network',
+    });
+
+    const operationTwo = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    let shouldSend = true;
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        onPush(onOperation),
+        map(op => ({
+          hasNext: false,
+          stale: true,
+          data: 'test',
+          operation: op,
+        })),
+        filter(() => {
+          if (shouldSend) {
+            shouldSend = false;
+            client.reexecuteOperation(operationTwo);
+            return true;
+          } else {
+            return false;
+          }
+        })
+      );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operationThree = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    pipe(client.executeRequestOperation(operationOne), subscribe(onResult));
+    pipe(client.executeRequestOperation(operationThree), subscribe(onResult));
+
+    expect(onOperation).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('shared sources behavior', () => {
