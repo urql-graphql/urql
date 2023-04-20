@@ -663,8 +663,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         result$,
         // Store replay result
         onPush(result => {
-          if (!result.hasNext && !result.stale)
+          if (result.stale) {
+            // If the current result has queued up an operation of the same
+            // key, then `stale` refers to it
+            for (const operation of queue) {
+              if (operation.key === result.operation.key) {
+                dispatched.delete(operation.key);
+                break;
+              }
+            }
+          } else if (!result.hasNext) {
             dispatched.delete(operation.key);
+          }
           replays.set(operation.key, result);
         }),
         // Cleanup active states on end of source
