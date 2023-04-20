@@ -25,7 +25,13 @@ describe('makeSelectionIterator', () => {
         }
       `
     );
-    const iterate = makeSelectionIterator('Query', 'Query', selection, ctx);
+    const iterate = makeSelectionIterator(
+      'Query',
+      'Query',
+      false,
+      selection,
+      ctx
+    );
     const result: FieldNode[] = [];
 
     let node: FieldNode | void;
@@ -78,7 +84,13 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator('Query', 'Query', selection, ctx);
+    const iterate = makeSelectionIterator(
+      'Query',
+      'Query',
+      false,
+      selection,
+      ctx
+    );
     const result: FieldNode[] = [];
 
     let node: FieldNode | void;
@@ -102,7 +114,13 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator('Query', 'Query', selection, ctx);
+    const iterate = makeSelectionIterator(
+      'Query',
+      'Query',
+      false,
+      selection,
+      ctx
+    );
     const result: FieldNode[] = [];
 
     let node: FieldNode | void;
@@ -181,16 +199,16 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator('Query', 'Query', selection, ctx);
-    const result: FieldNode[] = [];
+    const iterate = makeSelectionIterator(
+      'Query',
+      'Query',
+      false,
+      selection,
+      ctx
+    );
+
     const deferred: boolean[] = [];
-
-    let node: FieldNode | void;
-    while ((node = iterate())) {
-      result.push(node);
-      deferred.push(deferRef.current);
-    }
-
+    while (iterate()) deferred.push(deferRef);
     expect(deferred).toEqual([
       false, // a
       true, // b
@@ -201,5 +219,31 @@ describe('makeSelectionIterator', () => {
       false, // g
       false, // h
     ]);
+  });
+
+  it('applies the parent’s defer state if needed', () => {
+    const selection = selectionOfDocument(gql`
+      {
+        a
+        ... @defer {
+          b
+        }
+        ... {
+          c
+        }
+      }
+    `);
+
+    const iterate = makeSelectionIterator(
+      'Query',
+      'Query',
+      true,
+      selection,
+      ctx
+    );
+
+    const deferred: boolean[] = [];
+    while (iterate()) deferred.push(deferRef);
+    expect(deferred).toEqual([true, true, true]);
   });
 });

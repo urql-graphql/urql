@@ -160,10 +160,10 @@ interface SelectionIterator {
 export const makeSelectionIterator = (
   typename: void | string,
   entityKey: string,
+  defer: boolean,
   selectionSet: SelectionSet,
   ctx: Context
 ): SelectionIterator => {
-  let defer = false;
   let child: SelectionIterator | void;
   let index = 0;
 
@@ -171,11 +171,9 @@ export const makeSelectionIterator = (
     let node: FieldNode | undefined;
     while (child || index < selectionSet.length) {
       node = undefined;
-      deferRef = false;
+      deferRef = defer;
       if (child) {
-        node = child();
-        deferRef = deferRef || defer;
-        if (node) {
+        if ((node = child())) {
           return node;
         } else {
           child = undefined;
@@ -204,10 +202,10 @@ export const makeSelectionIterator = (
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
-              defer = isDeferred(select, ctx.variables);
               child = makeSelectionIterator(
                 typename,
                 entityKey,
+                defer || isDeferred(select, ctx.variables),
                 getSelectionSet(fragment),
                 ctx
               );
