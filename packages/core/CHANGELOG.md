@@ -1,5 +1,18 @@
 # @urql/core
 
+## 4.0.5
+
+### Patch Changes
+
+- Replace `File` and `Blob` objects with `null` in variables if multipart request will be started
+  Submitted by [@kitten](https://github.com/kitten) (See [#3169](https://github.com/urql-graphql/urql/pull/3169))
+- Strictly deduplicate `cache-and-network` and `network-only` operations, while a non-stale response is being waited for
+  Submitted by [@kitten](https://github.com/kitten) (See [#3157](https://github.com/urql-graphql/urql/pull/3157))
+- ⚠️ Fix boundary stopping `multipart/mixed` streams when it randomly occurs in response payloads
+  Submitted by [@kitten](https://github.com/kitten) (See [#3155](https://github.com/urql-graphql/urql/pull/3155))
+- Improve dispatching of arbitrary operations using `reexecuteOperation`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3159](https://github.com/urql-graphql/urql/pull/3159))
+
 ## 4.0.4
 
 ### Patch Changes
