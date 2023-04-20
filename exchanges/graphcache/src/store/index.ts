@@ -4,7 +4,6 @@ export {
   noopDataState,
   makeData,
   ownsData,
-  foreignData,
   reserveLayer,
   getCurrentOperation,
   getCurrentDependencies,

@@ -156,14 +156,8 @@ export const cacheExchange =
       ) {
         operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
-        initDataState('write', store.data, operation.key, true);
-        const { dependencies } = _write(
-          store,
-          operation,
-          undefined,
-          undefined,
-          true
-        );
+        initDataState('write', store.data, operation.key, true, false);
+        const { dependencies } = _write(store, operation, undefined, undefined);
         clearDataState();
         if (dependencies.size) {
           // Update blocked optimistic dependencies
@@ -209,7 +203,7 @@ export const cacheExchange =
     const operationResultFromCache = (
       operation: Operation
     ): OperationResultWithMeta => {
-      initDataState('read', store.data, undefined, false);
+      initDataState('read', store.data, undefined, false, false);
       const result = _query(
         store,
         operation,
@@ -258,7 +252,7 @@ export const cacheExchange =
       if (data) {
         // Write the result to cache and collect all dependencies that need to be
         // updated
-        initDataState('write', store.data, operation.key, false);
+        initDataState('write', store.data, operation.key, false, false);
         const writeDependencies = _write(
           store,
           operation,
@@ -269,7 +263,13 @@ export const cacheExchange =
         collectPendingOperations(pendingOperations, writeDependencies);
         const prevData =
           operation.kind === 'query' ? results.get(operation.key) : null;
-        initDataState('read', store.data, operation.key, false);
+        initDataState(
+          'read',
+          store.data,
+          operation.key,
+          false,
+          prevData !== data
+        );
         const queryResult = _query(
           store,
           operation,

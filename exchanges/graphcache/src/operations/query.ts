@@ -37,7 +37,6 @@ import {
   keyOfField,
   makeData,
   ownsData,
-  foreignData,
 } from '../store';
 
 import * as InMemoryData from '../store/data';
@@ -144,10 +143,9 @@ const readRoot = (
   }
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
-  const isForeignData = foreignData(input);
 
   let node: FieldNode | void;
-  let hasChanged = isForeignData;
+  let hasChanged = InMemoryData.currentForeignData;
   const output = makeData(input);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
@@ -161,8 +159,7 @@ const readRoot = (
       dataFieldValue = readRootField(
         ctx,
         getSelectionSet(node),
-        ensureData(fieldValue),
-        isForeignData
+        ensureData(fieldValue)
       );
     } else {
       dataFieldValue = fieldValue;
@@ -182,17 +179,16 @@ const readRoot = (
 const readRootField = (
   ctx: Context,
   select: SelectionSet,
-  originalData: Link<Data>,
-  isForeignData: boolean
+  originalData: Link<Data>
 ): Link<Data> => {
   if (Array.isArray(originalData)) {
     const newData = new Array(originalData.length);
-    let hasChanged = isForeignData;
+    let hasChanged = InMemoryData.currentForeignData;
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
       // Recursively read the root field's value
-      newData[i] = readRootField(ctx, select, originalData[i], isForeignData);
+      newData[i] = readRootField(ctx, select, originalData[i]);
       hasChanged = hasChanged || newData[i] !== originalData[i];
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -339,12 +335,11 @@ const readSelection = (
 
   const resolvers = store.resolvers[typename];
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
-  const isForeignData = foreignData(input);
 
   let hasFields = false;
   let hasPartials = false;
   let hasNext = false;
-  let hasChanged = isForeignData;
+  let hasChanged = InMemoryData.currentForeignData;
   let node: FieldNode | void;
   const output = makeData(input);
   while ((node = iterate()) !== undefined) {

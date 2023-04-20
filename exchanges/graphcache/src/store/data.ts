@@ -57,14 +57,13 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
-const globalOwnership = new WeakSet<Data>();
-
 let currentOwnership: null | WeakSet<Data> = null;
 let currentDataMapping: null | WeakMap<Data, Data> = null;
 let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
+export let currentForeignData = false;
 export let currentOptimistic = false;
 
 /** Creates a new data object unless it's been created in this data run */
@@ -79,7 +78,6 @@ export const makeData = (data?: Data): Data => {
   }
 
   currentOwnership!.add(newData);
-  globalOwnership.add(newData);
   return newData;
 };
 
@@ -88,14 +86,13 @@ export const isWriting = (): boolean => currentOperation === 'write';
 export const ownsData = (data?: Data): boolean =>
   !!data && currentOwnership!.has(data);
 
-export const foreignData = (data: Data): boolean => !globalOwnership.has(data);
-
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
   operationType: OperationType,
   data: InMemoryData,
   layerKey?: number | null,
-  isOptimistic?: boolean
+  isOptimistic?: boolean,
+  isForeignData?: boolean
 ) => {
   currentOwnership = new WeakSet();
   currentDataMapping = new WeakMap();
@@ -103,6 +100,7 @@ export const initDataState = (
   currentData = data;
   currentDependencies = new Set();
   currentOptimistic = !!isOptimistic;
+  currentForeignData = !!isForeignData;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
