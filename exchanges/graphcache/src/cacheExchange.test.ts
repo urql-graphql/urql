@@ -2411,9 +2411,9 @@ describe('commutativity', () => {
   });
 
   it('applies deferred results to previous layers', () => {
-    let normalData: any;
-    let deferredData: any;
-    let combinedData: any;
+    let normalData: OperationResult | undefined;
+    let deferredData: OperationResult | undefined;
+    let combinedData: OperationResult | undefined;
 
     const client = createClient({
       url: 'http://0.0.0.0',
@@ -2475,11 +2475,11 @@ describe('commutativity', () => {
       tap(result => {
         if (result.operation.kind === 'query') {
           if (result.operation.key === 1) {
-            deferredData = result.data;
+            deferredData = result;
           } else if (result.operation.key === 42) {
-            combinedData = result.data;
+            combinedData = result;
           } else {
-            normalData = result.data;
+            normalData = result;
           }
         }
       }),
@@ -2530,9 +2530,9 @@ describe('commutativity', () => {
       },
     });
 
-    expect(normalData).toHaveProperty('node.id', 2);
-    expect(combinedData).not.toHaveProperty('deferred');
-    expect(combinedData).toHaveProperty('node.id', 2);
+    expect(normalData).toHaveProperty('data.node.id', 2);
+    expect(combinedData).not.toHaveProperty('data.deferred');
+    expect(combinedData).toHaveProperty('data.node.id', 2);
 
     nextRes({
       ...queryResponse,
@@ -2548,8 +2548,11 @@ describe('commutativity', () => {
       hasNext: true,
     });
 
-    expect(deferredData).toHaveProperty('deferred.id', 1);
-    expect(combinedData).toHaveProperty('deferred.id', 1);
-    expect(combinedData).toHaveProperty('node.id', 2);
+    expect(deferredData).toHaveProperty('hasNext', true);
+    expect(deferredData).toHaveProperty('data.deferred.id', 1);
+
+    expect(combinedData).toHaveProperty('hasNext', false);
+    expect(combinedData).toHaveProperty('data.deferred.id', 1);
+    expect(combinedData).toHaveProperty('data.node.id', 2);
   });
 });
