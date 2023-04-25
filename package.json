@@ -51,11 +51,11 @@
       "react-is": "^17.0.2",
       "styled-components": "^5.2.3",
       "vite": "^3.2.4",
-      "wonka": "^6.3.0"
+      "wonka": "^6.3.2"
     }
   },
   "devDependencies": {
-    "@0no-co/graphql.web": "^1.0.0",
+    "@0no-co/graphql.web": "^1.0.1",
     "@actions/artifact": "^1.1.1",
     "@actions/core": "^1.10.0",
     "@babel/core": "^7.21.3",

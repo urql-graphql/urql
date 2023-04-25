@@ -8,7 +8,7 @@ overrides:
   react-is: ^17.0.2
   styled-components: ^5.2.3
   vite: ^3.2.4
-  wonka: ^6.3.0
+  wonka: ^6.3.2
 
 importers:
 
@@ -22,8 +22,8 @@ importers:
         version: 3.3.1
     devDependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.0
-        version: 1.0.0(graphql@16.6.0)
+        specifier: ^1.0.1
+        version: 1.0.1(graphql@16.6.0)
       '@actions/artifact':
         specifier: ^1.1.1
         version: 1.1.1
@@ -184,8 +184,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -197,8 +197,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -210,8 +210,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -220,14 +220,14 @@ importers:
   exchanges/graphcache:
     dependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.0
-        version: 1.0.0(graphql@16.6.0)
+        specifier: ^1.0.1
+        version: 1.0.1(graphql@16.6.0)
       '@urql/core':
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       '@cypress/react':
         specifier: ^7.0.2
@@ -260,8 +260,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -273,8 +273,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -286,8 +286,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       '@types/react':
         specifier: ^17.0.39
@@ -302,8 +302,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -315,8 +315,8 @@ importers:
         specifier: '>=4.0.0'
         version: link:../../packages/core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -325,11 +325,11 @@ importers:
   packages/core:
     dependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.0
-        version: 1.0.0(graphql@16.6.0)
+        specifier: ^1.0.1
+        version: 1.0.1(graphql@16.6.0)
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
 
   packages/introspection:
     devDependencies:
@@ -392,8 +392,8 @@ importers:
         specifier: ^4.0.0
         version: link:../core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       '@testing-library/preact':
         specifier: ^2.0.0
@@ -411,8 +411,8 @@ importers:
         specifier: ^4.0.0
         version: link:../core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       '@cypress/react':
         specifier: ^7.0.2
@@ -584,8 +584,8 @@ importers:
         specifier: ^4.0.0
         version: link:../core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       graphql:
         specifier: ^16.6.0
@@ -600,8 +600,8 @@ importers:
         specifier: ^4.0.0
         version: link:../core
       wonka:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.3.2
+        version: 6.3.2
     devDependencies:
       '@vue/test-utils':
         specifier: ^2.3.0
@@ -615,8 +615,8 @@ importers:
 
 packages:
 
-  /@0no-co/graphql.web@1.0.0(graphql@16.6.0):
-    resolution: {integrity: sha512-JBq2pWyDchE1vVjj/+c4dzZ8stbpew4RrzpZ3vYdn1WJFGHfYg6YIX1fDdMKtSXJJM9FUlsoDOxemr9WMM2p+A==}
+  /@0no-co/graphql.web@1.0.1(graphql@16.6.0):
+    resolution: {integrity: sha512-6Yaxyv6rOwRkLIvFaL0NrLDgfNqC/Ng9QOPmTmlqW4mORXMEKmh5NYGkIvvt5Yw8fZesnMAqkj8cIqTj8f40cQ==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     peerDependenciesMeta:
@@ -15484,8 +15484,8 @@ packages:
       execa: 1.0.0
     dev: true
 
-  /wonka@6.3.0:
-    resolution: {integrity: sha512-7np+Kj4OnDQeEN0kafYLkPFKj1Qo+k7mNgyMHSgOeg+9AEvJbL8ipTBgSCTQfGcgVo6TPNU4T5+AZ2rAOyVrAw==}
+  /wonka@6.3.2:
+    resolution: {integrity: sha512-2xXbQ1LnwNS7egVm1HPhW2FyKrekolzhpM3mCwXdQr55gO+tAiY76rhb32OL9kKsW8taj++iP7C6hxlVzbnvrw==}
     dev: false
 
   /word-wrap@1.2.3:
