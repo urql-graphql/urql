@@ -1,5 +1,12 @@
 # @urql/exchange-populate
 
+## 1.1.2
+
+### Patch Changes
+
+- Publish with npm provenance
+  Submitted by [@kitten](https://github.com/kitten) (See [#3180](https://github.com/urql-graphql/urql/pull/3180))
+
 ## 1.1.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-context",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "An exchange for setting (a)synchronous operation-context in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",

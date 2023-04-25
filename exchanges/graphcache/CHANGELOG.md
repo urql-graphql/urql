@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.0.3
+
+### Patch Changes
+
+- Publish with npm provenance
+  Submitted by [@kitten](https://github.com/kitten) (See [#3180](https://github.com/urql-graphql/urql/pull/3180))
+
 ## 6.0.2
 
 ### Patch Changes
