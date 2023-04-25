@@ -52,5 +52,8 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "urql": "^4.0.0"
+  },
+  "publishConfig": {
+    "provenance": true
   }
 }

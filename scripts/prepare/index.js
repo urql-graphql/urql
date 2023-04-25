@@ -27,6 +27,11 @@ const posixPath = x =>
 
 const is = (a, b) => posixPath(a) === posixPath(b);
 
+invariant(
+  pkg.publishConfig.provenance === true,
+  'package.json:publishConfig.provenance must be set to true'
+);
+
 if (pkg.name.startsWith('@urql/')) {
   invariant(
     pkg.publishConfig.access === 'public',

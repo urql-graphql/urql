@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@urql/core": "^4.0.0",
-    "wonka": "^6.3.0"
+    "wonka": "^6.3.2"
   },
   "devDependencies": {
     "@urql/core": "workspace:*",
@@ -60,6 +60,7 @@
     "svelte": "^3.20.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }

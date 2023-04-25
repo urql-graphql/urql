@@ -48,13 +48,14 @@
   },
   "dependencies": {
     "@urql/core": ">=4.0.0",
-    "wonka": "^6.3.0"
+    "wonka": "^6.3.2"
   },
   "devDependencies": {
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }
