@@ -61,10 +61,7 @@ const client = new Client({
 });
 ```
 
-As we can see, typically it's recommended to set `preferGetForPersistedQueries` to `true` to force
-all persisted queries to use GET requests instead of POST so that CDNs can do their job.
-It does so by setting the `preferGetMethod` option to `'force'` when it's
-updating operations.
+As we can see, typically it's recommended to set `preferGetForPersistedQueries` to `true` to encourage persisted queries to use GET requests instead of POST so that CDNs can do their job. When set to `true` or `'within-url-limit'`, persisted queries will use GET requests if the resulting URL doesn't exceed the 2048 character limit.
 
 The `fetchExchange` can see the modifications that the `persistedExchange` is
 making to operations, and understands to leave out the `query` from any request

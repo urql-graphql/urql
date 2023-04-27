@@ -17,6 +17,7 @@ import {
   CombinedError,
   Exchange,
   Operation,
+  OperationContext,
 } from '@urql/core';
 
 import { hash } from './sha256';
@@ -29,19 +30,23 @@ const isPersistedUnsupported = (error: CombinedError): boolean =>
 
 /** Input parameters for the {@link persistedExchange}. */
 export interface PersistedExchangeOptions {
-  /** Enforces GET method requests to be made for Persisted Queries.
+  /** Controls whether GET method requests will be made for Persisted Queries.
    *
    * @remarks
-   * When enabled, the `persistedExchange` will set
+   * When set to `true` or `'within-url-limit'`, the `persistedExchange`
+   * will use GET requests on persisted queries when the request URL
+   * doesn't exceed the 2048 character limit.
+   *
+   * When set to `force`, the `persistedExchange` will set
    * `OperationContext.preferGetMethod` to `'force'` on persisted queries,
    * which will force requests to be made using a GET request.
    *
-   * This is frequently used to make GraphQL requests more cacheable
-   * on CDNs.
+   * GET requests are frequently used to make GraphQL requests more
+   * cacheable on CDNs.
    *
    * @defaultValue `true` - enabled
    */
-  preferGetForPersistedQueries?: boolean;
+  preferGetForPersistedQueries?: OperationContext['preferGetMethod'];
   /** Enforces non-automatic persisted queries by ignoring APQ errors.
    *
    * @remarks
@@ -118,7 +123,8 @@ export const persistedExchange =
   ({ forward }) => {
     if (!options) options = {};
 
-    const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
+    const preferGetForPersistedQueries =
+      options.preferGetForPersistedQueries ?? true;
     const enforcePersistedQueries = !!options.enforcePersistedQueries;
     const hashFn = options.generateHash || hash;
     const enableForMutation = !!options.enableForMutation;
@@ -159,11 +165,9 @@ export const persistedExchange =
                 sha256Hash,
               },
             };
-            if (
-              persistedOperation.kind === 'query' &&
-              preferGetForPersistedQueries
-            ) {
-              persistedOperation.context.preferGetMethod = 'force';
+            if (persistedOperation.kind === 'query') {
+              persistedOperation.context.preferGetMethod =
+                preferGetForPersistedQueries;
             }
           }
 
