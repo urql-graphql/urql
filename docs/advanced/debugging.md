@@ -133,7 +133,7 @@ custom exchanges:
 - ✅ **Create unique event types** : Key events should be easily identifiable and have a unique
   names.
 - ❌ **Don't listen to debug events inside your exchange**: While it's possible to call
-  `client.subscsubscribeToDebugTarget` in an exchange it's only valuable when creating a debugging
+  `client.subscribeToDebugTarget` in an exchange it's only valuable when creating a debugging
   exchange, like the `devtoolsExchange`.
 - ❌ **Don't send warnings in debug events**: Informing your user about warnings isn't effective
   when the event isn't seen. You should still rely on `console.warn` so all users see your important
