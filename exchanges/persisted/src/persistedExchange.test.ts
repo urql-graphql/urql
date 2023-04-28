@@ -119,20 +119,7 @@ it('retries query persisted query resulted in unsupported', async () => {
   expect(operations[2].extensions).toEqual(undefined);
 });
 
-it('sets `context.preferGetMethod` to `true` by default', async () => {
-  const { exchangeArgs } = makeExchangeArgs();
-
-  const res = await pipe(
-    fromValue(queryOperation),
-    persistedExchange()(exchangeArgs),
-    take(1),
-    toPromise
-  );
-
-  expect(res.operation.context.preferGetMethod).toBe(true);
-});
-
-it.each([true, false, 'force', 'within-url-limit'] as const)(
+it.each([true, 'force', 'within-url-limit'] as const)(
   'sets `context.preferGetMethod` to %s when `options.preferGetForPersistedQueries` is %s',
   async preferGetMethodValue => {
     const { exchangeArgs } = makeExchangeArgs();

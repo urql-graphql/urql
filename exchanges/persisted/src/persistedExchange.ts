@@ -44,7 +44,7 @@ export interface PersistedExchangeOptions {
    * GET requests are frequently used to make GraphQL requests more
    * cacheable on CDNs.
    *
-   * @defaultValue `true` - enabled
+   * @defaultValue `false` - disabled
    */
   preferGetForPersistedQueries?: OperationContext['preferGetMethod'];
   /** Enforces non-automatic persisted queries by ignoring APQ errors.
@@ -123,8 +123,7 @@ export const persistedExchange =
   ({ forward }) => {
     if (!options) options = {};
 
-    const preferGetForPersistedQueries =
-      options.preferGetForPersistedQueries ?? true;
+    const preferGetForPersistedQueries = options.preferGetForPersistedQueries;
     const enforcePersistedQueries = !!options.enforcePersistedQueries;
     const hashFn = options.generateHash || hash;
     const enableForMutation = !!options.enableForMutation;
@@ -165,7 +164,10 @@ export const persistedExchange =
                 sha256Hash,
               },
             };
-            if (persistedOperation.kind === 'query') {
+            if (
+              persistedOperation.kind === 'query' &&
+              preferGetForPersistedQueries
+            ) {
               persistedOperation.context.preferGetMethod =
                 preferGetForPersistedQueries;
             }
