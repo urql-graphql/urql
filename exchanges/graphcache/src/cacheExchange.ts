@@ -219,6 +219,7 @@ export const cacheExchange =
         : 'miss';
 
       results.set(operation.key, result.data);
+      operations.set(operation.key, operation);
       updateDependencies(operation, result.dependencies);
 
       return {
