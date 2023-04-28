@@ -9,10 +9,21 @@ export const initialState = {
   operation: undefined,
 };
 
-const isShallowDifferent = (a: any, b: any) => {
-  if (typeof a != 'object' || typeof b != 'object') return a !== b;
-  for (const x in a) if (!(x in b)) return true;
-  for (const x in b) if (a[x] !== b[x]) return true;
+/**
+ * Checks if two objects are shallowly different with a special case for
+ * 'operation' where it compares the key if they are not the otherwise equal
+ */
+const isShallowDifferent = <T extends Record<string, any>>(a: T, b: T) => {
+  for (const key in a) if (!(key in b)) return true;
+  for (const key in b) {
+    if (a[key] !== b[key]) {
+      // Two operations are considered equal if they have the same key
+      if (key === 'operation' && a.operation?.key === b.operation?.key) {
+        continue;
+      }
+      return true;
+    }
+  }
   return false;
 };
 
@@ -27,7 +38,7 @@ export const computeNextState = <T extends Stateish>(
   prevState: T,
   result: Partial<T>
 ): T => {
-  const newState = {
+  const newState: T = {
     ...prevState,
     ...result,
     data:

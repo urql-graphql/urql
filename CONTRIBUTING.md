@@ -75,7 +75,7 @@ There are multiple commands you can run in the root folder to test your changes:
 
 ```sh
 # TypeScript checks:
-pnpnm run check
+pnpm run check
 
 # Linting (prettier & eslint):
 pnpm run lint
