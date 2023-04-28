@@ -103,7 +103,7 @@ const app = createApp(Root);
 
 app.use(urql, {
   url: 'http://localhost:3000/graphql',
-  exchanges: [urql.cacheExchange, fetchExchange]
+  exchanges: [cacheExchange, fetchExchange]
 });
 
 app.mount('#app');
