@@ -151,11 +151,6 @@ export const offlineExchange =
       const flushQueue = () => {
         if (!isFlushingQueue) {
           isFlushingQueue = true;
-          if (!hasRehydrated) {
-            storage.onOnline!(flushQueue);
-            hasRehydrated = true;
-          }
-
           for (let i = 0; i < failedQueue.length; i++) {
             const operation = failedQueue[i];
             if (operation.kind === 'mutation')
@@ -174,6 +169,7 @@ export const offlineExchange =
           outerForward(ops$),
           filter(res => {
             if (
+              hasRehydrated &&
               res.operation.kind === 'mutation' &&
               isOfflineError(res.error, res) &&
               isOptimisticMutation(optimisticMutations, res.operation)
@@ -193,23 +189,26 @@ export const offlineExchange =
         ...opts,
         storage: {
           ...storage,
-          async readData() {
+          readData() {
             const hydrate = storage.readData();
-            const mutations = await storage.readMetadata!();
-            if (mutations) {
-              for (let i = 0; i < mutations.length; i++) {
-                failedQueue.push(
-                  client.createRequestOperation(
-                    'mutation',
-                    createRequest(mutations[i].query, mutations[i].variables),
-                    mutations[i].extensions
-                  )
-                );
-              }
-            }
-            return hydrate.finally(() => {
-              setTimeout(flushQueue);
-            });
+            return {
+              async then(onEntries) {
+                const mutations = await storage.readMetadata!();
+                for (let i = 0; mutations && i < mutations.length; i++) {
+                  failedQueue.push(
+                    client.createRequestOperation(
+                      'mutation',
+                      createRequest(mutations[i].query, mutations[i].variables),
+                      mutations[i].extensions
+                    )
+                  );
+                }
+                onEntries!(await hydrate);
+                storage.onOnline!(flushQueue);
+                hasRehydrated = true;
+                flushQueue();
+              },
+            };
           },
         },
       })({
