@@ -44,7 +44,7 @@ export interface PersistedExchangeOptions {
    * GET requests are frequently used to make GraphQL requests more
    * cacheable on CDNs.
    *
-   * @defaultValue `false` - disabled
+   * @defaultValue `undefined` - disabled
    */
   preferGetForPersistedQueries?: OperationContext['preferGetMethod'];
   /** Enforces non-automatic persisted queries by ignoring APQ errors.
