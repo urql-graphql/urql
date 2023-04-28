@@ -71,6 +71,7 @@ export const cacheExchange =
     const store = new Store<C>(opts);
 
     if (opts && opts.storage) {
+      store.data.hydrating = true;
       opts.storage.readData().then(entries => {
         hydrateData(store.data, opts!.storage!, entries);
       });
