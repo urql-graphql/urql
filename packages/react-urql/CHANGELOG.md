@@ -1,5 +1,12 @@
 # urql
 
+## 4.0.2
+
+### Patch Changes
+
+- Avoid unnecessary re-render when two components use the same query but receive unchanging results, due to differing operations
+  Submitted by [@nathan-knight](https://github.com/nathan-knight) (See [#3195](https://github.com/urql-graphql/urql/pull/3195))
+
 ## 4.0.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @urql/exchange-persisted-fetch
 
+## 4.0.0
+
+### Major Changes
+
+- Update the `preferGetForPersistedQueries` option to include the `'force'` and `'within-url-limit'` values from the Client's `preferGetMethod` option. The default value of `true` no longer sets `OperationContext`'s `preferGetMethod` setting to `'force'`. Instead, the value of `preferGetForPersistedQueries` carries through to the `OperationContext`'s `preferGetMethod` setting for persisted queries
+  Submitted by [@NWRichmond](https://github.com/NWRichmond) (See [#3192](https://github.com/urql-graphql/urql/pull/3192))
+
 ## 3.0.1
 
 ### Patch Changes
