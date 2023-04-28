@@ -43,7 +43,23 @@ by the urql GraphQL team.**
 
 If you'd like to get involved, [check out our Contributor's guide.](https://github.com/urql-graphql/urql/blob/main/CONTRIBUTING.md)
 
-## 📃 [Documentation](https://formidable.com/open-source/urql/docs/)
+## 📦 [Releases](https://github.com/urql-graphql/urql/releases)
+
+All new releases and updates are listed on GitHub with full changelogs. Each package in this
+repository further contains an independent `CHANGELOG.md` file with the historical changelog, for
+instance, [here’s `@urql/core`’s
+changelog](https://github.com/urql-graphql/urql/blob/main/packages/core/CHANGELOG.md).
+
+If you’re upgrading to v4, [check out our migration guide, posted as an
+issue.](https://github.com/urql-graphql/urql/issues/3114)
+
+New releases are prepared using
+[changesets](https://github.com/urql-graphql/urql/blob/main/CONTRIBUTING.md#how-do-i-document-a-change-for-the-changelog),
+which are changelog entries added to each PR, and we have “Version Packages” PRs that once merged
+will release new versions of `urql` packages. You can use `@canary` releases from `npm` if you’d
+like to get a preview of the merged changes.
+
+## 📃 [Documentation](https://urql.dev/goto/docs)
 
 The documentation contains everything you need to know about `urql`, and contains several sections in order of importance
 when you first get started:
@@ -53,6 +69,10 @@ when you first get started:
 - **[Advanced](https://formidable.com/open-source/urql/docs/advanced/)** — covers more uncommon use-cases and things you don't immediately need when getting started.
 - **[Graphcache](https://formidable.com/open-source/urql/docs/graphcache/)** — documents ["Normalized Caching" support](https://formidable.com/open-source/urql/docs/graphcache/normalized-caching/) which enables more complex apps and use-cases.
 - **[API](https://formidable.com/open-source/urql/docs/api/)** — the API documentation for each individual package.
+
+Furthermore, all APIs and packages are self-documented using TSDocs. If you’re using a language
+server for TypeScript, the documentation for each API should pop up in your editor when hovering
+`urql`’s code and APIs.
 
 _You can find the raw markdown files inside this repository's `docs` folder._
 
