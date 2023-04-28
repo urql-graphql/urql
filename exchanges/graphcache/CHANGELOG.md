@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.0.4
+
+### Patch Changes
+
+- ⚠️ Fix missing cache updates, when a query that was previously torn down restarts and retrieves results from the cache. In this case a regression caused cache updates to not be correctly applied to the queried results, since the operation wouldn’t be recognised properly
+  Submitted by [@kitten](https://github.com/kitten) (See [#3193](https://github.com/urql-graphql/urql/pull/3193))
+
 ## 6.0.3
 
 ### Patch Changes
