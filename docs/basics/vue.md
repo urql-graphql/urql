@@ -97,12 +97,13 @@ importing its default export and using it [as a plugin](https://v3.vuejs.org/gui
 ```js
 import { createApp } from 'vue';
 import Root from './App.vue';
-import urql from '@urql/vue';
+import urql, { cacheExchange, fetchExchange } from '@urql/vue';
 
 const app = createApp(Root);
 
 app.use(urql, {
   url: 'http://localhost:3000/graphql',
+  exchanges: [cacheExchange, fetchExchange]
 });
 
 app.mount('#app');
