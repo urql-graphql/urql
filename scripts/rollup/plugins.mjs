@@ -3,7 +3,6 @@ import * as React from 'react';
 
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import sucrase from '@rollup/plugin-sucrase';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import visualizer from 'rollup-plugin-visualizer';
@@ -36,10 +35,6 @@ export const makeBasePlugins = () => [
 
 export const makePlugins = () => [
   ...makeBasePlugins(),
-  sucrase({
-    exclude: ['node_modules/**'],
-    transforms: ['typescript']
-  }),
   babel({
     babelrc: false,
     babelHelpers: 'bundled',
@@ -47,6 +42,7 @@ export const makePlugins = () => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
+      '@babel/plugin-transform-typescript',
       '@babel/plugin-transform-block-scoping',
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
@@ -107,6 +103,7 @@ const terserPretty = terser({
     keep_fnames: true,
   },
   output: {
+    comments: false,
     beautify: true,
     braces: true,
     indent_level: 2

@@ -1,7 +1,8 @@
-import genPackageJson from 'rollup-plugin-generate-package-json';
 import dts from 'rollup-plugin-dts';
 
+import * as fs from 'fs/promises';
 import { relative, join, dirname, basename } from 'path';
+
 import { makePlugins, makeBasePlugins, makeOutputPlugins } from './plugins.mjs';
 import cleanup from './cleanup-plugin.mjs'
 import * as settings from './settings.mjs';
@@ -26,27 +27,29 @@ const input = settings.sources.reduce((acc, source) => {
   acc[source.name] = source.source;
   if (source.name !== settings.name) {
     const rel = relative(source.dir, process.cwd());
-    plugins.push(genPackageJson({
-      outputFolder: source.dir,
-      baseContents: {
-        name: source.name,
-        private: true,
-        version: '0.0.0',
-        main: join(rel, dirname(source.main), basename(source.main, '.js')),
-        module: join(rel, source.module),
-        types: join(rel, source.types),
-        source: join(rel, source.source),
-        exports: {
-          '.': {
-            import: join(rel, source.module),
-            require: join(rel, source.main),
-            types: join(rel, source.types),
-            source: join(rel, source.source),
+    plugins.push({
+      async writeBundle() {
+        await fs.mkdir(source.dir, { recursive: true });
+        await fs.writeFile(join(source.dir, 'package.json'), JSON.stringify({
+          name: source.name,
+          private: true,
+          version: '0.0.0',
+          main: join(rel, dirname(source.main), basename(source.main, '.js')),
+          module: join(rel, source.module),
+          types: join(rel, source.types),
+          source: join(rel, source.source),
+          exports: {
+            '.': {
+              import: join(rel, source.module),
+              require: join(rel, source.main),
+              types: join(rel, source.types),
+              source: join(rel, source.source),
+            },
+            './package.json': './package.json'
           },
-          './package.json': './package.json'
-        }
-      }
-    }));
+        }, null, 2));
+      },
+    });
   }
 
   return acc;
@@ -72,6 +75,7 @@ const output = ({ format, isProduction }) => {
     exports: 'named',
     sourcemap: true,
     sourcemapExcludeSources: false,
+    hoistTransitiveImports: false,
     indent: false,
     freeze: false,
     strict: false,
