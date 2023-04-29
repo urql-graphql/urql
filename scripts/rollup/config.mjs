@@ -72,6 +72,7 @@ const output = ({ format, isProduction }) => {
     exports: 'named',
     sourcemap: true,
     sourcemapExcludeSources: false,
+    hoistTransitiveImports: false,
     indent: false,
     freeze: false,
     strict: false,
