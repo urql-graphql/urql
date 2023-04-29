@@ -99,7 +99,6 @@
     "rollup": "^3.21.1",
     "rollup-plugin-cjs-check": "^1.0.2",
     "rollup-plugin-dts": "^5.3.0",
-    "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-visualizer": "^5.9.0",
     "tar": "^6.1.13",
     "terser": "^5.17.1",
