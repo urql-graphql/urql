@@ -151,11 +151,16 @@ export const offlineExchange =
       const flushQueue = () => {
         if (!isFlushingQueue) {
           isFlushingQueue = true;
+
+          const sent = new Set<number>();
           for (let i = 0; i < failedQueue.length; i++) {
             const operation = failedQueue[i];
-            if (operation.kind === 'mutation')
-              next(makeOperation('teardown', operation));
-            next(operation);
+            if (operation.kind === 'mutation' || !sent.has(operation.key)) {
+              if (operation.kind !== 'subscription')
+                next(makeOperation('teardown', operation));
+              sent.add(operation.key);
+              next(operation);
+            }
           }
 
           failedQueue.length = 0;
