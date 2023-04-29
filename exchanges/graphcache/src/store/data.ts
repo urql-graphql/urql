@@ -31,6 +31,8 @@ interface NodeMap<T> {
 }
 
 export interface InMemoryData {
+  /** Flag for whether the data is waiting for hydration */
+  hydrating: boolean;
   /** Flag for whether deferred tasks have been scheduled yet */
   defer: boolean;
   /** A list of entities that have been flagged for gargabe collection since no references to them are left */
@@ -109,7 +111,11 @@ export const initDataState = (
     // We don't create new layers for read operations and instead simply
     // apply the currently available layer, if any
     currentOptimisticKey = layerKey;
-  } else if (isOptimistic || data.optimisticOrder.length > 1) {
+  } else if (
+    isOptimistic ||
+    data.hydrating ||
+    data.optimisticOrder.length > 1
+  ) {
     // If this operation isn't optimistic and we see it for the first time,
     // then it must've been optimistic in the past, so we can proactively
     // clear the optimistic data before writing
@@ -155,7 +161,11 @@ export const clearDataState = () => {
   currentOptimisticKey = null;
 
   // Determine whether the current operation has been a commutative layer
-  if (layerKey && data.optimisticOrder.indexOf(layerKey) > -1) {
+  if (
+    !data.hydrating &&
+    layerKey &&
+    data.optimisticOrder.indexOf(layerKey) > -1
+  ) {
     // Squash all layers in reverse order (low priority upwards) that have
     // been written already
     let i = data.optimisticOrder.length;
@@ -217,6 +227,7 @@ export const getCurrentDependencies = (): Dependencies => {
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
+  hydrating: false,
   defer: false,
   gc: new Set(),
   persist: new Set(),
@@ -634,6 +645,7 @@ export const hydrateData = (
     }
   }
 
-  clearDataState();
   data.storage = storage;
+  data.hydrating = false;
+  clearDataState();
 };

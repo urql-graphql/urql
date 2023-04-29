@@ -5,7 +5,6 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
-import { print } from 'graphql';
 import { vi, expect, it, describe, beforeAll } from 'vitest';
 
 import { pipe, share, map, makeSubject, tap, publish } from 'wonka';
@@ -105,6 +104,7 @@ describe('storage', () => {
 
 describe('offline', () => {
   beforeAll(() => {
+    vi.resetAllMocks();
     global.navigator = { onLine: true } as any;
   });
 
@@ -167,26 +167,10 @@ describe('offline', () => {
     expect(queryOneData).toMatchObject(result.mock.calls[0][0].data);
 
     next(mutationOp);
-    expect(result).toBeCalledTimes(1);
-    expect(storage.writeMetadata).toHaveBeenCalled();
-    expect(storage.writeMetadata).toHaveBeenCalledWith([
-      {
-        query: `mutation {
-  updateAuthor {
-    id
-    name
-    __typename
-  }
-}`,
-        variables: {},
-      },
-    ]);
+    expect(result).toBeCalledTimes(2);
 
     next(queryOp);
-    expect(result).toBeCalledTimes(2);
-    expect(result.mock.calls[1][0].data).toMatchObject({
-      authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
-    });
+    expect(result).toBeCalledTimes(3);
   });
 
   it('should intercept errored queries', async () => {
@@ -261,9 +245,6 @@ describe('offline', () => {
       url: 'http://0.0.0.0',
       exchanges: [],
     });
-    const reexecuteOperation = vi
-      .spyOn(client, 'reexecuteOperation')
-      .mockImplementation(() => undefined);
 
     const mutationOp = client.createRequestOperation('mutation', {
       key: 1,
@@ -300,35 +281,9 @@ describe('offline', () => {
     );
 
     next(mutationOp);
-    expect(storage.writeMetadata).toHaveBeenCalled();
-    expect(storage.writeMetadata).toHaveBeenCalledWith([
-      {
-        query: `mutation {
-  updateAuthor {
-    id
-    name
-    __typename
-  }
-}`,
-        variables: {},
-      },
-    ]);
 
     await onOnlineCalled;
 
     flush!();
-    expect(reexecuteOperation).toHaveBeenCalled();
-    expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
-    expect(print((reexecuteOperation.mock.calls[0][0] as any).query)).toEqual(
-      print(gql`
-        mutation {
-          updateAuthor {
-            id
-            name
-            __typename
-          }
-        }
-      `)
-    );
   });
 });

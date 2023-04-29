@@ -1,4 +1,4 @@
-import { pipe, share, merge, makeSubject, filter } from 'wonka';
+import { pipe, share, merge, makeSubject, filter, onPush } from 'wonka';
 import { SelectionNode } from '@0no-co/graphql.web';
 
 import {
@@ -128,36 +128,35 @@ export const offlineExchange =
       const { source: reboundOps$, next } = makeSubject<Operation>();
       const optimisticMutations = opts.optimistic || {};
       const failedQueue: Operation[] = [];
+      let hasRehydrated = false;
+      let isFlushingQueue = false;
 
       const updateMetadata = () => {
-        const requests: SerializedRequest[] = [];
-        for (let i = 0; i < failedQueue.length; i++) {
-          const operation = failedQueue[i];
-          if (operation.kind === 'mutation') {
-            requests.push({
-              query: stringifyDocument(operation.query),
-              variables: operation.variables,
-              extensions: operation.extensions,
-            });
-          }
-        }
-        storage.writeMetadata!(requests);
-      };
-
-      let isFlushingQueue = false;
-      const flushQueue = () => {
-        if (!isFlushingQueue) {
-          isFlushingQueue = true;
-
+        if (hasRehydrated) {
+          const requests: SerializedRequest[] = [];
           for (let i = 0; i < failedQueue.length; i++) {
             const operation = failedQueue[i];
             if (operation.kind === 'mutation') {
-              next(makeOperation('teardown', operation));
+              requests.push({
+                query: stringifyDocument(operation.query),
+                variables: operation.variables,
+                extensions: operation.extensions,
+              });
             }
           }
+          storage.writeMetadata!(requests);
+        }
+      };
 
-          for (let i = 0; i < failedQueue.length; i++)
-            client.reexecuteOperation(failedQueue[i]);
+      const flushQueue = () => {
+        if (!isFlushingQueue) {
+          isFlushingQueue = true;
+          for (let i = 0; i < failedQueue.length; i++) {
+            const operation = failedQueue[i];
+            if (operation.kind === 'mutation')
+              next(makeOperation('teardown', operation));
+            next(operation);
+          }
 
           failedQueue.length = 0;
           isFlushingQueue = false;
@@ -170,6 +169,7 @@ export const offlineExchange =
           outerForward(ops$),
           filter(res => {
             if (
+              hasRehydrated &&
               res.operation.kind === 'mutation' &&
               isOfflineError(res.error, res) &&
               isOptimisticMutation(optimisticMutations, res.operation)
@@ -185,31 +185,30 @@ export const offlineExchange =
         );
       };
 
-      storage
-        .readMetadata()
-        .then(mutations => {
-          if (mutations) {
-            for (let i = 0; i < mutations.length; i++) {
-              failedQueue.push(
-                client.createRequestOperation(
-                  'mutation',
-                  createRequest(mutations[i].query, mutations[i].variables),
-                  mutations[i].extensions
-                )
-              );
-            }
-
-            flushQueue();
-          }
-        })
-        .finally(() => storage.onOnline!(flushQueue));
-
       const cacheResults$ = cacheExchange({
         ...opts,
         storage: {
           ...storage,
           readData() {
-            return storage.readData().finally(flushQueue);
+            const hydrate = storage.readData();
+            return {
+              async then(onEntries) {
+                const mutations = await storage.readMetadata!();
+                for (let i = 0; mutations && i < mutations.length; i++) {
+                  failedQueue.push(
+                    client.createRequestOperation(
+                      'mutation',
+                      createRequest(mutations[i].query, mutations[i].variables),
+                      mutations[i].extensions
+                    )
+                  );
+                }
+                onEntries!(await hydrate);
+                storage.onOnline!(flushQueue);
+                hasRehydrated = true;
+                flushQueue();
+              },
+            };
           },
         },
       })({
@@ -219,7 +218,17 @@ export const offlineExchange =
       });
 
       return operations$ => {
-        const opsAndRebound$ = merge([reboundOps$, operations$]);
+        const opsAndRebound$ = merge([
+          reboundOps$,
+          pipe(
+            operations$,
+            onPush(operation => {
+              if (operation.kind === 'query' && !hasRehydrated) {
+                failedQueue.push(operation);
+              }
+            })
+          ),
+        ]);
 
         return pipe(
           cacheResults$(opsAndRebound$),
@@ -232,7 +241,6 @@ export const offlineExchange =
               failedQueue.push(res.operation);
               return false;
             }
-
             return true;
           })
         );
