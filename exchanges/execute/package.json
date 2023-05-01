@@ -25,9 +25,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-execute.d.ts",
       "import": "./dist/urql-exchange-execute.mjs",
       "require": "./dist/urql-exchange-execute.js",
-      "types": "./dist/urql-exchange-execute.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

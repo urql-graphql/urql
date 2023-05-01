@@ -23,9 +23,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-persisted.d.ts",
       "import": "./dist/urql-exchange-persisted.mjs",
       "require": "./dist/urql-exchange-persisted.js",
-      "types": "./dist/urql-exchange-persisted.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

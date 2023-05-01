@@ -24,16 +24,16 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-core.d.ts",
       "import": "./dist/urql-core.mjs",
       "require": "./dist/urql-core.js",
-      "types": "./dist/urql-core.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json",
     "./internal": {
+      "types": "./dist/urql-core-internal.d.ts",
       "import": "./dist/urql-core-internal.mjs",
       "require": "./dist/urql-core-internal.js",
-      "types": "./dist/urql-core-internal.d.ts",
       "source": "./src/internal/index.ts"
     }
   },

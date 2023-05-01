@@ -25,9 +25,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-vue.d.ts",
       "import": "./dist/urql-vue.mjs",
       "require": "./dist/urql-vue.js",
-      "types": "./dist/urql-vue.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

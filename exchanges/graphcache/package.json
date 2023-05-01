@@ -25,22 +25,22 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-graphcache.d.ts",
       "import": "./dist/urql-exchange-graphcache.mjs",
       "require": "./dist/urql-exchange-graphcache.js",
-      "types": "./dist/urql-exchange-graphcache.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json",
     "./extras": {
+      "types": "./dist/urql-exchange-graphcache-extras.d.ts",
       "import": "./dist/urql-exchange-graphcache-extras.mjs",
       "require": "./dist/urql-exchange-graphcache-extras.js",
-      "types": "./dist/urql-exchange-graphcache-extras.d.ts",
       "source": "./src/extras/index.ts"
     },
     "./default-storage": {
+      "types": "./dist/urql-exchange-graphcache-default-storage.d.ts",
       "import": "./dist/urql-exchange-graphcache-default-storage.mjs",
       "require": "./dist/urql-exchange-graphcache-default-storage.js",
-      "types": "./dist/urql-exchange-graphcache-default-storage.d.ts",
       "source": "./src/default-storage/index.ts"
     }
   },
