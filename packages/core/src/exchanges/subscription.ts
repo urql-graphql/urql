@@ -186,20 +186,22 @@ export const subscriptionExchange =
         };
       });
     };
+
     const isSubscriptionOperationFn =
       isSubscriptionOperation ||
-      (operation => {
-        const { kind } = operation;
-        return (
-          kind === 'subscription' ||
-          (!!enableAllOperations && (kind === 'query' || kind === 'mutation'))
-        );
-      });
+      (operation =>
+        operation.kind === 'subscription' ||
+        (!!enableAllOperations &&
+          (operation.kind === 'query' || operation.kind === 'mutation')));
 
     return ops$ => {
       const subscriptionResults$ = pipe(
         ops$,
-        filter(isSubscriptionOperationFn),
+        filter(
+          operation =>
+            operation.kind !== 'teardown' &&
+            isSubscriptionOperationFn(operation)
+        ),
         mergeMap(operation => {
           const { key } = operation;
           const teardown$ = pipe(
@@ -216,7 +218,11 @@ export const subscriptionExchange =
 
       const forward$ = pipe(
         ops$,
-        filter(op => !isSubscriptionOperationFn(op)),
+        filter(
+          operation =>
+            operation.kind === 'teardown' ||
+            !isSubscriptionOperationFn(operation)
+        ),
         forward
       );
 
