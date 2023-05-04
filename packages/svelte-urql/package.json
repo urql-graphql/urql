@@ -25,9 +25,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-svelte.d.ts",
       "import": "./dist/urql-svelte.mjs",
       "require": "./dist/urql-svelte.js",
-      "types": "./dist/urql-svelte.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

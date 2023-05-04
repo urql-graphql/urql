@@ -22,9 +22,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-populate.d.ts",
       "import": "./dist/urql-exchange-populate.mjs",
       "require": "./dist/urql-exchange-populate.js",
-      "types": "./dist/urql-exchange-populate.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

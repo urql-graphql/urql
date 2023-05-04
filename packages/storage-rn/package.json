@@ -32,9 +32,9 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/urql-storage-rn.d.ts",
       "import": "./dist/urql-storage-rn.mjs",
       "require": "./dist/urql-storage-rn.js",
-      "types": "./dist/urql-storage-rn.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

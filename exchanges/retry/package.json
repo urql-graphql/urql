@@ -24,9 +24,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-retry.d.ts",
       "import": "./dist/urql-exchange-retry.mjs",
       "require": "./dist/urql-exchange-retry.js",
-      "types": "./dist/urql-exchange-retry.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

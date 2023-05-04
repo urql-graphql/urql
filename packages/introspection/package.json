@@ -23,9 +23,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-introspection.d.ts",
       "import": "./dist/urql-introspection.mjs",
       "require": "./dist/urql-introspection.js",
-      "types": "./dist/urql-introspection.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

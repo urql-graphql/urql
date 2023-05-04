@@ -24,9 +24,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-request-policy.d.ts",
       "import": "./dist/urql-exchange-request-policy.mjs",
       "require": "./dist/urql-exchange-request-policy.js",
-      "types": "./dist/urql-exchange-request-policy.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

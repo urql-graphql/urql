@@ -25,9 +25,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-preact.d.ts",
       "import": "./dist/urql-preact.mjs",
       "require": "./dist/urql-preact.js",
-      "types": "./dist/urql-preact.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

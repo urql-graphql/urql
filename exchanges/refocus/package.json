@@ -25,9 +25,9 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
+      "types": "./dist/urql-exchange-refocus.d.ts",
       "import": "./dist/urql-exchange-refocus.mjs",
       "require": "./dist/urql-exchange-refocus.js",
-      "types": "./dist/urql-exchange-refocus.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"
