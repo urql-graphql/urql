@@ -12,9 +12,9 @@
     "url": "https://github.com/urql-graphql/urql.git",
     "directory": "packages/next-urql"
   },
-  "main": "dist/next-urql.js",
-  "module": "dist/next-urql.es.js",
-  "types": "dist/next-urql.d.ts",
+  "main": "dist/urql-next.js",
+  "module": "dist/urql-next.es.js",
+  "types": "dist/urql-next.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
@@ -25,9 +25,9 @@
     },
     "./package.json": "./package.json",
     "./rsc": {
-      "types": "./dist/rsc.d.ts",
-      "import": "./dist/rsc.mjs",
-      "require": "./dist/rsc.js",
+      "types": "./dist/urql-next-rsc.d.ts",
+      "import": "./dist/urql-next-rsc.mjs",
+      "require": "./dist/urql-next-rsc.js",
       "source": "./src/rsc.ts"
     }
   },

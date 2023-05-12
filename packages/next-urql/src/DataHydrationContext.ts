@@ -25,10 +25,10 @@ export const DataHydrationContextProvider = ({
       dataHydrationContext.current = buildContext();
   }
 
-  return (
-    <DataHydrationContext.Provider value={dataHydrationContext.current}>
-      {children}
-    </DataHydrationContext.Provider>
+  return React.createElement(
+    DataHydrationContext.Provider,
+    { value: dataHydrationContext.current },
+    children
   );
 };
 
@@ -40,7 +40,9 @@ export function useDataHydrationContext(): DataHydrationValue | undefined {
 
   if (insertHtml && dataHydrationContext && !dataHydrationContext.isInjecting) {
     dataHydrationContext.isInjecting = true;
-    insertHtml(() => <dataHydrationContext.RehydrateScript />);
+    insertHtml(() =>
+      React.createElement(dataHydrationContext.RehydrateScript, {})
+    );
   }
   return dataHydrationContext;
 }
@@ -52,7 +54,7 @@ function buildContext(): DataHydrationValue {
     RehydrateScript() {
       dataHydrationContext.isInjecting = false;
       if (!Object.keys(dataHydrationContext.operationValuesByKey).length)
-        return <></>;
+        return React.createElement(React.Fragment);
 
       const __html = transportDataToJS({
         rehydrate: { ...dataHydrationContext.operationValuesByKey },
@@ -60,14 +62,9 @@ function buildContext(): DataHydrationValue {
 
       dataHydrationContext.operationValuesByKey = {};
 
-      return (
-        <script
-          key={Math.random()}
-          dangerouslySetInnerHTML={{
-            __html,
-          }}
-        />
-      );
+      return React.createElement('script', {
+        dangerouslySetInnerHTML: { __html },
+      });
     },
   };
 

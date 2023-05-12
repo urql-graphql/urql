@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useDataHydrationContext } from './DataHydrationContext';
-import { ssrContext } from './Provider';
+import { SSRContext } from './Provider';
 
 export const symbolString = 'urql_transport';
 export const urqlTransportSymbol = Symbol.for(symbolString);
@@ -11,7 +11,7 @@ export function useUrqlValue(
   operationKey: number,
   value?: { data: any; error: any }
 ): void {
-  const ssrExchange = React.useContext(ssrContext);
+  const ssrExchange = React.useContext(SSRContext);
   const rehydrationContext = useDataHydrationContext();
 
   if (!ssrExchange) {
