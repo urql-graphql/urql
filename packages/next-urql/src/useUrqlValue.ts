@@ -27,12 +27,14 @@ export function useUrqlValue(
       []) as unknown as Array<{
       rehydrate: Record<number, { data: any; error: any }>;
     }>;
+
     const store = stores.find(
       x => x && x.rehydrate && x.rehydrate[operationKey]
     );
     if (store) {
       const result = store.rehydrate && store.rehydrate[operationKey];
       if (result) {
+        delete store.rehydrate[operationKey];
         ssrExchange.restoreData({
           [operationKey]: {
             data: JSON.stringify(result.data),

@@ -52,6 +52,7 @@ export function useDataHydrationContext(): DataHydrationValue | undefined {
   return dataHydrationContext;
 }
 
+let key = 0;
 function buildContext(): DataHydrationValue {
   const dataHydrationContext: DataHydrationValue = {
     isInjecting: false,
@@ -68,6 +69,7 @@ function buildContext(): DataHydrationValue {
       dataHydrationContext.operationValuesByKey = {};
 
       return React.createElement('script', {
+        key: key++,
         dangerouslySetInnerHTML: { __html },
       });
     },
