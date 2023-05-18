@@ -177,254 +177,154 @@ we'll have to import from. `preact-ssr-prepass`.
 ## Next.js
 
 If you're using [Next.js](https://nextjs.org/) you can save yourself a lot of work by using
-`next-urql`. The `next-urql` package includes setup for `react-ssr-prepass` already, which automates
-a lot of the complexity of setting up server-side rendering with `urql`.
+`@urql/next`. The `@urql/next` package is set to work with Next 13.
 
-We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/urql-graphql/urql/tree/main/packages/next-urql)
-this integration contains convenience methods specifically for `Next.js`.
-These will simplify the above setup for SSR.
-
-To set up `next-urql`, first we'll install `next-urql` with `react-is` and `urql` as
+To set up `@urql/next`, first we'll install `@urql/next` and `urql` as
 peer dependencies:
 
 ```sh
-yarn add next-urql react-is urql graphql
+yarn add @urql/next urql graphql
 # or
-npm install --save next-urql react-is urql graphql
+npm install --save @urql/next urql graphql
 ```
 
-The peer dependency on `react-is` is inherited from `react-ssr-prepass` requiring it.
+We now have two ways to leverage `@urql/next`, one being part of a Server component
+or being part of the general `app/` folder.
 
-Note that if you are using Next before v9.4 you'll need to polyfill fetch, this can be
-done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch).
+In a server component we will import from `@urql/next/rsc`
 
-We're now able to wrap any page or `_app.js` using the `withUrqlClient` higher-order component. If
-we wrap `_app.js` we won't have to wrap any individual page.
-
-```js
-// pages/index.js
+```ts
+// app/page.tsx
 import React from 'react';
 import Head from 'next/head';
-import { useQuery } from 'urql';
-import { withUrqlClient } from 'next-urql';
+import { cacheExchange, createClient, fetchExchange, gql } from '@urql/core';
+import { registerUrql } from '@urql/next/rsc';
 
-const Index = () => {
-  const [result] = useQuery({
-    query: '{ test }',
+const makeClient = () => {
+  return createClient({
+    url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+    exchanges: [cacheExchange, fetchExchange],
   });
-
-  // ...
 };
 
-export default withUrqlClient((_ssrExchange, ctx) => ({
-  // ...add your Client options here
-  url: 'http://localhost:3000/graphql',
-}))(Index);
+const { getClient } = registerUrql(makeClient);
+
+export default async function Home() {
+  const result = await getClient().query(PokemonsQuery, {});
+  return (
+    <main>
+      <h1>This is rendered as part of an RSC</h1>
+      <ul>
+        {result.data.pokemons.map((x: any) => (
+          <li key={x.id}>{x.name}</li>
+        ))}
+      </ul>
+    </main>
+  );
+}
 ```
 
-The `withUrqlClient` higher-order component function accepts the usual `Client` options as
-an argument. This may either just be an object, or a function that receives the Next.js'
-`getInitialProps` context.
+When we aren't leveraging server components we will import the things we will
+need to do a bit more setup, we go to the `client` component's layout file and
+structure it as the following.
 
-One added caveat is that these options may not include the `exchanges` option because `next-urql`
-injects the `ssrExchange` automatically at the right location. If you're setting up custom exchanges
-you'll need to instead provide them in the `exchanges` property of the returned client object.
+```tsx
+// app/client/layout.tsx
+import { UrqlProvider, ssrExchange, cacheExchange, fetchExchange, createClient } from '@urql/next';
 
-```js
-import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+const ssr = ssrExchange();
+const client = createClient({
+  url: 'https://trygql.formidable.dev/graphql/web-collections',
+  exchanges: [cacheExchange, ssr, fetchExchange],
+});
 
-import { withUrqlClient } from 'next-urql';
-
-export default withUrqlClient(ssrExchange => ({
-  url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
-}))(Index);
+export default function Layout({ children }: React.PropsWithChildren) {
+  return (
+    <UrqlProvider client={client} ssr={ssr}>
+      {children}
+    </UrqlProvider>
+  );
+}
 ```
 
-Unless the component that is being wrapped already has a `getInitialProps` method, `next-urql` won't add its own SSR logic, which automatically fetches queries during
-server-side rendering. This can be explicitly enabled by passing the `{ ssr: true }` option as a second argument to `withUrqlClient`.
+It is important that we pas both a client as well as the `ssrExchange` to the `Provider`
+this way we will be able to restore the data that Next streams to the client later on
+when we are hydrating.
 
-When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`, you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
-During the prepass of your component tree `next-urql` can't know how these functions will alter the props passed to your page component. This injection
-could change the `variables` used in your `useQuery`. This will lead to error being thrown during the subsequent `toString` pass, which isn't supported in React 16.
+The next step is to query data in your client components by means of the `useQuery`
+method defined in `@urql/next`.
 
-### SSR with { ssr: true }
+```tsx
+// app/client/page.tsx
+'use client';
 
-The `withUrqlClient` only wraps our component tree with the context provider by default.
-To enable SSR, the easiest way is specifying the `{ ssr: true }` option as a second
-argument to `withUrqlClient`:
+import Link from 'next/link';
+import { Suspense } from 'react';
+import { useQuery, gql } from '@urql/next';
 
-```js
-import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+export default function Page() {
+  return (
+    <Suspense>
+      <Pokemons />
+    </Suspense>
+  );
+}
 
-import { withUrqlClient } from 'next-urql';
-
-export default withUrqlClient(
-  ssrExchange => ({
-    url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
-  }),
-  { ssr: true } // Enables server-side rendering using `getInitialProps`
-)(Index);
-```
-
-Be aware that wrapping the `_app` component using `withUrqlClient` with the `{ ssr: true }`
-option disables Next's ["Automatic Static
-Optimization"](https://nextjs.org/docs/advanced-features/automatic-static-optimization) for
-**all our pages**. It is thus preferred to enable server-side rendering on a per-page basis.
-
-### SSR with getStaticProps or getServerSideProps
-
-Enabling server-side rendering using `getStaticProps` and `getServerSideProps` is a little
-more involved, but has two major benefits:
-
-1. allows **direct schema execution** for performance optimisation
-2. allows performing extra operations in those functions
-
-To make the functions work with the `withUrqlClient` wrapper, return the `urqlState` prop
-with the extracted data from the `ssrExchange`:
-
-```js
-import { withUrqlClient, initUrqlClient } from 'next-urql';
-import { ssrExchange, dedupExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
-
-const TODOS_QUERY = `
-  query { todos { id text } }
+const PokemonsQuery = gql`
+  query {
+    pokemons(limit: 10) {
+      id
+      name
+    }
+  }
 `;
 
-function Todos() {
-  const [res] = useQuery({ query: TODOS_QUERY });
+function Pokemons() {
+  const [result] = useQuery({ query: PokemonsQuery });
   return (
-    <div>
-      {res.data.todos.map(todo => (
-        <div key={todo.id}>
-          {todo.id} - {todo.text}
-        </div>
-      ))}
-    </div>
+    <main>
+      <h1>This is rendered as part of SSR</h1>
+      <ul>
+        {result.data.pokemons.map((x: any) => (
+          <li key={x.id}>{x.name}</li>
+        ))}
+      </ul>
+    </main>
   );
 }
+```
 
-export async function getStaticProps(ctx) {
-  const ssrCache = ssrExchange({ isClient: false });
-  const client = initUrqlClient(
-    {
-      url: 'your-url',
-      exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
-    },
-    false
-  );
+The data queried in the above component will be rendered on the server
+and re-hydrated back on the client. When using multiple Suspense boundaries
+these will also get flushed as they complete and re-hydrated.
 
-  // This query is used to populate the cache for the query
-  // used on this page.
-  await client.query(TODOS_QUERY).toPromise();
+> When data is used throughout the application we advise against
+> rendering this as part of a server-component so you can benefit
+> from the client-side cache.
 
-  return {
-    props: {
-      // urqlState is a keyword here so withUrqlClient can pick it up.
-      urqlState: ssrCache.extractData(),
-    },
-    revalidate: 600,
+### Invalidating data from a server-component
+
+When data is rendered by a server component but you dispatch a mutation
+from a client component the server won't automatically know that the
+server-component on the client needs refreshing. You can forcefully
+tell the server to do so by using the Next router and calling `.refresh()`.
+
+```tsx
+import { useRouter } from 'next/router';
+
+const Todo = () => {
+  const router = useRouter();
+  const executeMutation = async () => {
+    await updateTodo();
+    router.refresh();
   };
-}
-
-export default withUrqlClient(
-  ssr => ({
-    url: 'your-url',
-  })
-  // Cannot specify { ssr: true } here so we don't wrap our component in getInitialProps
-)(Todos);
+};
 ```
 
-The above example will make sure the page is rendered as a static-page, It's important that
-you fully pre-populate your cache so in our case we were only interested in getting our todos,
-if there are child components relying on data you'll have to make sure these are fetched as well.
+### Disabling RSC fetch caching
 
-The `getServerSideProps` and `getStaticProps` functions only run on the **server-side** — any
-code used in them is automatically stripped away from the client-side bundle using the
-[next-code-elimination tool](https://next-code-elimination.vercel.app/). This allows **executing
-our schema directly** using `@urql/exchange-execute` if we have access to our GraphQL server:
-
-```js
-import { withUrqlClient, initUrqlClient } from 'next-urql';
-import { ssrExchange, dedupExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
-import { executeExchange } from '@urql/exchange-execute';
-
-import { schema } from '@/server/graphql'; // our GraphQL server's executable schema
-
-const TODOS_QUERY = `
-  query { todos { id text } }
-`;
-
-function Todos() {
-  const [res] = useQuery({ query: TODOS_QUERY });
-  return (
-    <div>
-      {res.data.todos.map(todo => (
-        <div key={todo.id}>
-          {todo.id} - {todo.text}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export async function getServerSideProps(ctx) {
-  const ssrCache = ssrExchange({ isClient: false });
-  const client = initUrqlClient(
-    {
-      url: '', // not needed without `fetchExchange`
-      exchanges: [
-        dedupExchange,
-        cacheExchange,
-        ssrCache,
-        executeExchange({ schema }), // replaces `fetchExchange`
-      ],
-    },
-    false
-  );
-
-  await client.query(TODOS_QUERY).toPromise();
-
-  return {
-    props: {
-      urqlState: ssrCache.extractData(),
-    },
-  };
-}
-
-export default withUrqlClient(ssr => ({
-  url: 'your-url',
-}))(Todos);
-```
-
-Direct schema execution skips one network round trip by accessing your resolvers directly
-instead of performing a `fetch` API call.
-
-### Stale While Revalidate
-
-If we choose to use Next's static site generation (SSG or ISG) we may be embedding data in our initial payload that's stale on the client. In this case, we may want to update this data immediately after rehydration.
-We can pass `staleWhileRevalidate: true` to `withUrqlClient`'s second option argument to Switch it to a mode where it'll refresh its rehydrated data immediately by issuing another network request.
-
-```js
-export default withUrqlClient(
-  ssr => ({
-    url: 'your-url',
-  }),
-  { staleWhileRevalidate: true }
-)(...);
-```
-
-Now, although on rehydration we'll receive the stale data from our `ssrExchange` first, it'll also immediately issue another `network-only` operation to update the data.
-During this revalidation our stale results will be marked using `result.stale`. While this is similar to what we see with `cache-and-network` without server-side rendering, it isn't quite the same. Changing the request policy wouldn't actually refetch our data on rehydration as the `ssrExchange` is simply a replacement of a full network request. Hence, this flag allows us to treat this case separately.
-
-### Resetting the client instance
-
-In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this
-is an uncommon scenario, and we consider it "unsafe" so evaluate this carefully for yourself.
-
-When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetUrqlClient`
-property, when invoked this will create a new top-level client and reset all prior operations.
+You can pass `fetchOptions: { cache: "no-store" }` to the `createClient`
+constructor to avoid running into cached fetches with server-components.
 
 ## Vue Suspense
 
