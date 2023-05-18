@@ -64,7 +64,7 @@ const output = ({ format, isProduction }) => {
     throw new Error('Invalid option `format` at output({ ... })');
 
   let extension = format === 'esm'
-    ? (settings.hasReact ? '.es.js' : '.mjs')
+    ? (settings.hasReact && !settings.hasNext ? '.es.js' : '.mjs')
     : '.js';
   if (isProduction) {
     extension = '.min' + extension;

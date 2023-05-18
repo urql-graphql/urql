@@ -55,7 +55,7 @@ invariant(
   'package.json:source must exist'
 );
 
-if (hasReact) {
+if (hasReact && !hasNext) {
   invariant(
     is(pkg.main, path.join('dist', `${name}.js`)),
     'package.json:main path must end in `.js` for packages depending on React.'

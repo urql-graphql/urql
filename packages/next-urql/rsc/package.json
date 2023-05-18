@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "main": "../dist/urql-next-rsc",
-  "module": "../dist/urql-next-rsc.es.js",
+  "module": "../dist/urql-next-rsc.mjs",
   "types": "../dist/urql-next-rsc.d.ts",
   "source": "../src/rsc.ts",
   "exports": {
     ".": {
-      "import": "../dist/urql-next-rsc.es.js",
+      "import": "../dist/urql-next-rsc.mjs",
       "require": "../dist/urql-next-rsc.js",
       "types": "../dist/urql-next-rsc.d.ts",
       "source": "../src/rsc.ts"
