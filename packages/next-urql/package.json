@@ -19,14 +19,14 @@
   "exports": {
     ".": {
       "types": "./dist/urql-next.d.ts",
-      "import": "./dist/urql-next.mjs",
+      "import": "./dist/urql-next.es.js",
       "require": "./dist/urql-next.js",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json",
     "./rsc": {
       "types": "./dist/urql-next-rsc.d.ts",
-      "import": "./dist/urql-next-rsc.mjs",
+      "import": "./dist/urql-next-rsc.es.js",
       "require": "./dist/urql-next-rsc.js",
       "source": "./src/rsc.ts"
     }
@@ -35,6 +35,7 @@
     "LICENSE",
     "CHANGELOG.md",
     "README.md",
+    "rsc/",
     "dist/"
   ],
   "scripts": {

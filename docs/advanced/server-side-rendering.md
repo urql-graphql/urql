@@ -230,6 +230,8 @@ structure it as the following.
 
 ```tsx
 // app/client/layout.tsx
+'use client';
+
 import { UrqlProvider, ssrExchange, cacheExchange, fetchExchange, createClient } from '@urql/next';
 
 const ssr = ssrExchange();
