@@ -7,10 +7,9 @@ import { SSRContext } from './Provider';
 export const symbolString = 'urql_transport';
 export const urqlTransportSymbol = Symbol.for(symbolString);
 
-export function useUrqlValue(
-  operationKey: number,
-  value?: { data: any; error: any }
-): void {
+export type UrqlResult = { data: any; error: any };
+
+export function useUrqlValue(operationKey: number, value?: UrqlResult): void {
   const ssrExchange = React.useContext(SSRContext);
   const rehydrationContext = useDataHydrationContext();
 
@@ -25,7 +24,7 @@ export function useUrqlValue(
   } else {
     const stores = (window[urqlTransportSymbol as any] ||
       []) as unknown as Array<{
-      rehydrate: Record<number, { data: any; error: any }>;
+      rehydrate: Record<number, UrqlResult>;
     }>;
 
     const store = stores.find(

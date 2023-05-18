@@ -15,7 +15,6 @@ export const useQuery: typeof orig_useQuery = args => {
 
   const transported: any = {};
   for (const key of transportKeys) {
-    // @ts-ignore
     transported[key] = result[key];
   }
 

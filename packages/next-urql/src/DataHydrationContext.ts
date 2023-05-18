@@ -1,9 +1,10 @@
 import React from 'react';
 import { ServerInsertedHTMLContext } from 'next/navigation';
+import { UrqlResult } from './useUrqlValue';
 
 interface DataHydrationValue {
   isInjecting: boolean;
-  operationValuesByKey: Record<number, { data: any; error: any }>;
+  operationValuesByKey: Record<number, UrqlResult>;
   RehydrateScript: () =>
     | React.DetailedReactHTMLElement<
         { dangerouslySetInnerHTML: { __html: string } },
