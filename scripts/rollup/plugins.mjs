@@ -69,13 +69,13 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
     cjsCheck({ extension }),
-    banner(),
     cleanup(),
     isProduction ? terserMinified : (extension !== '.js' ? terserPretty : null),
     isProduction && settings.isAnalyze && visualizer({
       filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
       sourcemap: true,
     }),
+    banner(),
   ].filter(Boolean);
 };
 
