@@ -4,7 +4,12 @@ import { ServerInsertedHTMLContext } from 'next/navigation';
 interface DataHydrationValue {
   isInjecting: boolean;
   operationValuesByKey: Record<number, { data: any; error: any }>;
-  RehydrateScript: () => JSX.Element;
+  RehydrateScript: () =>
+    | React.DetailedReactHTMLElement<
+        { dangerouslySetInnerHTML: { __html: string } },
+        HTMLElement
+      >
+    | React.FunctionComponentElement<any>;
 }
 
 const DataHydrationContext = React.createContext<
