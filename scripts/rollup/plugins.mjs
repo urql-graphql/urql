@@ -9,6 +9,7 @@ import visualizer from 'rollup-plugin-visualizer';
 import terser from '@rollup/plugin-terser';
 import cjsCheck from 'rollup-plugin-cjs-check';
 
+import banner from './banner-plugin.mjs'
 import cleanup from './cleanup-plugin.mjs'
 import babelPluginTransformPipe from '../babel/transform-pipe.mjs';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning.mjs';
@@ -68,6 +69,7 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
     cjsCheck({ extension }),
+    banner(),
     cleanup(),
     isProduction ? terserMinified : (extension !== '.js' ? terserPretty : null),
     isProduction && settings.isAnalyze && visualizer({
