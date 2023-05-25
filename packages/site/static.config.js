@@ -3,7 +3,8 @@ import { resolve } from 'path';
 import constants from './src/constants';
 import Document from './src/html';
 
-const basePath = 'open-source/urql';
+const basePath =
+  process.env.VERCEL_ENV === 'preview' ? '.' : 'open-source/urql';
 const isStaging = process.env.REACT_STATIC_ENV === 'staging';
 const isProduction = process.env.REACT_STATIC_ENV === 'production';
 
