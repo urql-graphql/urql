@@ -10,9 +10,7 @@
     "clean": "rimraf dist",
     "prepublishOnly": "run-s clean build",
     "stage:build": "pnpm build --staging",
-    "prod:build": "pnpm build",
-    "prod:serve": "formideploy serve",
-    "deploy": "formideploy deploy"
+    "prod:build": "pnpm build"
   },
   "babel": {
     "presets": [
@@ -51,7 +49,6 @@
     "@mdx-js/mdx": "^1.5.7",
     "@octokit/plugin-request-log": "1.0.0",
     "babel-plugin-universal-import": "^3.1.3",
-    "formideploy": "^0.4.2",
     "lodash": "^4.17.19",
     "react-hot-loader": "^4.12.20",
     "react-static-plugin-sitemap": "7.2.2",
