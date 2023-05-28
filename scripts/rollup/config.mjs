@@ -76,6 +76,7 @@ const output = ({ format, isProduction }) => {
     dir: './dist',
     exports: 'named',
     sourcemap: true,
+    banner: chunk => chunk.name === 'urql-next' ? '"use client"' : undefined,
     sourcemapExcludeSources: false,
     hoistTransitiveImports: false,
     indent: false,
