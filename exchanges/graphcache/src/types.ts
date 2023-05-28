@@ -581,6 +581,17 @@ export type CacheExchangeOpts = {
    * the full keys docs.
    */
   keys?: KeyingConfig;
+  /** Enables global IDs for keying GraphQL types.
+   *
+   * @rematks
+   * When `globalIDs` are enabled, GraphQL object type names will not contribute
+   * to the keys of entities and instead only their ID fields (or `keys` return
+   * values will be used.
+   *
+   * This is useful to overlap types of differing typenames. While this isn’t recommended
+   * it can be necessary to represent more complex interface relationships.
+   */
+  globalIDs?: boolean;
   /** Configures Graphcache with Schema Introspection data.
    *
    * @remarks

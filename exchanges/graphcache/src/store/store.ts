@@ -50,6 +50,7 @@ export class Store<
   updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
+  globalIDs: boolean;
   schema?: SchemaIntrospector;
 
   rootFields: { query: string; mutation: string; subscription: string };
@@ -61,6 +62,7 @@ export class Store<
     this.resolvers = opts.resolvers || {};
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
+    this.globalIDs = !!opts.globalIDs;
 
     let queryName = 'Query';
     let mutationName = 'Mutation';
@@ -107,22 +109,26 @@ export class Store<
     // In resolvers and updaters we may have a specific parent
     // object available that can be used to skip to a specific parent
     // key directly without looking at its incomplete properties
-    if (contextRef && data === contextRef.parent) return contextRef.parentKey;
+    if (contextRef && data === contextRef.parent) {
+      return contextRef.parentKey;
+    } else if (data == null || typeof data === 'string') {
+      return data || null;
+    } else if (!data.__typename) {
+      return null;
+    } else if (this.rootNames[data.__typename]) {
+      return data.__typename;
+    }
 
-    if (data == null || typeof data === 'string') return data || null;
-    if (!data.__typename) return null;
-    if (this.rootNames[data.__typename]) return data.__typename;
-
-    let key: string | null | void;
+    let key: string | null = null;
     if (this.keys[data.__typename]) {
-      key = this.keys[data.__typename](data);
+      key = this.keys[data.__typename](data) || null;
     } else if (data.id != null) {
       key = `${data.id}`;
     } else if (data._id != null) {
       key = `${data._id}`;
     }
 
-    return key ? `${data.__typename}:${key}` : null;
+    return this.globalIDs || !key ? key : `${data.__typename}:${key}`;
   }
 
   resolve(entity: Entity, field: string, args?: FieldArgs): DataField {
