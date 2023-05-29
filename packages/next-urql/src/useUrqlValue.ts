@@ -14,7 +14,9 @@ export function useUrqlValue(operationKey: number, value?: UrqlResult): void {
   const rehydrationContext = useDataHydrationContext();
 
   if (!ssrExchange) {
-    throw new Error('forgot to pass an "ssrExchange" to the UrqlProvider.');
+    throw new Error(
+      'Missing "UrqlProvider" component as a parent or did not pass in an "ssrExchange" to the Provider.'
+    );
   }
 
   if (typeof window == 'undefined') {
