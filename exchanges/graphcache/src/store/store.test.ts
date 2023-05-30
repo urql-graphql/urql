@@ -237,6 +237,20 @@ describe('Store with KeyingConfig', () => {
   });
 });
 
+describe('Store with Global IDs', () => {
+  it('generates keys without typenames when set to true', () => {
+    const store = new Store({ globalIDs: true });
+    expect(store.keyOfEntity({ __typename: 'Any', id: '123' })).toBe('123');
+    expect(store.keyOfEntity({ __typename: 'None', id: '123' })).toBe('123');
+  });
+
+  it('generates keys without typenames when matching an input set', () => {
+    const store = new Store({ globalIDs: ['User'] });
+    expect(store.keyOfEntity({ __typename: 'Any', id: '123' })).toBe('Any:123');
+    expect(store.keyOfEntity({ __typename: 'User', id: '123' })).toBe('123');
+  });
+});
+
 describe('Store with ResolverConfig', () => {
   it("sets the store's resolvers field to the given argument", () => {
     const resolversOption = {
