@@ -78,6 +78,11 @@ export interface RetryExchangeOptions {
   ): Operation | null | undefined;
 }
 
+interface RetryState {
+  count: number;
+  delay: number | null;
+}
+
 /** Exchange factory that retries failed operations.
  *
  * @param options - A {@link RetriesExchangeOptions} configuration object.
@@ -117,10 +122,14 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
 
       const retryWithBackoff$ = pipe(
         retry$,
-        mergeMap((op: Operation) => {
-          const { key, context } = op;
-          const retryCount = (context.retryCount || 0) + 1;
-          let delayAmount = context.retryDelay || MIN_DELAY;
+        mergeMap((operation: Operation) => {
+          const retry: RetryState = operation.context.retry || {
+            count: 0,
+            delay: null,
+          };
+
+          const retryCount = ++retry.count;
+          let delayAmount = retry.delay || MIN_DELAY;
 
           const backoffFactor = Math.random() + 1.5;
           // if randomDelay is enabled and it won't exceed the max delay, apply a random
@@ -137,7 +146,7 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
             filter(op => {
               return (
                 (op.kind === 'query' || op.kind === 'teardown') &&
-                op.key === key
+                op.key === operation.key
               );
             })
           );
@@ -145,7 +154,7 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
           dispatchDebug({
             type: 'retryAttempt',
             message: `The operation has failed and a retry has been triggered (${retryCount} / ${MAX_ATTEMPTS})`,
-            operation: op,
+            operation,
             data: {
               retryCount,
             },
@@ -154,10 +163,9 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
           // Add new retryDelay and retryCount to operation
           return pipe(
             fromValue(
-              makeOperation(op.kind, op, {
-                ...op.context,
-                retryDelay: delayAmount,
-                retryCount,
+              makeOperation(operation.kind, operation, {
+                ...operation.context,
+                retry,
               })
             ),
             debounce(() => delayAmount),
@@ -171,6 +179,7 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
         merge([operations$, retryWithBackoff$]),
         forward,
         filter(res => {
+          const retry = res.operation.context.retry as RetryState | undefined;
           // Only retry if the error passes the conditional retryIf function (if passed)
           // or if the error contains a networkError
           if (
@@ -179,12 +188,16 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
               ? !retryIf(res.error, res.operation)
               : !retryWith && !res.error.networkError)
           ) {
+            // Reset the delay state for a successful operation
+            if (retry) {
+              retry.count = 0;
+              retry.delay = null;
+            }
             return true;
           }
 
           const maxNumberAttemptsExceeded =
-            (res.operation.context.retryCount || 0) >= MAX_ATTEMPTS - 1;
-
+            ((retry && retry.count) || 0) >= MAX_ATTEMPTS - 1;
           if (!maxNumberAttemptsExceeded) {
             const operation = retryWith
               ? retryWith(res.error, res.operation)
