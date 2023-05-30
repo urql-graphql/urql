@@ -1,4 +1,14 @@
-import { pipe, map, makeSubject, publish, tap } from 'wonka';
+import {
+  Source,
+  pipe,
+  map,
+  makeSubject,
+  mergeMap,
+  fromValue,
+  fromArray,
+  publish,
+  tap,
+} from 'wonka';
 import { vi, expect, it, beforeEach, afterEach } from 'vitest';
 
 import {
@@ -67,7 +77,7 @@ beforeEach(() => {
   ({ source: ops$, next } = makeSubject<Operation>());
 });
 
-it(`retries if it hits an error and works for multiple concurrent operations`, () => {
+it('retries if it hits an error and works for multiple concurrent operations', () => {
   const queryTwo = gql`
     {
       films {
@@ -149,7 +159,7 @@ it('should retry x number of times and then return the successful result', () =>
     // @ts-ignore
     return {
       operation: forwardOp,
-      ...(forwardOp.context.retryCount! >= numberRetriesBeforeSuccess
+      ...(forwardOp.context.retry?.count >= numberRetriesBeforeSuccess
         ? { data: queryOneData }
         : { error: queryOneError }),
     };
@@ -184,6 +194,68 @@ it('should retry x number of times and then return the successful result', () =>
   // one for original source, one for retry
   expect(response).toHaveBeenCalledTimes(1 + numberRetriesBeforeSuccess);
   expect(result).toHaveBeenCalledTimes(1);
+});
+
+it('should reset the retry counter if an operation succeeded first', () => {
+  let call = 0;
+  const response = vi.fn((forwardOp: Operation): Source<any> => {
+    expect(forwardOp.key).toBe(op.key);
+    if (call === 0) {
+      call++;
+      return fromValue({
+        operation: forwardOp,
+        error: queryOneError,
+      } as any);
+    } else if (call === 1) {
+      call++;
+      return fromArray([
+        {
+          operation: forwardOp,
+          data: queryOneData,
+        } as any,
+        {
+          operation: forwardOp,
+          error: queryOneError,
+        } as any,
+      ]);
+    } else {
+      expect(forwardOp.context.retry).toEqual({ count: 1, delay: null });
+
+      return fromValue({
+        operation: forwardOp,
+        data: queryOneData,
+      } as any);
+    }
+  });
+
+  const result = vi.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, mergeMap(response));
+  };
+
+  const mockRetryIf = vi.fn(() => true);
+
+  pipe(
+    retryExchange({
+      ...mockOptions,
+      retryIf: mockRetryIf,
+    })({
+      forward,
+      client,
+      dispatchDebug,
+    })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(op);
+  vi.runAllTimers();
+
+  expect(mockRetryIf).toHaveBeenCalledTimes(2);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError as any, op);
+
+  expect(response).toHaveBeenCalledTimes(3);
+  expect(result).toHaveBeenCalledTimes(2);
 });
 
 it(`should still retry if retryIf undefined but there is a networkError`, () => {
