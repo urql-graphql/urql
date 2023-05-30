@@ -369,6 +369,10 @@ describe('Query', () => {
         __typename
         todos {
           __typename
+          test
+        }
+        todos {
+          __typename
           id
         }
       }
@@ -383,14 +387,17 @@ describe('Query', () => {
         {
           __typename: 'Todo',
           id: '0',
+          test: '0',
         },
         {
           __typename: 'Todo',
           id: '1',
+          test: '1',
         },
         {
           __typename: 'Todo',
           id: '2',
+          test: '2',
         },
       ],
       __typename: 'query_root',
@@ -406,14 +413,17 @@ describe('Query', () => {
           {
             __typename: 'Todo',
             id: 'prev-0',
+            test: '0',
           },
           {
             __typename: 'Todo',
             id: '1',
+            test: '1',
           },
           {
             __typename: 'Todo',
             id: '2',
+            test: '2',
           },
         ],
         __typename: 'query_root',
@@ -426,5 +436,7 @@ describe('Query', () => {
     expect(prevData.todos[0]).toBe(data.todos[0]);
     expect(prevData.todos[1]).toBe(data.todos[1]);
     expect(prevData.todos[2]).toBe(data.todos[2]);
+    expect(prevData.todos).toBe(data.todos);
+    expect(prevData).toBe(data);
   });
 });
