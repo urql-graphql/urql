@@ -523,9 +523,9 @@ const resolveResolverResult = (
     const _isListNullable = store.schema
       ? isListNullable(store.schema, typename, fieldName)
       : false;
-    const data = new Array(result.length);
+    const data = InMemoryData.makeData(prevData, true);
     let hasChanged =
-      !isOwnedData ||
+      InMemoryData.currentForeignData ||
       !Array.isArray(prevData) ||
       result.length !== prevData.length;
     for (let i = 0, l = result.length; i < l; i++) {
@@ -561,7 +561,7 @@ const resolveResolverResult = (
   } else if (!isOwnedData && prevData === null) {
     return null;
   } else if (isDataOrKey(result)) {
-    const data = (prevData || InMemoryData.makeData()) as Data;
+    const data = (prevData || InMemoryData.makeData(prevData)) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -592,11 +592,11 @@ const resolveLink = (
     const _isListNullable = store.schema
       ? isListNullable(store.schema, typename, fieldName)
       : false;
-    const newLink = new Array(link.length);
+    const newLink = InMemoryData.makeData(prevData, true);
     let hasChanged =
-      !isOwnedData ||
+      InMemoryData.currentForeignData ||
       !Array.isArray(prevData) ||
-      newLink.length !== prevData.length;
+      link.length !== prevData.length;
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -632,7 +632,7 @@ const resolveLink = (
     ctx,
     link,
     select,
-    (prevData || InMemoryData.makeData()) as Data
+    (prevData || InMemoryData.makeData(prevData)) as Data
   );
 };
 

@@ -8,6 +8,7 @@ import {
   SerializedEntries,
   Dependencies,
   OperationType,
+  DataField,
   Data,
 } from '../types';
 
@@ -59,8 +60,8 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
-let currentOwnership: null | WeakSet<Data> = null;
-let currentDataMapping: null | WeakMap<Data, Data> = null;
+let currentOwnership: null | WeakSet<any> = null;
+let currentDataMapping: null | WeakMap<any, any> = null;
 let currentData: null | InMemoryData = null;
 let currentOptimisticKey: null | number = null;
 export let currentOperation: null | OperationType = null;
@@ -68,20 +69,28 @@ export let currentDependencies: null | Dependencies = null;
 export let currentForeignData = false;
 export let currentOptimistic = false;
 
+export function makeData(data: DataField | void, isArray?: false): Data;
+export function makeData(data: DataField | void, isArray: true): DataField[];
+
 /** Creates a new data object unless it's been created in this data run */
-export const makeData = (data?: Data): Data => {
-  let newData: Data;
+export function makeData(data?: DataField | void, isArray?: boolean) {
+  let newData: Data | Data[] | undefined;
   if (data) {
     if (currentOwnership!.has(data)) return data;
-    newData = currentDataMapping!.get(data) || ({} as Data);
+    newData = currentDataMapping!.get(data) as any;
+  }
+
+  if (newData == null) {
+    newData = (isArray ? [] : {}) as any;
+  }
+
+  if (data) {
     currentDataMapping!.set(data, newData);
-  } else {
-    newData = {} as Data;
   }
 
   currentOwnership!.add(newData);
   return newData;
-};
+}
 
 export const ownsData = (data?: Data): boolean =>
   !!data && currentOwnership!.has(data);
