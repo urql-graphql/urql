@@ -114,12 +114,21 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
         let { operation } = response;
         if (!operation) return;
 
-        const typenames = collectTypesFromResponse(response.data).concat(
-          operation.context.additionalTypenames || []
-        );
+        let typenames = operation.context.additionalTypenames || [];
+        // NOTE: For now, we only respect `additionalTypenames` from subscriptions to
+        // avoid unexpected breaking changes
+        // We'd expect live queries or other update mechanisms to be more suitable rather
+        // than using subscriptions as “signals” to reexecute queries. However, if they’re
+        // just used as signals, it’s intuitive to hook them up using `additionalTypenames`
+        if (response.operation.kind !== 'subscription') {
+          typenames = collectTypesFromResponse(response.data).concat(typenames);
+        }
 
         // Invalidates the cache given a mutation's response
-        if (response.operation.kind === 'mutation') {
+        if (
+          response.operation.kind === 'mutation' ||
+          response.operation.kind === 'subscription'
+        ) {
           const pendingOperations = new Set<number>();
 
           dispatchDebug({
