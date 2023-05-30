@@ -590,8 +590,11 @@ export type CacheExchangeOpts = {
    *
    * This is useful to overlap types of differing typenames. While this isn’t recommended
    * it can be necessary to represent more complex interface relationships.
+   *
+   * If this should only be applied to a limited set of type names, a list of
+   * type names may be passed instead.
    */
-  globalIDs?: boolean;
+  globalIDs?: string[] | boolean;
   /** Configures Graphcache with Schema Introspection data.
    *
    * @remarks

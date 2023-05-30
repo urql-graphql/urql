@@ -50,7 +50,7 @@ export class Store<
   updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
-  globalIDs: boolean;
+  globalIDs: Set<string> | boolean;
   schema?: SchemaIntrospector;
 
   rootFields: { query: string; mutation: string; subscription: string };
@@ -62,7 +62,10 @@ export class Store<
     this.resolvers = opts.resolvers || {};
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
-    this.globalIDs = !!opts.globalIDs;
+
+    this.globalIDs = Array.isArray(opts.globalIDs)
+      ? new Set(opts.globalIDs)
+      : !!opts.globalIDs;
 
     let queryName = 'Query';
     let mutationName = 'Mutation';
@@ -128,7 +131,11 @@ export class Store<
       key = `${data._id}`;
     }
 
-    return this.globalIDs || !key ? key : `${data.__typename}:${key}`;
+    const typename = data.__typename;
+    const globalID =
+      this.globalIDs === true ||
+      (this.globalIDs && this.globalIDs.has(typename));
+    return globalID || !key ? key : `${typename}:${key}`;
   }
 
   resolve(entity: Entity, field: string, args?: FieldArgs): DataField {
