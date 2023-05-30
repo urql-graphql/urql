@@ -159,7 +159,7 @@ export const offlineExchange =
               if (operation.kind !== 'subscription')
                 next(makeOperation('teardown', operation));
               sent.add(operation.key);
-              next(operation);
+              next(toRequestPolicy(operation, 'cache-first'));
             }
           }
 
