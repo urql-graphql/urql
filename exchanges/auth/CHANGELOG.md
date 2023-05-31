@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.4
+
+### Patch Changes
+
+- ⚠️ Fix regression that caused teardowns to be ignored by an `authExchange`’s retry queue
+  Submitted by [@kitten](https://github.com/kitten) (See [#3235](https://github.com/urql-graphql/urql/pull/3235))
+
 ## 2.1.3
 
 ### Patch Changes
