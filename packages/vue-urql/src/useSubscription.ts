@@ -2,7 +2,15 @@
 
 import { Source, pipe, subscribe, onEnd } from 'wonka';
 
-import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
+import {
+  WatchStopHandle,
+  Ref,
+  ref,
+  shallowRef,
+  watchEffect,
+  reactive,
+  isRef,
+} from 'vue';
 
 import {
   Client,
@@ -13,11 +21,10 @@ import {
   OperationContext,
   Operation,
   createRequest,
-  GraphQLRequest,
 } from '@urql/core';
 
 import { useClient } from './useClient';
-import { unwrapPossibleProxy } from './utils';
+import { unwrapPossibleProxy, updateShallowRef } from './utils';
 
 type MaybeRef<T> = Exclude<T, void> | Ref<Exclude<T, void>>;
 type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
@@ -259,31 +266,32 @@ export function callUseSubscription<
     ? _args.pause
     : ref(!!_args.pause);
 
-  const request: Ref<GraphQLRequest<T, V>> = ref(
-    createRequest<T, V>(
+  const input = shallowRef({
+    request: createRequest<T, V>(
       unwrapPossibleProxy(args.query as any),
       unwrapPossibleProxy<V>(args.variables as V)
-    ) as any
-  );
+    ),
+    isPaused: isPaused.value,
+  });
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
   stops.push(
     watchEffect(() => {
-      const newRequest = createRequest<T, V>(
-        unwrapPossibleProxy(args.query as any),
-        unwrapPossibleProxy<V>(args.variables as V)
-      );
-      if (request.value.key !== newRequest.key) {
-        request.value = newRequest;
-      }
+      updateShallowRef(input, {
+        request: createRequest<T, V>(
+          unwrapPossibleProxy(args.query as any),
+          unwrapPossibleProxy<V>(args.variables as V)
+        ),
+        isPaused: isPaused.value,
+      });
     }, watchOptions)
   );
 
   stops.push(
     watchEffect(() => {
       source.value = !isPaused.value
-        ? client.value.executeSubscription<T, V>(request.value, {
+        ? client.value.executeSubscription<T, V>(input.value.request, {
             ...(unwrapPossibleProxy(args.context) as Partial<OperationContext>),
           })
         : undefined;
@@ -333,10 +341,13 @@ export function callUseSubscription<
     executeSubscription(
       opts?: Partial<OperationContext>
     ): UseSubscriptionResponse<T, R, V> {
-      source.value = client.value.executeSubscription<T, V>(request.value, {
-        ...unwrapPossibleProxy(args.context),
-        ...opts,
-      });
+      source.value = client.value.executeSubscription<T, V>(
+        input.value.request,
+        {
+          ...unwrapPossibleProxy(args.context),
+          ...opts,
+        }
+      );
 
       return state;
     },

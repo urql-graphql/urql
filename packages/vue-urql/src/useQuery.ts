@@ -1,6 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
+import {
+  WatchStopHandle,
+  Ref,
+  shallowRef,
+  ref,
+  watchEffect,
+  reactive,
+  isRef,
+} from 'vue';
 
 import { Subscription, Source, pipe, subscribe, onEnd } from 'wonka';
 
@@ -14,11 +22,10 @@ import {
   RequestPolicy,
   Operation,
   createRequest,
-  GraphQLRequest,
 } from '@urql/core';
 
 import { useClient } from './useClient';
-import { unwrapPossibleProxy } from './utils';
+import { unwrapPossibleProxy, updateShallowRef } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
 type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
@@ -258,31 +265,34 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     ? _args.pause
     : ref(!!_args.pause);
 
-  const request: Ref<GraphQLRequest<T, V>> = ref(
-    createRequest<T, V>(
+  const input = shallowRef({
+    request: createRequest<T, V>(
       unwrapPossibleProxy(args.query as any),
       unwrapPossibleProxy<V>(args.variables as V)
-    ) as any
-  );
+    ),
+    requestPolicy: unwrapPossibleProxy(args.requestPolicy),
+    isPaused: isPaused.value,
+  });
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
   stops.push(
     watchEffect(() => {
-      const newRequest = createRequest<T, V>(
-        unwrapPossibleProxy(args.query as any),
-        unwrapPossibleProxy<V>(args.variables as V)
-      );
-      if (request.value.key !== newRequest.key) {
-        request.value = newRequest;
-      }
+      updateShallowRef(input, {
+        request: createRequest<T, V>(
+          unwrapPossibleProxy(args.query as any),
+          unwrapPossibleProxy<V>(args.variables as V)
+        ),
+        requestPolicy: unwrapPossibleProxy(args.requestPolicy),
+        isPaused: isPaused.value,
+      });
     }, watchOptions)
   );
 
   stops.push(
     watchEffect(() => {
-      source.value = !isPaused.value
-        ? client.value.executeQuery<T, V>(request.value, {
+      source.value = !input.value.isPaused
+        ? client.value.executeQuery<T, V>(input.value.request, {
             requestPolicy: unwrapPossibleProxy(
               args.requestPolicy
             ) as RequestPolicy,
@@ -301,11 +311,16 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     fetching,
     isPaused,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      const s = (source.value = client.value.executeQuery<T, V>(request.value, {
-        requestPolicy: unwrapPossibleProxy(args.requestPolicy) as RequestPolicy,
-        ...args.context,
-        ...opts,
-      }));
+      const s = (source.value = client.value.executeQuery<T, V>(
+        input.value.request,
+        {
+          requestPolicy: unwrapPossibleProxy(
+            args.requestPolicy
+          ) as RequestPolicy,
+          ...args.context,
+          ...opts,
+        }
+      ));
 
       return {
         ...response,
