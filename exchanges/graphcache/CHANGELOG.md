@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.1.1
+
+### Patch Changes
+
+- ⚠️ Fix torn down queries not being removed from `offlineExchange`’s failed queue on rehydration
+  Submitted by [@kitten](https://github.com/kitten) (See [#3236](https://github.com/urql-graphql/urql/pull/3236))
+
 ## 6.1.0
 
 ### Minor Changes
