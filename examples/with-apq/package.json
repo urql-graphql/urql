@@ -6,12 +6,12 @@
     "start": "vite"
   },
   "dependencies": {
-    "@urql/core": "^4.0.7",
+    "@urql/core": "^4.0.8",
     "@urql/exchange-persisted-fetch": "^1.3.0",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "urql": "^4.0.2"
+    "urql": "^4.0.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^3.1.0",

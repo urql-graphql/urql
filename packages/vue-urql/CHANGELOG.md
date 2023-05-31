@@ -1,5 +1,14 @@
 # @urql/vue
 
+## 1.1.2
+
+### Patch Changes
+
+- Update build process to generate correct source maps
+  Submitted by [@kitten](https://github.com/kitten) (See [#3201](https://github.com/urql-graphql/urql/pull/3201))
+- Prevent multiple operations being executed in a row when multiple inputs change simultaneously (e.g. `isPaused` and query inputs)
+  Submitted by [@kitten](https://github.com/kitten) (See [#3231](https://github.com/urql-graphql/urql/pull/3231))
+
 ## 1.1.1
 
 ### Patch Changes

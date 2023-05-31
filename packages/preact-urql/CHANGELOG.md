@@ -1,5 +1,12 @@
 # @urql/preact
 
+## 4.0.2
+
+### Patch Changes
+
+- Update build process to generate correct source maps
+  Submitted by [@kitten](https://github.com/kitten) (See [#3201](https://github.com/urql-graphql/urql/pull/3201))
+
 ## 4.0.1
 
 ### Patch Changes

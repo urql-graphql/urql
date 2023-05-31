@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-execute",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "An exchange for executing queries against a local schema in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",

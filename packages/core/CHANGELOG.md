@@ -1,5 +1,16 @@
 # @urql/core
 
+## 4.0.8
+
+### Patch Changes
+
+- Respect `additionalTypenames` on subscriptions and re-execute queries for them as well, as one would intuitively expect
+  Submitted by [@kitten](https://github.com/kitten) (See [#3230](https://github.com/urql-graphql/urql/pull/3230))
+- Update build process to generate correct source maps
+  Submitted by [@kitten](https://github.com/kitten) (See [#3201](https://github.com/urql-graphql/urql/pull/3201))
+- Don't allow `isSubscriptionOperation` option in `subscriptionExchange` to include `teardown` operations, to avoid confusion
+  Submitted by [@kitten](https://github.com/kitten) (See [#3206](https://github.com/urql-graphql/urql/pull/3206))
+
 ## 4.0.7
 
 ### Patch Changes

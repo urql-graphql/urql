@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.3
+
+### Patch Changes
+
+- Update build process to generate correct source maps
+  Submitted by [@kitten](https://github.com/kitten) (See [#3201](https://github.com/urql-graphql/urql/pull/3201))
+
 ## 2.1.2
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # @urql/exchange-graphcache
 
+## 6.1.0
+
+### Minor Changes
+
+- Add `globalIDs` configuration option to omit typenames in cache keys
+  Submitted by [@kitten](https://github.com/kitten) (See [#3224](https://github.com/urql-graphql/urql/pull/3224))
+
+### Patch Changes
+
+- Update build process to generate correct source maps
+  Submitted by [@kitten](https://github.com/kitten) (See [#3201](https://github.com/urql-graphql/urql/pull/3201))
+- Prevent `offlineExchange` from issuing duplicate operations
+  Submitted by [@kitten](https://github.com/kitten) (See [#3200](https://github.com/urql-graphql/urql/pull/3200))
+- ⚠️ Fix reference equality not being preserved. This is a fix on top of [#3165](https://github.com/urql-graphql/urql/pull/3165), and was previously not addressed to avoid having to test for corner cases that are hard to cover. If you experience issues with this fix, please let us know
+  Submitted by [@kitten](https://github.com/kitten) (See [#3228](https://github.com/urql-graphql/urql/pull/3228))
+- Retry operations against offline cache and stabilize timing of flushing failed operations queue after rehydrating the storage data
+  Submitted by [@kitten](https://github.com/kitten) (See [#3196](https://github.com/urql-graphql/urql/pull/3196))
+
 ## 6.0.4
 
 ### Patch Changes
