@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@urql/core": "^4.0.7",
-    "@urql/next": "file:../../packages/next-urql",
+    "@urql/next": "beta",
     "graphql": "^16.6.0",
     "next": "13.4.2",
     "react": "^18.2.0",
