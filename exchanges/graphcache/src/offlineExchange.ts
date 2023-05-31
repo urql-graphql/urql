@@ -230,6 +230,10 @@ export const offlineExchange =
             onPush(operation => {
               if (operation.kind === 'query' && !hasRehydrated) {
                 failedQueue.push(operation);
+              } else if (operation.kind === 'teardown') {
+                for (let i = failedQueue.length - 1; i >= 0; i--)
+                  if (failedQueue[i].key === operation.key)
+                    failedQueue.splice(i, 1);
               }
             })
           ),
