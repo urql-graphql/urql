@@ -306,20 +306,13 @@ export function authExchange(
         return config ? config.addAuthToOperation(operation) : operation;
       }
 
-      const teardownOps$ = pipe(
-        operations$,
-        filter(operation => operation.kind === 'teardown')
-      );
-
-      const pendingOps$ = pipe(
-        operations$,
-        filter(operation => operation.kind !== 'teardown')
-      );
-
       const opsWithAuth$ = pipe(
-        merge([retries.source, pendingOps$]),
+        merge([retries.source, operations$]),
         map(operation => {
-          if (
+          if (operation.kind === 'teardown') {
+            retryQueue.delete(operation.key);
+            return operation;
+          } else if (
             operation.context._instance &&
             bypassQueue.has(operation.context._instance)
           ) {
@@ -346,7 +339,7 @@ export function authExchange(
         filter(Boolean)
       ) as Source<Operation>;
 
-      const result$ = pipe(merge([opsWithAuth$, teardownOps$]), forward);
+      const result$ = pipe(opsWithAuth$, forward);
 
       return pipe(
         result$,
