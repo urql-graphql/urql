@@ -1,6 +1,6 @@
 {
   "name": "@urql/core",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "description": "The shared core for the highly customizable and versatile GraphQL client",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- Reset `retryExchange`’s previous attempts and delay if an operation succeeds. This prevents the exchange from keeping its old retry count and delay if the operation delivered a result in the meantime. This is important for it to help recover from failing subscriptions
+  Submitted by [@kitten](https://github.com/kitten) (See [#3229](https://github.com/urql-graphql/urql/pull/3229))
+
 ## 1.1.1
 
 ### Patch Changes
