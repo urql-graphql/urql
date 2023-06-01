@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.0.9
+
+### Patch Changes
+
+- Return `AbortController` invocation to previous behaviour where it used to be more forceful. It will now properly abort outside of when our generator yields results, and hence now also cancels requests again that have already delivered headers but are currently awaiting a response body
+  Submitted by [@kitten](https://github.com/kitten) (See [#3239](https://github.com/urql-graphql/urql/pull/3239))
+
 ## 4.0.8
 
 ### Patch Changes
