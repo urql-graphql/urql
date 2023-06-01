@@ -1,4 +1,4 @@
-import { Source, fromAsyncIterable, filter, pipe } from 'wonka';
+import { Source, fromAsyncIterable, onEnd, filter, pipe } from 'wonka';
 import { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
@@ -108,15 +108,10 @@ async function* fetchOperation(
   fetchOptions: RequestInit
 ) {
   let networkMode = true;
-  let abortController: AbortController | void;
   let result: OperationResult | null = null;
   let response: Response | void;
 
   try {
-    if (typeof AbortController !== 'undefined') {
-      fetchOptions.signal = (abortController = new AbortController()).signal;
-    }
-
     // Delay for a tick to give the Client a chance to cancel the request
     // if a teardown comes in immediately
     yield await Promise.resolve();
@@ -161,8 +156,6 @@ async function* fetchOperation(
         : error,
       response
     );
-  } finally {
-    if (abortController) abortController.abort();
   }
 }
 
@@ -198,8 +191,15 @@ export function makeFetchSource(
   url: string,
   fetchOptions: RequestInit
 ): Source<OperationResult> {
+  let abortController: AbortController | void;
+  if (typeof AbortController !== 'undefined') {
+    fetchOptions.signal = (abortController = new AbortController()).signal;
+  }
   return pipe(
     fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
-    filter((result): result is OperationResult => !!result)
+    filter((result): result is OperationResult => !!result),
+    onEnd(() => {
+      if (abortController) abortController.abort();
+    })
   );
 }
