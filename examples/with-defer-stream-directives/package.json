@@ -27,7 +27,6 @@
   "devDependencies": {
     "@apollo/server": "^4.4.1",
     "@vitejs/plugin-react": "^3.1.0",
-    "graphql-helix": "^1.13.0",
     "graphql-yoga": "^3.7.1",
     "npm-run-all": "^4.1.5",
     "vite": "^4.2.0"
