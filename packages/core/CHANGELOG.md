@@ -1,5 +1,14 @@
 # @urql/core
 
+## 4.0.10
+
+### Patch Changes
+
+- Add missing `fetchSubscriptions` entry to `OperationContext`. The Client’s `fetchSubscriptions` now works properly and can be used to execute subscriptions as multipart/event-stream requests
+  Submitted by [@kitten](https://github.com/kitten) (See [#3244](https://github.com/urql-graphql/urql/pull/3244))
+- ⚠️ Fix `fetchSource` not working for subscriptions since `hasNext` isn’t necessarily set
+  Submitted by [@kitten](https://github.com/kitten) (See [#3244](https://github.com/urql-graphql/urql/pull/3244))
+
 ## 4.0.9
 
 ### Patch Changes
