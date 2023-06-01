@@ -64,10 +64,10 @@ async function* parseEventStream(
       } catch (error) {
         if (!payload) throw error;
       }
-      if (payload && !payload.hasNext) break;
+      if (payload && payload.hasNext === false) break;
     }
   }
-  if (payload && payload.hasNext) {
+  if (payload && payload.hasNext !== false) {
     yield { hasNext: false };
   }
 }
@@ -95,9 +95,9 @@ async function* parseMultipartMixed(
     } catch (error) {
       if (!payload) throw error;
     }
-    if (payload && !payload.hasNext) break;
+    if (payload && payload.hasNext === false) break;
   }
-  if (payload && payload.hasNext) {
+  if (payload && payload.hasNext !== false) {
     yield { hasNext: false };
   }
 }
