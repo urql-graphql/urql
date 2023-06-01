@@ -568,6 +568,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
   const baseOpts = {
     url: opts.url,
+    fetchSubscriptions: opts.fetchSubscriptions,
     fetchOptions: opts.fetchOptions,
     fetch: opts.fetch,
     preferGetMethod: !!opts.preferGetMethod,
