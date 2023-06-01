@@ -17,4 +17,4 @@ npm run start
 This example contains:
 
 - The `urql` bindings and a React app with a client set up in [`src/App.jsx`](src/App.jsx)
-- A local `polka` server set up to test deferred and streamed results in [`server/`](server/).
+- A local `graphql-yoga` server set up to test deferred and streamed results in [`server/`](server/).
