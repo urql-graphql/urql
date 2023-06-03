@@ -12,8 +12,6 @@ import {
 } from 'urql';
 import { useUrqlValue } from './useUrqlValue';
 
-const transportKeys = ['data', 'error'];
-
 /** Input arguments for the {@link useQuery} hook.
  *
  * @param query - The GraphQL query that `useQuery` executes.
@@ -210,12 +208,7 @@ export function useQuery<
 
   const [result, execute] = orig_useQuery(args);
 
-  const transported: any = {};
-  for (const key of transportKeys) {
-    transported[key] = result[key];
-  }
-
-  useUrqlValue(request.key, transported);
+  useUrqlValue(request.key);
 
   return [result, execute];
 }
