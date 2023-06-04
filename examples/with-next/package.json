@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@urql/core": "^4.0.7",
-    "@urql/next": "beta",
+    "@urql/core": "^4.0.10",
+    "@urql/next": "file:../../packages/next-urql",
     "graphql": "^16.6.0",
     "next": "13.4.2",
     "react": "^18.2.0",

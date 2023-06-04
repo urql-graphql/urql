@@ -10,7 +10,7 @@ import {
 
 const ssr = ssrExchange();
 const client = createClient({
-  url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+  url: 'https://graphql-pokeapi.graphcdn.app/',
   exchanges: [cacheExchange, ssr, fetchExchange],
   suspense: true,
 });

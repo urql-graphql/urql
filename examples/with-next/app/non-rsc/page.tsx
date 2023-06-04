@@ -15,8 +15,10 @@ export default function Page() {
 const PokemonsQuery = gql`
   query {
     pokemons(limit: 10) {
-      id
-      name
+      results {
+        id
+        name
+      }
     }
   }
 `;
@@ -27,12 +29,14 @@ function Pokemons() {
     <main>
       <h1>This is rendered as part of SSR</h1>
       <ul>
-        {result.data.pokemons.map((x: any) => (
-          <li key={x.id}>{x.name}</li>
-        ))}
+        {result.data
+          ? result.data.pokemons.results.map((x: any) => (
+              <li key={x.id}>{x.name}</li>
+            ))
+          : JSON.stringify(result.error)}
       </ul>
       <Suspense>
-        <Pokemon id="001" />
+        <Pokemon name="bulbasaur" />
       </Suspense>
       <Link href="/">RSC</Link>
     </main>
@@ -40,8 +44,8 @@ function Pokemons() {
 }
 
 const PokemonQuery = gql`
-  query ($id: ID!) {
-    pokemon(id: $id) {
+  query ($name: String!) {
+    pokemon(name: $name) {
       id
       name
     }
@@ -51,7 +55,7 @@ const PokemonQuery = gql`
 function Pokemon(props: any) {
   const [result] = useQuery({
     query: PokemonQuery,
-    variables: { id: props.id },
+    variables: { name: props.name },
   });
   return (
     <div>
