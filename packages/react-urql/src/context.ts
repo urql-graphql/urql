@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import * as React from 'react';
 import { Client } from '@urql/core';
 
 const OBJ = {};
@@ -10,7 +10,7 @@ const OBJ = {};
  * You may use the reexported {@link Provider} to provide a `Client` as well.
  */
 export const Context: import('react').Context<Client | object> =
-  createContext(OBJ);
+  React.createContext(OBJ);
 
 /** Provider for `urql`'s {@link Client} to GraphQL hooks.
  *
@@ -39,15 +39,13 @@ export const Context: import('react').Context<Client | object> =
  * );
  * ```
  */
-export const Provider: import('react').Provider<Client | object> =
-  Context.Provider;
+export const Provider: React.Provider<Client | object> = Context.Provider;
 
 /** React Consumer component, providing the {@link Client} provided on a parent component.
  * @remarks
  * This is an alias for {@link Context.Consumer}.
  */
-export const Consumer: import('react').Consumer<Client | object> =
-  Context.Consumer;
+export const Consumer: React.Consumer<Client | object> = Context.Consumer;
 
 Context.displayName = 'UrqlContext';
 
@@ -65,7 +63,7 @@ Context.displayName = 'UrqlContext';
  * not wrapped in a {@link Provider}, an error is thrown.
  */
 export const useClient = (): Client => {
-  const client = useContext(Context);
+  const client = React.useContext(Context);
 
   if (client === OBJ && process.env.NODE_ENV !== 'production') {
     const error =

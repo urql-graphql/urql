@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import * as React from 'react';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
 import {
@@ -144,13 +144,13 @@ export function useMutation<
   Data = any,
   Variables extends AnyVariables = AnyVariables
 >(query: DocumentInput<Data, Variables>): UseMutationResponse<Data, Variables> {
-  const isMounted = useRef(true);
+  const isMounted = React.useRef(true);
   const client = useClient();
 
   const [state, setState] =
-    useState<UseMutationState<Data, Variables>>(initialState);
+    React.useState<UseMutationState<Data, Variables>>(initialState);
 
-  const executeMutation = useCallback(
+  const executeMutation = React.useCallback(
     (variables: Variables, context?: Partial<OperationContext>) => {
       deferDispatch(setState, { ...initialState, fetching: true });
       return pipe(
@@ -179,7 +179,7 @@ export function useMutation<
     [client, query, setState]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     isMounted.current = true;
     return () => {
       isMounted.current = false;

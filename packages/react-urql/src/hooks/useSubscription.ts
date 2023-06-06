@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { pipe, subscribe, onEnd } from 'wonka';
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import * as React from 'react';
 
 import {
   GraphQLRequestParams,
@@ -233,12 +233,12 @@ export function useSubscription<
   const client = useClient();
   const request = useRequest(args.query, args.variables as Variables);
 
-  const handlerRef = useRef<SubscriptionHandler<Data, Result> | undefined>(
-    handler
-  );
+  const handlerRef = React.useRef<
+    SubscriptionHandler<Data, Result> | undefined
+  >(handler);
   handlerRef.current = handler;
 
-  const source = useMemo(
+  const source = React.useMemo(
     () =>
       !args.pause ? client.executeSubscription(request, args.context) : null,
     [client, request, args.pause, args.context]
@@ -246,7 +246,7 @@ export function useSubscription<
 
   const deps = [client, request, args.context, args.pause] as const;
 
-  const [state, setState] = useState(
+  const [state, setState] = React.useState(
     () => [source, { ...initialState, fetching: !!source }, deps] as const
   );
 
@@ -259,7 +259,7 @@ export function useSubscription<
     ]);
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     const updateResult = (
       result: Partial<UseSubscriptionState<Data, Variables>>
     ) => {
@@ -291,7 +291,7 @@ export function useSubscription<
   }, [state[0]]);
 
   // This is the imperative execute function passed to the user
-  const executeSubscription = useCallback(
+  const executeSubscription = React.useCallback(
     (opts?: Partial<OperationContext>) => {
       const source = client.executeSubscription(request, {
         ...args.context,

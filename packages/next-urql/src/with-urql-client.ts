@@ -1,11 +1,5 @@
-import {
-  createElement,
-  useCallback,
-  useReducer,
-  useMemo,
-  ReactNode,
-  ReactElement,
-} from 'react';
+import type { ReactNode, ReactElement } from 'react';
+import * as React from 'react';
 
 import {
   Provider,
@@ -85,10 +79,10 @@ export function withUrqlClient(
       urqlState,
       ...rest
     }: WithUrqlProps) => {
-      const [version, forceUpdate] = useReducer(prev => prev + 1, 0);
+      const [version, forceUpdate] = React.useReducer(prev => prev + 1, 0);
       const urqlServerState = (pageProps && pageProps.urqlState) || urqlState;
 
-      const client = useMemo(() => {
+      const client = React.useMemo(() => {
         if (urqlClient && !version) {
           return urqlClient;
         }
@@ -116,16 +110,16 @@ export function withUrqlClient(
         return initUrqlClient(clientConfig, shouldEnableSuspense)!;
       }, [urqlClient, urqlServerState, version]);
 
-      const resetUrqlClient = useCallback(() => {
+      const resetUrqlClient = React.useCallback(() => {
         resetClient();
         ssr = ssrExchange({ initialState: undefined });
         forceUpdate();
       }, []);
 
-      return createElement(
+      return React.createElement(
         Provider,
         { value: client },
-        createElement(AppOrPage, {
+        React.createElement(AppOrPage, {
           ...rest,
           pageProps,
           urqlClient: client,
@@ -189,7 +183,7 @@ export function withUrqlClient(
 
         // Run the prepass step on AppTree. This will run all urql queries on the server.
         if (!options!.neverSuspend) {
-          await ssrPrepass(createElement(AppTree, appTreeProps));
+          await ssrPrepass(React.createElement(AppTree, appTreeProps));
         }
 
         return {

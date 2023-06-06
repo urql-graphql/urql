@@ -88,6 +88,15 @@ const output = ({ format, isProduction }) => {
     // When this changes (and terser mangles the output) this will interfere with Node.js ESM intercompatibility
     esModule: format !== 'esm',
     externalLiveBindings: format !== 'esm',
+    interop(id) {
+      if (format === 'esm') {
+        return 'esModule';
+      } else if (id === 'react') {
+        return 'defaultOnly';
+      } else {
+        return 'auto';
+      }
+    },
     generatedCode: {
       preset: 'es5',
       reservedNamesAsProps: false,

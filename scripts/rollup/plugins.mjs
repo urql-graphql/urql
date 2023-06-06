@@ -27,9 +27,6 @@ export const makeBasePlugins = () => [
   commonjs({
     ignoreGlobal: true,
     include: /\/node_modules\//,
-    namedExports: settings.hasReact ? {
-      react: Object.keys(React)
-    } : {},
   }),
 ];
 
