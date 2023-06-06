@@ -3,7 +3,7 @@ import {
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
 
-import { warn, invariant } from '../helpers/help';
+import { warn } from '../helpers/help';
 import { getTypeCondition } from './node';
 import { SchemaIntrospector, SchemaObject } from './schema';
 
@@ -49,22 +49,21 @@ export const isFieldAvailableOnType = (
 export const isInterfaceOfType = (
   schema: SchemaIntrospector,
   node: InlineFragmentNode | FragmentDefinitionNode,
-  typename: string | void
-): boolean => {
-  if (!typename) return false;
+  typename: string
+): null | boolean => {
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) {
     return true;
-  } else if (
-    schema.types!.has(typeCondition) &&
-    schema.types!.get(typeCondition)!.kind === 'OBJECT'
-  ) {
+  }
+
+  const type = schema.types!.get(typeCondition);
+  if (type && type.kind === 'OBJECT') {
     return typeCondition === typename;
   }
 
-  expectAbstractType(schema, typeCondition!);
-  expectObjectType(schema, typename!);
-  return schema.isSubType(typeCondition, typename);
+  const abstract = getAbstractType(schema, typeCondition);
+  const object = getObjectType(schema, typename);
+  return abstract && object ? schema.isSubType(typeCondition, typename) : null;
 };
 
 const getField = (
@@ -78,10 +77,13 @@ const getField = (
   )
     return;
 
-  expectObjectType(schema, typename);
-  const object = schema.types!.get(typename) as SchemaObject;
-  const field = object.fields()[fieldName];
-  if (!field) {
+  const object = getObjectType(schema, typename);
+  if (object) {
+    const field = object.fields()[fieldName];
+    if (field) {
+      return field;
+    }
+
     warn(
       'Invalid field: The field `' +
         fieldName +
@@ -93,14 +95,15 @@ const getField = (
       4
     );
   }
-
-  return field;
 };
 
-function expectObjectType(schema: SchemaIntrospector, typename: string) {
-  invariant(
-    schema.types!.has(typename) &&
-      schema.types!.get(typename)!.kind === 'OBJECT',
+function getObjectType(schema: SchemaIntrospector, typename: string) {
+  const object = schema.types!.get(typename);
+  if (object && object.kind === 'OBJECT') {
+    return object;
+  }
+
+  warn(
     'Invalid Object type: The type `' +
       typename +
       '` is not an object in the defined schema, ' +
@@ -109,11 +112,16 @@ function expectObjectType(schema: SchemaIntrospector, typename: string) {
   );
 }
 
-function expectAbstractType(schema: SchemaIntrospector, typename: string) {
-  invariant(
-    schema.types!.has(typename) &&
-      (schema.types!.get(typename)!.kind === 'INTERFACE' ||
-        schema.types!.get(typename)!.kind === 'UNION'),
+function getAbstractType(schema: SchemaIntrospector, typename: string) {
+  const abstract = schema.types!.get(typename);
+  if (
+    abstract &&
+    (abstract.kind === 'INTERFACE' || abstract.kind === 'UNION')
+  ) {
+    return abstract;
+  }
+
+  warn(
     'Invalid Abstract type: The type `' +
       typename +
       '` is not an Interface or Union type in the defined schema, ' +

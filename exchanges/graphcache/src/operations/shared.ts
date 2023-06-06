@@ -121,11 +121,10 @@ export const updateContext = (
 
 const isFragmentHeuristicallyMatching = (
   node: InlineFragmentNode | FragmentDefinitionNode,
-  typename: void | string,
+  typename: string,
   entityKey: string,
   vars: Variables
 ) => {
-  if (!typename) return false;
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) return true;
 
@@ -188,17 +187,25 @@ export const makeSelectionIterator = (
           const fragment = !isInlineFragment(select)
             ? ctx.fragments[getName(select)]
             : select;
-          if (fragment) {
-            const isMatching =
-              !fragment.typeCondition ||
-              (ctx.store.schema
-                ? isInterfaceOfType(ctx.store.schema, fragment, typename)
-                : isFragmentHeuristicallyMatching(
-                    fragment,
-                    typename,
-                    entityKey,
-                    ctx.variables
-                  ));
+          if (fragment && typename) {
+            let isMatching: boolean | null = !fragment.typeCondition || null;
+            if (isMatching === null && ctx.store.schema) {
+              isMatching = isInterfaceOfType(
+                ctx.store.schema,
+                fragment,
+                typename
+              );
+            }
+
+            if (isMatching === null) {
+              isMatching = isFragmentHeuristicallyMatching(
+                fragment,
+                typename,
+                entityKey,
+                ctx.variables
+              );
+            }
+
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
