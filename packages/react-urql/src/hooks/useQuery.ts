@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import * as React from 'react';
 
 import {
   GraphQLRequestParams,
@@ -221,7 +221,7 @@ export function useQuery<
   const suspense = isSuspense(client, args.context);
   const request = useRequest(args.query, args.variables as Variables);
 
-  const source = useMemo(() => {
+  const source = React.useMemo(() => {
     if (args.pause) return null;
 
     const source = client.executeQuery(request, {
@@ -247,7 +247,7 @@ export function useQuery<
     args.context,
   ]);
 
-  const getSnapshot = useCallback(
+  const getSnapshot = React.useCallback(
     (
       source: Source<OperationResult<Data, Variables>> | null,
       suspense: boolean
@@ -294,7 +294,7 @@ export function useQuery<
     args.pause,
   ] as const;
 
-  const [state, setState] = useState(
+  const [state, setState] = React.useState(
     () =>
       [
         source,
@@ -315,7 +315,7 @@ export function useQuery<
     ]);
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     const source = state[0];
     const request = state[2][1];
 
@@ -351,7 +351,7 @@ export function useQuery<
     }
   }, [cache, state[0], state[2][1]]);
 
-  const executeQuery = useCallback(
+  const executeQuery = React.useCallback(
     (opts?: Partial<OperationContext>) => {
       const context = {
         requestPolicy: args.requestPolicy,

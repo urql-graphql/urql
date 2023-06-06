@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import * as React from 'react';
 import {
   AnyVariables,
   DocumentInput,
@@ -16,9 +16,11 @@ export function useRequest<
   query: DocumentInput<Data, Variables>,
   variables: Variables
 ): GraphQLRequest<Data, Variables> {
-  const prev = useRef<undefined | GraphQLRequest<Data, Variables>>(undefined);
+  const prev = React.useRef<undefined | GraphQLRequest<Data, Variables>>(
+    undefined
+  );
 
-  return useMemo(() => {
+  return React.useMemo(() => {
     const request = createRequest<Data, Variables>(query, variables);
     // We manually ensure reference equality if the key hasn't changed
     if (prev.current !== undefined && prev.current.key === request.key) {
