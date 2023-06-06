@@ -55,8 +55,8 @@
   "devDependencies": {
     "@urql/core": "workspace:*",
     "@urql/exchange-graphcache": "workspace:*",
-    "@react-native-async-storage/async-storage": "^1.15.5",
-    "@react-native-community/netinfo": "^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0"
+    "@react-native-async-storage/async-storage": "^1.18.2",
+    "@react-native-community/netinfo": "^9.3.10"
   },
   "publishConfig": {
     "access": "public",
