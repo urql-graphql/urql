@@ -92,7 +92,7 @@ const output = ({ format, isProduction }) => {
       if (format === 'esm') {
         return 'esModule';
       } else if (id === 'react') {
-        return 'defaultOnly';
+        return 'esModule';
       } else {
         return 'auto';
       }
