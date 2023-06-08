@@ -87,9 +87,11 @@ const Search = () => {
 
 Here we keep an array of all `variables` we've encountered and use them to render their
 respective `result` page. This only rerenders the additional page rather than having a long
-list that constantly changes. [You can find a full code example of this pattern in our example folder on the topic of Graphcache pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-graphcache-pagination)
+list that constantly changes. [You can find a full code example of this pattern in our example folder on the topic of pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-pagination)
 
-We also do not need to use our normalized cache to achieve this. As long as we're able to split individual lists up into chunks across components, we can also solve this problem entirely in UI code. [Read our example code on how to achieve this.](https://github.com/urql-graphql/urql/tree/main/examples/with-pagination)
+This code doesn't take changing variables into account, which will affect the cursors. For an
+example that takes full infinite scrolling into account, [you can find a full code example of an
+extended pattern in our example folder on the topic of infinite pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-infinite--pagination)
 
 ## Prefetching data
 

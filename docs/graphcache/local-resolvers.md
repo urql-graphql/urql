@@ -452,6 +452,14 @@ like to add infinite pagination to an app quickly to try it out or if we're unab
 with separate components per page in environments like React Native, where a `FlatList` would
 require a flat, infinite list of items.
 
+> **Note:** If you don't need a flat array of results, you can also achieve infinite pagination
+> with only UI code. [You can find a code example of UI infinite pagination in our example folder.](https://github.com/urql-graphql/urql/tree/main/examples/with-pagination)
+
+[You can find a code example of infinite pagination with Graphcahce in our example folder.](https://github.com/urql-graphql/urql/tree/main/examples/with-graphcache-pagination).
+Please keep in mind that this patterns has some limitations when you're handling cache updates.
+Deleting old pages from the cache selectively may be difficult, so the UI pattern in the above
+note is preferred.
+
 ### Simple Pagination
 
 Given we have a schema that uses some form of `offset` and `limit` based pagination, we can use the
