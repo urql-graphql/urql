@@ -93,8 +93,6 @@ This code doesn't take changing variables into account, which will affect the cu
 example that takes full infinite scrolling into account, [you can find a full code example of an
 extended pattern in our example folder on the topic of infinite pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-infinite--pagination)
 
-We also do not need to use our normalized cache to achieve this. As long as we're able to split individual lists up into chunks across components, we can also solve this problem entirely in UI code. [Read our example code on how to achieve this.](https://github.com/urql-graphql/urql/tree/main/examples/with-pagination)
-
 ## Prefetching data
 
 We sometimes find it necessary to load data for a new page before that page is opened, for instance while a JS bundle is still loading. We may
