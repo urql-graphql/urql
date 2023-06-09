@@ -243,7 +243,7 @@ For instance, we may start out with a paused store and then unpause it once a ca
   });
 
   function unpause() {
-    $todos.resume();
+    todos.resume();
   }
 </script>
 
