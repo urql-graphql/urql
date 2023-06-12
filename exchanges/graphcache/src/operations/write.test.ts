@@ -165,9 +165,9 @@ describe('Query', () => {
     // This should not overwrite the field
     write(store, { query }, { field: undefined } as any);
     // Because of us writing an undefined field
-    expect(console.warn).toHaveBeenCalledTimes(1);
+    expect(console.warn).toHaveBeenCalledTimes(2);
 
-    expect((console.warn as any).mock.calls[0][0]).toMatch(
+    expect((console.warn as any).mock.calls[1][0]).toMatch(
       /Invalid undefined: The field at `field`/
     );
 

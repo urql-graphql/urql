@@ -248,26 +248,6 @@ const writeSelection = (
         (deferRef || (ctx.optimistic && rootField === 'query')))
     ) {
       continue;
-    } else if (rootField === 'query' && fieldValue === undefined && !deferRef) {
-      if (process.env.NODE_ENV !== 'production') {
-        if (!entityKey || !InMemoryData.hasField(entityKey, fieldKey)) {
-          const expected =
-            node.selectionSet === undefined
-              ? 'scalar (number, boolean, etc)'
-              : 'selection set';
-
-          warn(
-            'Invalid undefined: The field at `' +
-              fieldKey +
-              '` is `undefined`, but the GraphQL query expects a ' +
-              expected +
-              ' for this field.',
-            13
-          );
-        }
-      }
-
-      continue; // Skip this field
     }
 
     if (process.env.NODE_ENV !== 'production') {
@@ -294,6 +274,28 @@ const writeSelection = (
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(ctx, data, typename, typename, fieldKey, fieldName);
       fieldValue = ensureData(resolver(fieldArgs || {}, ctx.store, ctx));
+    }
+
+    if (fieldValue === undefined) {
+      if (process.env.NODE_ENV !== 'production') {
+        if (!entityKey || !InMemoryData.hasField(entityKey, fieldKey)) {
+          const expected =
+            node.selectionSet === undefined
+              ? 'scalar (number, boolean, etc)'
+              : 'selection set';
+
+          warn(
+            'Invalid undefined: The field at `' +
+              fieldKey +
+              '` is `undefined`, but the GraphQL query expects a ' +
+              expected +
+              ' for this field.',
+            13
+          );
+        }
+      }
+
+      continue; // Skip this field
     }
 
     if (node.selectionSet) {
