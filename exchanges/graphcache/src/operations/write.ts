@@ -210,7 +210,13 @@ const writeSelection = (
   const rootField = ctx.store.rootNames[entityKey!] || 'query';
   const isRoot = !!ctx.store.rootNames[entityKey!];
 
-  const typename = isRoot ? entityKey : data.__typename;
+  let typename = isRoot ? entityKey : data.__typename;
+  if (!typename && entityKey && ctx.optimistic) {
+    typename = InMemoryData.readRecord(entityKey, '__typename') as
+      | string
+      | undefined;
+  }
+
   if (!typename) {
     warn(
       "Couldn't find __typename when writing.\n" +
@@ -239,34 +245,6 @@ const writeSelection = (
     const fieldAlias = getFieldAlias(node);
     let fieldValue = data[ctx.optimistic ? fieldName : fieldAlias];
 
-    // Development check of undefined fields
-    if (process.env.NODE_ENV !== 'production') {
-      if (
-        rootField === 'query' &&
-        fieldValue === undefined &&
-        !deferRef &&
-        !ctx.optimistic
-      ) {
-        const expected =
-          node.selectionSet === undefined
-            ? 'scalar (number, boolean, etc)'
-            : 'selection set';
-
-        warn(
-          'Invalid undefined: The field at `' +
-            fieldKey +
-            '` is `undefined`, but the GraphQL query expects a ' +
-            expected +
-            ' for this field.',
-          13
-        );
-
-        continue; // Skip this field
-      } else if (ctx.store.schema && typename && fieldName !== '__typename') {
-        isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
-      }
-    }
-
     if (
       // Skip typename fields and assume they've already been written above
       fieldName === '__typename' ||
@@ -276,6 +254,12 @@ const writeSelection = (
         (deferRef || (ctx.optimistic && rootField === 'query')))
     ) {
       continue;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      if (ctx.store.schema && typename && fieldName !== '__typename') {
+        isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
+      }
     }
 
     // Add the current alias to the walked path before processing the field's value
@@ -298,6 +282,32 @@ const writeSelection = (
       fieldValue = ensureData(resolver(fieldArgs || {}, ctx.store, ctx));
     }
 
+    if (fieldValue === undefined) {
+      if (process.env.NODE_ENV !== 'production') {
+        if (
+          !entityKey ||
+          !InMemoryData.hasField(entityKey, fieldKey) ||
+          (ctx.optimistic && !InMemoryData.readRecord(entityKey, '__typename'))
+        ) {
+          const expected =
+            node.selectionSet === undefined
+              ? 'scalar (number, boolean, etc)'
+              : 'selection set';
+
+          warn(
+            'Invalid undefined: The field at `' +
+              fieldKey +
+              '` is `undefined`, but the GraphQL query expects a ' +
+              expected +
+              ' for this field.',
+            13
+          );
+        }
+      }
+
+      continue; // Skip this field
+    }
+
     if (node.selectionSet) {
       // Process the field and write links for the child entities that have been written
       if (entityKey && rootField === 'query') {
@@ -306,7 +316,10 @@ const writeSelection = (
           ctx,
           getSelectionSet(node),
           ensureData(fieldValue),
-          key
+          key,
+          ctx.optimistic
+            ? InMemoryData.readLink(entityKey || typename, fieldKey)
+            : undefined
         );
         InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       } else {
@@ -353,7 +366,8 @@ const writeField = (
   ctx: Context,
   select: SelectionSet,
   data: null | Data | NullArray<Data>,
-  parentFieldKey?: string
+  parentFieldKey?: string,
+  prevLink?: Link
 ): Link | undefined => {
   if (Array.isArray(data)) {
     const newData = new Array(data.length);
@@ -365,7 +379,8 @@ const writeField = (
         ? joinKeys(parentFieldKey, `${i}`)
         : undefined;
       // Recursively write array data
-      const links = writeField(ctx, select, data[i], indexKey);
+      const prevIndex = prevLink != null ? prevLink[i] : undefined;
+      const links = writeField(ctx, select, data[i], indexKey, prevIndex);
       // Link cannot be expressed as a recursive type
       newData[i] = links as string | null;
       // After processing the field, remove the current index from the path
@@ -377,7 +392,9 @@ const writeField = (
     return getFieldError(ctx) ? undefined : null;
   }
 
-  const entityKey = ctx.store.keyOfEntity(data);
+  const entityKey =
+    ctx.store.keyOfEntity(data) ||
+    (typeof prevLink === 'string' ? prevLink : null);
   const typename = data.__typename;
 
   if (
