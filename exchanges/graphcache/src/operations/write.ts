@@ -278,7 +278,14 @@ const writeSelection = (
     // Execute the field-level resolver to retrieve its data
     if (resolver) {
       // We have to update the context to reflect up-to-date ResolveInfo
-      updateContext(ctx, data, typename, typename, fieldKey, fieldName);
+      updateContext(
+        ctx,
+        data,
+        typename,
+        entityKey || typename,
+        fieldKey,
+        fieldName
+      );
       fieldValue = ensureData(resolver(fieldArgs || {}, ctx.store, ctx));
     }
 
@@ -345,7 +352,7 @@ const writeSelection = (
         ctx,
         data,
         typename,
-        typename,
+        entityKey || typename,
         joinKeys(typename, fieldKey),
         fieldName
       );
