@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.1.3
+
+### Patch Changes
+
+- ⚠️ Fix `info.parentKey` not being correctly set for updaters or optimistic updaters
+  Submitted by [@kitten](https://github.com/kitten) (See [#3267](https://github.com/urql-graphql/urql/pull/3267))
+
 ## 6.1.2
 
 ### Patch Changes
