@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 6.1.2
+
+### Patch Changes
+
+- Make "Invalid undefined" warning heuristic smarter and allow for partial optimistic results. Previously, when a partial optimistic result would be passed, a warning would be issued, and in production, fields would be deleted from the cache. Instead, we now only issue a warning if these fields aren't cached already
+  Submitted by [@kitten](https://github.com/kitten) (See [#3264](https://github.com/urql-graphql/urql/pull/3264))
+- Optimistic mutation results should never result in dependent operations being blocked
+  Submitted by [@kitten](https://github.com/kitten) (See [#3265](https://github.com/urql-graphql/urql/pull/3265))
+
 ## 6.1.1
 
 ### Patch Changes

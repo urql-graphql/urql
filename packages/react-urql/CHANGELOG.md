@@ -1,5 +1,12 @@
 # urql
 
+## 4.0.4
+
+### Patch Changes
+
+- Switch `react` imports to namespace imports, and update build process for CommonJS outputs to interoperate with `__esModule` marked modules again
+  Submitted by [@kitten](https://github.com/kitten) (See [#3251](https://github.com/urql-graphql/urql/pull/3251))
+
 ## 4.0.3
 
 ### Patch Changes
