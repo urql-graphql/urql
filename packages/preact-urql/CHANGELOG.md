@@ -1,5 +1,12 @@
 # @urql/preact
 
+## 4.0.3
+
+### Patch Changes
+
+- Apply shallow difference patch from React bindings to `@urql/preact` (See: #3195)
+  Submitted by [@kitten](https://github.com/kitten) (See [#3266](https://github.com/urql-graphql/urql/pull/3266))
+
 ## 4.0.2
 
 ### Patch Changes
