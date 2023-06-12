@@ -210,7 +210,13 @@ const writeSelection = (
   const rootField = ctx.store.rootNames[entityKey!] || 'query';
   const isRoot = !!ctx.store.rootNames[entityKey!];
 
-  const typename = isRoot ? entityKey : data.__typename;
+  let typename = isRoot ? entityKey : data.__typename;
+  if (!typename && entityKey && ctx.optimistic) {
+    typename = InMemoryData.readRecord(entityKey, '__typename') as
+      | string
+      | undefined;
+  }
+
   if (!typename) {
     warn(
       "Couldn't find __typename when writing.\n" +
@@ -278,7 +284,11 @@ const writeSelection = (
 
     if (fieldValue === undefined) {
       if (process.env.NODE_ENV !== 'production') {
-        if (!entityKey || !InMemoryData.hasField(entityKey, fieldKey)) {
+        if (
+          !entityKey ||
+          !InMemoryData.hasField(entityKey, fieldKey) ||
+          (ctx.optimistic && !InMemoryData.readRecord(entityKey, '__typename'))
+        ) {
           const expected =
             node.selectionSet === undefined
               ? 'scalar (number, boolean, etc)'
@@ -306,7 +316,10 @@ const writeSelection = (
           ctx,
           getSelectionSet(node),
           ensureData(fieldValue),
-          key
+          key,
+          ctx.optimistic
+            ? InMemoryData.readLink(entityKey || typename, fieldKey)
+            : undefined
         );
         InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       } else {
@@ -353,7 +366,8 @@ const writeField = (
   ctx: Context,
   select: SelectionSet,
   data: null | Data | NullArray<Data>,
-  parentFieldKey?: string
+  parentFieldKey?: string,
+  prevLink?: Link
 ): Link | undefined => {
   if (Array.isArray(data)) {
     const newData = new Array(data.length);
@@ -365,7 +379,8 @@ const writeField = (
         ? joinKeys(parentFieldKey, `${i}`)
         : undefined;
       // Recursively write array data
-      const links = writeField(ctx, select, data[i], indexKey);
+      const prevIndex = prevLink != null ? prevLink[i] : undefined;
+      const links = writeField(ctx, select, data[i], indexKey, prevIndex);
       // Link cannot be expressed as a recursive type
       newData[i] = links as string | null;
       // After processing the field, remove the current index from the path
@@ -377,7 +392,9 @@ const writeField = (
     return getFieldError(ctx) ? undefined : null;
   }
 
-  const entityKey = ctx.store.keyOfEntity(data);
+  const entityKey =
+    ctx.store.keyOfEntity(data) ||
+    (typeof prevLink === 'string' ? prevLink : null);
   const typename = data.__typename;
 
   if (
