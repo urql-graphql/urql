@@ -8,10 +8,26 @@ type Updater<T> = (input: T) => void;
 
 let currentInit = false;
 
+// Two operations are considered equal if they have the same key
+const areOperationsEqual = (
+  a: { key: number } | undefined,
+  b: { key: number } | undefined
+) => {
+  return a === b || !!(a && b && a.key === b.key);
+};
+
 const isShallowDifferent = (a: any, b: any) => {
   if (typeof a != 'object' || typeof b != 'object') return a !== b;
   for (const x in a) if (!(x in b)) return true;
-  for (const x in b) if (a[x] !== b[x]) return true;
+  for (const key in b) {
+    if (
+      key === 'operation'
+        ? !areOperationsEqual(a[key], b[key])
+        : a[key] !== b[key]
+    ) {
+      return true;
+    }
+  }
   return false;
 };
 
