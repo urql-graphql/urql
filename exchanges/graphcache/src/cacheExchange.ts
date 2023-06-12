@@ -111,7 +111,8 @@ export const cacheExchange =
 
     const executePendingOperations = (
       operation: Operation,
-      pendingOperations: Operations
+      pendingOperations: Operations,
+      isOptimistic: boolean
     ) => {
       // Reexecute collected operations and delete them from the mapping
       for (const key of pendingOperations.values()) {
@@ -130,13 +131,15 @@ export const cacheExchange =
         }
       }
 
-      // Upon completion, all dependent operations become reexecuting operations, preventing
-      // them from reexecuting prior operations again, causing infinite loops
-      const _reexecutingOperations = reexecutingOperations;
-      if (operation.kind === 'query') {
-        (reexecutingOperations = dependentOperations).add(operation.key);
+      if (!isOptimistic) {
+        // Upon completion, all dependent operations become reexecuting operations, preventing
+        // them from reexecuting prior operations again, causing infinite loops
+        const _reexecutingOperations = reexecutingOperations;
+        if (operation.kind === 'query') {
+          (reexecutingOperations = dependentOperations).add(operation.key);
+        }
+        (dependentOperations = _reexecutingOperations).clear();
       }
-      (dependentOperations = _reexecutingOperations).clear();
     };
 
     // This registers queries with the data layer to ensure commutativity
@@ -171,7 +174,7 @@ export const cacheExchange =
           // Update related queries
           const pendingOperations: Operations = new Set();
           collectPendingOperations(pendingOperations, dependencies);
-          executePendingOperations(operation, pendingOperations);
+          executePendingOperations(operation, pendingOperations, true);
         }
       }
 
@@ -424,7 +427,7 @@ export const cacheExchange =
           // Update the cache with the incoming API result
           const cacheResult = updateCacheWithResult(result, pendingOperations);
           // Execute all dependent queries
-          executePendingOperations(result.operation, pendingOperations);
+          executePendingOperations(result.operation, pendingOperations, false);
           return cacheResult;
         })
       );
@@ -458,7 +461,7 @@ export const cacheExchange =
             );
 
           // Execute all dependent queries as a single batch
-          executePendingOperations(result.operation, pendingOperations);
+          executePendingOperations(result.operation, pendingOperations, false);
 
           return fromArray(results);
         })
