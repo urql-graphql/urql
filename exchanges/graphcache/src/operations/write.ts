@@ -239,13 +239,17 @@ const writeSelection = (
     const fieldAlias = getFieldAlias(node);
     let fieldValue = data[ctx.optimistic ? fieldName : fieldAlias];
 
-    // Development check of undefined fields
-    if (rootField === 'query' && fieldValue === undefined && !deferRef) {
+    if (
+      // Skip typename fields and assume they've already been written above
+      fieldName === '__typename' ||
+      // Fields marked as deferred that aren't defined must be skipped
+      // Otherwise, we also ignore undefined values in optimistic updaters
+      (fieldValue === undefined &&
+        (deferRef || (ctx.optimistic && rootField === 'query')))
+    ) {
+      continue;
+    } else if (rootField === 'query' && fieldValue === undefined && !deferRef) {
       if (process.env.NODE_ENV !== 'production') {
-        if (ctx.store.schema && typename && fieldName !== '__typename') {
-          isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
-        }
-
         if (!entityKey || !InMemoryData.hasField(entityKey, fieldKey)) {
           const expected =
             node.selectionSet === undefined
@@ -264,15 +268,12 @@ const writeSelection = (
       }
 
       continue; // Skip this field
-    } else if (
-      // Skip typename fields and assume they've already been written above
-      fieldName === '__typename' ||
-      // Fields marked as deferred that aren't defined must be skipped
-      // Otherwise, we also ignore undefined values in optimistic updaters
-      (fieldValue === undefined &&
-        (deferRef || (ctx.optimistic && rootField === 'query')))
-    ) {
-      continue;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      if (ctx.store.schema && typename && fieldName !== '__typename') {
+        isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
+      }
     }
 
     // Add the current alias to the walked path before processing the field's value

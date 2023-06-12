@@ -164,8 +164,6 @@ describe('Query', () => {
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
 
-    // The warning should be called for `__typename`
-    expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.error).not.toHaveBeenCalled();
   });
 
