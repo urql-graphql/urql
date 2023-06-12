@@ -240,34 +240,31 @@ const writeSelection = (
     let fieldValue = data[ctx.optimistic ? fieldName : fieldAlias];
 
     // Development check of undefined fields
-    if (process.env.NODE_ENV !== 'production') {
-      if (
-        rootField === 'query' &&
-        fieldValue === undefined &&
-        !deferRef &&
-        !ctx.optimistic
-      ) {
-        const expected =
-          node.selectionSet === undefined
-            ? 'scalar (number, boolean, etc)'
-            : 'selection set';
+    if (rootField === 'query' && fieldValue === undefined && !deferRef) {
+      if (process.env.NODE_ENV !== 'production') {
+        if (ctx.store.schema && typename && fieldName !== '__typename') {
+          isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
+        }
 
-        warn(
-          'Invalid undefined: The field at `' +
-            fieldKey +
-            '` is `undefined`, but the GraphQL query expects a ' +
-            expected +
-            ' for this field.',
-          13
-        );
+        if (!entityKey || !InMemoryData.hasField(entityKey, fieldKey)) {
+          const expected =
+            node.selectionSet === undefined
+              ? 'scalar (number, boolean, etc)'
+              : 'selection set';
 
-        continue; // Skip this field
-      } else if (ctx.store.schema && typename && fieldName !== '__typename') {
-        isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
+          warn(
+            'Invalid undefined: The field at `' +
+              fieldKey +
+              '` is `undefined`, but the GraphQL query expects a ' +
+              expected +
+              ' for this field.',
+            13
+          );
+        }
       }
-    }
 
-    if (
+      continue; // Skip this field
+    } else if (
       // Skip typename fields and assume they've already been written above
       fieldName === '__typename' ||
       // Fields marked as deferred that aren't defined must be skipped
