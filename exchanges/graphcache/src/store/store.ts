@@ -106,7 +106,9 @@ export class Store<
     }
   }
 
-  keyOfField = keyOfField;
+  keyOfField(fieldName: string, fieldArgs?: FieldArgs) {
+    return keyOfField(fieldName, fieldArgs);
+  }
 
   keyOfEntity(data: Entity) {
     // In resolvers and updaters we may have a specific parent
@@ -148,7 +150,9 @@ export class Store<
     return link || null;
   }
 
-  resolveFieldByKey = this.resolve;
+  resolveFieldByKey(entity: Entity, field: string, args?: FieldArgs) {
+    return this.resolve(entity, field, args);
+  }
 
   invalidate(entity: Entity, field?: string, args?: FieldArgs) {
     const entityKey = this.keyOfEntity(entity);
