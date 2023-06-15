@@ -76,6 +76,14 @@ module.exports = {
         '@typescript-eslint/array-type': 'off',
         'import/no-internal-modules': 'off',
 
+        'no-restricted-syntax': [
+          "error",
+          {
+            "selector": "PropertyDefinition[value]",
+            "message": "Property definitions with value initializers aren’t transpiled"
+          },
+        ],
+
         '@typescript-eslint/no-unused-vars': ['error', {
           argsIgnorePattern: '^_',
         }],
