@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.1.4
+
+### Patch Changes
+
+- ⚠️ Fix untranspiled class property initializer syntax being leftover in build output. (Regression in #3053)
+  Submitted by [@kitten](https://github.com/kitten) (See [#3275](https://github.com/urql-graphql/urql/pull/3275))
+
 ## 6.1.3
 
 ### Patch Changes
