@@ -368,7 +368,7 @@ export function useQuery<
               })
             )
           : client.executeQuery(request, context);
-        return [source, state[1], deps];
+        return [source, state[1], state[2]];
       });
     },
     [
