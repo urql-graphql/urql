@@ -6,6 +6,7 @@
   "homepage": "https://formidable.com/open-source/urql/docs/graphcache",
   "bugs": "https://github.com/urql-graphql/urql/issues",
   "license": "MIT",
+  "author": "urql GraphQL Contributors",
   "repository": {
     "type": "git",
     "url": "https://github.com/urql-graphql/urql.git",

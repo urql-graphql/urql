@@ -62,7 +62,7 @@
     "@babel/plugin-transform-block-scoping": "^7.21.0",
     "@babel/plugin-transform-react-jsx": "^7.21.5",
     "@babel/plugin-transform-typescript": "^7.21.3",
-    "@changesets/cli": "^2.26.0",
+    "@changesets/cli": "^2.26.2",
     "@changesets/get-github-info": "0.5.2",
     "@npmcli/arborist": "^6.2.5",
     "@rollup/plugin-babel": "^6.0.3",
