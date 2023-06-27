@@ -138,6 +138,11 @@ if (hasReact) {
       is(entry.types, `./dist/${bundleName}.d.ts`),
       'package.json:types path must be valid'
     );
+
+    invariant(
+      Object.keys(entry)[0] === 'types',
+      'package.json:types must come first'
+    );
   }
 }
 
