@@ -90,6 +90,11 @@ invariant(
 );
 
 invariant(
+  !!pkg.author,
+  'package.json:author must be defined'
+);
+
+invariant(
   pkg.license === 'MIT',
   'package.json:license must be "MIT"'
 );
