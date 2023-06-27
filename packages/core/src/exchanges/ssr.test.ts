@@ -4,7 +4,7 @@ import { vi, expect, it, beforeEach, afterEach } from 'vitest';
 import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
 import { ExchangeIO, Operation, OperationResult } from '../types';
-import { CombinedError } from '../utils';
+import { CombinedError, formatDocument } from '../utils';
 import { ssrExchange } from './ssr';
 
 let forward: ExchangeIO;
@@ -254,6 +254,10 @@ it('resolves deferred, cached query results correctly', () => {
       },
     },
   });
+
+  expect(output.mock.calls[0][0].query).toBe(
+    formatDocument(queryOperation.query)
+  );
 });
 
 it('deletes cached results in non-suspense environments', async () => {

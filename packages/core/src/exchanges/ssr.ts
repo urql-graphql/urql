@@ -2,7 +2,7 @@ import type { GraphQLError } from '../utils/graphql';
 import { pipe, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
 import { addMetadata, CombinedError } from '../utils';
-import { reexecuteOperation } from './cache';
+import { reexecuteOperation, mapTypeNames } from './cache';
 
 /** A serialized version of an {@link OperationResult}.
  *
@@ -226,6 +226,7 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
             !!data[operation.key]!.hasNext ||
             operation.context.requestPolicy === 'network-only'
         ),
+        map(mapTypeNames),
         forward
       );
 

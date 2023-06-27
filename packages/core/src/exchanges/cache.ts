@@ -17,6 +17,18 @@ type OperationCache = Map<string, Set<number>>;
 const shouldSkip = ({ kind }: Operation) =>
   kind !== 'mutation' && kind !== 'query';
 
+/** Adds unique typenames to query (for invalidating cache entries) */
+export const mapTypeNames = (operation: Operation): Operation => {
+  const query = formatDocument(operation.query);
+  if (query !== operation.query) {
+    const formattedOperation = makeOperation(operation.kind, operation);
+    formattedOperation.query = query;
+    return formattedOperation;
+  } else {
+    return operation;
+  }
+};
+
 /** Default document cache exchange.
  *
  * @remarks
@@ -40,13 +52,6 @@ const shouldSkip = ({ kind }: Operation) =>
 export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache: ResultCache = new Map();
   const operationCache: OperationCache = new Map();
-
-  // Adds unique typenames to query (for invalidating cache entries)
-  const mapTypeNames = (operation: Operation): Operation => {
-    const formattedOperation = makeOperation(operation.kind, operation);
-    formattedOperation.query = formatDocument(operation.query);
-    return formattedOperation;
-  };
 
   const isOperationCached = (operation: Operation) =>
     operation.kind === 'query' &&
