@@ -1,3 +1,47 @@
+/* Summary: This file handles the HTTP transport via GraphQL over HTTP
+ * See: https://graphql.github.io/graphql-over-http/draft/
+ *
+ * `@urql/core`, by default, implements several RFC'd protocol extensions
+ * on top of this. As such, this implementation supports:
+ * - [Incremental Delivery](https://github.com/graphql/graphql-over-http/blob/main/rfcs/IncrementalDelivery.md)
+ * - [GraphQL over SSE](https://github.com/graphql/graphql-over-http/blob/main/rfcs/GraphQLOverSSE.md)
+ *
+ * This also supports the "Defer Stream" payload format.
+ * See: https://github.com/graphql/graphql-wg/blob/main/rfcs/DeferStream.md
+ * Implementation for this is located in `../utils/result.ts` in `mergeResultPatch`
+ *
+ * And; this also supports the GraphQL Multipart spec for file uploads.
+ * See: https://github.com/jaydenseric/graphql-multipart-request-spec
+ * Implementation for this is located in `../utils/variables.ts` in `extractFiles`,
+ * and `./fetchOptions.ts` in `serializeBody`.
+ *
+ * And; this also supports GET requests (and hence; automatic persisted queries)
+ * via the `@urql/exchange-persisted` package.
+ *
+ * This implementation DOES NOT support Batching.
+ * See: https://github.com/graphql/graphql-over-http/blob/main/rfcs/Batching.md
+ * Which is deemed out-of-scope, as it's sufficiently unnecessary given
+ * modern handling of HTTP requests being in parallel.
+ *
+ * The implementation in this file needs to make certain accommodations for:
+ * - The Web Fetch API
+ * - Non-browser or polyfill Fetch APIs
+ * - Node.js-like Fetch implementations (see `toString` below)
+ *
+ * GraphQL over SSE has a reference implementation, which supports non-HTTP/2
+ * modes and is a faithful implementation of the spec.
+ * See: https://github.com/enisdenjo/graphql-sse
+ *
+ * GraphQL Inremental Delivery (aka “GraphQL Multipart Responses”) has a
+ * reference implementation, which a prior implementation of this file heavily
+ * leaned on (See prior attribution comments)
+ * See: https://github.com/maraisr/meros
+ *
+ * This file merges support for all three GraphQL over HTTP response formats
+ * via async generators and Wonka’s `fromAsyncIterable`. As part of this, `streamBody`
+ * and `split` are the common, cross-compatible base implementations.
+ */
+
 import { Source, fromAsyncIterable, onEnd, filter, pipe } from 'wonka';
 import { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
