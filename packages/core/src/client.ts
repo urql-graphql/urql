@@ -629,6 +629,14 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       )
     );
 
+    // Mask typename properties if the option for it is turned on
+    if (opts.maskTypename) {
+      result$ = pipe(
+        result$,
+        map(res => ({ ...res, data: maskTypename(res.data, true) }))
+      );
+    }
+
     if (operation.kind !== 'query') {
       // Interrupt subscriptions and mutations when they have no more results
       result$ = pipe(
@@ -702,14 +710,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         onStart(() => {
           nextOperation(operation);
         })
-      );
-    }
-
-    // Mask typename properties if the option for it is turned on
-    if (opts.maskTypename) {
-      result$ = pipe(
-        result$,
-        map(res => ({ ...res, data: maskTypename(res.data, true) }))
       );
     }
 
