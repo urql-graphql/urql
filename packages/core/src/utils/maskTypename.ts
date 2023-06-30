@@ -1,5 +1,7 @@
 /** Used to recursively mark `__typename` fields in data as non-enumerable.
  *
+ * @deprecated Not recommended over modelling inputs manually (See #3299)
+ *
  * @remarks
  * This utility can be used to recursively copy GraphQl response data and hide
  * all `__typename` fields present on it.

@@ -171,6 +171,8 @@ export interface ClientOptions {
   preferGetMethod?: boolean | 'force' | 'within-url-limit';
   /** Instructs the `Client` to remove `__typename` properties on all results.
    *
+   * @deprecated Not recommended over modelling inputs manually (See #3299)
+   *
    * @remarks
    * By default, cache exchanges will alter your GraphQL documents to request `__typename` fields
    * for all selections. However, this means that your GraphQL data will now contain `__typename` fields you
