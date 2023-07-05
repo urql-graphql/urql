@@ -237,6 +237,7 @@ export const cacheExchange =
       operations.set(operation.key, operation);
       updateDependencies(operation, result.dependencies);
 
+      // TODO: remove directives before sending it on
       return {
         outcome: cacheOutcome,
         operation,

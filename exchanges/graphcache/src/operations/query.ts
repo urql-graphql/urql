@@ -357,9 +357,8 @@ const readSelection = (
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
     const fieldDirectives = node.directives?.map(x => x.name.value);
-
-    // TODO: strip out the directive so we don't send it to origin
     const storeDirective = fieldDirectives?.find(x => store.directives[x]);
+
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
@@ -409,9 +408,14 @@ const readSelection = (
       }
 
       if (storeDirective) {
+        const fieldDirective = node.directives!.find(
+          x => x.name.value === storeDirective
+        )!;
+        const directiveArguments =
+          getFieldArguments(fieldDirective, ctx.variables) || {};
         dataFieldValue = store.directives[storeDirective]!(
           output,
-          fieldArgs || ({} as Variables),
+          { ...(fieldArgs || ({} as Variables)), ...directiveArguments },
           store,
           ctx
         );

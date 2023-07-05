@@ -697,7 +697,7 @@ export type ResolverConfig = {
 
 // TODO: docs
 export type DirectivesConfig = {
-  [directiveName: string]: Resolver | void;
+  [directiveName: string]: Resolver;
 };
 
 /** Cache Updater, which defines additional cache updates after cache writes.

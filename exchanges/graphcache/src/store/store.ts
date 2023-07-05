@@ -38,6 +38,17 @@ import {
 type DocumentNode = TypedDocumentNode<any, any>;
 type RootField = 'query' | 'mutation' | 'subscription';
 
+const defaultDirectives: DirectivesConfig = {
+  optional: (_parent, args, cache, info) => {
+    const result = cache.resolve(info.parentFieldKey, info.fieldName, args);
+    return result === undefined ? null : result;
+  },
+  required: (_parent, args, cache, info) => {
+    const result = cache.resolve(info.parentFieldKey, info.fieldName, args);
+    return result === null ? undefined : result;
+  },
+};
+
 /** Implementation of the {@link Cache} interface as created internally by the {@link cacheExchange}.
  * @internal
  */
@@ -62,7 +73,8 @@ export class Store<
     if (!opts) opts = {} as C;
 
     this.resolvers = opts.resolvers || {};
-    this.directives = opts.directives || {};
+    this.directives =
+      { ...defaultDirectives, ...opts.directives } || defaultDirectives;
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
 

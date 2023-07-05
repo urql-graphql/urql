@@ -1,5 +1,6 @@
 import {
   FieldNode,
+  DirectiveNode,
   OperationDefinitionNode,
   valueFromASTUntyped,
 } from '@0no-co/graphql.web';
@@ -10,7 +11,7 @@ import { Variables } from '../types';
 
 /** Evaluates a fields arguments taking vars into account */
 export const getFieldArguments = (
-  node: FieldNode,
+  node: FieldNode | DirectiveNode,
   vars: Variables
 ): null | Variables => {
   let args: null | Variables = null;
