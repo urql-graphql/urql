@@ -356,6 +356,10 @@ const readSelection = (
   let node: FormattedNode<FieldNode> | void;
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
+    const fieldDirectives = node.directives?.map(x => x.name.value);
+
+    // TODO: strip out the directive so we don't send it to origin
+    const storeDirective = fieldDirectives?.find(x => store.directives[x]);
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
@@ -383,8 +387,7 @@ const readSelection = (
       dataFieldValue = resultValue;
     } else if (
       InMemoryData.currentOperation === 'read' &&
-      resolvers &&
-      resolvers[fieldName]
+      ((resolvers && resolvers[fieldName]) || storeDirective)
     ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
@@ -396,12 +399,23 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
-      dataFieldValue = resolvers[fieldName]!(
-        output,
-        fieldArgs || ({} as Variables),
-        store,
-        ctx
-      );
+      if (resolvers[fieldName]) {
+        dataFieldValue = resolvers[fieldName]!(
+          output,
+          fieldArgs || ({} as Variables),
+          store,
+          ctx
+        );
+      }
+
+      if (storeDirective) {
+        dataFieldValue = store.directives[storeDirective]!(
+          output,
+          fieldArgs || ({} as Variables),
+          store,
+          ctx
+        );
+      }
 
       if (node.selectionSet) {
         // When it has a selection set we are resolving an entity with a
@@ -423,6 +437,7 @@ const readSelection = (
       if (
         store.schema &&
         dataFieldValue === null &&
+        // TODO: how would we inform this that we are indeed dealing with a nullable field
         !isFieldNullable(store.schema, typename, fieldName)
       ) {
         // Special case for when null is not a valid value for the

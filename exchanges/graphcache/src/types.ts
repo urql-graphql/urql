@@ -555,6 +555,8 @@ export type CacheExchangeOpts = {
    * @see {@link https://urql.dev/goto/docs/graphcache/local-resolvers} for the full resolvers docs.
    */
   resolvers?: ResolverConfig;
+  // TODO: docs
+  directives?: DirectivesConfig;
   /** Configures optimistic updates to react to mutations instantly before an API response.
    *
    * @remarks
@@ -691,6 +693,11 @@ export type ResolverConfig = {
   [typeName: string]: {
     [fieldName: string]: Resolver | void;
   } | void;
+};
+
+// TODO: docs
+export type DirectivesConfig = {
+  [directiveName: string]: Resolver | void;
 };
 
 /** Cache Updater, which defines additional cache updates after cache writes.

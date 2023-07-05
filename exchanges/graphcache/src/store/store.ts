@@ -15,6 +15,7 @@ import {
   KeyingConfig,
   Entity,
   CacheExchangeOpts,
+  DirectivesConfig,
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -46,6 +47,7 @@ export class Store<
 {
   data: InMemoryData.InMemoryData;
 
+  directives: DirectivesConfig;
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
@@ -60,6 +62,7 @@ export class Store<
     if (!opts) opts = {} as C;
 
     this.resolvers = opts.resolvers || {};
+    this.directives = opts.directives || {};
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
 
