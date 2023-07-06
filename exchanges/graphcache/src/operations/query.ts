@@ -398,7 +398,7 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
-      if (resolvers[fieldName]) {
+      if (resolvers && resolvers[fieldName]) {
         dataFieldValue = resolvers[fieldName]!(
           output,
           fieldArgs || ({} as Variables),
