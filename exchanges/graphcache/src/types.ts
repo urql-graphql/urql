@@ -678,6 +678,19 @@ export type Resolver<
   ): Result;
 }['bivarianceHack'];
 
+export type Directive<
+  ParentData = DataFields,
+  Args = Variables,
+  Result = ResolverResult
+> = {
+  bivarianceHack(
+    parent: ParentData,
+    args: Args,
+    cache: Cache,
+    info: ResolveInfo & { directiveArguments: Record<string, any> }
+  ): Result;
+}['bivarianceHack'];
+
 /** Configures resolvers which replace cached reuslts with custom values.
  *
  * @remarks
@@ -697,7 +710,7 @@ export type ResolverConfig = {
 
 // TODO: docs
 export type DirectivesConfig = {
-  [directiveName: string]: Resolver;
+  [directiveName: string]: Directive;
 };
 
 /** Cache Updater, which defines additional cache updates after cache writes.

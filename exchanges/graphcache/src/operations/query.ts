@@ -398,6 +398,13 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
+      if (resolvers && resolvers[fieldName] && storeDirective) {
+        warn(
+          `A resolver and directive is being used at "${typename}.${fieldName}", only the directive will apply.`,
+          28
+        );
+      }
+
       if (resolvers && resolvers[fieldName]) {
         dataFieldValue = resolvers[fieldName]!(
           output,
@@ -415,9 +422,9 @@ const readSelection = (
           getFieldArguments(fieldDirective, ctx.variables) || {};
         dataFieldValue = store.directives[storeDirective]!(
           output,
-          { ...(fieldArgs || ({} as Variables)), ...directiveArguments },
+          fieldArgs || ({} as Variables),
           store,
-          ctx
+          { ...ctx, directiveArguments }
         );
       }
 
