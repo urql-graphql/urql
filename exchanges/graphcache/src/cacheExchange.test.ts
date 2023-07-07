@@ -6,6 +6,7 @@ import {
   OperationResult,
   CombinedError,
 } from '@urql/core';
+import { print, stripIgnoredCharacters } from 'graphql';
 
 import { vi, expect, it, describe } from 'vitest';
 
@@ -810,6 +811,9 @@ describe('directives', () => {
 
     expect(response).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(1);
+    expect(
+      stripIgnoredCharacters(print(response.mock.calls[0][0].query))
+    ).toEqual('{todos{id text completed __typename}}');
     expect(reexecuteOperation).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0].data).toEqual(null);
   });
