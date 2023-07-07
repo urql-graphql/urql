@@ -1,6 +1,6 @@
 ---
 title: Errors
-order: 7
+order: 8
 ---
 
 # Help!
@@ -411,3 +411,8 @@ write to the cache when it's being queried.
 
 Please make sure that you're not calling `cache.updateQuery`,
 `cache.writeFragment`, or `cache.link` inside `resolvers`.
+
+## (28) Resolver and directive match the same field
+
+When you have a resolver defined on a field you shouln't be combining it with a directive as the directive
+will apply and the resolver will be void.
