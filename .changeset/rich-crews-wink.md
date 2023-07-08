@@ -2,4 +2,4 @@
 '@urql/svelte': patch
 ---
 
-Allowed Svelte 4.0 as a peer dependency
+Updated peer dependency range to include support for Svelte `^4.0.0`
