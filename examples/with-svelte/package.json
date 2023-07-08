@@ -11,10 +11,10 @@
     "@urql/core": "^4.0.10",
     "@urql/svelte": "^4.0.2",
     "graphql": "^16.6.0",
-    "svelte": "^4.0.0"
+    "svelte": "^4.0.5"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.0.3",
+    "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "vite": "^4.2.0"
   }
 }
