@@ -13,6 +13,7 @@ import {
 import {
   createRequest,
   makeOperation,
+  makeErrorResult,
   Operation,
   OperationContext,
   OperationResult,
@@ -202,15 +203,24 @@ export function authExchange(
   return ({ client, forward }) => {
     const bypassQueue = new Set<OperationInstance | undefined>();
     const retries = makeSubject<Operation>();
+    const errors = makeSubject<OperationResult>();
 
     let retryQueue = new Map<number, Operation>();
 
-    function flushQueue(_config?: AuthConfig | undefined) {
-      if (_config) config = _config;
+    function flushQueue() {
       authPromise = undefined;
       const queue = retryQueue;
       retryQueue = new Map();
       queue.forEach(retries.next);
+    }
+
+    function errorQueue(error: Error) {
+      authPromise = undefined;
+      const queue = retryQueue;
+      retryQueue = new Map();
+      queue.forEach(operation => {
+        errors.next(makeErrorResult(operation, error));
+      });
     }
 
     let authPromise: Promise<void> | void;
@@ -270,7 +280,10 @@ export function authExchange(
             },
           })
         )
-        .then(flushQueue);
+        .then((_config: AuthConfig) => {
+          if (_config) config = _config;
+          flushQueue();
+        });
 
       function refreshAuth(operation: Operation) {
         // add to retry queue to try again later
@@ -281,7 +294,7 @@ export function authExchange(
 
         // check that another operation isn't already doing refresh
         if (config && !authPromise) {
-          authPromise = config.refreshAuth().finally(flushQueue);
+          authPromise = config.refreshAuth().then(flushQueue).catch(errorQueue);
         }
       }
 
@@ -341,26 +354,29 @@ export function authExchange(
 
       const result$ = pipe(opsWithAuth$, forward);
 
-      return pipe(
-        result$,
-        filter(result => {
-          if (
-            !bypassQueue.has(result.operation.context._instance) &&
-            result.error &&
-            didAuthError(result) &&
-            !result.operation.context.authAttempt
-          ) {
-            refreshAuth(result.operation);
-            return false;
-          }
+      return merge([
+        errors.source,
+        pipe(
+          result$,
+          filter(result => {
+            if (
+              !bypassQueue.has(result.operation.context._instance) &&
+              result.error &&
+              didAuthError(result) &&
+              !result.operation.context.authAttempt
+            ) {
+              refreshAuth(result.operation);
+              return false;
+            }
 
-          if (bypassQueue.has(result.operation.context._instance)) {
-            bypassQueue.delete(result.operation.context._instance);
-          }
+            if (bypassQueue.has(result.operation.context._instance)) {
+              bypassQueue.delete(result.operation.context._instance);
+            }
 
-          return true;
-        })
-      );
+            return true;
+          })
+        ),
+      ]);
     };
   };
 }
