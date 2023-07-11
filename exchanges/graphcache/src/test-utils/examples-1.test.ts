@@ -534,12 +534,41 @@ it('correctly resolves optimistic updates on Relay schemas', () => {
   `;
 
   write(store, { query: getRoot }, queryData);
-  writeOptimistic(store, { query: updateItem, variables: { id: '2' } }, 1);
+  const { dependencies } = writeOptimistic(
+    store,
+    { query: updateItem, variables: { id: '2' } },
+    1
+  );
+  expect(dependencies.size).not.toBe(0);
   InMemoryData.noopDataState(store.data, 1);
   const queryRes = query(store, { query: getRoot });
 
   expect(queryRes.partial).toBe(false);
   expect(queryRes.data).not.toBe(null);
+});
+
+it('skips non-optimistic mutation fields on writes', () => {
+  const store = new Store();
+
+  const updateItem = gql`
+    mutation UpdateItem($id: ID!) {
+      updateItem(id: $id) {
+        __typename
+        item {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  `;
+
+  const { dependencies } = writeOptimistic(
+    store,
+    { query: updateItem, variables: { id: '2' } },
+    1
+  );
+  expect(dependencies.size).toBe(0);
 });
 
 it('allows cumulative optimistic updates', () => {
