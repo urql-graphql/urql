@@ -7,6 +7,7 @@ import {
   Exchange,
   ExchangeIO,
   CombinedError,
+  RequestPolicy,
   stringifyDocument,
   createRequest,
   makeOperation,
@@ -32,6 +33,13 @@ import {
 
 import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
+
+const policyLevel = {
+  'cache-only': 0,
+  'cache-first': 1,
+  'cache-and-network': 2,
+  'network-only': 3,
+} as const;
 
 /** Determines whether a given query contains an optimistic mutation field */
 const isOptimisticMutation = <T extends OptimisticMutationConfig>(
@@ -127,7 +135,7 @@ export const offlineExchange =
       const { forward: outerForward, client, dispatchDebug } = input;
       const { source: reboundOps$, next } = makeSubject<Operation>();
       const optimisticMutations = opts.optimistic || {};
-      const failedQueue: Operation[] = [];
+      let failedQueue: Operation[] = [];
       let hasRehydrated = false;
       let isFlushingQueue = false;
 
@@ -150,20 +158,28 @@ export const offlineExchange =
 
       const flushQueue = () => {
         if (!isFlushingQueue) {
-          isFlushingQueue = true;
-
           const sent = new Set<number>();
-          for (let i = 0; i < failedQueue.length; i++) {
-            const operation = failedQueue[i];
+          const queue = failedQueue;
+          isFlushingQueue = true;
+          failedQueue = [];
+          for (let i = 0; i < queue.length; i++) {
+            const operation = queue[i];
             if (operation.kind === 'mutation' || !sent.has(operation.key)) {
-              if (operation.kind !== 'subscription')
-                next(makeOperation('teardown', operation));
               sent.add(operation.key);
-              next(toRequestPolicy(operation, 'cache-first'));
+              if (operation.kind !== 'subscription') {
+                next(makeOperation('teardown', operation));
+                let overridePolicy: RequestPolicy = 'cache-first';
+                for (let i = 0; i < queue.length; i++) {
+                  const { requestPolicy } = queue[i].context;
+                  if (policyLevel[requestPolicy] > policyLevel[overridePolicy])
+                    overridePolicy = requestPolicy;
+                }
+                next(toRequestPolicy(operation, overridePolicy));
+              } else {
+                next(toRequestPolicy(operation, 'cache-first'));
+              }
             }
           }
-
-          failedQueue.length = 0;
           isFlushingQueue = false;
           updateMetadata();
         }
