@@ -155,6 +155,7 @@ export const cacheExchange =
         reexecutingOperations.delete(operation.key);
         // Mark operation layer as done
         noopDataState(store.data, operation.key);
+        return operation;
       } else if (
         operation.kind === 'mutation' &&
         operation.context.requestPolicy !== 'network-only'
