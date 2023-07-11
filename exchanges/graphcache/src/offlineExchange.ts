@@ -20,8 +20,8 @@ import { toRequestPolicy } from './helpers/operation';
 const policyLevel = {
   'cache-only': 0,
   'cache-first': 1,
-  'cache-and-network': 2,
-  'network-only': 3,
+  'network-only': 2,
+  'cache-and-network': 3,
 } as const;
 
 /** Input parameters for the {@link offlineExchange}.
