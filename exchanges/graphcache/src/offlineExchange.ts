@@ -1,5 +1,4 @@
 import { pipe, share, merge, makeSubject, filter, onPush } from 'wonka';
-import { SelectionNode } from '@0no-co/graphql.web';
 
 import {
   Operation,
@@ -13,23 +12,7 @@ import {
   makeOperation,
 } from '@urql/core';
 
-import {
-  getMainOperation,
-  getFragments,
-  isInlineFragment,
-  isFieldNode,
-  shouldInclude,
-  getSelectionSet,
-  getName,
-} from './ast';
-
-import {
-  SerializedRequest,
-  OptimisticMutationConfig,
-  Variables,
-  CacheExchangeOpts,
-  StorageAdapter,
-} from './types';
+import { SerializedRequest, CacheExchangeOpts, StorageAdapter } from './types';
 
 import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
@@ -40,32 +23,6 @@ const policyLevel = {
   'cache-and-network': 2,
   'network-only': 3,
 } as const;
-
-/** Determines whether a given query contains an optimistic mutation field */
-const isOptimisticMutation = <T extends OptimisticMutationConfig>(
-  config: T,
-  operation: Operation
-) => {
-  const vars: Variables = operation.variables || {};
-  const fragments = getFragments(operation.query);
-  const selections = [...getSelectionSet(getMainOperation(operation.query))];
-
-  let field: void | SelectionNode;
-  while ((field = selections.pop())) {
-    if (!shouldInclude(field, vars)) {
-      continue;
-    } else if (!isFieldNode(field)) {
-      const fragmentNode = !isInlineFragment(field)
-        ? fragments[getName(field)]
-        : field;
-      if (fragmentNode) selections.push(...getSelectionSet(fragmentNode));
-    } else if (config[getName(field)]) {
-      return true;
-    }
-  }
-
-  return false;
-};
 
 /** Input parameters for the {@link offlineExchange}.
  * @remarks
@@ -134,7 +91,6 @@ export const offlineExchange =
     ) {
       const { forward: outerForward, client, dispatchDebug } = input;
       const { source: reboundOps$, next } = makeSubject<Operation>();
-      const optimisticMutations = opts.optimistic || {};
       const failedQueue: Operation[] = [];
       let hasRehydrated = false;
       let isFlushingQueue = false;
@@ -196,8 +152,8 @@ export const offlineExchange =
             if (
               hasRehydrated &&
               res.operation.kind === 'mutation' &&
-              isOfflineError(res.error, res) &&
-              isOptimisticMutation(optimisticMutations, res.operation)
+              res.operation.context.optimistic &&
+              isOfflineError(res.error, res)
             ) {
               failedQueue.push(res.operation);
               updateMetadata();

@@ -528,6 +528,13 @@ export interface OperationContext {
    * @see {@link https://beta.reactjs.org/blog/2022/03/29/react-v18#new-suspense-features} for more information on React Suspense.
    */
   suspense?: boolean;
+  /** A metdata flag indicating whether this operation triggered optimistic updates.
+   *
+   * @remarks
+   * This configuration flag is reserved for `@urql/exchange-graphcache` and is flipped
+   * when an operation triggerd optimistic updates.
+   */
+  optimistic?: boolean;
   [key: string]: any;
 }
 
