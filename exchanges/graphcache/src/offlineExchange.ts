@@ -135,7 +135,7 @@ export const offlineExchange =
       const { forward: outerForward, client, dispatchDebug } = input;
       const { source: reboundOps$, next } = makeSubject<Operation>();
       const optimisticMutations = opts.optimistic || {};
-      let failedQueue: Operation[] = [];
+      const failedQueue: Operation[] = [];
       let hasRehydrated = false;
       let isFlushingQueue = false;
 
@@ -156,21 +156,24 @@ export const offlineExchange =
         }
       };
 
+      const filterQueue = (key: number) => {
+        for (let i = failedQueue.length - 1; i >= 0; i--)
+          if (failedQueue[i].key === key) failedQueue.splice(i, 1);
+      };
+
       const flushQueue = () => {
         if (!isFlushingQueue) {
           const sent = new Set<number>();
-          const queue = failedQueue;
           isFlushingQueue = true;
-          failedQueue = [];
-          for (let i = 0; i < queue.length; i++) {
-            const operation = queue[i];
+          for (let i = 0; i < failedQueue.length; i++) {
+            const operation = failedQueue[i];
             if (operation.kind === 'mutation' || !sent.has(operation.key)) {
               sent.add(operation.key);
               if (operation.kind !== 'subscription') {
                 next(makeOperation('teardown', operation));
                 let overridePolicy: RequestPolicy = 'cache-first';
-                for (let i = 0; i < queue.length; i++) {
-                  const { requestPolicy } = queue[i].context;
+                for (let i = 0; i < failedQueue.length; i++) {
+                  const { requestPolicy } = failedQueue[i].context;
                   if (policyLevel[requestPolicy] > policyLevel[overridePolicy])
                     overridePolicy = requestPolicy;
                 }
@@ -181,6 +184,7 @@ export const offlineExchange =
             }
           }
           isFlushingQueue = false;
+          failedQueue.length = 0;
           updateMetadata();
         }
       };
@@ -247,9 +251,7 @@ export const offlineExchange =
               if (operation.kind === 'query' && !hasRehydrated) {
                 failedQueue.push(operation);
               } else if (operation.kind === 'teardown') {
-                for (let i = failedQueue.length - 1; i >= 0; i--)
-                  if (failedQueue[i].key === operation.key)
-                    failedQueue.splice(i, 1);
+                filterQueue(operation.key);
               }
             })
           ),
@@ -258,13 +260,14 @@ export const offlineExchange =
         return pipe(
           cacheResults$(opsAndRebound$),
           filter(res => {
-            if (
-              res.operation.kind === 'query' &&
-              isOfflineError(res.error, res)
-            ) {
-              next(toRequestPolicy(res.operation, 'cache-only'));
-              failedQueue.push(res.operation);
-              return false;
+            if (res.operation.kind === 'query') {
+              if (isOfflineError(res.error, res)) {
+                next(toRequestPolicy(res.operation, 'cache-only'));
+                failedQueue.push(res.operation);
+                return false;
+              } else if (!hasRehydrated) {
+                filterQueue(res.operation.key);
+              }
             }
             return true;
           })
