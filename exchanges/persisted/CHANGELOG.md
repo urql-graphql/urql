@@ -1,5 +1,12 @@
 # @urql/exchange-persisted-fetch
 
+## 4.0.1
+
+### Patch Changes
+
+- ⚠️ Fix `persistedExchange` ignoring teardowns in its initial operation mapping. Since the hash function is promisified, which defers any persisted operation, it needs to respect teardowns
+  Submitted by [@kitten](https://github.com/kitten) (See [#3312](https://github.com/urql-graphql/urql/pull/3312))
+
 ## 4.0.0
 
 ### Major Changes
