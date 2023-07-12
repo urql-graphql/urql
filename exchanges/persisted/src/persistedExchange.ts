@@ -5,6 +5,7 @@ import {
   filter,
   merge,
   mergeMap,
+  takeUntil,
   pipe,
 } from 'wonka';
 
@@ -135,6 +136,36 @@ export const persistedExchange =
       ((enableForMutation && operation.kind === 'mutation') ||
         operation.kind === 'query');
 
+    const getPersistedOperation = async (operation: Operation) => {
+      const persistedOperation = makeOperation(operation.kind, operation, {
+        ...operation.context,
+        persistAttempt: true,
+      });
+
+      const sha256Hash = await hashFn(
+        stringifyDocument(operation.query),
+        operation.query
+      );
+      if (sha256Hash) {
+        persistedOperation.extensions = {
+          ...persistedOperation.extensions,
+          persistedQuery: {
+            version: 1,
+            sha256Hash,
+          },
+        };
+        if (
+          persistedOperation.kind === 'query' &&
+          preferGetForPersistedQueries
+        ) {
+          persistedOperation.context.preferGetMethod =
+            preferGetForPersistedQueries;
+        }
+      }
+
+      return persistedOperation;
+    };
+
     return operations$ => {
       const retries = makeSubject<Operation>();
 
@@ -146,36 +177,18 @@ export const persistedExchange =
       const persistedOps$ = pipe(
         operations$,
         filter(operationFilter),
-        map(async operation => {
-          const persistedOperation = makeOperation(operation.kind, operation, {
-            ...operation.context,
-            persistAttempt: true,
-          });
-
-          const sha256Hash = await hashFn(
-            stringifyDocument(operation.query),
-            operation.query
+        mergeMap(operation => {
+          const persistedOperation$ = getPersistedOperation(operation);
+          return pipe(
+            fromPromise(persistedOperation$),
+            takeUntil(
+              pipe(
+                operations$,
+                filter(op => op.kind === 'teardown' && op.key === operation.key)
+              )
+            )
           );
-          if (sha256Hash) {
-            persistedOperation.extensions = {
-              ...persistedOperation.extensions,
-              persistedQuery: {
-                version: 1,
-                sha256Hash,
-              },
-            };
-            if (
-              persistedOperation.kind === 'query' &&
-              preferGetForPersistedQueries
-            ) {
-              persistedOperation.context.preferGetMethod =
-                preferGetForPersistedQueries;
-            }
-          }
-
-          return persistedOperation;
-        }),
-        mergeMap(fromPromise)
+        })
       );
 
       return pipe(
