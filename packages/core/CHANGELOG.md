@@ -1,5 +1,19 @@
 # @urql/core
 
+## 4.0.11
+
+### Patch Changes
+
+- Re-order `maskTypename` to apply masking earlier in the chain
+  Submitted by [@kitten](https://github.com/kitten) (See [#3298](https://github.com/urql-graphql/urql/pull/3298))
+- ⚠️ Fix `ssrExchange` not formatting query documents using `formatDocument`. Without this call we'd run the risk of not having `__typename` available on the client-side when rehydrating
+  Submitted by [@kitten](https://github.com/kitten) (See [#3288](https://github.com/urql-graphql/urql/pull/3288))
+- Add deprecation notice for `maskTypename` option.
+  Masking typenames in a result is no longer recommended. It’s only
+  useful when multiple pre-conditions are applied and inferior to
+  mapping to an input object manually
+  Submitted by [@kitten](https://github.com/kitten) (See [#3299](https://github.com/urql-graphql/urql/pull/3299))
+
 ## 4.0.10
 
 ### Patch Changes

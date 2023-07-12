@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.5
+
+### Patch Changes
+
+- Handle `refreshAuth` rejections and pass the resulting error on to `OperationResult`s on the authentication queue
+  Submitted by [@kitten](https://github.com/kitten) (See [#3307](https://github.com/urql-graphql/urql/pull/3307))
+
 ## 2.1.4
 
 ### Patch Changes

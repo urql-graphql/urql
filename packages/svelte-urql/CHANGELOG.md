@@ -1,5 +1,12 @@
 # @urql/svelte
 
+## 4.0.3
+
+### Patch Changes
+
+- Updated peer dependency range to include support for Svelte `^4.0.0`
+  Submitted by [@ategen3rt](https://github.com/ategen3rt) (See [#3302](https://github.com/urql-graphql/urql/pull/3302))
+
 ## 4.0.2
 
 ### Patch Changes
