@@ -442,3 +442,37 @@ it('does not infinitely retry authentication when an operation did error', async
     'final-token'
   );
 });
+
+it('passes on failing refreshAuth() errors to results', async () => {
+  const { exchangeArgs, result } = makeExchangeArgs();
+
+  const didAuthError = vi.fn().mockReturnValue(true);
+  const willAuthError = vi.fn().mockReturnValue(true);
+
+  const res = await pipe(
+    fromValue(queryOperation),
+    authExchange(async utils => {
+      const token = 'initial-token';
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError,
+        willAuthError,
+        async refreshAuth() {
+          throw new Error('test');
+        },
+      };
+    })(exchangeArgs),
+    take(1),
+    toPromise
+  );
+
+  expect(result).toHaveBeenCalledTimes(0);
+  expect(didAuthError).toHaveBeenCalledTimes(0);
+  expect(willAuthError).toHaveBeenCalledTimes(1);
+
+  expect(res.error).toMatchInlineSnapshot('[CombinedError: [Network] test]');
+});
