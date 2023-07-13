@@ -20,7 +20,7 @@ import { Client } from '@urql/core';
  * const { getClient } = registerUrql(makeClient);
  * ```
  */
-export function registerUrql(makeClient: () => Client) {
+export function registerUrql(makeClient: () => Client): { getClient: () => Client } {
   // @ts-ignore you exist don't worry
   const getClient = React.cache(makeClient);
   return {
