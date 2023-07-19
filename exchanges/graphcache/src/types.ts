@@ -684,29 +684,6 @@ export type Resolver<
   ): Result;
 }['bivarianceHack'];
 
-/** Cache Directive, which may resolve or replace data during cache reads.
- *
- * @param parent - The GraphQL object that is currently being constructed from cache data.
- * @param args - This field’s arguments.
- * @param cache - {@link Cache} interface.
- * @param info - {@link ResolveInfo} interface.
- * @returns a {@link ResolverResult}, which is an updated value, partial entity, or entity key
- *
- * @see {@link https://urql.dev/goto/docs/graphcache/local-directives} for the full directives docs.
- */
-export type Directive<
-  ParentData = DataFields,
-  Args = Variables,
-  Result = ResolverResult
-> = {
-  bivarianceHack(
-    parent: ParentData,
-    args: Args,
-    cache: Cache,
-    info: ResolveInfo & { directiveArguments: Record<string, any> }
-  ): Result;
-}['bivarianceHack'];
-
 /** Configures resolvers which replace cached reuslts with custom values.
  *
  * @remarks
@@ -723,6 +700,10 @@ export type ResolverConfig = {
     [fieldName: string]: Resolver | void;
   } | void;
 };
+
+export type Directive = (
+  directiveArguments: Record<string, unknown> | null
+) => Resolver;
 
 export type DirectivesConfig = {
   [directiveName: string]: Directive;

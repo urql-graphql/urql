@@ -1566,7 +1566,7 @@ describe('as directive', () => {
 
     const store = new Store({
       directives: {
-        relayPagination: relayPagination(),
+        relayPagination: () => relayPagination(),
       },
     });
 

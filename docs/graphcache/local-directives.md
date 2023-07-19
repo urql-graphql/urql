@@ -20,13 +20,15 @@ If you want to add directives yourself you can do so by performing
 cacheExchange({
   directives: {
     // If you now add `@_pagination` to your document we will execute this
-    pagination: () => {}, 
+    pagination: directiveArguments => () => {
+      /* Resolver */
+    },
   },
 });
 ```
 
-The function signature of a directive is the same as the one of a [Resolver](./local-directives.md). In
-case you need to access the arguments you have passed to a directive you can do so by checking `info.directiveArguments`.
+The function signature of a directive is a function which receives the arguments the directive is called with in the document.
+That function should returns a [Resolver](./local-directives.md).
 
 ### Reading on
 

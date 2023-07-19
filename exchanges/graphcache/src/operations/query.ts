@@ -4,6 +4,7 @@ import {
   FieldNode,
   DocumentNode,
   FragmentDefinitionNode,
+  DirectiveNode,
 } from '@0no-co/graphql.web';
 
 import {
@@ -16,6 +17,7 @@ import {
   getMainOperation,
   normalizeVariables,
   getFieldArguments,
+  getDirectives,
 } from '../ast';
 
 import {
@@ -25,6 +27,7 @@ import {
   Link,
   OperationRequest,
   Dependencies,
+  Directive,
 } from '../types';
 
 import { joinKeys, keyOfField } from '../store/keys';
@@ -295,6 +298,20 @@ export const _queryFragment = (
   return result;
 };
 
+function getFieldDirective(
+  node: FormattedNode<FieldNode>,
+  store: Store
+): { storeDirective: Directive; fieldDirective: DirectiveNode } | undefined {
+  const directives = getDirectives(node);
+  for (const name in directives) {
+    if (name !== 'include' && name !== 'skip' && store.directives[name])
+      return {
+        storeDirective: store.directives[name],
+        fieldDirective: directives[name]!,
+      };
+  }
+}
+
 const readSelection = (
   ctx: Context,
   key: string,
@@ -356,8 +373,7 @@ const readSelection = (
   let node: FormattedNode<FieldNode> | void;
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
-    const fieldDirectives = Object.keys(node._directives || {}).map(x => x);
-    const storeDirective = fieldDirectives.find(x => store.directives[x]);
+    const foundDirective = getFieldDirective(node, store);
 
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -376,7 +392,7 @@ const readSelection = (
     ctx.__internal.path.push(fieldAlias);
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
-    let dataFieldValue: void | DataField;
+    let dataFieldValue: void | DataField = undefined;
 
     if (fieldName === '__typename') {
       // We directly assign the typename as it's already available
@@ -386,7 +402,7 @@ const readSelection = (
       dataFieldValue = resultValue;
     } else if (
       InMemoryData.currentOperation === 'read' &&
-      ((resolvers && resolvers[fieldName]) || storeDirective)
+      ((resolvers && resolvers[fieldName]) || foundDirective)
     ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
@@ -398,7 +414,7 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
-      if (resolvers && resolvers[fieldName] && storeDirective) {
+      if (resolvers && resolvers[fieldName] && foundDirective) {
         warn(
           `A resolver and directive is being used at "${typename}.${fieldName}", only the directive will apply.`,
           28
@@ -412,11 +428,12 @@ const readSelection = (
           store,
           ctx
         );
-      } else if (storeDirective) {
-        const fieldDirective = node._directives![storeDirective];
-        const directiveArguments =
-          getFieldArguments(fieldDirective, ctx.variables) || {};
-        dataFieldValue = store.directives[storeDirective]!(directiveArguments)(
+      } else {
+        const directiveArguments = getFieldArguments(
+          foundDirective!.fieldDirective,
+          ctx.variables
+        );
+        dataFieldValue = foundDirective!.storeDirective(directiveArguments)(
           output,
           fieldArgs || ({} as Variables),
           store,

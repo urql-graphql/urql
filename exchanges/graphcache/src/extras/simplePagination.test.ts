@@ -3,7 +3,7 @@ import { it, expect, describe } from 'vitest';
 import { __initAnd_query as query } from '../operations/query';
 import { __initAnd_write as write } from '../operations/write';
 import { Store } from '../store/store';
-import { simplePagination } from './simplePagination';
+import { MergeMode, simplePagination } from './simplePagination';
 
 describe('as resolver', () => {
   it('works with forward pagination', () => {
@@ -453,7 +453,7 @@ describe('as directive', () => {
 
     const store = new Store({
       directives: {
-        simplePagination: simplePagination(),
+        simplePagination: () => simplePagination(),
       },
     });
 
@@ -500,6 +500,79 @@ describe('as directive', () => {
     expect((pageTwoResult.data as any).persons).toEqual([
       ...pageOne.persons,
       ...pageTwo.persons,
+    ]);
+
+    const pageThreeResult = query(store, {
+      query: Pagination,
+      variables: { skip: 6, limit: 3 },
+    });
+    expect(pageThreeResult.data).toEqual(null);
+  });
+
+  it('works with backwards pagination', () => {
+    const Pagination = gql`
+      query ($skip: Number, $limit: Number) {
+        __typename
+        persons(skip: $skip, limit: $limit)
+          @_simplePagination(mergeMode: "before") {
+          __typename
+          id
+          name
+        }
+      }
+    `;
+
+    const store = new Store({
+      directives: {
+        simplePagination: directiveArguments =>
+          simplePagination({
+            mergeMode: directiveArguments!.mergeMode as MergeMode,
+          }),
+      },
+    });
+
+    const pageOne = {
+      __typename: 'Query',
+      persons: [
+        { id: 7, name: 'Jovi', __typename: 'Person' },
+        { id: 8, name: 'Phil', __typename: 'Person' },
+        { id: 9, name: 'Andy', __typename: 'Person' },
+      ],
+    };
+
+    const pageTwo = {
+      __typename: 'Query',
+      persons: [
+        { id: 4, name: 'Kadi', __typename: 'Person' },
+        { id: 5, name: 'Dom', __typename: 'Person' },
+        { id: 6, name: 'Sofia', __typename: 'Person' },
+      ],
+    };
+
+    write(
+      store,
+      { query: Pagination, variables: { skip: 0, limit: 3 } },
+      pageOne
+    );
+    const pageOneResult = query(store, {
+      query: Pagination,
+      variables: { skip: 0, limit: 3 },
+    });
+    expect(pageOneResult.data).toEqual(pageOne);
+
+    write(
+      store,
+      { query: Pagination, variables: { skip: 3, limit: 3 } },
+      pageTwo
+    );
+
+    const pageTwoResult = query(store, {
+      query: Pagination,
+      variables: { skip: 3, limit: 3 },
+    });
+    expect((pageTwoResult.data as any).persons).toEqual([
+      ...pageTwo.persons,
+      ...pageOne.persons,
     ]);
 
     const pageThreeResult = query(store, {
