@@ -1,5 +1,4 @@
 import { pipe, share, merge, makeSubject, filter, onPush } from 'wonka';
-import { SelectionNode } from '@0no-co/graphql.web';
 
 import {
   Operation,
@@ -7,57 +6,23 @@ import {
   Exchange,
   ExchangeIO,
   CombinedError,
+  RequestPolicy,
   stringifyDocument,
   createRequest,
   makeOperation,
 } from '@urql/core';
 
-import {
-  getMainOperation,
-  getFragments,
-  isInlineFragment,
-  isFieldNode,
-  shouldInclude,
-  getSelectionSet,
-  getName,
-} from './ast';
-
-import {
-  SerializedRequest,
-  OptimisticMutationConfig,
-  Variables,
-  CacheExchangeOpts,
-  StorageAdapter,
-} from './types';
+import { SerializedRequest, CacheExchangeOpts, StorageAdapter } from './types';
 
 import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 
-/** Determines whether a given query contains an optimistic mutation field */
-const isOptimisticMutation = <T extends OptimisticMutationConfig>(
-  config: T,
-  operation: Operation
-) => {
-  const vars: Variables = operation.variables || {};
-  const fragments = getFragments(operation.query);
-  const selections = [...getSelectionSet(getMainOperation(operation.query))];
-
-  let field: void | SelectionNode;
-  while ((field = selections.pop())) {
-    if (!shouldInclude(field, vars)) {
-      continue;
-    } else if (!isFieldNode(field)) {
-      const fragmentNode = !isInlineFragment(field)
-        ? fragments[getName(field)]
-        : field;
-      if (fragmentNode) selections.push(...getSelectionSet(fragmentNode));
-    } else if (config[getName(field)]) {
-      return true;
-    }
-  }
-
-  return false;
-};
+const policyLevel = {
+  'cache-only': 0,
+  'cache-first': 1,
+  'network-only': 2,
+  'cache-and-network': 3,
+} as const;
 
 /** Input parameters for the {@link offlineExchange}.
  * @remarks
@@ -126,7 +91,6 @@ export const offlineExchange =
     ) {
       const { forward: outerForward, client, dispatchDebug } = input;
       const { source: reboundOps$, next } = makeSubject<Operation>();
-      const optimisticMutations = opts.optimistic || {};
       const failedQueue: Operation[] = [];
       let hasRehydrated = false;
       let isFlushingQueue = false;
@@ -148,23 +112,35 @@ export const offlineExchange =
         }
       };
 
+      const filterQueue = (key: number) => {
+        for (let i = failedQueue.length - 1; i >= 0; i--)
+          if (failedQueue[i].key === key) failedQueue.splice(i, 1);
+      };
+
       const flushQueue = () => {
         if (!isFlushingQueue) {
-          isFlushingQueue = true;
-
           const sent = new Set<number>();
+          isFlushingQueue = true;
           for (let i = 0; i < failedQueue.length; i++) {
             const operation = failedQueue[i];
             if (operation.kind === 'mutation' || !sent.has(operation.key)) {
-              if (operation.kind !== 'subscription')
-                next(makeOperation('teardown', operation));
               sent.add(operation.key);
-              next(toRequestPolicy(operation, 'cache-first'));
+              if (operation.kind !== 'subscription') {
+                next(makeOperation('teardown', operation));
+                let overridePolicy: RequestPolicy = 'cache-first';
+                for (let i = 0; i < failedQueue.length; i++) {
+                  const { requestPolicy } = failedQueue[i].context;
+                  if (policyLevel[requestPolicy] > policyLevel[overridePolicy])
+                    overridePolicy = requestPolicy;
+                }
+                next(toRequestPolicy(operation, overridePolicy));
+              } else {
+                next(toRequestPolicy(operation, 'cache-first'));
+              }
             }
           }
-
-          failedQueue.length = 0;
           isFlushingQueue = false;
+          failedQueue.length = 0;
           updateMetadata();
         }
       };
@@ -176,8 +152,8 @@ export const offlineExchange =
             if (
               hasRehydrated &&
               res.operation.kind === 'mutation' &&
-              isOfflineError(res.error, res) &&
-              isOptimisticMutation(optimisticMutations, res.operation)
+              res.operation.context.optimistic &&
+              isOfflineError(res.error, res)
             ) {
               failedQueue.push(res.operation);
               updateMetadata();
@@ -231,9 +207,7 @@ export const offlineExchange =
               if (operation.kind === 'query' && !hasRehydrated) {
                 failedQueue.push(operation);
               } else if (operation.kind === 'teardown') {
-                for (let i = failedQueue.length - 1; i >= 0; i--)
-                  if (failedQueue[i].key === operation.key)
-                    failedQueue.splice(i, 1);
+                filterQueue(operation.key);
               }
             })
           ),
@@ -242,13 +216,14 @@ export const offlineExchange =
         return pipe(
           cacheResults$(opsAndRebound$),
           filter(res => {
-            if (
-              res.operation.kind === 'query' &&
-              isOfflineError(res.error, res)
-            ) {
-              next(toRequestPolicy(res.operation, 'cache-only'));
-              failedQueue.push(res.operation);
-              return false;
+            if (res.operation.kind === 'query') {
+              if (isOfflineError(res.error, res)) {
+                next(toRequestPolicy(res.operation, 'cache-only'));
+                failedQueue.push(res.operation);
+                return false;
+              } else if (!hasRehydrated) {
+                filterQueue(res.operation.key);
+              }
             }
             return true;
           })
