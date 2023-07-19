@@ -50,7 +50,7 @@ When we define this function it must return an "Observable-like" object, which n
 [Observable spec](https://github.com/tc39/proposal-observable), which comes down to having an
 object with a `.subscribe()` method accepting an observer.
 
-## Setting up `graphql-ws`
+### Setting up `graphql-ws`
 
 For backends supporting `graphql-ws`, we recommend using the [graphql-ws](https://github.com/enisdenjo/graphql-ws) client.
 
@@ -88,7 +88,7 @@ we return to the `subscriptionExchange` inside `forwardSubscription`.
 
 [Read more on the `graphql-ws` README.](https://github.com/enisdenjo/graphql-ws/blob/master/README.md)
 
-## Setting up `subscriptions-transport-ws`
+### Setting up `subscriptions-transport-ws`
 
 For backends supporting `subscriptions-transport-ws`, [Apollo's `subscriptions-transport-ws`
 package](https://github.com/apollographql/subscriptions-transport-ws) can be used.
@@ -118,6 +118,29 @@ and are using the `SubscriptionClient`'s `request` method to create a Subscripti
 we return to the `subscriptionExchange` inside `forwardSubscription`.
 
 [Read more about `subscription-transport-ws` on its README.](https://github.com/apollographql/subscriptions-transport-ws/blob/master/README.md)
+
+### Using `fetch` for subscriptions
+
+Some GraphQL backends (for example GraphQL Yoga) support built-in transport protocols that
+can execute subscriptions via a simple HTTP fetch call.
+In fact, this is how `@defer` and `@stream` directives are supported. These transports can
+also be used for subscriptions.
+
+```js
+import { Client, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
+
+const client = new Client({
+  url: '/graphql',
+  fetchSubscriptions: true,
+  exchanges: [cacheExchange, fetchExchange],
+});
+```
+
+In this example, we only need to enable `fetchSubscriptions: true` on the `Client`, and the
+`fetchExchange` will be used to send subscriptions to the API. If your API supports this transport,
+it will stream results back to the `fetchExchange`.
+
+[You can find a code example of subscriptions via `fetch` in an example in the `urql` repository.](https://github.com/urql-graphql/urql/tree/main/examples/with-subscriptions-via-fetch)
 
 ## React & Preact
 
