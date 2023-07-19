@@ -1,0 +1,74 @@
+{
+  "name": "@urql/solid",
+  "version": "4.0.4",
+  "description": "A highly customizable and versatile GraphQL client for Solid",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
+  "license": "MIT",
+  "author": "urql GraphQL Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urql-graphql/urql.git",
+    "directory": "packages/solid-urql"
+  },
+  "keywords": [
+    "graphql client",
+    "state management",
+    "cache",
+    "graphql",
+    "exchanges",
+    "solid"
+  ],
+  "main": "dist/urql-solid",
+  "module": "dist/urql-solid.mjs",
+  "types": "dist/urql-solid.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/urql-solid.d.ts",
+      "import": "./dist/urql-solid.mjs",
+      "require": "./dist/urql-solid.js",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "vitest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.mjs",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "devDependencies": {
+    "@solidjs/testing-library": "^0.8.2",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@urql/core": "workspace:*",
+    "graphql": "^16.0.0",
+    "jsdom": "^22.1.0",
+    "vite-plugin-solid": "^2.7.0",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.32.2"
+  },
+  "peerDependencies": {
+    "@urql/core": "^5.0.0",
+    "solid-js": "^1.7.7"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "^6.2.0",
+    "@urql/core": "^4.0.0",
+    "wonka": "^6.3.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
