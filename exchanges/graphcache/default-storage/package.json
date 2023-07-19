@@ -8,9 +8,9 @@
   "source": "../src/default-storage/index.ts",
   "exports": {
     ".": {
-      "types": "../dist/urql-exchange-graphcache-default-storage.d.ts",
       "import": "../dist/urql-exchange-graphcache-default-storage.mjs",
       "require": "../dist/urql-exchange-graphcache-default-storage.js",
+      "types": "../dist/urql-exchange-graphcache-default-storage.d.ts",
       "source": "../src/default-storage/index.ts"
     },
     "./package.json": "./package.json"

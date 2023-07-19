@@ -1,4 +1,4 @@
-import { gql } from '@urql/core';
+import { formatDocument, gql } from '@urql/core';
 import { it, expect, afterEach } from 'vitest';
 import { __initAnd_query as query } from '../operations/query';
 import {
@@ -9,7 +9,7 @@ import * as InMemoryData from '../store/data';
 import { Store } from '../store/store';
 import { Data } from '../types';
 
-const Todos = gql`
+const Todos = formatDocument(gql`
   query {
     __typename
     todos {
@@ -19,18 +19,18 @@ const Todos = gql`
       text
     }
   }
-`;
+`);
 
-const TodoFragment = gql`
+const TodoFragment = formatDocument(gql`
   fragment _ on Todo {
     __typename
     id
     text
     complete
   }
-`;
+`);
 
-const Todo = gql`
+const Todo = formatDocument(gql`
   query ($id: ID!) {
     __typename
     todo(id: $id) {
@@ -39,9 +39,9 @@ const Todo = gql`
       complete
     }
   }
-`;
+`);
 
-const ToggleTodo = gql`
+const ToggleTodo = formatDocument(gql`
   mutation ($id: ID!) {
     __typename
     toggleTodo(id: $id) {
@@ -51,9 +51,9 @@ const ToggleTodo = gql`
       complete
     }
   }
-`;
+`);
 
-const NestedClearNameTodo = gql`
+const NestedClearNameTodo = formatDocument(gql`
   mutation ($id: ID!) {
     __typename
     clearName(id: $id) {
@@ -66,7 +66,7 @@ const NestedClearNameTodo = gql`
       }
     }
   }
-`;
+`);
 
 afterEach(() => {
   expect(console.warn).not.toHaveBeenCalled();
@@ -150,7 +150,7 @@ it('passes the "getting-started" example', () => {
 it('resolves missing, nullable arguments on fields', () => {
   const store = new Store();
 
-  const GetWithVariables = gql`
+  const GetWithVariables = formatDocument(gql`
     query {
       __typename
       todo(first: null) {
@@ -158,9 +158,9 @@ it('resolves missing, nullable arguments on fields', () => {
         id
       }
     }
-  `;
+  `);
 
-  const GetWithoutVariables = gql`
+  const GetWithoutVariables = formatDocument(gql`
     query {
       __typename
       todo {
@@ -168,7 +168,7 @@ it('resolves missing, nullable arguments on fields', () => {
         id
       }
     }
-  `;
+  `);
 
   const dataToWrite = {
     __typename: 'Query',

@@ -1,4 +1,4 @@
-import { gql } from '@urql/core';
+import { formatDocument, gql } from '@urql/core';
 import { describe, it, expect } from 'vitest';
 
 import { getSelectionSet } from './node';
@@ -6,33 +6,36 @@ import { getMainOperation, shouldInclude } from './traversal';
 
 describe('getMainOperation', () => {
   it('retrieves the first operation', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       query Query {
         field
       }
-    `;
+    `);
+
     const operation = getMainOperation(doc);
     expect(operation).toBe(doc.definitions[0]);
   });
 
   it('throws when no operation is found', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       fragment _ on Query {
         field
       }
-    `;
+    `);
+
     expect(() => getMainOperation(doc)).toThrow();
   });
 });
 
 describe('shouldInclude', () => {
   it('should include fields with truthy @include or falsy @skip directives', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       {
         fieldA @include(if: true)
         fieldB @skip(if: false)
       }
-    `;
+    `);
+
     const fieldA = getSelectionSet(getMainOperation(doc))[0];
     const fieldB = getSelectionSet(getMainOperation(doc))[1];
     expect(shouldInclude(fieldA, {})).toBe(true);
@@ -40,12 +43,13 @@ describe('shouldInclude', () => {
   });
 
   it('should exclude fields with falsy @include or truthy @skip directives', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       {
         fieldA @include(if: false)
         fieldB @skip(if: true)
       }
-    `;
+    `);
+
     const fieldA = getSelectionSet(getMainOperation(doc))[0];
     const fieldB = getSelectionSet(getMainOperation(doc))[1];
     expect(shouldInclude(fieldA, {})).toBe(false);
@@ -53,31 +57,34 @@ describe('shouldInclude', () => {
   });
 
   it('ignore other directives', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       {
         field @test(if: false)
       }
-    `;
+    `);
+
     const field = getSelectionSet(getMainOperation(doc))[0];
     expect(shouldInclude(field, {})).toBe(true);
   });
 
   it('ignore unknown arguments on directives', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       {
         field @skip(if: true, other: false)
       }
-    `;
+    `);
+
     const field = getSelectionSet(getMainOperation(doc))[0];
     expect(shouldInclude(field, {})).toBe(false);
   });
 
   it('ignore directives with invalid first arguments', () => {
-    const doc = gql`
+    const doc = formatDocument(gql`
       {
         field @skip(other: true)
       }
-    `;
+    `);
+
     const field = getSelectionSet(getMainOperation(doc))[0];
     expect(shouldInclude(field, {})).toBe(true);
   });

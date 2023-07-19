@@ -1,4 +1,4 @@
-import { gql } from '@urql/core';
+import { formatDocument, gql } from '@urql/core';
 import { it, afterEach, expect } from 'vitest';
 import { __initAnd_query as query } from '../operations/query';
 import { __initAnd_write as write } from '../operations/write';
@@ -10,12 +10,12 @@ afterEach(() => {
 
 it('allows viewer fields to overwrite the root Query data', () => {
   const store = new Store();
-  const get = gql`
+  const get = formatDocument(gql`
     {
       int
     }
-  `;
-  const set = gql`
+  `);
+  const set = formatDocument(gql`
     mutation {
       mutate {
         viewer {
@@ -23,7 +23,7 @@ it('allows viewer fields to overwrite the root Query data', () => {
         }
       }
     }
-  `;
+  `);
 
   write(
     store,
