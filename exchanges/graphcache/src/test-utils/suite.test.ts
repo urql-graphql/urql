@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { formatDocument, gql } from '@urql/core';
+import { gql } from '@urql/core';
 import { it, expect } from 'vitest';
 import { __initAnd_query as query } from '../operations/query';
 import { __initAnd_write as write } from '../operations/write';
@@ -13,10 +13,7 @@ interface TestCase {
 
 const expectCacheIntegrity = (testcase: TestCase) => {
   const store = new Store();
-  const request = {
-    query: formatDocument(testcase.query),
-    variables: testcase.variables,
-  };
+  const request = { query: testcase.query, variables: testcase.variables };
   const writeRes = write(store, request, testcase.data);
   const queryRes = query(store, request);
   expect(queryRes.data).not.toBe(null);

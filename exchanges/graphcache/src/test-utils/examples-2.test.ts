@@ -1,10 +1,10 @@
-import { formatDocument, gql } from '@urql/core';
+import { gql } from '@urql/core';
 import { it, afterEach, expect } from 'vitest';
 import { __initAnd_query as query } from '../operations/query';
 import { __initAnd_write as write } from '../operations/write';
 import { Store } from '../store/store';
 
-const Item = formatDocument(gql`
+const Item = gql`
   {
     todo {
       __typename
@@ -13,9 +13,9 @@ const Item = formatDocument(gql`
       text
     }
   }
-`);
+`;
 
-const ItemDetailed = formatDocument(gql`
+const ItemDetailed = gql`
   {
     todo {
       __typename
@@ -29,9 +29,9 @@ const ItemDetailed = formatDocument(gql`
       }
     }
   }
-`);
+`;
 
-const Pagination = formatDocument(gql`
+const Pagination = gql`
   query {
     todos {
       __typename
@@ -51,7 +51,7 @@ const Pagination = formatDocument(gql`
       }
     }
   }
-`);
+`;
 
 afterEach(() => {
   expect(console.warn).not.toHaveBeenCalled();
