@@ -1,4 +1,10 @@
 import type { GraphQLError, DocumentNode } from './utils/graphql';
+import type {
+  Kind,
+  DirectiveNode,
+  ValueNode,
+  TypeNode,
+} from '@0no-co/graphql.web';
 import { Subscription, Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -35,6 +41,36 @@ export type TypedDocumentNode<
    */
   __ensureTypesOfVariablesAndResultMatching?: (variables: Variables) => Result;
 };
+
+/** GraphQL nodes with added `_directives` dictionary on nodes with directives.
+ *
+ * @remarks
+ * The {@link formatDocument} utility processes documents to add `__typename`
+ * fields to them. It additionally provides additional directives processing
+ * and outputs this type.
+ *
+ * When applied, every node with non-const directives, will have an additional
+ * `_directives` dictionary added to it, and filter directives starting with
+ * a leading `_` underscore from the directives array.
+ */
+export type FormattedNode<Node> = Node extends readonly (infer Child)[]
+  ? readonly FormattedNode<Child>[]
+  : Node extends ValueNode | TypeNode
+  ? Node
+  : Node extends { kind: Kind }
+  ? {
+      [K in Exclude<keyof Node, 'directives' | 'loc'>]: FormattedNode<Node[K]>;
+    } extends infer Node
+    ? Node extends {
+        kind: Kind.FIELD | Kind.INLINE_FRAGMENT | Kind.FRAGMENT_SPREAD;
+      }
+      ? Node & {
+          _generated?: boolean;
+          _directives?: Record<string, DirectiveNode> | undefined;
+        }
+      : Node
+    : Node
+  : Node;
 
 /** Any GraphQL `DocumentNode` or query string input.
  *
