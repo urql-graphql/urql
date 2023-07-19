@@ -4,7 +4,6 @@ import {
   makeOperation,
   Operation,
   OperationResult,
-  OperationContext,
   RequestPolicy,
   CacheOutcome,
 } from '@urql/core';
@@ -145,7 +144,6 @@ export const cacheExchange =
 
     // This registers queries with the data layer to ensure commutativity
     const prepareForwardedOperation = (operation: Operation) => {
-      let context: Partial<OperationContext> | undefined;
       if (operation.kind === 'query') {
         // Pre-reserve the position of the result layer
         reserveLayer(store.data, operation.key);
@@ -170,7 +168,7 @@ export const cacheExchange =
             ? filterVariables(getMainOperation(query), operation.variables)
             : operation.variables,
         },
-        { ...operation.context },
+        { ...operation.context }
       );
 
       if (
