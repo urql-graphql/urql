@@ -691,7 +691,7 @@ describe('directives', () => {
         todos {
           id
           text
-          completed @optional
+          completed @_optional
         }
       }
     `;
@@ -763,7 +763,7 @@ describe('directives', () => {
         todos {
           id
           text
-          completed @required
+          completed @_required
         }
       }
     `;

@@ -356,8 +356,8 @@ const readSelection = (
   let node: FormattedNode<FieldNode> | void;
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
-    const fieldDirectives = node.directives?.map(x => x.name.value);
-    const storeDirective = fieldDirectives?.find(x => store.directives[x]);
+    const fieldDirectives = Object.keys(node._directives || {}).map(x => x);
+    const storeDirective = fieldDirectives.find(x => store.directives[x]);
 
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -415,9 +415,7 @@ const readSelection = (
       }
 
       if (storeDirective) {
-        const fieldDirective = node.directives!.find(
-          x => x.name.value === storeDirective
-        )!;
+        const fieldDirective = node._directives![storeDirective];
         const directiveArguments =
           getFieldArguments(fieldDirective, ctx.variables) || {};
         dataFieldValue = store.directives[storeDirective]!(
@@ -448,7 +446,6 @@ const readSelection = (
       if (
         store.schema &&
         dataFieldValue === null &&
-        // TODO: how would we inform this that we are indeed dealing with a nullable field
         !isFieldNullable(store.schema, typename, fieldName)
       ) {
         // Special case for when null is not a valid value for the

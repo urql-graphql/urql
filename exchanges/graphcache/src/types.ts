@@ -555,7 +555,14 @@ export type CacheExchangeOpts = {
    * @see {@link https://urql.dev/goto/docs/graphcache/local-resolvers} for the full resolvers docs.
    */
   resolvers?: ResolverConfig;
-  // TODO: docs
+  /** Configures directives which can perform custom logic on fields.
+   *
+   * @remarks
+   * `directives` is a map of a directive-name to a function which will be executed
+   * when graphcache encounters this directive.
+   *
+   * @see {@link https://urql.dev/goto/docs/graphcache/local-directives} for the full directives docs.
+   */
   directives?: DirectivesConfig;
   /** Configures optimistic updates to react to mutations instantly before an API response.
    *
@@ -678,6 +685,16 @@ export type Resolver<
   ): Result;
 }['bivarianceHack'];
 
+/** Cache Directive, which may resolve or replace data during cache reads.
+ *
+ * @param parent - The GraphQL object that is currently being constructed from cache data.
+ * @param args - This field’s arguments.
+ * @param cache - {@link Cache} interface.
+ * @param info - {@link ResolveInfo} interface.
+ * @returns a {@link ResolverResult}, which is an updated value, partial entity, or entity key
+ *
+ * @see {@link https://urql.dev/goto/docs/graphcache/local-directives} for the full directives docs.
+ */
 export type Directive<
   ParentData = DataFields,
   Args = Variables,
@@ -708,7 +725,6 @@ export type ResolverConfig = {
   } | void;
 };
 
-// TODO: docs
 export type DirectivesConfig = {
   [directiveName: string]: Directive;
 };

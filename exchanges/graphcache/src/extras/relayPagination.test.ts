@@ -1542,7 +1542,7 @@ describe('as directive', () => {
     const Pagination = gql`
       query ($cursor: String) {
         __typename
-        items(first: 1, after: $cursor) @relayPagination {
+        items(first: 1, after: $cursor) @_relayPagination {
           __typename
           edges {
             __typename

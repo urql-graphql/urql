@@ -443,7 +443,7 @@ describe('as directive', () => {
     const Pagination = gql`
       query ($skip: Number, $limit: Number) {
         __typename
-        persons(skip: $skip, limit: $limit) @simplePagination {
+        persons(skip: $skip, limit: $limit) @_simplePagination {
           __typename
           id
           name
