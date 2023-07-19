@@ -558,8 +558,7 @@ export type CacheExchangeOpts = {
   /** Configures directives which can perform custom logic on fields.
    *
    * @remarks
-   * `directives` is a map of a directive-name to a function which will be executed
-   * when graphcache encounters this directive.
+   * A {@link DirectivesConfig} may be passed to allow local directives to be used. For example, when `@_custom` is placed on a field and the configuration contains `custom` then this directive is executed by Graphcache.
    *
    * @see {@link https://urql.dev/goto/docs/graphcache/local-directives} for the full directives docs.
    */
