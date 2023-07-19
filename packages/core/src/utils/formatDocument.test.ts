@@ -1,14 +1,14 @@
-import { parse, print } from '@0no-co/graphql.web';
+import { Kind, parse, print } from '@0no-co/graphql.web';
 import { describe, it, expect } from 'vitest';
-import { collectTypesFromResponse, formatDocument } from './typenames';
 import { createRequest } from './request';
+import { formatDocument } from './formatDocument';
 
 const formatTypeNames = (query: string) => {
   const typedNode = formatDocument(parse(query));
   return print(typedNode);
 };
 
-describe('formatTypeNames', () => {
+describe('formatDocument', () => {
   it('creates a new instance when adding typenames', () => {
     const doc = parse(`{ id todos { id } }`) as any;
     const newDoc = formatDocument(doc) as any;
@@ -112,90 +112,39 @@ describe('formatTypeNames', () => {
       }"
     `);
   });
-});
 
-describe('collectTypesFromResponse', () => {
-  it('returns all typenames included in a response as an array', () => {
-    const typeNames = collectTypesFromResponse({
-      todos: [
-        {
-          id: 1,
-          __typename: 'Todo',
-        },
-      ],
-    });
-    expect(typeNames).toEqual(['Todo']);
-  });
+  it('processes directives', () => {
+    const document = `
+      {
+        todos @skip {
+          id @_test
+        }
+      }
+   `;
 
-  it('does not duplicate typenames', () => {
-    const typeNames = collectTypesFromResponse({
-      todos: [
-        {
-          id: 1,
-          __typename: 'Todo',
-        },
-        {
-          id: 3,
-          __typename: 'Todo',
-        },
-      ],
-    });
-    expect(typeNames).toEqual(['Todo']);
-  });
+    const node = formatDocument(parse(document));
 
-  it('returns multiple different typenames', () => {
-    const typeNames = collectTypesFromResponse({
-      todos: [
-        {
-          id: 1,
-          __typename: 'Todo',
-        },
-        {
-          id: 3,
-          __typename: 'Avocado',
-        },
-      ],
-    });
-    expect(typeNames).toEqual(['Todo', 'Avocado']);
-  });
-
-  it('works on nested objects', () => {
-    const typeNames = collectTypesFromResponse({
-      todos: [
-        {
-          id: 1,
-          __typename: 'Todo',
-        },
-        {
-          id: 2,
-          subTask: {
-            id: 3,
-            __typename: 'SubTask',
+    expect(node).toHaveProperty(
+      'definitions.0.selectionSet.selections.0.selectionSet.selections.0._directives',
+      {
+        test: {
+          kind: Kind.DIRECTIVE,
+          arguments: [],
+          name: {
+            kind: Kind.NAME,
+            value: '_test',
           },
         },
-      ],
-    });
-    expect(typeNames).toEqual(['Todo', 'SubTask']);
-  });
+      }
+    );
 
-  it('traverses nested arrays of objects', () => {
-    const typenames = collectTypesFromResponse({
-      todos: [
-        {
-          id: 1,
-          authors: [
-            [
-              {
-                name: 'Phil',
-                __typename: 'Author',
-              },
-            ],
-          ],
-          __typename: 'Todo',
-        },
-      ],
-    });
-
-    expect(typenames).toEqual(['Author', 'Todo']);
+    expect(formatTypeNames(document)).toMatchInlineSnapshot(`
+     "{
+       todos @skip {
+         id
+         __typename
+       }
+     }"
+   `);
   });
 });
