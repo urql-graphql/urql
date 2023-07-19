@@ -10,6 +10,8 @@ Most APIs include some type of authentication, usually in the form of an auth to
 The purpose of the [`authExchange`](../api/auth-exchange.md) is to provide a flexible API that facilitates the typical
 JWT-based authentication flow.
 
+> **Note:** [You can find a code example for `@urql/exchange-auth` in an example in the `urql` repository.](https://github.com/urql-graphql/urql/tree/main/examples/with-refresh-auth)
+
 ## Typical Authentication Flow
 
 **Initial login** — the user opens the application and authenticates for the first time. They enter their credentials and receive an auth token.

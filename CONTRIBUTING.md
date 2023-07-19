@@ -30,6 +30,13 @@ standard and the rule of thumb is to try to explain **what you expected** and **
 instead.** Following this makes it very clear whether it's a known behavior, an unexpected issue,
 or an undocumented quirk.
 
+We do ask that issues _aren’t_ created for questions, or where a bug is likely to be either caused
+by misusage or misconfiguration. In short, if you can’t provide a reproduction of the issue, then
+it may be the case that you’ve got a question instead.
+
+If you need a template for creating a reproduction, all of our examples can be opened in isolated
+sandboxes or modified as you see fit: https://github.com/urql-graphql/urql/tree/main/examples
+
 ### How do I propose changes?
 
 We follow an **RFC proposal process**. This allows anyone to propose a new feature or a change, and
