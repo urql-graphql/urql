@@ -416,11 +416,11 @@ const readSelection = (
         const fieldDirective = node._directives![storeDirective];
         const directiveArguments =
           getFieldArguments(fieldDirective, ctx.variables) || {};
-        dataFieldValue = store.directives[storeDirective]!(
+        dataFieldValue = store.directives[storeDirective]!(directiveArguments)(
           output,
           fieldArgs || ({} as Variables),
           store,
-          { ...ctx, directiveArguments }
+          ctx
         );
       }
 
