@@ -32,6 +32,8 @@ enable support for Automatic Persisted Queries. This exchange works alongside ot
 subscription exchanges by adding metadata for persisted queries to each GraphQL
 request by modifying the `extensions` object of operations.
 
+> **Note:** [You can find a code example for `@urql/exchange-persisted` in an example in the `urql` repository.](https://github.com/urql-graphql/urql/tree/main/examples/with-apq)
+
 ### Installation & Setup
 
 First install `@urql/exchange-persisted` alongside `urql`:
@@ -131,3 +133,5 @@ GraphQL Multipart Request specification, and sends it off to the API.
 
 > **Note:** Previously, this worked by installing the `@urql/multipart-fetch-exchange` package.
 > however, this package has been deprecated and file uploads are now built into `@urql/core@4`.
+
+[You can find a code example for file uploads in an example in the `urql` repository.](https://github.com/urql-graphql/urql/tree/main/examples/with-multipart)

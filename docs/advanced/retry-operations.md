@@ -9,6 +9,8 @@ The `retryExchange` lets us retry specific operation, by default it will
 retry only network errors, but we can specify additional options to add
 functionality.
 
+> **Note:** [You can find a code example for `@urql/exchange-retry` in an example in the `urql` repository.](https://github.com/urql-graphql/urql/tree/main/examples/with-retry)
+
 ## Installation and Setup
 
 First install `@urql/exchange-retry` alongside `urql`:
