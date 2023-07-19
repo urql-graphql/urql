@@ -412,9 +412,7 @@ const readSelection = (
           store,
           ctx
         );
-      }
-
-      if (storeDirective) {
+      } else if (storeDirective) {
         const fieldDirective = node._directives![storeDirective];
         const directiveArguments =
           getFieldArguments(fieldDirective, ctx.variables) || {};
