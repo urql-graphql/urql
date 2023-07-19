@@ -7,7 +7,7 @@ import { Exchange, Operation, OperationResult } from '../types';
 import {
   makeOperation,
   addMetadata,
-  collectTypesFromResponse,
+  collectTypenames,
   formatDocument,
 } from '../utils';
 
@@ -126,7 +126,7 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
         // than using subscriptions as “signals” to reexecute queries. However, if they’re
         // just used as signals, it’s intuitive to hook them up using `additionalTypenames`
         if (response.operation.kind !== 'subscription') {
-          typenames = collectTypesFromResponse(response.data).concat(typenames);
+          typenames = collectTypenames(response.data).concat(typenames);
         }
 
         // Invalidates the cache given a mutation's response

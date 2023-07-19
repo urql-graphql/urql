@@ -1,4 +1,4 @@
-import { CombinedError } from '@urql/core';
+import { formatDocument, FormattedNode, CombinedError } from '@urql/core';
 
 import {
   FieldNode,
@@ -97,7 +97,8 @@ export const _write = (
     InMemoryData.getCurrentDependencies();
   }
 
-  const operation = getMainOperation(request.query);
+  const query = formatDocument(request.query);
+  const operation = getMainOperation(query);
   const result: WriteResult = {
     data: data || InMemoryData.makeData(),
     dependencies: InMemoryData.currentDependencies!,
@@ -107,7 +108,7 @@ export const _write = (
   const ctx = makeContext(
     store,
     normalizeVariables(operation, request.variables),
-    getFragments(request.query),
+    getFragments(query),
     kind,
     kind,
     error
@@ -128,15 +129,15 @@ export const _write = (
 
 export const _writeFragment = (
   store: Store,
-  query: DocumentNode,
+  query: FormattedNode<DocumentNode>,
   data: Partial<Data>,
   variables?: Variables,
   fragmentName?: string
 ) => {
   const fragments = getFragments(query);
-  let fragment: FragmentDefinitionNode;
+  let fragment: FormattedNode<FragmentDefinitionNode>;
   if (fragmentName) {
-    fragment = fragments[fragmentName] as FragmentDefinitionNode;
+    fragment = fragments[fragmentName]!;
     if (!fragment) {
       warn(
         'writeFragment(...) was called with a fragment name that does not exist.\n' +
@@ -152,7 +153,7 @@ export const _writeFragment = (
     }
   } else {
     const names = Object.keys(fragments);
-    fragment = fragments[names[0]] as FragmentDefinitionNode;
+    fragment = fragments[names[0]]!;
     if (!fragment) {
       warn(
         'writeFragment(...) was called with an empty fragment.\n' +
@@ -200,7 +201,7 @@ export const _writeFragment = (
 const writeSelection = (
   ctx: Context,
   entityKey: undefined | string,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   data: Data
 ) => {
   // These fields determine how we write. The `Query` root type is written
@@ -237,7 +238,7 @@ const writeSelection = (
     ctx
   );
 
-  let node: FieldNode | void;
+  let node: FormattedNode<FieldNode> | void;
   while ((node = iterate())) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
@@ -371,7 +372,7 @@ const KEYLESS_TYPE_RE = /^__|PageInfo|(Connection|Edge)$/;
 
 const writeField = (
   ctx: Context,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   data: null | Data | NullArray<Data>,
   parentFieldKey?: string,
   prevLink?: Link

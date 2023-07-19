@@ -1,55 +1,45 @@
-import { Kind, SelectionNode, DefinitionNode } from '@0no-co/graphql.web';
+import {
+  Kind,
+  FieldNode,
+  SelectionNode,
+  DefinitionNode,
+  DirectiveNode,
+} from '@0no-co/graphql.web';
 import { KeyedDocumentNode, keyDocument } from './request';
-import { TypedDocumentNode } from '../types';
-
-interface EntityLike {
-  [key: string]: EntityLike | EntityLike[] | any;
-  __typename: string | null | void;
-}
-
-const collectTypes = (obj: EntityLike | EntityLike[], types: Set<string>) => {
-  if (Array.isArray(obj)) {
-    for (const item of obj) collectTypes(item, types);
-  } else if (typeof obj === 'object' && obj !== null) {
-    for (const key in obj) {
-      if (key === '__typename' && typeof obj[key] === 'string') {
-        types.add(obj[key] as string);
-      } else {
-        collectTypes(obj[key], types);
-      }
-    }
-  }
-
-  return types;
-};
-
-/** Finds and returns a list of `__typename` fields found in response data.
- *
- * @privateRemarks
- * This is used by `@urql/core`’s document `cacheExchange` to find typenames
- * in a given GraphQL response’s data.
- */
-export const collectTypesFromResponse = (response: object): string[] => [
-  ...collectTypes(response as EntityLike, new Set()),
-];
+import { FormattedNode, TypedDocumentNode } from '../types';
 
 const formatNode = <
   T extends SelectionNode | DefinitionNode | TypedDocumentNode<any, any>
 >(
   node: T
-): T => {
-  let hasChanged = false;
-
+): FormattedNode<T> => {
   if ('definitions' in node) {
-    const definitions: DefinitionNode[] = [];
+    const definitions: FormattedNode<DefinitionNode>[] = [];
     for (const definition of node.definitions) {
       const newDefinition = formatNode(definition);
-      hasChanged = hasChanged || newDefinition !== definition;
       definitions.push(newDefinition);
     }
-    if (hasChanged) return { ...node, definitions };
-  } else if ('selectionSet' in node) {
-    const selections: SelectionNode[] = [];
+
+    return { ...node, definitions } as FormattedNode<T>;
+  }
+
+  if ('directives' in node && node.directives && node.directives.length) {
+    const directives: DirectiveNode[] = [];
+    const _directives = {};
+    for (const directive of node.directives) {
+      let name = directive.name.value;
+      if (name[0] !== '_') {
+        directives.push(directive);
+      } else {
+        name = name.slice(1);
+      }
+      _directives[name] = directive;
+    }
+    node = { ...node, directives, _directives };
+  }
+
+  if ('selectionSet' in node) {
+    const selections: FormattedNode<SelectionNode>[] = [];
     let hasTypename = node.kind === Kind.OPERATION_DEFINITION;
     if (node.selectionSet) {
       for (const selection of node.selectionSet.selections || []) {
@@ -59,39 +49,46 @@ const formatNode = <
             selection.name.value === '__typename' &&
             !selection.alias);
         const newSelection = formatNode(selection);
-        hasChanged = hasChanged || newSelection !== selection;
         selections.push(newSelection);
       }
+
       if (!hasTypename) {
-        hasChanged = true;
         selections.push({
           kind: Kind.FIELD,
           name: {
             kind: Kind.NAME,
             value: '__typename',
           },
-        });
+          _generated: true,
+        } as FormattedNode<FieldNode>);
       }
-      if (hasChanged)
-        return { ...node, selectionSet: { ...node.selectionSet, selections } };
+
+      return {
+        ...node,
+        selectionSet: { ...node.selectionSet, selections },
+      } as FormattedNode<T>;
     }
   }
 
-  return node;
+  return node as FormattedNode<T>;
 };
 
 const formattedDocs = new Map<number, KeyedDocumentNode>();
 
-/** Adds `__typename` fields to a GraphQL `DocumentNode`.
+/** Formats a GraphQL document to add `__typename` fields and process client-side directives.
  *
  * @param node - a {@link DocumentNode}.
- * @returns a copy of the passed {@link DocumentNode} with added `__typename` introspection fields.
+ * @returns a {@link FormattedDocument}
  *
  * @remarks
  * Cache {@link Exchange | Exchanges} will require typename introspection to
  * recognize types in a GraphQL response. To retrieve these typenames,
  * this function is used to add the `__typename` fields to non-root
  * selection sets of a GraphQL document.
+ *
+ * Additionally, this utility will process directives, filter out client-side
+ * directives starting with an `_` underscore, and place a `_directives` dictionary
+ * on selection nodes.
  *
  * This utility also preserves the internally computed key of the
  * document as created by {@link createRequest} to avoid any
@@ -102,7 +99,7 @@ const formattedDocs = new Map<number, KeyedDocumentNode>();
  */
 export const formatDocument = <T extends TypedDocumentNode<any, any>>(
   node: T
-): T => {
+): FormattedNode<T> => {
   const query = keyDocument(node);
 
   let result = formattedDocs.get(query.__key);
@@ -121,5 +118,5 @@ export const formatDocument = <T extends TypedDocumentNode<any, any>>(
     });
   }
 
-  return result as unknown as T;
+  return result as FormattedNode<T>;
 };

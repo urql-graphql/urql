@@ -29,8 +29,7 @@ const input = settings.sources.reduce((acc, source) => {
     const rel = relative(source.dir, process.cwd());
     plugins.push({
       async writeBundle() {
-        await fs.mkdir(source.dir, { recursive: true });
-        await fs.writeFile(join(source.dir, 'package.json'), JSON.stringify({
+        const packageJson = JSON.stringify({
           name: source.name,
           private: true,
           version: '0.0.0',
@@ -40,14 +39,17 @@ const input = settings.sources.reduce((acc, source) => {
           source: join(rel, source.source),
           exports: {
             '.': {
+              types: join(rel, source.types),
               import: join(rel, source.module),
               require: join(rel, source.main),
-              types: join(rel, source.types),
               source: join(rel, source.source),
             },
             './package.json': './package.json'
           },
-        }, null, 2));
+        }, null, 2).trim();
+
+        await fs.mkdir(source.dir, { recursive: true });
+        await fs.writeFile(join(source.dir, 'package.json'), packageJson + '\n');
       },
     });
   }

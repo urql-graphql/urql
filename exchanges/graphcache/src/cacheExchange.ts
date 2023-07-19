@@ -4,7 +4,6 @@ import {
   makeOperation,
   Operation,
   OperationResult,
-  OperationContext,
   RequestPolicy,
   CacheOutcome,
 } from '@urql/core';
@@ -145,7 +144,6 @@ export const cacheExchange =
 
     // This registers queries with the data layer to ensure commutativity
     const prepareForwardedOperation = (operation: Operation) => {
-      let context: Partial<OperationContext> | undefined;
       if (operation.kind === 'query') {
         // Pre-reserve the position of the result layer
         reserveLayer(store.data, operation.key);
@@ -158,14 +156,34 @@ export const cacheExchange =
         // Mark operation layer as done
         noopDataState(store.data, operation.key);
         return operation;
-      } else if (
+      }
+
+      const query = formatDocument(operation.query);
+      operation = makeOperation(
+        operation.kind,
+        {
+          key: operation.key,
+          query,
+          variables: operation.variables
+            ? filterVariables(getMainOperation(query), operation.variables)
+            : operation.variables,
+        },
+        { ...operation.context }
+      );
+
+      if (
         operation.kind === 'mutation' &&
         operation.context.requestPolicy !== 'network-only'
       ) {
         operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
         initDataState('write', store.data, operation.key, true, false);
-        const { dependencies } = _write(store, operation, undefined, undefined);
+        const { dependencies } = _write(
+          store,
+          operation as any,
+          undefined,
+          undefined
+        );
         clearDataState();
         if (dependencies.size) {
           // Update blocked optimistic dependencies
@@ -180,24 +198,11 @@ export const cacheExchange =
           executePendingOperations(operation, pendingOperations, true);
 
           // Mark operation as optimistic
-          context = { optimistic: true };
+          operation.context.optimistic = true;
         }
       }
 
-      return makeOperation(
-        operation.kind,
-        {
-          key: operation.key,
-          query: formatDocument(operation.query),
-          variables: operation.variables
-            ? filterVariables(
-                getMainOperation(operation.query),
-                operation.variables
-              )
-            : operation.variables,
-        },
-        { ...operation.context, ...context }
-      );
+      return operation;
     };
 
     // This updates the known dependencies for the passed operation
@@ -246,9 +251,7 @@ export const cacheExchange =
       result: OperationResult,
       pendingOperations: Operations
     ): OperationResult => {
-      // Retrieve the original operation to remove changes made by formatDocument
-      const operation =
-        operations.get(result.operation.key) || result.operation;
+      const { operation } = result;
       if (operation.kind === 'mutation') {
         // Collect previous dependencies that have been written for optimistic updates
         const dependencies = optimisticKeysToDependencies.get(operation.key);

@@ -1,6 +1,7 @@
-import { CombinedError, ErrorLike } from '@urql/core';
+import { CombinedError, ErrorLike, FormattedNode } from '@urql/core';
 
 import {
+  Kind,
   FieldNode,
   InlineFragmentNode,
   FragmentDefinitionNode,
@@ -8,12 +9,10 @@ import {
 
 import {
   isDeferred,
-  isInlineFragment,
   getTypeCondition,
   getSelectionSet,
   getName,
   SelectionSet,
-  isFieldNode,
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
@@ -120,7 +119,7 @@ export const updateContext = (
 };
 
 const isFragmentHeuristicallyMatching = (
-  node: InlineFragmentNode | FragmentDefinitionNode,
+  node: FormattedNode<InlineFragmentNode | FragmentDefinitionNode>,
   typename: void | string,
   entityKey: string,
   vars: Variables
@@ -146,7 +145,7 @@ const isFragmentHeuristicallyMatching = (
   return (
     currentOperation === 'write' ||
     !getSelectionSet(node).some(node => {
-      if (!isFieldNode(node)) return false;
+      if (node.kind !== Kind.FIELD) return false;
       const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
       return !hasField(entityKey, fieldKey);
     })
@@ -154,21 +153,21 @@ const isFragmentHeuristicallyMatching = (
 };
 
 interface SelectionIterator {
-  (): FieldNode | undefined;
+  (): FormattedNode<FieldNode> | undefined;
 }
 
 export const makeSelectionIterator = (
   typename: void | string,
   entityKey: string,
   defer: boolean,
-  selectionSet: SelectionSet,
+  selectionSet: FormattedNode<SelectionSet>,
   ctx: Context
 ): SelectionIterator => {
   let child: SelectionIterator | void;
   let index = 0;
 
   return function next() {
-    let node: FieldNode | undefined;
+    let node: FormattedNode<FieldNode> | undefined;
     while (child || index < selectionSet.length) {
       node = undefined;
       deferRef = defer;
@@ -183,11 +182,12 @@ export const makeSelectionIterator = (
         const select = selectionSet[index++];
         if (!shouldInclude(select, ctx.variables)) {
           /*noop*/
-        } else if (!isFieldNode(select)) {
+        } else if (select.kind !== Kind.FIELD) {
           // A fragment is either referred to by FragmentSpread or inline
-          const fragment = !isInlineFragment(select)
-            ? ctx.fragments[getName(select)]
-            : select;
+          const fragment =
+            select.kind !== Kind.INLINE_FRAGMENT
+              ? ctx.fragments[getName(select)]
+              : select;
           if (fragment) {
             const isMatching =
               !fragment.typeCondition ||
@@ -211,7 +211,7 @@ export const makeSelectionIterator = (
               );
             }
           }
-        } else {
+        } else if (currentOperation === 'write' || !select._generated) {
           return select;
         }
       }

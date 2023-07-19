@@ -1,4 +1,4 @@
-import { gql } from '@urql/core';
+import { formatDocument, gql } from '@urql/core';
 import { describe, it, expect } from 'vitest';
 import { getMainOperation } from './traversal';
 import { normalizeVariables, filterVariables } from './variables';
@@ -7,11 +7,13 @@ describe('normalizeVariables', () => {
   it('normalizes variables', () => {
     const input = { x: 42 };
     const operation = getMainOperation(
-      gql`
-        query ($x: Int!) {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query ($x: Int!) {
+            field
+          }
+        `
+      )
     );
     const normalized = normalizeVariables(operation, input);
     expect(normalized).toEqual({ x: 42 });
@@ -20,11 +22,13 @@ describe('normalizeVariables', () => {
   it('normalizes variables with defaults', () => {
     const input = { x: undefined };
     const operation = getMainOperation(
-      gql`
-        query ($x: Int! = 42) {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query ($x: Int! = 42) {
+            field
+          }
+        `
+      )
     );
     const normalized = normalizeVariables(operation, input);
     expect(normalized).toEqual({ x: 42 });
@@ -33,11 +37,13 @@ describe('normalizeVariables', () => {
   it('normalizes variables even with missing fields', () => {
     const input = { x: undefined };
     const operation = getMainOperation(
-      gql`
-        query ($x: Int!) {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query ($x: Int!) {
+            field
+          }
+        `
+      )
     );
     const normalized = normalizeVariables(operation, input);
     expect(normalized).toEqual({});
@@ -45,11 +51,13 @@ describe('normalizeVariables', () => {
 
   it('skips normalizing for queries without variables', () => {
     const operation = getMainOperation(
-      gql`
-        query {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query {
+            field
+          }
+        `
+      )
     );
     (operation as any).variableDefinitions = undefined;
     const normalized = normalizeVariables(operation, {});
@@ -58,11 +66,13 @@ describe('normalizeVariables', () => {
 
   it('preserves missing variables', () => {
     const operation = getMainOperation(
-      gql`
-        query {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query {
+            field
+          }
+        `
+      )
     );
     (operation as any).variableDefinitions = undefined;
     const normalized = normalizeVariables(operation, { test: true });
@@ -73,11 +83,13 @@ describe('normalizeVariables', () => {
 describe('filterVariables', () => {
   it('returns undefined when no variables are defined', () => {
     const operation = getMainOperation(
-      gql`
-        query {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query {
+            field
+          }
+        `
+      )
     );
     const vars = filterVariables(operation, { test: true });
     expect(vars).toBe(undefined);
@@ -86,11 +98,13 @@ describe('filterVariables', () => {
   it('filters out missing vars', () => {
     const input = { x: true, y: false };
     const operation = getMainOperation(
-      gql`
-        query ($x: Int!) {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query ($x: Int!) {
+            field
+          }
+        `
+      )
     );
     const vars = filterVariables(operation, input);
     expect(vars).toEqual({ x: true });
@@ -99,11 +113,13 @@ describe('filterVariables', () => {
   it('ignores defaults', () => {
     const input = { x: undefined };
     const operation = getMainOperation(
-      gql`
-        query ($x: Int! = 42) {
-          field
-        }
-      `
+      formatDocument(
+        gql`
+          query ($x: Int! = 42) {
+            field
+          }
+        `
+      )
     );
     const vars = filterVariables(operation, input);
     expect(vars).toEqual({ x: undefined });

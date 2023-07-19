@@ -1,14 +1,21 @@
 import { describe, it, expect } from 'vitest';
-import { TypedDocumentNode, gql } from '@urql/core';
+import {
+  TypedDocumentNode,
+  FormattedNode,
+  formatDocument,
+  gql,
+} from '@urql/core';
 import { FieldNode } from '@0no-co/graphql.web';
 
 import { makeSelectionIterator, deferRef } from './shared';
 import { SelectionSet } from '../ast';
 
-const selectionOfDocument = (doc: TypedDocumentNode): SelectionSet => {
-  for (const definition of doc.definitions)
+const selectionOfDocument = (
+  doc: TypedDocumentNode
+): FormattedNode<SelectionSet> => {
+  for (const definition of formatDocument(doc).definitions)
     if (definition.kind === 'OperationDefinition')
-      return definition.selectionSet.selections;
+      return definition.selectionSet.selections as FormattedNode<SelectionSet>;
   return [];
 };
 
