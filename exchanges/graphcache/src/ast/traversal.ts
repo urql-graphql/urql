@@ -8,18 +8,21 @@ import {
   Kind,
 } from '@0no-co/graphql.web';
 
-import { getName } from './node';
-
+import { FormattedNode } from '@urql/core';
+import { getName, getDirectives } from './node';
 import { invariant } from '../helpers/help';
 import { Fragments, Variables } from '../types';
 
+function getMainOperation(
+  doc: FormattedNode<DocumentNode>
+): FormattedNode<OperationDefinitionNode>;
+function getMainOperation(doc: DocumentNode): OperationDefinitionNode;
+
 /** Returns the main operation's definition */
-export const getMainOperation = (
-  doc: DocumentNode
-): OperationDefinitionNode => {
+function getMainOperation(doc: DocumentNode): OperationDefinitionNode {
   for (let i = 0; i < doc.definitions.length; i++) {
     if (doc.definitions[i].kind === Kind.OPERATION_DEFINITION) {
-      return doc.definitions[i] as OperationDefinitionNode;
+      return doc.definitions[i] as FormattedNode<OperationDefinitionNode>;
     }
   }
 
@@ -29,10 +32,12 @@ export const getMainOperation = (
       'node for a query, subscription, or mutation.',
     1
   );
-};
+}
+
+export { getMainOperation };
 
 /** Returns a mapping from fragment names to their selections */
-export const getFragments = (doc: DocumentNode): Fragments => {
+export const getFragments = (doc: FormattedNode<DocumentNode>): Fragments => {
   const fragments: Fragments = {};
   for (let i = 0; i < doc.definitions.length; i++) {
     const node = doc.definitions[i];
@@ -46,52 +51,45 @@ export const getFragments = (doc: DocumentNode): Fragments => {
 
 /** Resolves @include and @skip directives to determine whether field is included. */
 export const shouldInclude = (
-  node: SelectionNode,
+  node: FormattedNode<SelectionNode>,
   vars: Variables
 ): boolean => {
-  // Finds any @include or @skip directive that forces the node to be skipped
-  for (let i = 0; node.directives && i < node.directives.length; i++) {
-    const directive = node.directives[i];
-    const name = getName(directive);
-    if (
-      (name === 'include' || name === 'skip') &&
-      directive.arguments &&
-      directive.arguments[0] &&
-      getName(directive.arguments[0]) === 'if'
-    ) {
-      // Return whether this directive forces us to skip
-      // `@include(if: false)` or `@skip(if: true)`
-      const value = valueFromASTUntyped(directive.arguments[0].value, vars);
-      return name === 'include' ? !!value : !value;
+  const directives = getDirectives(node);
+  if (directives.include || directives.skip) {
+    // Finds any @include or @skip directive that forces the node to be skipped
+    for (const name in directives) {
+      const directive = directives[name];
+      if (
+        directive &&
+        (name === 'include' || name === 'skip') &&
+        directive.arguments &&
+        directive.arguments[0] &&
+        getName(directive.arguments[0]) === 'if'
+      ) {
+        // Return whether this directive forces us to skip
+        // `@include(if: false)` or `@skip(if: true)`
+        const value = valueFromASTUntyped(directive.arguments[0].value, vars);
+        return name === 'include' ? !!value : !value;
+      }
     }
   }
-
   return true;
 };
 
 /** Resolves @defer directive to determine whether a fragment is potentially skipped. */
 export const isDeferred = (
-  node: FragmentSpreadNode | InlineFragmentNode,
+  node: FormattedNode<FragmentSpreadNode | InlineFragmentNode>,
   vars: Variables
 ): boolean => {
-  for (let i = 0; node.directives && i < node.directives.length; i++) {
-    const directive = node.directives[i];
-    const name = getName(directive);
-    if (name === 'defer') {
-      for (
-        let j = 0;
-        directive.arguments && j < directive.arguments.length;
-        j++
-      ) {
-        const argument = directive.arguments[i];
-        if (getName(argument) === 'if') {
-          // Return whether `@defer(if: )` is enabled
-          return !!valueFromASTUntyped(argument.value, vars);
-        }
+  const { defer } = getDirectives(node);
+  if (defer) {
+    for (const argument of defer.arguments || []) {
+      if (getName(argument) === 'if') {
+        // Return whether `@defer(if: )` is enabled
+        return !!valueFromASTUntyped(argument.value, vars);
       }
-
-      return true;
     }
+    return true;
   }
 
   return false;

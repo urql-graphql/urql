@@ -3,10 +3,11 @@ import {
   DocumentInput,
   RequestExtensions,
   TypedDocumentNode,
+  FormattedNode,
   ErrorLike,
 } from '@urql/core';
 
-import { FragmentDefinitionNode } from '@0no-co/graphql.web';
+import { DocumentNode, FragmentDefinitionNode } from '@0no-co/graphql.web';
 import { IntrospectionData } from './ast';
 
 /** Nullable GraphQL list types of `T`.
@@ -26,7 +27,7 @@ export type NullArray<T> = Array<null | T | NullArray<T>>;
  * executing.
  */
 export interface Fragments {
-  [fragmentName: string]: void | FragmentDefinitionNode;
+  [fragmentName: string]: void | FormattedNode<FragmentDefinitionNode>;
 }
 
 /** Non-object JSON values as serialized by a GraphQL API
@@ -184,7 +185,7 @@ export interface KeyInfo {
  * GraphQL operation: its query document and variables.
  */
 export interface OperationRequest {
-  query: Exclude<DocumentInput<any, any>, string>;
+  query: FormattedNode<DocumentNode> | DocumentNode;
   variables?: any;
 }
 

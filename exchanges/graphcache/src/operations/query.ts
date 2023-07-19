@@ -1,4 +1,4 @@
-import { CombinedError } from '@urql/core';
+import { formatDocument, FormattedNode, CombinedError } from '@urql/core';
 
 import {
   FieldNode,
@@ -80,14 +80,15 @@ export const _query = (
   input?: Data | null | undefined,
   error?: CombinedError | undefined
 ): QueryResult => {
-  const operation = getMainOperation(request.query);
+  const query = formatDocument(request.query);
+  const operation = getMainOperation(query);
   const rootKey = store.rootFields[operation.operation];
   const rootSelect = getSelectionSet(operation);
 
   const ctx = makeContext(
     store,
     normalizeVariables(operation, request.variables),
-    getFragments(request.query),
+    getFragments(query),
     rootKey,
     rootKey,
     error
@@ -127,7 +128,7 @@ export const _query = (
 const readRoot = (
   ctx: Context,
   entityKey: string,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   input: Data
 ): Data => {
   const typename = ctx.store.rootNames[entityKey]
@@ -145,7 +146,7 @@ const readRoot = (
     ctx
   );
 
-  let node: FieldNode | void;
+  let node: FormattedNode<FieldNode> | void;
   let hasChanged = InMemoryData.currentForeignData;
   const output = InMemoryData.makeData(input);
   while ((node = iterate())) {
@@ -179,7 +180,7 @@ const readRoot = (
 
 const readRootField = (
   ctx: Context,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   originalData: Link<Data>
 ): Link<Data> => {
   if (Array.isArray(originalData)) {
@@ -213,16 +214,16 @@ const readRootField = (
 
 export const _queryFragment = (
   store: Store,
-  query: DocumentNode,
+  query: FormattedNode<DocumentNode>,
   entity: Partial<Data> | string,
   variables?: Variables,
   fragmentName?: string
 ): Data | null => {
   const fragments = getFragments(query);
 
-  let fragment: FragmentDefinitionNode;
+  let fragment: FormattedNode<FragmentDefinitionNode>;
   if (fragmentName) {
-    fragment = fragments[fragmentName] as FragmentDefinitionNode;
+    fragment = fragments[fragmentName]!;
     if (!fragment) {
       warn(
         'readFragment(...) was called with a fragment name that does not exist.\n' +
@@ -238,7 +239,7 @@ export const _queryFragment = (
     }
   } else {
     const names = Object.keys(fragments);
-    fragment = fragments[names[0]] as FragmentDefinitionNode;
+    fragment = fragments[names[0]]!;
     if (!fragment) {
       warn(
         'readFragment(...) was called with an empty fragment.\n' +
@@ -297,7 +298,7 @@ export const _queryFragment = (
 const readSelection = (
   ctx: Context,
   key: string,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   input: Data,
   result?: Data
 ): Data | undefined => {
@@ -352,7 +353,7 @@ const readSelection = (
   let hasPartials = false;
   let hasNext = false;
   let hasChanged = InMemoryData.currentForeignData;
-  let node: FieldNode | void;
+  let node: FormattedNode<FieldNode> | void;
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
@@ -511,7 +512,7 @@ const resolveResolverResult = (
   typename: string,
   fieldName: string,
   key: string,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   prevData: void | null | Data | Data[],
   result: void | DataField,
   isOwnedData: boolean
@@ -583,7 +584,7 @@ const resolveLink = (
   link: Link | Link[],
   typename: string,
   fieldName: string,
-  select: SelectionSet,
+  select: FormattedNode<SelectionSet>,
   prevData: void | null | Data | Data[],
   isOwnedData: boolean
 ): DataField | undefined => {

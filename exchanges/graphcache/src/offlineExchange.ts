@@ -13,7 +13,6 @@ import {
 } from '@urql/core';
 
 import { SerializedRequest, CacheExchangeOpts, StorageAdapter } from './types';
-
 import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 

@@ -180,7 +180,6 @@ export class Store<
     updater: (data: T | null) => T | null
   ): void {
     const request = createRequest(input.query, input.variables!);
-    request.query = formatDocument(request.query);
     const output = updater(this.readQuery(request));
     if (output !== null) {
       _write(this, request, output as any, undefined);
@@ -189,7 +188,6 @@ export class Store<
 
   readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null {
     const request = createRequest(input.query, input.variables!);
-    request.query = formatDocument(request.query);
     return _query(this, request, undefined, undefined).data as T | null;
   }
 

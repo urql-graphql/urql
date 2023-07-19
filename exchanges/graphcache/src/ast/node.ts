@@ -1,15 +1,23 @@
 import {
   NamedTypeNode,
   NameNode,
+  DirectiveNode,
   SelectionNode,
   SelectionSetNode,
-  InlineFragmentNode,
   FieldNode,
   FragmentDefinitionNode,
-  Kind,
 } from '@0no-co/graphql.web';
 
-export type SelectionSet = ReadonlyArray<SelectionNode>;
+import { FormattedNode } from '@urql/core';
+
+export type SelectionSet = readonly FormattedNode<SelectionNode>[];
+
+const EMPTY_DIRECTIVES: Record<string, DirectiveNode | undefined> = {};
+
+/** Returns the directives dictionary of a given node */
+export const getDirectives = (node: {
+  _directives?: Record<string, DirectiveNode | undefined>;
+}) => node._directives || EMPTY_DIRECTIVES;
 
 /** Returns the name of a given node */
 export const getName = (node: { name: NameNode }): string => node.name.value;
@@ -25,18 +33,13 @@ const emptySelectionSet: SelectionSet = [];
 
 /** Returns the SelectionSet for a given inline or defined fragment node */
 export const getSelectionSet = (node: {
-  selectionSet?: SelectionSetNode;
-}): SelectionSet =>
-  node.selectionSet ? node.selectionSet.selections : emptySelectionSet;
+  selectionSet?: FormattedNode<SelectionSetNode>;
+}): FormattedNode<SelectionSet> =>
+  (node.selectionSet
+    ? node.selectionSet.selections
+    : emptySelectionSet) as FormattedNode<SelectionSet>;
 
 export const getTypeCondition = (node: {
   typeCondition?: NamedTypeNode;
 }): string | null =>
   node.typeCondition ? node.typeCondition.name.value : null;
-
-export const isFieldNode = (node: SelectionNode): node is FieldNode =>
-  node.kind === Kind.FIELD;
-
-export const isInlineFragment = (
-  node: SelectionNode
-): node is InlineFragmentNode => node.kind === Kind.INLINE_FRAGMENT;
