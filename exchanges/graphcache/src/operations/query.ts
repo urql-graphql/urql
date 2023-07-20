@@ -392,7 +392,7 @@ const readSelection = (
     ctx.__internal.path.push(fieldAlias);
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
-    let dataFieldValue: undefined | DataField;
+    let dataFieldValue: void | DataField = undefined;
 
     if (fieldName === '__typename') {
       // We directly assign the typename as it's already available
