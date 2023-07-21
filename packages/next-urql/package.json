@@ -1,6 +1,6 @@
 {
-  "name": "next-urql",
-  "version": "5.0.2",
+  "name": "@urql/next",
+  "version": "0.1.0",
   "description": "Convenience wrappers for using urql with NextJS.",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -12,18 +12,33 @@
     "url": "https://github.com/urql-graphql/urql.git",
     "directory": "packages/next-urql"
   },
-  "main": "dist/next-urql.js",
-  "module": "dist/next-urql.es.js",
-  "types": "dist/next-urql.d.ts",
+  "main": "dist/urql-next",
+  "module": "dist/urql-next.mjs",
+  "types": "dist/urql-next.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/urql-next.d.ts",
+      "import": "./dist/urql-next.mjs",
+      "require": "./dist/urql-next.js",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json",
+    "./rsc": {
+      "types": "./dist/urql-next-rsc.d.ts",
+      "import": "./dist/urql-next-rsc.mjs",
+      "require": "./dist/urql-next-rsc.js",
+      "source": "./src/rsc.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",
     "README.md",
+    "rsc/",
     "dist/"
   ],
   "scripts": {
-    "test": "vitest --config ../../vitest.config.ts",
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -34,27 +49,20 @@
   "devDependencies": {
     "@urql/core": "workspace:*",
     "urql": "workspace:*",
-    "@types/enzyme": "^3.10.3",
-    "@types/enzyme-adapter-react-16": "^1.0.5",
-    "@types/node-fetch": "^2.5.4",
-    "@types/react": "^17.0.4",
-    "@types/react-dom": "^17.0.3",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
     "graphql": "^16.0.0",
-    "next": "^11.0.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-is": "^17.0.1"
-  },
-  "dependencies": {
-    "react-ssr-prepass": "^1.4.0"
+    "next": "^13.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "peerDependencies": {
-    "react": ">=16.8.0",
+    "next": ">=13.0.0",
+    "react": ">=18.0.0",
     "urql": "^4.0.0"
   },
   "publishConfig": {
+    "access": "public",
     "provenance": true
   }
 }

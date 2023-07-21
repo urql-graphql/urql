@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "@urql/core": "^4.0.11",
+    "@urql/next": "^1.0.0-beta.2",
     "graphql": "^16.6.0",
-    "next": "13.2.4",
-    "next-urql": "^5.0.2",
+    "next": "13.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "urql": "^4.0.4"
@@ -15,5 +15,8 @@
     "dev": "next dev",
     "start": "next",
     "build": "next build"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.6"
   }
 }

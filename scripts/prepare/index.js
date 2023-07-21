@@ -14,6 +14,12 @@ const hasReact = [
   'peerDependencies',
 ].some((dep) => pkg[dep] && pkg[dep].react);
 
+const hasNext = [
+  'dependencies',
+  'optionalDependencies',
+  'peerDependencies',
+].some((dep) => pkg[dep] && pkg[dep].next);
+
 const normalize = name => name
   .replace(/[@\s\/\.]+/g, ' ')
   .trim()
@@ -49,7 +55,7 @@ invariant(
   'package.json:source must exist'
 );
 
-if (hasReact) {
+if (hasReact && !hasNext) {
   invariant(
     is(pkg.main, path.join('dist', `${name}.js`)),
     'package.json:main path must end in `.js` for packages depending on React.'
@@ -106,7 +112,7 @@ invariant(
   'package.json:files must include "dist" and "LICENSE"'
 );
 
-if (hasReact) {
+if (hasReact && !hasNext) {
   invariant(!pkg.exports, 'package.json:exports must not be added for packages depending on React.');
 } else {
   invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');

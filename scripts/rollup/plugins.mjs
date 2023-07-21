@@ -19,7 +19,7 @@ import * as settings from './settings.mjs';
 export const makeBasePlugins = () => [
   resolve({
     dedupe: settings.externalModules,
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.ts', '.tsx'],
     mainFields: ['module', 'jsnext', 'main'],
     preferBuiltins: false,
     browser: true

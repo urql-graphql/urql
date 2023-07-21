@@ -54,6 +54,7 @@ export const isExternal = id => {
   return externalPredicate.test(id);
 };
 
+export const hasNext = prodDependencies.has('next');
 export const hasReact = prodDependencies.has('react');
 export const hasPreact = prodDependencies.has('preact');
 export const hasSvelte = prodDependencies.has('svelte');

@@ -177,15 +177,161 @@ we'll have to import from. `preact-ssr-prepass`.
 ## Next.js
 
 If you're using [Next.js](https://nextjs.org/) you can save yourself a lot of work by using
-`next-urql`. The `next-urql` package includes setup for `react-ssr-prepass` already, which automates
-a lot of the complexity of setting up server-side rendering with `urql`.
+`@urql/next`. The `@urql/next` package is set to work with Next 13.
 
-We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/urql-graphql/urql/tree/main/packages/next-urql)
-this integration contains convenience methods specifically for `Next.js`.
-These will simplify the above setup for SSR.
-
-To set up `next-urql`, first we'll install `next-urql` with `react-is` and `urql` as
+To set up `@urql/next`, first we'll install `@urql/next` and `urql` as
 peer dependencies:
+
+```sh
+yarn add @urql/next urql graphql
+# or
+npm install --save @urql/next urql graphql
+```
+
+We now have two ways to leverage `@urql/next`, one being part of a Server component
+or being part of the general `app/` folder.
+
+In a server component we will import from `@urql/next/rsc`
+
+```ts
+// app/page.tsx
+import React from 'react';
+import Head from 'next/head';
+import { cacheExchange, createClient, fetchExchange, gql } from '@urql/core';
+import { registerUrql } from '@urql/next/rsc';
+
+const makeClient = () => {
+  return createClient({
+    url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+    exchanges: [cacheExchange, fetchExchange],
+  });
+};
+
+const { getClient } = registerUrql(makeClient);
+
+export default async function Home() {
+  const result = await getClient().query(PokemonsQuery, {});
+  return (
+    <main>
+      <h1>This is rendered as part of an RSC</h1>
+      <ul>
+        {result.data.pokemons.map((x: any) => (
+          <li key={x.id}>{x.name}</li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+```
+
+When we aren't leveraging server components we will import the things we will
+need to do a bit more setup, we go to the `client` component's layout file and
+structure it as the following.
+
+```tsx
+// app/client/layout.tsx
+'use client';
+
+import { UrqlProvider, ssrExchange, cacheExchange, fetchExchange, createClient } from '@urql/next';
+
+const ssr = ssrExchange();
+const client = createClient({
+  url: 'https://trygql.formidable.dev/graphql/web-collections',
+  exchanges: [cacheExchange, ssr, fetchExchange],
+});
+
+export default function Layout({ children }: React.PropsWithChildren) {
+  return (
+    <UrqlProvider client={client} ssr={ssr}>
+      {children}
+    </UrqlProvider>
+  );
+}
+```
+
+It is important that we pas both a client as well as the `ssrExchange` to the `Provider`
+this way we will be able to restore the data that Next streams to the client later on
+when we are hydrating.
+
+The next step is to query data in your client components by means of the `useQuery`
+method defined in `@urql/next`.
+
+```tsx
+// app/client/page.tsx
+'use client';
+
+import Link from 'next/link';
+import { Suspense } from 'react';
+import { useQuery, gql } from '@urql/next';
+
+export default function Page() {
+  return (
+    <Suspense>
+      <Pokemons />
+    </Suspense>
+  );
+}
+
+const PokemonsQuery = gql`
+  query {
+    pokemons(limit: 10) {
+      id
+      name
+    }
+  }
+`;
+
+function Pokemons() {
+  const [result] = useQuery({ query: PokemonsQuery });
+  return (
+    <main>
+      <h1>This is rendered as part of SSR</h1>
+      <ul>
+        {result.data.pokemons.map((x: any) => (
+          <li key={x.id}>{x.name}</li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+```
+
+The data queried in the above component will be rendered on the server
+and re-hydrated back on the client. When using multiple Suspense boundaries
+these will also get flushed as they complete and re-hydrated.
+
+> When data is used throughout the application we advise against
+> rendering this as part of a server-component so you can benefit
+> from the client-side cache.
+
+### Invalidating data from a server-component
+
+When data is rendered by a server component but you dispatch a mutation
+from a client component the server won't automatically know that the
+server-component on the client needs refreshing. You can forcefully
+tell the server to do so by using the Next router and calling `.refresh()`.
+
+```tsx
+import { useRouter } from 'next/router';
+
+const Todo = () => {
+  const router = useRouter();
+  const executeMutation = async () => {
+    await updateTodo();
+    router.refresh();
+  };
+};
+```
+
+### Disabling RSC fetch caching
+
+You can pass `fetchOptions: { cache: "no-store" }` to the `createClient`
+constructor to avoid running into cached fetches with server-components.
+
+## Legacy Next.js (pages)
+
+If you're using [Next.js](https://nextjs.org/) with the classic `pages` you can instead use `next-urql`.
+To set up `next-urql`, first we'll install `next-urql` with `react-is` and `urql` as peer dependencies:
 
 ```sh
 yarn add next-urql react-is urql graphql
