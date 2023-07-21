@@ -119,6 +119,27 @@ it('retries query persisted query resulted in unsupported', async () => {
   expect(operations[2].extensions).toEqual(undefined);
 });
 
+it('skips operation when generateHash returns a nullish value', async () => {
+  const { result, operations, exchangeArgs } = makeExchangeArgs();
+
+  result.mockImplementationOnce(operation => ({
+    ...queryResponse,
+    operation,
+    data: null,
+  }));
+
+  const res = await pipe(
+    fromValue(queryOperation),
+    persistedExchange({ generateHash: async () => null })(exchangeArgs),
+    take(1),
+    toPromise
+  );
+
+  expect(res.operation.context.persistAttempt).toBe(true);
+  expect(operations.length).toBe(1);
+  expect(operations[0]).not.toHaveProperty('extensions.persistedQuery');
+});
+
 it.each([true, 'force', 'within-url-limit'] as const)(
   'sets `context.preferGetMethod` to %s when `options.preferGetForPersistedQueries` is %s',
   async preferGetMethodValue => {
