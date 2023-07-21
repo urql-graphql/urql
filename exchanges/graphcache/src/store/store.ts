@@ -15,6 +15,7 @@ import {
   KeyingConfig,
   Entity,
   CacheExchangeOpts,
+  DirectivesConfig,
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -37,6 +38,17 @@ import {
 type DocumentNode = TypedDocumentNode<any, any>;
 type RootField = 'query' | 'mutation' | 'subscription';
 
+const defaultDirectives: DirectivesConfig = {
+  optional: () => (_parent, args, cache, info) => {
+    const result = cache.resolve(info.parentFieldKey, info.fieldName, args);
+    return result === undefined ? null : result;
+  },
+  required: () => (_parent, args, cache, info) => {
+    const result = cache.resolve(info.parentFieldKey, info.fieldName, args);
+    return result === null ? undefined : result;
+  },
+};
+
 /** Implementation of the {@link Cache} interface as created internally by the {@link cacheExchange}.
  * @internal
  */
@@ -46,6 +58,7 @@ export class Store<
 {
   data: InMemoryData.InMemoryData;
 
+  directives: DirectivesConfig;
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
@@ -60,6 +73,8 @@ export class Store<
     if (!opts) opts = {} as C;
 
     this.resolvers = opts.resolvers || {};
+    this.directives =
+      { ...defaultDirectives, ...opts.directives } || defaultDirectives;
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
 

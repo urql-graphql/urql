@@ -1,6 +1,6 @@
 ---
 title: Schema Awareness
-order: 4
+order: 5
 ---
 
 # Schema Awareness
@@ -19,9 +19,9 @@ on `cacheExchange` allows us to pass an introspected schema to Graphcache:
 ```js
 const introspectedSchema = {
   __schema: {
-    queryType: { name: 'Query', },
-    mutationType: { name: 'Mutation', },
-    subscriptionType: { name: 'Subscription', },
+    queryType: { name: 'Query' },
+    mutationType: { name: 'Mutation' },
+    subscriptionType: { name: 'Subscription' },
   },
 };
 

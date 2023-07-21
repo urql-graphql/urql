@@ -555,6 +555,14 @@ export type CacheExchangeOpts = {
    * @see {@link https://urql.dev/goto/docs/graphcache/local-resolvers} for the full resolvers docs.
    */
   resolvers?: ResolverConfig;
+  /** Configures directives which can perform custom logic on fields.
+   *
+   * @remarks
+   * A {@link DirectivesConfig} may be passed to allow local directives to be used. For example, when `@_custom` is placed on a field and the configuration contains `custom` then this directive is executed by Graphcache.
+   *
+   * @see {@link https://urql.dev/goto/docs/graphcache/local-directives} for the full directives docs.
+   */
+  directives?: DirectivesConfig;
   /** Configures optimistic updates to react to mutations instantly before an API response.
    *
    * @remarks
@@ -691,6 +699,14 @@ export type ResolverConfig = {
   [typeName: string]: {
     [fieldName: string]: Resolver | void;
   } | void;
+};
+
+export type Directive = (
+  directiveArguments: Record<string, unknown> | null
+) => Resolver;
+
+export type DirectivesConfig = {
+  [directiveName: string]: Directive;
 };
 
 /** Cache Updater, which defines additional cache updates after cache writes.

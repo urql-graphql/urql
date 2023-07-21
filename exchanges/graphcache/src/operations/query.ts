@@ -16,6 +16,7 @@ import {
   getMainOperation,
   normalizeVariables,
   getFieldArguments,
+  getDirectives,
 } from '../ast';
 
 import {
@@ -25,6 +26,7 @@ import {
   Link,
   OperationRequest,
   Dependencies,
+  Resolver,
 } from '../types';
 
 import { joinKeys, keyOfField } from '../store/keys';
@@ -295,6 +297,43 @@ export const _queryFragment = (
   return result;
 };
 
+function getFieldResolver(
+  ctx: Context,
+  node: FormattedNode<FieldNode>,
+  typename: string,
+  fieldName: string
+): Resolver | void {
+  const resolvers = ctx.store.resolvers[typename];
+  const fieldResolver = resolvers && resolvers[fieldName];
+  const directives = getDirectives(node);
+
+  let directiveResolver: Resolver | undefined;
+  for (const name in directives) {
+    const directiveNode = directives[name];
+    if (
+      directiveNode &&
+      name !== 'include' &&
+      name !== 'skip' &&
+      ctx.store.directives[name]
+    ) {
+      directiveResolver = ctx.store.directives[name](
+        getFieldArguments(directiveNode, ctx.variables)
+      );
+      if (process.env.NODE_ENV === 'production') return directiveResolver;
+      break;
+    }
+  }
+
+  if (fieldResolver && directiveResolver) {
+    warn(
+      `A resolver and directive is being used at "${typename}.${fieldName}" simultaneously. Only the directive will apply.`,
+      28
+    );
+  }
+
+  return directiveResolver || fieldResolver;
+}
+
 const readSelection = (
   ctx: Context,
   key: string,
@@ -340,7 +379,6 @@ const readSelection = (
     return;
   }
 
-  const resolvers = store.resolvers[typename];
   const iterate = makeSelectionIterator(
     typename,
     entityKey,
@@ -361,6 +399,7 @@ const readSelection = (
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
     const fieldKey = keyOfField(fieldName, fieldArgs);
+    const resolver = getFieldResolver(ctx, node, typename, fieldName);
     const key = joinKeys(entityKey, fieldKey);
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const resultValue = result ? result[fieldName] : undefined;
@@ -373,7 +412,7 @@ const readSelection = (
     ctx.__internal.path.push(fieldAlias);
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
-    let dataFieldValue: void | DataField;
+    let dataFieldValue: void | DataField = undefined;
 
     if (fieldName === '__typename') {
       // We directly assign the typename as it's already available
@@ -381,11 +420,7 @@ const readSelection = (
     } else if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
-    } else if (
-      InMemoryData.currentOperation === 'read' &&
-      resolvers &&
-      resolvers[fieldName]
-    ) {
+    } else if (InMemoryData.currentOperation === 'read' && resolver) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
       updateContext(ctx, output, typename, entityKey, key, fieldName);
@@ -396,7 +431,7 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
-      dataFieldValue = resolvers[fieldName]!(
+      dataFieldValue = resolver(
         output,
         fieldArgs || ({} as Variables),
         store,

@@ -6,6 +6,7 @@ import {
   OperationResult,
   CombinedError,
 } from '@urql/core';
+import { print, stripIgnoredCharacters } from 'graphql';
 
 import { vi, expect, it, describe } from 'vitest';
 
@@ -674,6 +675,147 @@ describe('data dependencies', () => {
     expect(result).toHaveBeenCalledTimes(1);
     expect(reexecuteOperation).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0]).toHaveProperty('data.author', null);
+  });
+});
+
+describe('directives', () => {
+  it('returns optional fields as partial', () => {
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const query = gql`
+      {
+        todos {
+          id
+          text
+          completed @_optional
+        }
+      }
+    `;
+
+    const operation = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
+
+    const queryResult: OperationResult = {
+      ...queryResponse,
+      operation,
+      data: {
+        __typename: 'Query',
+        todos: [
+          {
+            id: '1',
+            text: 'learn urql',
+            __typename: 'Todo',
+          },
+        ],
+      },
+    };
+
+    const reexecuteOperation = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) return queryResult;
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(operation);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+    expect(reexecuteOperation).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0].data).toEqual({
+      todos: [
+        {
+          completed: null,
+          id: '1',
+          text: 'learn urql',
+        },
+      ],
+    });
+  });
+
+  it('does not return missing required fields', () => {
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const query = gql`
+      {
+        todos {
+          id
+          text
+          completed @_required
+        }
+      }
+    `;
+
+    const operation = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
+
+    const queryResult: OperationResult = {
+      ...queryResponse,
+      operation,
+      data: {
+        __typename: 'Query',
+        todos: [
+          {
+            id: '1',
+            text: 'learn urql',
+            __typename: 'Todo',
+          },
+        ],
+      },
+    };
+
+    const reexecuteOperation = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) return queryResult;
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(operation);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+    expect(
+      stripIgnoredCharacters(print(response.mock.calls[0][0].query))
+    ).toEqual('{todos{id text completed __typename}}');
+    expect(reexecuteOperation).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0].data).toEqual(null);
   });
 });
 
