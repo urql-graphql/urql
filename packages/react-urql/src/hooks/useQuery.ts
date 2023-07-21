@@ -376,9 +376,9 @@ export function useQuery<
       cache,
       request,
       suspense,
-      getSnapshot,
       args.requestPolicy,
       args.context,
+      args.pause,
     ]
   );
 
