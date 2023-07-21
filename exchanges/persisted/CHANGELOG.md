@@ -1,5 +1,17 @@
 # @urql/exchange-persisted-fetch
 
+## 4.1.0
+
+### Minor Changes
+
+- Allow persisted query logic to be skipped by the `persistedExchange` if the passed `generateHash` function resolves to a nullish value. This allows (A)PQ to be selectively disabled for individual operations
+  Submitted by [@kitten](https://github.com/kitten) (See [#3324](https://github.com/urql-graphql/urql/pull/3324))
+
+### Patch Changes
+
+- Updated dependencies (See [#3317](https://github.com/urql-graphql/urql/pull/3317) and [#3308](https://github.com/urql-graphql/urql/pull/3308))
+  - @urql/core@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes

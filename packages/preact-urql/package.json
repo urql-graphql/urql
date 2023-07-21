@@ -58,7 +58,7 @@
     "preact": ">= 10.0.0"
   },
   "dependencies": {
-    "@urql/core": "^4.0.0",
+    "@urql/core": "^4.1.0",
     "wonka": "^6.3.2"
   },
   "publishConfig": {

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0
+
+### Major Changes
+
+- Create `@urql/next` which is a package meant to support Next 13 and
+  the React 18 features contained within.
+  For server components we have `@urql/next/rsc` and for client components
+  just `@urql/next`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3214](https://github.com/urql-graphql/urql/pull/3214))
+
 ## 5.0.2
 
 ### Patch Changes
