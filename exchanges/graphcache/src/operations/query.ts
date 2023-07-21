@@ -331,7 +331,7 @@ function getFieldResolver(
     );
   }
 
-  return fieldResolver;
+  return directiveResolver || fieldResolver;
 }
 
 const readSelection = (
