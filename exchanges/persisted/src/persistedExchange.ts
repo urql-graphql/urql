@@ -68,6 +68,10 @@ export interface PersistedExchangeOptions {
    * hashes at compile-time, or need to use a custom SHA-256 function,
    * you may pass one here.
    *
+   * If `generateHash` returns either `null` or `undefined`, the
+   * operation will not be treated as a persisted operation, which
+   * essentially skips this exchange’s logic for a given operation.
+   *
    * Hint: The default SHA-256 function uses the WebCrypto API. This
    * API is unavailable on React Native, which may require you to
    * pass a custom function here.
@@ -75,7 +79,7 @@ export interface PersistedExchangeOptions {
   generateHash?(
     query: string,
     document: TypedDocumentNode<any, any>
-  ): Promise<string>;
+  ): Promise<string | undefined | null>;
   /** Enables persisted queries to be used for mutations.
    *
    * @remarks
