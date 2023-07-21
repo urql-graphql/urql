@@ -300,7 +300,7 @@ export function useSubscription<
 
       deferDispatch(setState, state => [source, state[1], deps]);
     },
-    [client, args.context, request]
+    [client, request, args.context, args.pause]
   );
 
   return [currentResult, executeSubscription];
