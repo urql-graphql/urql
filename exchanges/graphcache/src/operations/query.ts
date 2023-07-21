@@ -4,7 +4,6 @@ import {
   FieldNode,
   DocumentNode,
   FragmentDefinitionNode,
-  DirectiveNode,
 } from '@0no-co/graphql.web';
 
 import {
@@ -27,7 +26,7 @@ import {
   Link,
   OperationRequest,
   Dependencies,
-  Directive,
+  Resolver,
 } from '../types';
 
 import { joinKeys, keyOfField } from '../store/keys';
@@ -298,18 +297,41 @@ export const _queryFragment = (
   return result;
 };
 
-function getFieldDirective(
+function getFieldResolver(
+  ctx: Context,
   node: FormattedNode<FieldNode>,
-  store: Store
-): { storeDirective: Directive; fieldDirective: DirectiveNode } | undefined {
+  typename: string,
+  fieldName: string
+): Resolver | void {
+  const resolvers = ctx.store.resolvers[typename];
+  const fieldResolver = resolvers && resolvers[fieldName];
   const directives = getDirectives(node);
+
+  let directiveResolver: Resolver | undefined;
   for (const name in directives) {
-    if (name !== 'include' && name !== 'skip' && store.directives[name])
-      return {
-        storeDirective: store.directives[name],
-        fieldDirective: directives[name]!,
-      };
+    const directiveNode = directives[name];
+    if (
+      directiveNode &&
+      name !== 'include' &&
+      name !== 'skip' &&
+      ctx.store.directives[name]
+    ) {
+      directiveResolver = ctx.store.directives[name](
+        getFieldArguments(directiveNode, ctx.variables)
+      );
+      if (process.env.NODE_ENV === 'production') return directiveResolver;
+      break;
+    }
   }
+
+  if (fieldResolver && directiveResolver) {
+    warn(
+      `A resolver and directive is being used at "${typename}.${fieldName}" simultaneously. Only the directive will apply.`,
+      28
+    );
+  }
+
+  return fieldResolver;
 }
 
 const readSelection = (
@@ -357,7 +379,6 @@ const readSelection = (
     return;
   }
 
-  const resolvers = store.resolvers[typename];
   const iterate = makeSelectionIterator(
     typename,
     entityKey,
@@ -373,13 +394,12 @@ const readSelection = (
   let node: FormattedNode<FieldNode> | void;
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
-    const foundDirective = getFieldDirective(node, store);
-
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
     const fieldKey = keyOfField(fieldName, fieldArgs);
+    const resolver = getFieldResolver(ctx, node, typename, fieldName);
     const key = joinKeys(entityKey, fieldKey);
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const resultValue = result ? result[fieldName] : undefined;
@@ -400,10 +420,7 @@ const readSelection = (
     } else if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
-    } else if (
-      InMemoryData.currentOperation === 'read' &&
-      ((resolvers && resolvers[fieldName]) || foundDirective)
-    ) {
+    } else if (InMemoryData.currentOperation === 'read' && resolver) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
       updateContext(ctx, output, typename, entityKey, key, fieldName);
@@ -414,32 +431,12 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
-      if (resolvers && resolvers[fieldName] && foundDirective) {
-        warn(
-          `A resolver and directive is being used at "${typename}.${fieldName}", only the directive will apply.`,
-          28
-        );
-      }
-
-      if (resolvers && resolvers[fieldName]) {
-        dataFieldValue = resolvers[fieldName]!(
-          output,
-          fieldArgs || ({} as Variables),
-          store,
-          ctx
-        );
-      } else {
-        const directiveArguments = getFieldArguments(
-          foundDirective!.fieldDirective,
-          ctx.variables
-        );
-        dataFieldValue = foundDirective!.storeDirective(directiveArguments)(
-          output,
-          fieldArgs || ({} as Variables),
-          store,
-          ctx
-        );
-      }
+      dataFieldValue = resolver(
+        output,
+        fieldArgs || ({} as Variables),
+        store,
+        ctx
+      );
 
       if (node.selectionSet) {
         // When it has a selection set we are resolving an entity with a
