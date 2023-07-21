@@ -1,5 +1,14 @@
 # urql
 
+## 4.0.5
+
+### Patch Changes
+
+- ⚠️ Fix edge case that causes execute functions from `useQuery` and `useSubscription` to fail when they’re called in their state after a render that changes `pause`. This would previously cause internal dependencies to be outdated and the source to be discarded immediately in some cases
+  Submitted by [@kitten](https://github.com/kitten) (See [#3323](https://github.com/urql-graphql/urql/pull/3323))
+- Updated dependencies (See [#3317](https://github.com/urql-graphql/urql/pull/3317) and [#3308](https://github.com/urql-graphql/urql/pull/3308))
+  - @urql/core@4.1.0
+
 ## 4.0.4
 
 ### Patch Changes

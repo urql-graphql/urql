@@ -1,5 +1,29 @@
 # @urql/exchange-graphcache
 
+## 6.2.0
+
+### Minor Changes
+
+- Implement **local directives**. It’s now possible to add client-only directives to queries by adding them to the `cacheExchange`’s new `directives` option.
+  Directives accept an object of their arguments and return a resolver. When a field is annotated with
+  a resolver, e.g. `@_optional` or `@_required`, their resolvers from the `directives` config are
+  executed. This means it’s now possible to use `@_relayPagination` for example, by passing adding
+  the `relayPagination` helper to the config.
+  Due to the change in [#3317](https://github.com/urql-graphql/urql/pull/3317), any directive in
+  queries that’s prefixed with an underscore (`_`) is only visible to Graphcache and not the API.
+  Submitted by undefined (See https://github.com/urql-graphql/urql/pull/3306)
+
+### Patch Changes
+
+- Use new `FormattedNode` / `formatDocument` functionality added to `@urql/core` to slightly speed up directive processing by using the client-side `_directives` dictionary that `formatDocument` adds
+  Submitted by [@kitten](https://github.com/kitten) (See [#3317](https://github.com/urql-graphql/urql/pull/3317))
+- Allow `offlineExchange` to once again issue all request policies, instead of mapping them to `cache-first`. When replaying operations after rehydrating it will now prioritise network policies, and before rehydrating receiving a network result will prevent a network request from being issued again
+  Submitted by [@kitten](https://github.com/kitten) (See [#3308](https://github.com/urql-graphql/urql/pull/3308))
+- Add `OperationContext.optimistic` flag as an internal indication on whether a mutation triggered an optimistic update in `@urql/exchange-graphcache`'s `cacheExchange`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3308](https://github.com/urql-graphql/urql/pull/3308))
+- Updated dependencies (See [#3317](https://github.com/urql-graphql/urql/pull/3317) and [#3308](https://github.com/urql-graphql/urql/pull/3308))
+  - @urql/core@4.1.0
+
 ## 6.1.4
 
 ### Patch Changes

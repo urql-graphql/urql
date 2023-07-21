@@ -1,5 +1,17 @@
 # @urql/core
 
+## 4.1.0
+
+### Minor Changes
+
+- Update `formatDocument` to output `FormattedNode` type mapping. The formatter will now annotate added `__typename` fields with `_generated: true`, place selection nodes' directives onto a `_directives` dictionary, and will filter directives to not include `"_"` underscore prefixed directives in the final query. This prepares us for a feature that allows enhanced client-side directives in Graphcache
+  Submitted by [@kitten](https://github.com/kitten) (See [#3317](https://github.com/urql-graphql/urql/pull/3317))
+
+### Patch Changes
+
+- Add `OperationContext.optimistic` flag as an internal indication on whether a mutation triggered an optimistic update in `@urql/exchange-graphcache`'s `cacheExchange`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3308](https://github.com/urql-graphql/urql/pull/3308))
+
 ## 4.0.11
 
 ### Patch Changes
