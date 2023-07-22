@@ -5,6 +5,7 @@ import {
   type DocumentInput,
   type OperationResult,
   type RequestPolicy,
+  OperationResultSource,
 } from '@urql/core';
 import {
   batch,
@@ -21,7 +22,6 @@ import {
   fromValue,
   makeSubject,
   map,
-  never,
   pipe,
   scan,
   subscribe,
@@ -88,11 +88,14 @@ export const createQuery = <
   args: CreateQueryArgs<Data, Variables>
 ) => {
   const client = useClient();
-  const optionsSubject = makeSubject<QueryExecuteArgs<Data, Variables>>();
   const getContext = asAccessor(args.context),
     getPause = asAccessor(args.pause),
     getRequestPolicy = asAccessor(args.requestPolicy),
     getVariables = asAccessor(args.variables);
+
+  const resultSourceSubject = makeSubject<
+    OperationResultSource<OperationResult<Data, Variables>> | undefined
+  >();
 
   const isSuspense = createMemo(() => {
     const ctx = getContext();
@@ -136,22 +139,16 @@ export const createQuery = <
   });
 
   const sub = pipe(
-    optionsSubject.source,
-    switchMap(options$ => {
-      if (options$.pause) return never;
+    resultSourceSubject.source,
+    switchMap(subscription$ => {
+      if (subscription$ === undefined) {
+        return fromValue({ fetching: false });
+      }
 
-      const request = createRequest<Data, AnyVariables>(
-        options$.query,
-        options$.variables
-      );
-
-      return concat<Partial<CreateQueryState<Data, Variables>>>([
+      return concat([
         fromValue({ fetching: true, stale: false }),
         pipe(
-          client.executeQuery(request, {
-            requestPolicy: options$.requestPolicy,
-            ...options$.context,
-          }),
+          subscription$,
           map(({ stale, data, error, extensions, operation }) => ({
             fetching: false,
             stale: !!stale,
@@ -165,7 +162,7 @@ export const createQuery = <
       ]);
     }),
     scan(
-      (result: CreateQueryState<Data, Variables>, partial) => ({
+      (result: CreateQueryState<Data, Variables>, partial: any) => ({
         ...result,
         ...partial,
       }),
@@ -183,16 +180,17 @@ export const createQuery = <
   createComputed(() => {
     const pause = getPause();
     if (pause === true) {
+      resultSourceSubject.next(undefined);
       return;
     }
 
-    optionsSubject.next({
-      query: args.query,
-      context: getContext(),
-      pause: pause,
+    const request = createRequest(args.query, getVariables() as any);
+    const context: Partial<OperationContext> = {
       requestPolicy: getRequestPolicy(),
-      variables: getVariables(),
-    });
+      ...getContext(),
+    };
+
+    resultSourceSubject.next(client.executeQuery(request, context));
   });
 
   onCleanup(() => sub.unsubscribe());
@@ -203,13 +201,14 @@ export const createQuery = <
   });
 
   const refetchFn = (refetchArgs: Partial<OperationContext>) => {
-    optionsSubject.next({
-      query: args.query,
+    const request = createRequest(args.query, getVariables() as any);
+    const context: Partial<OperationContext> = {
       requestPolicy: refetchArgs.requestPolicy ?? getRequestPolicy(),
-      context: refetchArgs ?? getContext(),
-      pause: false,
-      variables: getVariables(),
-    });
+      ...getContext(),
+      ...refetchArgs,
+    };
+
+    resultSourceSubject.next(client.executeQuery(request, context));
   };
 
   const handler = {
