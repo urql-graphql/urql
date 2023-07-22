@@ -29,7 +29,7 @@ vi.mock('./context', () => {
 });
 
 describe('createMutation', () => {
-  it.only('should have expected state before and after finish', async () => {
+  it('should have expected state before and after finish', async () => {
     const subject = makeSubject<any>();
     const clientMutation = vi
       .spyOn(client, 'executeMutation')
