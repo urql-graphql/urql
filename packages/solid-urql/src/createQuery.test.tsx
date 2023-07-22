@@ -37,7 +37,7 @@ const App = (props: AppProps) => {
   return (
     <Suspense fallback={<span data-testid="loading">loading</span>}>
       <Show when={resource.data}>
-        <span data-testid="value">{resource.data?.test}</span>
+        {data => <span data-testid="value">{data().test}</span>}
       </Show>
       <button
         data-testid="refetch"
@@ -116,22 +116,22 @@ describe('createQuery', () => {
       })
     );
 
-    expect(result[0].fetching).toStrictEqual(true);
+    expect(result[0].fetching).toEqual(true);
     subject.next({ data: { test: true } });
-    await waitFor(() => result[0].fetching === false);
+    expect(result[0].fetching).toEqual(false);
 
     setVariable(2);
 
-    expect(result[0].fetching).toStrictEqual(true);
+    expect(result[0].fetching).toEqual(true);
     subject.next({ data: { test: true } });
-    await waitFor(() => result[0].fetching === false);
+    expect(result[0].fetching).toEqual(false);
 
     expect(executeQuery).toHaveBeenCalledTimes(2);
 
     setPause(true);
     setVariable(3);
 
-    expect(result[0].fetching).toStrictEqual(false);
+    expect(result[0].fetching).toEqual(false);
     expect(executeQuery).toHaveBeenCalledTimes(2);
   });
 
@@ -155,18 +155,18 @@ describe('createQuery', () => {
       })
     );
 
-    await waitFor(() => expect(result[0].fetching).toStrictEqual(true));
+    expect(result[0].fetching).toEqual(true);
     subject.next({ data: { test: true } });
-    await waitFor(() => expect(result[0].fetching).toStrictEqual(false));
-    await waitFor(() => expect(result[0].data?.test).toStrictEqual(true));
+    expect(result[0].fetching).toEqual(false);
+    expect(result[0].data?.test).toEqual(true);
     setVariables({ variable: 2 });
 
-    await waitFor(() => expect(result[0].fetching).toStrictEqual(true));
+    expect(result[0].fetching).toEqual(true);
     expect(executeQuery).toHaveBeenCalledTimes(2);
 
     subject.next({ data: { test: false } });
-    await waitFor(() => expect(result[0].fetching).toStrictEqual(false));
-    await waitFor(() => expect(result[0].data?.test).toStrictEqual(false));
+    expect(result[0].fetching).toEqual(false);
+    expect(result[0].data?.test).toEqual(false);
   });
 
   it('should receive data', async () => {
@@ -184,12 +184,12 @@ describe('createQuery', () => {
       })
     );
 
-    await waitFor(() => expect(result[0].fetching).toStrictEqual(true));
+    expect(result[0].fetching).toEqual(true);
     expect(result[0].data).toBeUndefined();
 
     subject.next({ data: { test: true } });
 
-    await waitFor(() => expect(result[0].fetching).toStrictEqual(false));
+    expect(result[0].fetching).toEqual(false);
     expect(result[0].data).toStrictEqual({ test: true });
     expect(executeQuery).toHaveBeenCalledTimes(1);
   });
