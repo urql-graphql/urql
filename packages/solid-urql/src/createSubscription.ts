@@ -76,14 +76,14 @@ export const createSubscription = <
     stale: false,
   };
 
-  const operationSubject = makeSubject<
+  const resultSourceSubject = makeSubject<
     OperationResultSource<OperationResult<Data, Variables>> | undefined
   >();
   const [state, setState] =
     createStore<CreateSubscriptionState<Result, Variables>>(initialState);
 
   const sub = pipe(
-    operationSubject.source,
+    resultSourceSubject.source,
     switchMap(subscription$ => {
       if (subscription$ === undefined) {
         return fromValue({ fetching: false });
@@ -130,13 +130,13 @@ export const createSubscription = <
 
   createComputed(() => {
     if (getPause() === true) {
-      operationSubject.next(undefined);
+      resultSourceSubject.next(undefined);
       return;
     }
 
     const ctx = getContext();
     const req = createRequest(args.query, getVariables() as Variables);
-    operationSubject.next(
+    resultSourceSubject.next(
       client.executeSubscription<Data, Variables>(req, ctx)
     );
   });
@@ -144,7 +144,7 @@ export const createSubscription = <
   const execute = (opts?: Partial<OperationContext>) => {
     const ctx = getContext();
     const req = createRequest(args.query, getVariables() as Variables);
-    operationSubject.next(
+    resultSourceSubject.next(
       client.executeSubscription<Data, Variables>(req, {
         ...ctx,
         ...opts,
