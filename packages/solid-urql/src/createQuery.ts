@@ -1,11 +1,11 @@
 import {
   type AnyVariables,
   type OperationContext,
-  createRequest,
   type DocumentInput,
   type OperationResult,
   type RequestPolicy,
-  OperationResultSource,
+  type OperationResultSource,
+  createRequest,
 } from '@urql/core';
 import {
   batch,
@@ -16,7 +16,7 @@ import {
 } from 'solid-js';
 import { createStore, unwrap } from 'solid-js/store';
 import { useClient } from './context';
-import { asAccessor } from '@solid-primitives/utils';
+import { type MaybeAccessor, asAccessor } from '@solid-primitives/utils';
 import {
   concat,
   fromValue,
@@ -27,7 +27,6 @@ import {
   subscribe,
   switchMap,
 } from 'wonka';
-import { type MaybeAccessor } from '@solid-primitives/utils';
 
 export type QueryExecuteArgs<
   Data = any,

@@ -1,13 +1,13 @@
-import { MaybeAccessor, asAccessor } from '@solid-primitives/utils';
+import { type MaybeAccessor, asAccessor } from '@solid-primitives/utils';
 import {
   type AnyVariables,
   type DocumentInput,
   type Operation,
   type OperationContext,
+  type OperationResult,
+  type OperationResultSource,
   CombinedError,
   createRequest,
-  OperationResult,
-  OperationResultSource,
 } from '@urql/core';
 import { useClient } from './context';
 import { createStore } from 'solid-js/store';
