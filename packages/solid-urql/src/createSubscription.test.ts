@@ -145,4 +145,32 @@ describe('createSubscription', () => {
     expect(executeQuery).toHaveBeenCalledOnce();
     expect(result[0].data).toStrictEqual({ value: 1 });
   });
+
+  it('should override pause when execute executeSubscription', async () => {
+    const subject =
+      makeSubject<Pick<OperationResult<{ value: number }, any>, 'data'>>();
+    const executeQuery = vi
+      .spyOn(client, 'executeSubscription')
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
+
+    const { result } = renderHook(() =>
+      createSubscription<{ value: number }, { variable: number }>({
+        query: QUERY,
+        pause: true,
+      })
+    );
+
+    expect(result[0].fetching).toEqual(false);
+    expect(executeQuery).not.toBeCalled();
+
+    result[1]();
+
+    expect(result[0].fetching).toEqual(true);
+    expect(executeQuery).toHaveBeenCalledOnce();
+    subject.next({ data: { value: 1 } });
+
+    expect(result[0].data).toStrictEqual({ value: 1 });
+  });
 });
