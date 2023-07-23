@@ -1,4 +1,4 @@
-import { Client } from '@urql/core';
+import { type Client } from '@urql/core';
 import { createContext, useContext } from 'solid-js';
 
 export const Context = createContext<Client>();
