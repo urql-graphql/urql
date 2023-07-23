@@ -28,17 +28,6 @@ import {
   switchMap,
 } from 'wonka';
 
-export type QueryExecuteArgs<
-  Data = any,
-  Variables extends AnyVariables = AnyVariables
-> = {
-  query: DocumentInput<Data, Variables>;
-  requestPolicy?: RequestPolicy;
-  context?: Partial<OperationContext>;
-  pause?: boolean;
-  variables?: Variables;
-};
-
 /** State of the current query, your {@link createQuery} hook is executing.
  *
  * @remarks
