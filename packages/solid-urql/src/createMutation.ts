@@ -1,11 +1,11 @@
 import { createStore } from 'solid-js/store';
 import {
-  createRequest,
   type AnyVariables,
   type DocumentInput,
-  OperationContext,
+  type OperationContext,
+  type Operation,
   CombinedError,
-  Operation,
+  createRequest,
 } from '@urql/core';
 import { useClient } from './context';
 import { pipe, onPush, filter, take, toPromise } from 'wonka';
