@@ -23,7 +23,7 @@ import {
   switchMap,
 } from 'wonka';
 
-type CreateSubscriptionArgs<
+export type CreateSubscriptionArgs<
   Data,
   Variables extends AnyVariables = AnyVariables
 > = {
@@ -33,7 +33,7 @@ type CreateSubscriptionArgs<
   pause?: MaybeAccessor<boolean>;
 };
 
-type CreateSubscriptionState<
+export type CreateSubscriptionState<
   Data = any,
   Variables extends AnyVariables = AnyVariables
 > = {
