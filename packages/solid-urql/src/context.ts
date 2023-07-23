@@ -4,7 +4,7 @@ import { createContext, useContext } from 'solid-js';
 export const Context = createContext<Client>();
 export const Provider = Context.Provider;
 
-type UseClient = () => Client;
+export type UseClient = () => Client;
 export const useClient: UseClient = () => {
   const client = useContext(Context);
 
