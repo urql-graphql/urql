@@ -135,6 +135,35 @@ describe('createQuery', () => {
     expect(executeQuery).toHaveBeenCalledTimes(2);
   });
 
+  it('should override pause when execute via refetch', async () => {
+    const subject =
+      makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
+    const executeQuery = vi
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
+
+    const { result } = renderHook(() =>
+      createQuery<{ variable: number }>({
+        query: '{ test }',
+        pause: true,
+      })
+    );
+
+    expect(result[0].fetching).toEqual(false);
+    expect(executeQuery).not.toBeCalled();
+
+    result[1]();
+
+    expect(result[0].fetching).toEqual(true);
+    expect(executeQuery).toHaveBeenCalledOnce();
+    subject.next({ data: { test: true } });
+
+    expect(result[0].fetching).toEqual(false);
+    expect(result[0].data).toStrictEqual({ test: true });
+  });
+
   it('should trigger refetch on variables change', async () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
@@ -192,5 +221,22 @@ describe('createQuery', () => {
     expect(result[0].fetching).toEqual(false);
     expect(result[0].data).toStrictEqual({ test: true });
     expect(executeQuery).toHaveBeenCalledTimes(1);
+  });
+
+  it('should unsubscribe on teardown', async () => {
+    const subject =
+      makeSubject<Pick<OperationResult<{ value: number }, any>, 'data'>>();
+    vi.spyOn(client, 'executeQuery').mockImplementation(
+      () => subject.source as OperationResultSource<OperationResult>
+    );
+
+    const { result, cleanup } = renderHook(() =>
+      createQuery<{ value: number }, { variable: number }>({
+        query: '{ test }',
+      })
+    );
+
+    cleanup();
+    waitFor(() => expect(result[0].fetching).toEqual(false));
   });
 });

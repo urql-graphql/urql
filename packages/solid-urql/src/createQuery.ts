@@ -200,12 +200,12 @@ export const createQuery = <
     refetch();
   });
 
-  const refetchFn = (refetchArgs: Partial<OperationContext>) => {
+  const executeQuery = (opts?: Partial<OperationContext>) => {
     const request = createRequest(args.query, getVariables() as any);
     const context: Partial<OperationContext> = {
-      requestPolicy: refetchArgs.requestPolicy ?? getRequestPolicy(),
+      requestPolicy: opts?.requestPolicy ?? getRequestPolicy(),
       ...getContext(),
-      ...refetchArgs,
+      ...opts,
     };
 
     resultSourceSubject.next(client.executeQuery(request, context));
@@ -225,5 +225,5 @@ export const createQuery = <
   };
 
   const proxy = new Proxy(result, handler);
-  return [proxy, refetchFn] as const;
+  return [proxy, executeQuery] as const;
 };

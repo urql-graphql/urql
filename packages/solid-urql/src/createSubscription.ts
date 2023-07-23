@@ -141,7 +141,7 @@ export const createSubscription = <
     );
   });
 
-  const execute = (opts?: Partial<OperationContext>) => {
+  const executeSubscription = (opts?: Partial<OperationContext>) => {
     const ctx = getContext();
     const req = createRequest(args.query, getVariables() as Variables);
     resultSourceSubject.next(
@@ -152,5 +152,5 @@ export const createSubscription = <
     );
   };
 
-  return [state, execute] as const;
+  return [state, executeSubscription] as const;
 };
