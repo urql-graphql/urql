@@ -79,6 +79,57 @@ The cache updaters return value is disregarded (and typed as `void` in TypeScrip
 method that they call on the `cache` instance a side effect, which may trigger additional cache
 changes and updates all affected queries as we modify them.
 
+## Why do we need cache updates?
+
+When we’re designing a GraphQL schema well, we won’t need to write many cache updaters for
+Graphcache.
+
+For example, we may have a mutation to update a username on a `User`, which can trivially
+update the cache without us writing an updater because it resolves the `User`.
+
+```graphql
+query User($id: ID!) {
+  user(id: $id) {
+    __typename # "User"
+    id
+    username
+  }
+}
+
+mutation UpdateUsername($id: ID!, $username: String!) {
+  updateUser(id: $id, username: $username) {
+    __typename # "User"
+    id
+    username
+  }
+}
+```
+
+In the above example, `Query.user` returns a `User`, which is then updated by a mutation on
+`Mutation.updateUser`. Since the mutation also queries the `User`, the updated username will
+automatically be applied by Graphcache. If the mutation field didn’t return a `User`, then this
+wouldn’t be possible, and while we can write an updater in Graphcache for it, we should consider
+this poor schema design.
+
+An updater instead becomes absolutely necessary when a mutation can’t reasonably return what has
+changed or when we can’t manually define a selection set that’d be even able to select all fields
+that may update. Some examples may include:
+
+- `Mutation.deleteUser`, since we’ll need to invalidate an entity
+- `Mutation.createUser`, since a list may now have to include a new entity
+- `Mutation.createBook`, since a given entity, e.g. `User` may have a field `User.books` that now
+  needs to be updated.
+
+In short, we may need to write a cache updater for any **relation** (i.e. link) that we can’t query
+via our GraphQL mutation directly, since there’ll be changes to our data that Graphcache won’t be
+able to see and store.
+
+In a later section on this page, [we’ll learn about the `cache.link` method.](#writing-links-individually)
+This method is used to update a field to point at a different entity. In other words, `cache.link`
+is used to update a relation from one entity field to one or more other child entities.
+This is the most common update we’ll need and it’s preferable to always try to use `cache.link`,
+unless we need to update a scalar.
+
 ## Manually updating entities
 
 If a mutation field's result isn't returning the full entity it updates then it becomes impossible
@@ -155,6 +206,22 @@ results and makes its behaviour much more predictable.
 
 If we still manage to call any of the cache's methods outside its callbacks in its configuration,
 we will receive [a "(2) Invalid Cache Call" error](./errors.md#2-invalid-cache-call).
+
+### Updaters on arbitrary types
+
+Cache updates **may** be configured for arbitrary types and not just for `Mutation` or
+`Subscription` fields. However, this can potentially be **dangerous** and is an easy trap
+to fall into. It is allowed though because it allows for some nice tricks and workarounds.
+
+Given an updater on an arbitrary type, e.g. `Todo.author`, we can chain updates onto this field
+whenever it’s written. The updater can then be triggerd by Graphcache during _any_ operation;
+mutations, queries, and subscriptions. When this update is triggered, it allows us to add more
+arbitrary updates onto this field.
+
+> **Note:** If you’re looking to use this because you’re nesting mutations onto other object types,
+> e.g. `Mutation.author.updateName`, please consider changing your schema first before using this.
+> Namespacing mutations is not recommended and changes the execution order to be concurrent rather
+> than sequential when you use multiple nested mutation fields.
 
 ## Updating lists or links
 
@@ -469,7 +536,19 @@ in a state where the cache can apply the "real" result to the cache.
 > confused with "real" data in your configuration.
 
 In the following example we assume that we'd like to implement an optimistic result for a
-`favoriteTodo` mutation. The mutation is rather simple and all we have to do is create a function
+`favoriteTodo` mutation, like such:
+
+```graphql
+mutation FavoriteTodo(id: $id) {
+  favoriteTodo(id: $id) {
+    id
+    favorite
+    updatedAt
+  }
+}
+```
+
+The mutation is rather simple and all we have to do is create a function
 that imitates the result that the API is assumed to send back:
 
 ```js
@@ -491,15 +570,30 @@ This optimistic mutation will be applied to the cache. If any `updates` configur
 Once the mutation result comes back from our API this temporary change will be rolled back and
 discarded.
 
-It's important to ensure that our optimistic mutations return all data that the real mutation may
-return. If our mutations request a field in their selection sets that our optimistic mutation
-doesn't contain then we'll see a warning, since this is a common mistake. To work around not having
-enough data we may use methods like `cache.readFragment` and `cache.resolve` to retrieve more data
-from our cache.
+In the above example optimistic mutation function we also see that `updatedAt` is not present in our
+optimistic return value. That’s because we don’t always have to (or can) match our mutations’
+selection sets perfectly. Instead, Graphcache will skip over fields and use cached fields for any we
+leave out. This can even work on nested entities and fields.
 
-If we'd like to make sure we don't compute more fields than we need, for instance because one
-mutation is run with several different selection sets, then we may pass nested optimistic resolver
-functions in our optimistic object, like so:
+However, leaving out fields can sometimes cause the optimistic update to not apply when we
+accidentally cause any query that needs to update accordingly to only be partially cached. In other
+words, if our optimistic updates cause a cache miss, we won’t see them being applied.
+
+Sometimes we may need to apply optimistic updates to fields that accept arguments. For instance, our
+`favorite` field may have a date cut-off:
+
+```graphql
+mutation FavoriteTodo(id: $id) {
+  favoriteTodo(id: $id) {
+    id
+    favorite(since: ONE_MONTH_AGO)
+    updatedAt
+  }
+}
+```
+
+To solve this, we can return a method on the optimistic result our `optimistic` update function
+returns:
 
 ```js
 const cache = cacheExchange({
@@ -518,7 +612,7 @@ const cache = cacheExchange({
 ```
 
 The function signature and arguments it receives is identical to the toplevel optimistic function
-you define.
+you define, and is basically like a nested optimistic function.
 
 ### Variables for Optimistic Updates
 
