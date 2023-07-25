@@ -138,47 +138,47 @@ export function queryStore<
     ...initialResult,
     operation,
   };
-  const result$ = writable(initialState, () => {
-    return subscription.unsubscribe;
-  });
+
   const isPaused$ = writable(!!args.pause);
 
-  const subscription = pipe(
-    fromStore(isPaused$),
-    switchMap(
-      (isPaused): Source<Partial<OperationResultState<Data, Variables>>> => {
-        if (isPaused) {
-          return never as any;
-        }
+  const result$ = writable(initialState, () => {
+    return pipe(
+      fromStore(isPaused$),
+      switchMap(
+        (isPaused): Source<Partial<OperationResultState<Data, Variables>>> => {
+          if (isPaused) {
+            return never as any;
+          }
 
-        return concat<Partial<OperationResultState<Data, Variables>>>([
-          fromValue({ fetching: true, stale: false }),
-          pipe(
-            args.client.executeRequestOperation(operation),
-            map(({ stale, data, error, extensions, operation }) => ({
-              fetching: false,
-              stale: !!stale,
-              data,
-              error,
-              operation,
-              extensions,
-            }))
-          ),
-          fromValue({ fetching: false }),
-        ]);
-      }
-    ),
-    scan(
-      (result: OperationResultState<Data, Variables>, partial) => ({
-        ...result,
-        ...partial,
-      }),
-      initialState
-    ),
-    subscribe(result => {
-      result$.set(result);
-    })
-  );
+          return concat<Partial<OperationResultState<Data, Variables>>>([
+            fromValue({ fetching: true, stale: false }),
+            pipe(
+              args.client.executeRequestOperation(operation),
+              map(({ stale, data, error, extensions, operation }) => ({
+                fetching: false,
+                stale: !!stale,
+                data,
+                error,
+                operation,
+                extensions,
+              }))
+            ),
+            fromValue({ fetching: false }),
+          ]);
+        }
+      ),
+      scan(
+        (result: OperationResultState<Data, Variables>, partial) => ({
+          ...result,
+          ...partial,
+        }),
+        initialState
+      ),
+      subscribe(result => {
+        result$.set(result);
+      })
+    ).unsubscribe;
+  });
 
   return {
     ...derived(result$, (result, set) => {
