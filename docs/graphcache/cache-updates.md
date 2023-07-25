@@ -536,7 +536,19 @@ in a state where the cache can apply the "real" result to the cache.
 > confused with "real" data in your configuration.
 
 In the following example we assume that we'd like to implement an optimistic result for a
-`favoriteTodo` mutation. The mutation is rather simple and all we have to do is create a function
+`favoriteTodo` mutation, like such:
+
+```graphql
+mutation FavoriteTodo(id: $id) {
+  favoriteTodo(id: $id) {
+    id
+    favorite
+    updatedAt
+  }
+}
+```
+
+The mutation is rather simple and all we have to do is create a function
 that imitates the result that the API is assumed to send back:
 
 ```js
@@ -558,15 +570,30 @@ This optimistic mutation will be applied to the cache. If any `updates` configur
 Once the mutation result comes back from our API this temporary change will be rolled back and
 discarded.
 
-It's important to ensure that our optimistic mutations return all data that the real mutation may
-return. If our mutations request a field in their selection sets that our optimistic mutation
-doesn't contain then we'll see a warning, since this is a common mistake. To work around not having
-enough data we may use methods like `cache.readFragment` and `cache.resolve` to retrieve more data
-from our cache.
+In the above example optimistic mutation function we also see that `updatedAt` is not present in our
+optimistic return value. That’s because we don’t always have to (or can) match our mutations’
+selection sets perfectly. Instead, Graphcache will skip over fields and use cached fields for any we
+leave out. This can even work on nested entities and fields.
 
-If we'd like to make sure we don't compute more fields than we need, for instance because one
-mutation is run with several different selection sets, then we may pass nested optimistic resolver
-functions in our optimistic object, like so:
+However, leaving out fields can sometimes cause the optimistic update to not apply when we
+accidentally cause any query that needs to update accordingly to only be partially cached. In other
+words, if our optimistic updates cause a cache miss, we won’t see them being applied.
+
+Sometimes we may need to apply optimistic updates to fields that accept arguments. For instance, our
+`favorite` field may have a date cut-off:
+
+```graphql
+mutation FavoriteTodo(id: $id) {
+  favoriteTodo(id: $id) {
+    id
+    favorite(since: ONE_MONTH_AGO)
+    updatedAt
+  }
+}
+```
+
+To solve this, we can return a method on the optimistic result our `optimistic` update function
+returns:
 
 ```js
 const cache = cacheExchange({
@@ -585,7 +612,7 @@ const cache = cacheExchange({
 ```
 
 The function signature and arguments it receives is identical to the toplevel optimistic function
-you define.
+you define, and is basically like a nested optimistic function.
 
 ### Variables for Optimistic Updates
 
