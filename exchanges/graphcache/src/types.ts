@@ -131,7 +131,7 @@ export type Data = SystemFields & DataFields;
  * as retrieved for instance by {@link Cache.keyOfEntity} or a partial GraphQL object
  * (i.e. an object with a `__typename` and key field).
  */
-export type Entity = null | Data | string;
+export type Entity = undefined | null | Data | string;
 
 /** A key of an entity, or `null`; or a list of keys.
  *
@@ -284,7 +284,7 @@ export interface Cache {
    * If it’s passed a `string` or `null`, it will simply return what it’s been passed.
    * Objects that lack a `__typename` field will return `null`.
    */
-  keyOfEntity(entity: Entity): string | null;
+  keyOfEntity(entity: Entity | undefined): string | null;
 
   /** Returns the cache key for a field.
    *
@@ -327,14 +327,21 @@ export interface Cache {
    * );
    * ```
    */
-  resolve(entity: Entity, fieldName: string, args?: FieldArgs): DataField;
+  resolve(
+    entity: Entity | undefined,
+    fieldName: string,
+    args?: FieldArgs
+  ): DataField | undefined;
 
   /** Returns a cached value on a given entity’s field by its field key.
    *
    * @deprecated
    * Use {@link cache.resolve} instead.
    */
-  resolveFieldByKey(entity: Entity, fieldKey: string): DataField;
+  resolveFieldByKey(
+    entity: Entity | undefined,
+    fieldKey: string
+  ): DataField | undefined;
 
   /** Returns a list of cached fields for a given GraphQL object (“entity”).
    *
@@ -372,7 +379,11 @@ export interface Cache {
    * However, if a field name (and optionally, its arguments) are passed,
    * only a single field is erased.
    */
-  invalidate(entity: Entity, fieldName?: string, args?: FieldArgs): void;
+  invalidate(
+    entity: Entity | undefined,
+    fieldName?: string,
+    args?: FieldArgs
+  ): void;
 
   /** Updates a GraphQL query‘s cached data.
    *

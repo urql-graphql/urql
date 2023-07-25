@@ -393,7 +393,7 @@ Since it can access the field's arguments from the GraphQL query document, we ca
 object is keyable, it will tell _Graphcache_ what the key of the returned entity is. In other words,
 we've told it how to get to a `Todo` from the `Query.todo` field.
 
-This mechanism is immensely more powerful than this example. We have two other use-cases that
+This mechanism is immensely more powerful than this example. We have other use-cases that
 resolvers may be used for:
 
 - Resolvers can be applied to fields with records, which means that it can be used to change or
@@ -402,6 +402,12 @@ resolvers may be used for:
 - Resolvers can return deeply nested results, which will be layered on top of the in-memory
   relational cached data of _Graphcache_, which means that it can emulate infinite pagination and
   other complex behaviour.
+- Resolvers can change when a cache miss or hit occurs. Returning `null` means that a field’s value
+  is literally `null`, which will not cause a cache miss, while returning `undefined` will mean
+  a field’s value is uncached.
+- Resolvers can return either partial entities or keys, so we can chain `cache.resolve` calls to
+  read fields from the cache, even when a field is pointing at another entity, since we can return
+  keys to the other entity directly.
 
 [Read more about resolvers on the following page about "Local Resolvers".](./local-resolvers.md)
 
