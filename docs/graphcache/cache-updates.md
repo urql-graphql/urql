@@ -79,6 +79,57 @@ The cache updaters return value is disregarded (and typed as `void` in TypeScrip
 method that they call on the `cache` instance a side effect, which may trigger additional cache
 changes and updates all affected queries as we modify them.
 
+## Why do we need cache updates?
+
+When we’re designing a GraphQL schema well, we won’t need to write many cache updaters for
+Graphcache.
+
+For example, we may have a mutation to update a username on a `User`, which can trivially
+update the cache without us writing an updater because it resolves the `User`.
+
+```graphql
+query User($id: ID!) {
+  user(id: $id) {
+    __typename # "User"
+    id
+    username
+  }
+}
+
+mutation UpdateUsername($id: ID!, $username: String!) {
+  updateUser(id: $id, username: $username) {
+    __typename # "User"
+    id
+    username
+  }
+}
+```
+
+In the above example, `Query.user` returns a `User`, which is then updated by a mutation on
+`Mutation.updateUser`. Since the mutation also queries the `User`, the updated username will
+automatically be applied by Graphcache. If the mutation field didn’t return a `User`, then this
+wouldn’t be possible, and while we can write an updater in Graphcache for it, we should consider
+this poor schema design.
+
+An updater instead becomes absolutely necessary when a mutation can’t reasonably return what has
+changed or when we can’t manually define a selection set that’d be even able to select all fields
+that may update. Some examples may include:
+
+- `Mutation.deleteUser`, since we’ll need to invalidate an entity
+- `Mutation.createUser`, since a list may now have to include a new entity
+- `Mutation.createBook`, since a given entity, e.g. `User` may have a field `User.books` that now
+  needs to be updated.
+
+In short, we may need to write a cache updater for any **relation** (i.e. link) that we can’t query
+via our GraphQL mutation directly, since there’ll be changes to our data that Graphcache won’t be
+able to see and store.
+
+In a later section on this page, [we’ll learn about the `cache.link` method.](#writing-links-individually)
+This method is used to update a field to point at a different entity. In other words, `cache.link`
+is used to update a relation from one entity field to one or more other child entities.
+This is the most common update we’ll need and it’s preferable to always try to use `cache.link`,
+unless we need to update a scalar.
+
 ## Manually updating entities
 
 If a mutation field's result isn't returning the full entity it updates then it becomes impossible
@@ -155,6 +206,22 @@ results and makes its behaviour much more predictable.
 
 If we still manage to call any of the cache's methods outside its callbacks in its configuration,
 we will receive [a "(2) Invalid Cache Call" error](./errors.md#2-invalid-cache-call).
+
+### Updaters on arbitrary types
+
+Cache updates **may** be configured for arbitrary types and not just for `Mutation` or
+`Subscription` fields. However, this can potentially be **dangerous** and is an easy trap
+to fall into. It is allowed though because it allows for some nice tricks and workarounds.
+
+Given an updater on an arbitrary type, e.g. `Todo.author`, we can chain updates onto this field
+whenever it’s written. The updater can then be triggerd by Graphcache during _any_ operation;
+mutations, queries, and subscriptions. When this update is triggered, it allows us to add more
+arbitrary updates onto this field.
+
+> **Note:** If you’re looking to use this because you’re nesting mutations onto other object types,
+> e.g. `Mutation.author.updateName`, please consider changing your schema first before using this.
+> Namespacing mutations is not recommended and changes the execution order to be concurrent rather
+> than sequential when you use multiple nested mutation fields.
 
 ## Updating lists or links
 
