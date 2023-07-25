@@ -60,7 +60,7 @@ A resolver may be attached to any type's field and accepts four positional argum
   docs](../api/graphcache.md#info).
 
 The local resolvers may return any value that fits the query document's shape, however we must
-ensure that what we return matches the types of our schema. It for instance isn't possible to turn a
+ensure that what we return matches the types of our schema. It, for instance, isn't possible to turn a
 record field into a link, i.e. replace a scalar with an entity. Instead, local resolvers are useful
 to transform records, like dates in our previous example, or to imitate server-side logic to allow
 Graphcache to retrieve more data from its cache without sending a query to our API.
@@ -69,6 +69,15 @@ Furthermore, while we see on this page that we get access to methods like `cache
 methods to read from our cache, only ["Cache Updates"](./cache-updates.md) get to write and change
 the cache. If you call `cache.updateQuery`, `cache.writeFragment`, or `cache.link` in resolvers,
 you‘ll get an error, since it‘s not possible to update the cache while reading from it.
+
+When writing a resolver you’ll mostly use `cache.resolve`, which can be chained, to read field
+values from the cache. When a field points to another entity we may get a key, but resolvers are
+allowed to return keys or partial entities containing keys.
+
+> **Note:** This essentially means that resolvers can return either scalar values for fields without
+> selection sets, and either partial entities or keys for fields with selection sets, i.e.
+> links / relations. When we return `null`, this will be interpreted a the literal GraphQL Null scalar,
+> while returning `undefined` will cause a cache miss.
 
 ## Transforming Records
 
@@ -222,13 +231,12 @@ link can return a partial entity [or a key](#resolving-by-keys).
 
 However sometimes we'll need to resolve data from other fields in our resolvers.
 
-For records, if the other field is on the same `parent` entity, it may seem logical to access it on
-`parent[otherFieldName]` as well, however the `parent` object will only be sparsely populated with
-fields that the cache has already queried prior to reaching the resolver.
-
-In the previous example, where we've created a resolver for `Todo.updatedAt` and accessed
-`parent.updatedAt` to transform its value the `parent.updatedAt` field is essentially a shortcut
-that allows us to get to the record quickly.
+> **Note:** For records, if the other field is on the same `parent` entity, it may seem logical to access it on
+> `parent[otherFieldName]` as well, however the `parent` object will only be sparsely populated with
+> fields that the cache has already queried prior to reaching the resolver.
+> In the previous example, where we've created a resolver for `Todo.updatedAt` and accessed
+> `parent.updatedAt` to transform its value the `parent.updatedAt` field is essentially a shortcut
+> that allows us to get to the record quickly.
 
 Instead we can use [the `cache.resolve` method](../api/graphcache.md#resolve). This method
 allows us to access Graphcache's cached data directly. It is used to resolve records or links on any
@@ -261,9 +269,10 @@ cacheExchange({
 
 When we call `cache.resolve(parent, "updatedAt")`, the cache will look up the `"updatedAt"` field on
 the `parent` entity, i.e. on the current `Todo` entity.
-We've also previously learned that `parent` may not contain all fields that the entity may have and
-may hence be missing its keyable fields, like `id`, so why does this then work?
-It works because `cache.resolve(parent)` is a shortcut for `cache.resolve(info.parentKey)`.
+
+> **Note:** We've also previously learned that `parent` may not contain all fields that the entity may have and
+> may hence be missing its keyable fields, like `id`, so why does this then work?
+> It works because `cache.resolve(parent)` is a shortcut for `cache.resolve(info.parentKey)`.
 
 Like the `info.fieldName` property `info.parentKey` gives us information about the current state of
 Graphcache's query operation. In this case, `info.parentKey` tells us what the parent's key is.
@@ -308,9 +317,13 @@ may return records for fields without selection sets, in other cases it may give
 other entities ("links") instead. It can even give you arrays of keys or records when the field's
 value contains a list.
 
-It's a pretty flexible method that allows us to access arbitrary values from our cache, however, we
-have to be careful about what value will be resolved by it, since the cache can't know itself what
-type of value it may return.
+When a value is not present in the cache, `cache.resolve` will instead return `undefined` to signal
+that a value is uncached. Similarly, a resolver may return `undefined` to tell Graphcache that the
+field isn’t cached and that a call to the API is necessary.
+
+`cache.resolve` is a pretty flexible method that allows us to access arbitrary values from our cache,
+however, we have to be careful about what value will be resolved by it, since the cache can't know
+itself what type of value it may return.
 
 The last trick this method allows you to apply is to access arbitrary fields on the root `Query`
 type. If we call `cache.resolve("Query", ...)` then we're also able to access arbitrary fields
