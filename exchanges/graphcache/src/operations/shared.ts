@@ -223,8 +223,8 @@ export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x == null ? null : (x as Data | NullArray<Data>);
 
 export const ensureLink = (store: Store, ref: Link<Entity>): Link => {
-  if (ref == null) {
-    return ref;
+  if (!ref) {
+    return ref || null;
   } else if (Array.isArray(ref)) {
     const link = new Array(ref.length);
     for (let i = 0, l = link.length; i < l; i++)

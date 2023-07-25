@@ -155,14 +155,20 @@ export class Store<
     return globalID || !key ? key : `${typename}:${key}`;
   }
 
-  resolve(entity: Entity, field: string, args?: FieldArgs): DataField {
-    const fieldKey = keyOfField(field, args);
+  resolve(
+    entity: Entity,
+    field: string,
+    args?: FieldArgs
+  ): DataField | undefined {
+    let fieldValue: DataField | undefined = null;
     const entityKey = this.keyOfEntity(entity);
-    if (!entityKey) return null;
-    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
-    if (fieldValue !== undefined) return fieldValue;
-    const link = InMemoryData.readLink(entityKey, fieldKey);
-    return link || null;
+    if (entityKey) {
+      const fieldKey = keyOfField(field, args);
+      fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
+      if (fieldValue === undefined)
+        fieldValue = InMemoryData.readLink(entityKey, fieldKey);
+    }
+    return fieldValue;
   }
 
   resolveFieldByKey(entity: Entity, field: string, args?: FieldArgs) {
@@ -248,15 +254,12 @@ export class Store<
   link(
     entity: Entity,
     field: string,
-    argsOrLink: FieldArgs | Link<Entity>,
-    maybeLink?: Link<Entity>
+    ...rest: [FieldArgs, Link<Entity>] | [Link<Entity>]
   ): void {
-    const args = (maybeLink !== undefined ? argsOrLink : null) as FieldArgs;
-    const link = (
-      maybeLink !== undefined ? maybeLink : argsOrLink
-    ) as Link<Entity>;
-    const entityKey = ensureLink(this, entity);
-    if (typeof entityKey === 'string') {
+    const args = rest.length === 2 ? rest[0] : null;
+    const link = rest.length === 2 ? rest[1] : rest[0];
+    const entityKey = this.keyOfEntity(entity);
+    if (entityKey) {
       InMemoryData.writeLink(
         entityKey,
         keyOfField(field, args),
