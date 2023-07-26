@@ -426,13 +426,20 @@ const readSelection = (
       updateContext(ctx, output, typename, entityKey, key, fieldName);
 
       // We have a resolver for this field.
-      // Prepare the actual fieldValue, so that the resolver can use it
-      if (fieldValue !== undefined) {
-        output[fieldAlias] = fieldValue;
+      // Prepare the actual fieldValue, so that the resolver can use it,
+      // as to avoid the user having to do `cache.resolve(parent, info.fieldKey)`
+      // only to get a scalar value.
+      let parent = output;
+      if (node.selectionSet === undefined && fieldValue !== undefined) {
+        parent = {
+          ...output,
+          [fieldAlias]: fieldValue,
+          [fieldName]: fieldValue,
+        };
       }
 
       dataFieldValue = resolver(
-        output,
+        parent,
         fieldArgs || ({} as Variables),
         store,
         ctx
