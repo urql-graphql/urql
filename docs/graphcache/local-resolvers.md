@@ -454,6 +454,121 @@ case `{ id: 1 }`.
 The cache read methods are not possible outside of GraphQL operations. This means these methods will
 be limited to the different `Graphcache` configuration methods.
 
+## Living with limitations of Local Resolvers
+
+Local Resolvers are powerful tools using which we can tell Graphcache what to do with a certain
+field beyond using results it’s seen on prior API results. However, it’s limitations come from this
+very intention they were made for.
+
+Resolvers are meant to augment Graphcache and teach it what to do with some fields. Sometimes this
+is trivial and simple (like most examples on this page), but other times, fields are incredibly
+complex to reproduce and hence resolvers become more complex.
+
+This section is not exhaustive, but documents some of the more commonly asked for features of
+resolvers. However, beyond the cases listed below, resolvers are limited and:
+
+- can't manipulate or see other fields on the current entity, or fields above it.
+- can't update the cache (they're only “computations” but don't change the cache)
+- can't change the query document that's sent to the API
+
+### Writing reusable resolvers
+
+As we've seen before in the ["Transforming Records" section above](#transforming-records), we can
+write generic resolvers by using the fourth argument that resolvers receive, the `ResolveInfo`
+object.
+
+This `info` object gives our resolvers some context on where they’re being executed and gives it
+information about the current field and its surroundings.
+
+For instance, while Graphcache has a convenience helper to access a current record on the parent
+object for scalar values, it doesn't for links. Hence, if we're trying to read relationships we have
+to use `cache.resolve`.
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      // This works:
+      updatedAt: parent => parent.updatedAt,
+      // This won't work:
+      author: parent => parent.author,
+    },
+  },
+});
+```
+
+The `info` object actually gives us two ways of accessing the original field's value:
+
+```js
+const resolver = (parent, args, cache, info) => {
+  // This is the full version
+  const original = cache.resolve(info.parentKey, info.fieldName, args);
+  // But we can replace `info.parentKey` with `parent` as a shortcut
+  const original = cache.resolve(parent, info.fieldName, args);
+  // And we can also avoid re-using arguments by using `fieldKey`
+  const original = cache.resolve(parent, info.fieldKey);
+};
+```
+
+Apart from telling us how to access the originally cached field value, we can also get more
+information from `info` about our field. For instance, we can:
+
+- Read the current field's name using `info.fieldName`
+- Read the current field's key using `info.parentFieldKey`
+- Read the current parent entity's key using `info.parentKey`
+- Read the current parent entity's typename using `info.parentTypename`
+- Access the current operation's raw variables using `info.variables`
+- Access the current operation's raw fragments using `info.fragments`
+
+### Causing cache misses and partial misses
+
+When we write resolvers we provide Graphcache with a value for the current field, or rather with
+"behavior", that it will execute no matter whether this field is also cached or not.
+
+This means that, unless our resolver returns `undefined`, if the query doesn't have any other cache
+misses, Graphcache will consider the field a cache hit and will, unless other cache misses occur,
+not make a network request.
+
+> **Note:** An exception for this is [Schema Awareness](./schema-awareness.md), which can
+> automatically cause partial cache misses.
+
+However, sometimes we may want a resolver to return a result, while still sending a GraphQL API
+request in the background to update our resolver’s values.
+
+To achieve this we can update the `info.partial` field.
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      author(parent, args, cache, info) {
+        const author = cache.resolve(parent, info.fieldKey);
+        if (author === null) {
+          info.partial = true;
+        }
+        return author;
+      },
+    },
+  },
+});
+```
+
+Suppose we have a field that our GraphQL schema _sometimes_ returns a `null` value for, but that may
+be upated with a value in the future. In the above example, we wrote a resolver that sets
+`info.partial = true` if a field’s value is `null`. This causes Graphcache to consider the result
+“partial and stale” and will cause it to make a background request to the API, while still
+delivering the outdated result.
+
+### Conditionally applying resolvers
+
+We may not always want a resolver to be used. While sometimes this can be dangerous (if your
+resolver affects the shape and types of your fields), in other cases this is necessary.
+For instance, if your resolver handles infinite-scroll pagination, like the examples [in the next
+section](#pagination), then you may not always want to apply this resolver.
+
+For this reason, Graphcache also supports [“local directives”, which are introduced on the next docs
+page.](./local-directives.md)
+
 ## Pagination
 
 `Graphcache` offers some preset `resolvers` to help us out with endless scrolling pagination, also
