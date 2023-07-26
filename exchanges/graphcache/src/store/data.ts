@@ -19,7 +19,6 @@ import {
   joinKeys,
 } from './keys';
 
-import { makeDict } from '../helpers/dict';
 import { invariant, currentDebugStack } from '../helpers/help';
 
 type Dict<T> = Record<string, T>;
@@ -283,7 +282,7 @@ const setNode = <T>(
   // On the map itself we get or create the entity as a dict
   let entity = keymap.get(entityKey) as Dict<T | undefined>;
   if (entity === undefined) {
-    keymap.set(entityKey, (entity = makeDict()));
+    keymap.set(entityKey, (entity = Object.create(null)));
   }
 
   // If we're setting undefined we delete the node's entry
@@ -614,7 +613,7 @@ export const persistData = () => {
   if (currentData!.storage) {
     currentOptimistic = true;
     currentOperation = 'read';
-    const entries: SerializedEntries = makeDict();
+    const entries: SerializedEntries = {};
     for (const key of currentData!.persist.keys()) {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
       let x: void | Link | EntityField;
