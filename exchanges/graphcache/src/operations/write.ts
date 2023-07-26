@@ -354,7 +354,7 @@ const writeSelection = (
         data,
         typename,
         entityKey || typename,
-        joinKeys(typename, fieldKey),
+        fieldKey,
         fieldName
       );
 

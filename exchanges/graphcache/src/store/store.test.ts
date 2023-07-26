@@ -425,7 +425,7 @@ describe('Store with OptimisticMutationConfig', () => {
       randomData,
       'Todo',
       'Todo:1',
-      'Todo:1.createdAt',
+      'createdAt',
       'createdAt'
     );
 
