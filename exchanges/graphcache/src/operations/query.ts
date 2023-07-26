@@ -421,10 +421,6 @@ const readSelection = (
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (InMemoryData.currentOperation === 'read' && resolver) {
-      // We have to update the information in context to reflect the info
-      // that the resolver will receive
-      updateContext(ctx, output, typename, entityKey, fieldKey, fieldName);
-
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it,
       // as to avoid the user having to do `cache.resolve(parent, info.fieldKey)`
@@ -437,6 +433,10 @@ const readSelection = (
           [fieldName]: fieldValue,
         };
       }
+
+      // We have to update the information in context to reflect the info
+      // that the resolver will receive
+      updateContext(ctx, parent, typename, entityKey, fieldKey, fieldName);
 
       dataFieldValue = resolver(
         parent,
