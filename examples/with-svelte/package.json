@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@urql/core": "^4.1.0",
-    "@urql/svelte": "^4.0.3",
+    "@urql/svelte": "^4.0.4",
     "graphql": "^16.6.0",
     "svelte": "^4.0.5"
   },
