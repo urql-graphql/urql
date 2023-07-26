@@ -1,5 +1,21 @@
 # @urql/exchange-graphcache
 
+## 6.3.0
+
+### Minor Changes
+
+- Allow scalar values on the parent to be accessed from `parent[info.fieldName]` consistently. Prior to this change `parent[fieldAlias]` would get populated, which wouldn’t always result in a field that’s consistently accessible
+  Submitted by [@kitten](https://github.com/kitten) (See [#3336](https://github.com/urql-graphql/urql/pull/3336))
+- Allow `cache.resolve` to return `undefined` when a value is not cached to make it easier to cause a cache miss in resolvers. **Reminder:** Returning `undefined` from a resolver means a field is uncached, while returning `null` means that a field’s value is `null` without causing a cache miss
+  Submitted by [@kitten](https://github.com/kitten) (See [#3333](https://github.com/urql-graphql/urql/pull/3333))
+
+### Patch Changes
+
+- Record a dependency when `__typename` field is read. This removes a prior, outdated exception to avoid confusion when using `cache.resolve(entity, '__typename')` which doesn't cause the cache to record a dependency
+  Submitted by [@kitten](https://github.com/kitten) (See [#3335](https://github.com/urql-graphql/urql/pull/3335))
+- ⚠️ Fix cases where `ResolveInfo`’s `parentFieldKey` was incorrectly populated with a key that isn’t a field key (allowing for `cache.resolve(info.parentKey, info.parentFieldKey)` to be possible) but was instead set to `info.parentKey` combined with the field key
+  Submitted by [@kitten](https://github.com/kitten) (See [#3336](https://github.com/urql-graphql/urql/pull/3336))
+
 ## 6.2.0
 
 ### Minor Changes
