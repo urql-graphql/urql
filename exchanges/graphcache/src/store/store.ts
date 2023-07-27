@@ -19,6 +19,7 @@ import {
 } from '../types';
 
 import { invariant } from '../helpers/help';
+import { defaultDirectives } from '../helpers/defaultDirectives';
 import { contextRef, ensureLink } from '../operations/shared';
 import { _query, _queryFragment } from '../operations/query';
 import { _write, _writeFragment } from '../operations/write';
@@ -37,22 +38,6 @@ import {
 
 type DocumentNode = TypedDocumentNode<any, any>;
 type RootField = 'query' | 'mutation' | 'subscription';
-
-const defaultDirectives: DirectivesConfig = {
-  optional: () => (_parent, _args, cache, info) => {
-    const result = cache.resolve(info.parentKey, info.parentFieldKey);
-    if (result === undefined) {
-      info.partial = true;
-      return null;
-    } else {
-      return result;
-    }
-  },
-  required: () => (_parent, _args, cache, info) => {
-    const result = cache.resolve(info.parentKey, info.parentFieldKey);
-    return result === null ? undefined : result;
-  },
-};
 
 /** Implementation of the {@link Cache} interface as created internally by the {@link cacheExchange}.
  * @internal
