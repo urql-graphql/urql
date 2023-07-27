@@ -19,7 +19,6 @@ import {
 } from '../types';
 
 import { invariant } from '../helpers/help';
-import { defaultDirectives } from '../helpers/defaultDirectives';
 import { contextRef, ensureLink } from '../operations/shared';
 import { _query, _queryFragment } from '../operations/query';
 import { _write, _writeFragment } from '../operations/write';
@@ -63,8 +62,7 @@ export class Store<
     if (!opts) opts = {} as C;
 
     this.resolvers = opts.resolvers || {};
-    this.directives =
-      { ...defaultDirectives, ...opts.directives } || defaultDirectives;
+    this.directives = opts.directives || {};
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
 

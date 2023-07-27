@@ -298,14 +298,13 @@ export const _queryFragment = (
 };
 
 function getFieldResolver(
-  ctx: Context,
-  node: FormattedNode<FieldNode>,
+  directives: ReturnType<typeof getDirectives>,
   typename: string,
-  fieldName: string
+  fieldName: string,
+  ctx: Context
 ): Resolver | void {
   const resolvers = ctx.store.resolvers[typename];
   const fieldResolver = resolvers && resolvers[fieldName];
-  const directives = getDirectives(node);
 
   let directiveResolver: Resolver | undefined;
   for (const name in directives) {
@@ -398,8 +397,9 @@ const readSelection = (
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
+    const directives = getDirectives(node);
+    const resolver = getFieldResolver(directives, typename, fieldName, ctx);
     const fieldKey = keyOfField(fieldName, fieldArgs);
-    const resolver = getFieldResolver(ctx, node, typename, fieldName);
     const key = joinKeys(entityKey, fieldKey);
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const resultValue = result ? result[fieldName] : undefined;
@@ -513,25 +513,19 @@ const readSelection = (
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
-    if (dataFieldValue === undefined && deferRef) {
-      // The field is undelivered and uncached, but is included in a deferred fragment
-      hasNext = true;
-    } else if (
+    if (
+      !deferRef &&
       dataFieldValue === undefined &&
-      ((store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
-        !!getFieldError(ctx))
+      (directives.optional ||
+        !!getFieldError(ctx) ||
+        (store.schema && isFieldNullable(store.schema, typename, fieldName)))
     ) {
       // The field is uncached or has errored, so it'll be set to null and skipped
       ctx.partial = true;
       dataFieldValue = null;
-    } else if (dataFieldValue === undefined) {
-      // If the field isn't deferred or partial then we have to abort and also reset
-      // the partial field
-      ctx.partial = hasPartials;
-      ctx.__internal.path.pop();
-      return undefined;
+    } else if (dataFieldValue === null && directives.required) {
+      dataFieldValue = undefined;
     } else {
-      // Otherwise continue as usual
       hasFields = hasFields || fieldName !== '__typename';
     }
 
@@ -539,7 +533,16 @@ const readSelection = (
     ctx.__internal.path.pop();
     // Check for any referential changes in the field's value
     hasChanged = hasChanged || dataFieldValue !== input[fieldAlias];
-    if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue;
+    if (dataFieldValue !== undefined) {
+      output[fieldAlias] = dataFieldValue;
+    } else if (deferRef) {
+      hasNext = true;
+    } else {
+      // If the field isn't deferred or partial then we have to abort and also reset
+      // the partial field
+      ctx.partial = hasPartials;
+      return undefined;
+    }
   }
 
   ctx.partial = ctx.partial || hasPartials;
