@@ -388,10 +388,10 @@ const readSelection = (
   );
 
   let hasFields = false;
-  let hasPartials = false;
   let hasNext = false;
   let hasChanged = InMemoryData.currentForeignData;
   let node: FormattedNode<FieldNode> | void;
+  const hasPartials = ctx.partial;
   const output = InMemoryData.makeData(input);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
@@ -522,10 +522,12 @@ const readSelection = (
         !!getFieldError(ctx))
     ) {
       // The field is uncached or has errored, so it'll be set to null and skipped
-      hasPartials = true;
+      ctx.partial = true;
       dataFieldValue = null;
     } else if (dataFieldValue === undefined) {
-      // If the field isn't deferred or partial then we have to abort
+      // If the field isn't deferred or partial then we have to abort and also reset
+      // the partial field
+      ctx.partial = hasPartials;
       ctx.__internal.path.pop();
       return undefined;
     } else {
@@ -542,7 +544,7 @@ const readSelection = (
 
   ctx.partial = ctx.partial || hasPartials;
   ctx.hasNext = ctx.hasNext || hasNext;
-  return isQuery && hasPartials && !hasFields
+  return isQuery && ctx.partial && !hasFields
     ? undefined
     : hasChanged
     ? output
@@ -566,6 +568,7 @@ const resolveResolverResult = (
     const _isListNullable = store.schema
       ? isListNullable(store.schema, typename, fieldName)
       : false;
+    const hasPartials = ctx.partial;
     const data = InMemoryData.makeData(prevData, true);
     let hasChanged =
       InMemoryData.currentForeignData ||
@@ -589,6 +592,7 @@ const resolveResolverResult = (
       ctx.__internal.path.pop();
       // Check the result for cache-missed values
       if (childResult === undefined && !_isListNullable) {
+        ctx.partial = hasPartials;
         return undefined;
       } else {
         ctx.partial =
@@ -636,6 +640,7 @@ const resolveLink = (
       ? isListNullable(store.schema, typename, fieldName)
       : false;
     const newLink = InMemoryData.makeData(prevData, true);
+    const hasPartials = ctx.partial;
     let hasChanged =
       InMemoryData.currentForeignData ||
       !Array.isArray(prevData) ||
@@ -657,6 +662,7 @@ const resolveLink = (
       ctx.__internal.path.pop();
       // Check the result for cache-missed values
       if (childLink === undefined && !_isListNullable) {
+        ctx.partial = hasPartials;
         return undefined;
       } else {
         ctx.partial =
