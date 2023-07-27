@@ -41,7 +41,12 @@ type RootField = 'query' | 'mutation' | 'subscription';
 const defaultDirectives: DirectivesConfig = {
   optional: () => (_parent, _args, cache, info) => {
     const result = cache.resolve(info.parentKey, info.parentFieldKey);
-    return result === undefined ? null : result;
+    if (result === undefined) {
+      info.partial = true;
+      return null;
+    } else {
+      return result;
+    }
   },
   required: () => (_parent, _args, cache, info) => {
     const result = cache.resolve(info.parentKey, info.parentFieldKey);
