@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 6.3.1
+
+### Patch Changes
+
+- Reset `partial` result marker when reading from selections when a child value sees a cache miss. This only affects resolvers on child values enabling `info.partial` while a parent may abort early instead
+  Submitted by [@kitten](https://github.com/kitten) (See [#3340](https://github.com/urql-graphql/urql/pull/3340))
+- ⚠️ Fix `@_optional` directive not setting `info.partial = true` on cache miss and fix usage of `info.parentKey` and `info.parentFieldKey` usage in default directives
+  Submitted by [@kitten](https://github.com/kitten) (See [#3338](https://github.com/urql-graphql/urql/pull/3338))
+- Replace implementation for `@_optional` and `@_required` with built-in handling inside cache reads to allow `@_optional` to work for nested selection sets
+  Submitted by [@kitten](https://github.com/kitten) (See [#3341](https://github.com/urql-graphql/urql/pull/3341))
+
 ## 6.3.0
 
 ### Minor Changes
