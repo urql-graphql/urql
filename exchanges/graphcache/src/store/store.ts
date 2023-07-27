@@ -39,12 +39,12 @@ type DocumentNode = TypedDocumentNode<any, any>;
 type RootField = 'query' | 'mutation' | 'subscription';
 
 const defaultDirectives: DirectivesConfig = {
-  optional: () => (_parent, args, cache, info) => {
-    const result = cache.resolve(info.parentFieldKey, info.fieldName, args);
+  optional: () => (_parent, _args, cache, info) => {
+    const result = cache.resolve(info.parentKey, info.parentFieldKey);
     return result === undefined ? null : result;
   },
-  required: () => (_parent, args, cache, info) => {
-    const result = cache.resolve(info.parentFieldKey, info.fieldName, args);
+  required: () => (_parent, _args, cache, info) => {
+    const result = cache.resolve(info.parentKey, info.parentFieldKey);
     return result === null ? undefined : result;
   },
 };
