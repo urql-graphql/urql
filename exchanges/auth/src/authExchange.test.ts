@@ -476,3 +476,33 @@ it('passes on failing refreshAuth() errors to results', async () => {
 
   expect(res.error).toMatchInlineSnapshot('[CombinedError: [Network] test]');
 });
+
+it('passes on errors during initialization', async () => {
+  const { source, next } = makeSubject<any>();
+  const { exchangeArgs, result } = makeExchangeArgs();
+  const init = vi.fn().mockRejectedValue(new Error('oops!'));
+  const output = vi.fn();
+
+  pipe(source, authExchange(init)(exchangeArgs), tap(output), publish);
+
+  expect(result).toHaveBeenCalledTimes(0);
+  expect(output).toHaveBeenCalledTimes(0);
+
+  next(queryOperation);
+  await new Promise(resolve => setTimeout(resolve));
+  expect(result).toHaveBeenCalledTimes(0);
+  expect(output).toHaveBeenCalledTimes(1);
+  expect(init).toHaveBeenCalledTimes(1);
+  expect(output.mock.calls[0][0].error).toMatchInlineSnapshot(
+    '[CombinedError: [Network] oops!]'
+  );
+
+  next(queryOperation);
+  await new Promise(resolve => setTimeout(resolve));
+  expect(result).toHaveBeenCalledTimes(0);
+  expect(output).toHaveBeenCalledTimes(2);
+  expect(init).toHaveBeenCalledTimes(2);
+  expect(output.mock.calls[1][0].error).toMatchInlineSnapshot(
+    '[CombinedError: [Network] oops!]'
+  );
+});
