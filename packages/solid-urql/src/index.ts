@@ -3,7 +3,11 @@ export * from '@urql/core';
 export { type UseClient } from './context';
 export { useClient } from './context';
 
-export { type CreateMutationState } from './createMutation';
+export {
+  type CreateMutationState,
+  type CreateMutationExecute,
+  type CreateMutationResult,
+} from './createMutation';
 export { createMutation } from './createMutation';
 
 export {
