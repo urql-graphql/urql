@@ -285,7 +285,18 @@ export function authExchange(
             if (_config) config = _config;
             flushQueue();
           })
-          .catch(errorQueue);
+          .catch((error: Error) => {
+            if (process.env.NODE_ENV !== 'production') {
+              console.warn(
+                'authExchange()’s initialization function has failed, which is unexpected.\n' +
+                  'If your initialization function is expected to throw/reject, catch this error and handle it explicitly.\n' +
+                  'Unless this error is handled it’ll be passed onto any `OperationResult` instantly and authExchange() will block further operations and retry.',
+                error
+              );
+            }
+
+            errorQueue(error);
+          });
       }
 
       initAuth();
