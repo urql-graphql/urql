@@ -227,63 +227,79 @@ export function authExchange(
     let config: AuthConfig | null = null;
 
     return operations$ => {
-      authPromise = Promise.resolve()
-        .then(() =>
-          init({
-            mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
-              query: DocumentInput<Data, Variables>,
-              variables: Variables,
-              context?: Partial<OperationContext>
-            ): Promise<OperationResult<Data>> {
-              const baseOperation = client.createRequestOperation(
-                'mutation',
-                createRequest(query, variables),
-                context
-              );
-              return pipe(
-                result$,
-                onStart(() => {
-                  const operation = addAuthToOperation(baseOperation);
-                  bypassQueue.add(
-                    operation.context._instance as OperationInstance
-                  );
-                  retries.next(operation);
-                }),
-                filter(
-                  result =>
-                    result.operation.key === baseOperation.key &&
-                    baseOperation.context._instance ===
-                      result.operation.context._instance
-                ),
-                take(1),
-                toPromise
-              );
-            },
-            appendHeaders(
-              operation: Operation,
-              headers: Record<string, string>
-            ) {
-              const fetchOptions =
-                typeof operation.context.fetchOptions === 'function'
-                  ? operation.context.fetchOptions()
-                  : operation.context.fetchOptions || {};
-              return makeOperation(operation.kind, operation, {
-                ...operation.context,
-                fetchOptions: {
-                  ...fetchOptions,
-                  headers: {
-                    ...fetchOptions.headers,
-                    ...headers,
+      function initAuth() {
+        authPromise = Promise.resolve()
+          .then(() =>
+            init({
+              mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
+                query: DocumentInput<Data, Variables>,
+                variables: Variables,
+                context?: Partial<OperationContext>
+              ): Promise<OperationResult<Data>> {
+                const baseOperation = client.createRequestOperation(
+                  'mutation',
+                  createRequest(query, variables),
+                  context
+                );
+                return pipe(
+                  result$,
+                  onStart(() => {
+                    const operation = addAuthToOperation(baseOperation);
+                    bypassQueue.add(
+                      operation.context._instance as OperationInstance
+                    );
+                    retries.next(operation);
+                  }),
+                  filter(
+                    result =>
+                      result.operation.key === baseOperation.key &&
+                      baseOperation.context._instance ===
+                        result.operation.context._instance
+                  ),
+                  take(1),
+                  toPromise
+                );
+              },
+              appendHeaders(
+                operation: Operation,
+                headers: Record<string, string>
+              ) {
+                const fetchOptions =
+                  typeof operation.context.fetchOptions === 'function'
+                    ? operation.context.fetchOptions()
+                    : operation.context.fetchOptions || {};
+                return makeOperation(operation.kind, operation, {
+                  ...operation.context,
+                  fetchOptions: {
+                    ...fetchOptions,
+                    headers: {
+                      ...fetchOptions.headers,
+                      ...headers,
+                    },
                   },
-                },
-              });
-            },
+                });
+              },
+            })
+          )
+          .then((_config: AuthConfig) => {
+            if (_config) config = _config;
+            flushQueue();
           })
-        )
-        .then((_config: AuthConfig) => {
-          if (_config) config = _config;
-          flushQueue();
-        });
+          .catch((error: Error) => {
+            if (process.env.NODE_ENV !== 'production') {
+              console.warn(
+                'authExchange()’s initialization function has failed, which is unexpected.\n' +
+                  'If your initialization function is expected to throw/reject, catch this error and handle it explicitly.\n' +
+                  'Unless this error is handled it’ll be passed onto any `OperationResult` instantly and authExchange() will block further operations and retry.',
+                error
+              );
+            }
+
+            errorQueue(error);
+          });
+      }
+
+      initAuth();
 
       function refreshAuth(operation: Operation) {
         // add to retry queue to try again later
@@ -332,13 +348,15 @@ export function authExchange(
             return operation;
           } else if (operation.context.authAttempt) {
             return addAuthToOperation(operation);
-          } else if (authPromise) {
-            if (!retryQueue.has(operation.key)) {
+          } else if (authPromise || !config) {
+            if (!authPromise) initAuth();
+
+            if (!retryQueue.has(operation.key))
               retryQueue.set(
                 operation.key,
                 addAuthAttemptToOperation(operation, false)
               );
-            }
+
             return null;
           } else if (willAuthError(operation)) {
             refreshAuth(operation);
