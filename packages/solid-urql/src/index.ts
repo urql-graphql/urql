@@ -6,7 +6,12 @@ export { useClient } from './context';
 export { type CreateMutationState } from './createMutation';
 export { createMutation } from './createMutation';
 
-export { type CreateQueryArgs, type CreateQueryState } from './createQuery';
+export {
+  type CreateQueryArgs,
+  type CreateQueryState,
+  type CreateQueryExecute,
+  type CreateQueryResult,
+} from './createQuery';
 export { createQuery } from './createQuery';
 
 export {
