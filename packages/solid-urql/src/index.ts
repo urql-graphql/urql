@@ -21,6 +21,8 @@ export { createQuery } from './createQuery';
 export {
   type CreateSubscriptionArgs,
   type CreateSubscriptionState,
+  type CreateSubscriptionExecute,
+  type CreateSubscriptionResult,
   type SubscriptionHandler,
 } from './createSubscription';
 
