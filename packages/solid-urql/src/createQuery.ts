@@ -52,7 +52,7 @@ export type CreateQueryExecute = (opts?: Partial<OperationContext>) => void;
 /** State of the current query, your {@link createQuery} hook is executing.
  *
  * @remarks
- * `UseQueryState` is returned (in a tuple) by {@link createQuery} and
+ * `CreateQueryState` is returned (in a tuple) by {@link createQuery} and
  * gives you the updating {@link OperationResult} of GraphQL queries.
  *
  * Even when the query and variables passed to {@link createQuery} change,
@@ -96,7 +96,7 @@ export type CreateQueryArgs<
    *
    * @remarks
    * `requestPolicy` modifies the {@link RequestPolicy} of the GraphQL query operation
-   * that `useQuery` executes, and indicates a caching strategy for cache exchanges.
+   * that `createQuery` executes, and indicates a caching strategy for cache exchanges.
    *
    * For example, when set to `'cache-and-network'`, {@link createQuery} will
    * receive a cached result with `stale: true` and an API request will be
@@ -118,7 +118,7 @@ export type CreateQueryArgs<
    */
   context?: MaybeAccessor<Partial<OperationContext>>;
 
-  /** Prevents {@link useQuery} from automatically executing GraphQL query operations.
+  /** Prevents {@link createQuery} from automatically executing GraphQL query operations.
    *
    * @remarks
    * `pause` may be set to `true` to stop {@link createQuery} from executing
@@ -157,7 +157,7 @@ export type CreateQueryResult<
  *
  * Additionally, if the `suspense` option is enabled on the `Client`,
  * the `createQuery` hook will suspend instead of indicating that it’s
- * waiting for a result via {@link UseQueryState.fetching}.
+ * waiting for a result via {@link CreateQueryState.fetching}.
  *
  * @example
  * ```tsx
