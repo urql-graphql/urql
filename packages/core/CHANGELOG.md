@@ -1,5 +1,13 @@
 # @urql/core
 
+## 4.1.1
+
+### Patch Changes
+
+- Add case for `subscriptionExchange` to handle `GraphQLError[]` received in the `error` observer callback.
+  **Note:** This doesn't strictly check for the `GraphQLError` shape and only checks for arrays and receiving errors in the `ExecutionResult` on the `next` observer callback is preferred and recommended for transports
+  Submitted by [@kitten](https://github.com/kitten) (See [#3346](https://github.com/urql-graphql/urql/pull/3346))
+
 ## 4.1.0
 
 ### Minor Changes
