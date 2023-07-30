@@ -144,24 +144,35 @@ export const subscriptionExchange =
         operation
       );
 
-      return make<OperationResult>(({ next, complete }) => {
+      return make<OperationResult>(observer => {
         let isComplete = false;
         let sub: Subscription | void;
         let result: OperationResult | void;
+
+        function nextResult(value: ExecutionResult) {
+          observer.next(
+            (result = result
+              ? mergeResultPatch(result, value)
+              : makeResult(operation, value))
+          );
+        }
 
         Promise.resolve().then(() => {
           if (isComplete) return;
 
           sub = observableish.subscribe({
-            next(nextResult) {
-              next(
-                (result = result
-                  ? mergeResultPatch(result, nextResult)
-                  : makeResult(operation, nextResult))
-              );
-            },
+            next: nextResult,
             error(error) {
-              next(makeErrorResult(operation, error));
+              if (Array.isArray(error)) {
+                // NOTE: This is an exception for transports that deliver `GraphQLError[]`, as part
+                // of the observer’s error callback (may happen as part of `graphql-ws`).
+                // We only check for arrays here, as this is an extremely “unexpected” case as the
+                // shape of `ExecutionResult` is instead strictly defined.
+                nextResult({ errors: error });
+              } else {
+                observer.next(makeErrorResult(operation, error));
+              }
+              observer.complete();
             },
             complete() {
               if (!isComplete) {
@@ -171,10 +182,10 @@ export const subscriptionExchange =
                     makeOperation('teardown', operation, operation.context)
                   );
                 }
-
-                if (result && result.hasNext)
-                  next(mergeResultPatch(result, { hasNext: false }));
-                complete();
+                if (result && result.hasNext) {
+                  nextResult({ hasNext: false });
+                }
+                observer.complete();
               }
             },
           });
