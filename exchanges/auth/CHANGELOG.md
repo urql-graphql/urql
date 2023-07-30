@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.6
+
+### Patch Changes
+
+- `authExchange()` will now block and pass on errors if the initialization function passed to it fails, and will retry indefinitely. It’ll also output a warning for these cases, as the initialization function (i.e. `authExchange(async (utils) => { /*...*/ })`) is not expected to reject/throw
+  Submitted by [@kitten](https://github.com/kitten) (See [#3343](https://github.com/urql-graphql/urql/pull/3343))
+
 ## 2.1.5
 
 ### Patch Changes
