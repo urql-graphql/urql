@@ -35,7 +35,7 @@ import { initialResult, createPausable, fromStore } from './common';
  */
 export type QueryArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The {@link Client} using which the query will be executed.
    *
@@ -116,7 +116,7 @@ export type QueryArgs<
  */
 export function queryStore<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   args: QueryArgs<Data, Variables>
 ): OperationResultStore<Data, Variables> & Pausable {

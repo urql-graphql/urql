@@ -146,7 +146,7 @@ export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
  */
 export const createRequest = <
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   _query: DocumentInput<Data, Variables>,
   _variables: Variables,

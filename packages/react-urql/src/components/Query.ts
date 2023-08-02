@@ -16,7 +16,7 @@ import { useQuery } from '../hooks';
  */
 export type QueryProps<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = UseQueryArgs<Variables, Data> & {
   children(arg: QueryState<Data, Variables>): ReactElement<any>;
 };
@@ -30,7 +30,7 @@ export type QueryProps<
  */
 export interface QueryState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends UseQueryState<Data, Variables> {
   /** Alias to {@link useQuery}’s `executeQuery` function. */
   executeQuery: UseQueryExecute;
@@ -45,7 +45,7 @@ export interface QueryState<
  */
 export function Query<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(props: QueryProps<Data, Variables>): ReactElement<any> {
   const query = useQuery<Data, Variables>(props);
   return props.children({ ...query[0], executeQuery: query[1] });

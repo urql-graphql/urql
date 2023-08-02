@@ -11,7 +11,7 @@ import { make } from 'wonka';
  */
 export interface OperationResultState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends OperationResult<Data, Variables> {
   /** Indicates whether the store is waiting for a new {@link OperationResult}.
    *
@@ -29,7 +29,7 @@ export interface OperationResultState<
 /** A Readable store of {@link OperationResultState}. */
 export type OperationResultStore<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = Readable<OperationResultState<Data, Variables>>;
 
 /** Consumes a {@link Readable} as a {@link Source}.

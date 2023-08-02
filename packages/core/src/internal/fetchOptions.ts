@@ -22,7 +22,7 @@ export interface FetchBody {
  */
 export function makeFetchBody<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(request: Omit<GraphQLRequest<Data, Variables>, 'key'>): FetchBody {
   const isAPQ =
     request.extensions &&

@@ -30,7 +30,7 @@ type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
  */
 export type UseSubscriptionArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** Prevents {@link useSubscription} from automatically executing GraphQL subscription operations.
    *
@@ -107,7 +107,7 @@ export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
 export interface UseSubscriptionResponse<
   T = any,
   R = T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 > {
   /** Indicates whether `useSubscription`’s subscription is active.
    *
@@ -227,7 +227,7 @@ const watchOptions = {
 export function useSubscription<
   T = any,
   R = T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 >(
   args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>
@@ -238,7 +238,7 @@ export function useSubscription<
 export function callUseSubscription<
   T = any,
   R = T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 >(
   _args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>,

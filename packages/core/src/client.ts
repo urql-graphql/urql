@@ -287,7 +287,7 @@ export interface Client {
    */
   createRequestOperation<
     Data = any,
-    Variables extends AnyVariables = AnyVariables
+    Variables extends AnyVariables = AnyVariables,
   >(
     kind: OperationType,
     request: GraphQLRequest<Data, Variables>,
@@ -319,7 +319,7 @@ export interface Client {
    */
   executeRequestOperation<
     Data = any,
-    Variables extends AnyVariables = AnyVariables
+    Variables extends AnyVariables = AnyVariables,
   >(
     operation: Operation<Data, Variables>
   ): OperationResultSource<OperationResult<Data, Variables>>;
@@ -479,7 +479,7 @@ export interface Client {
    */
   executeSubscription<
     Data = any,
-    Variables extends AnyVariables = AnyVariables
+    Variables extends AnyVariables = AnyVariables,
   >(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined

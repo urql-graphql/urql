@@ -24,7 +24,7 @@ import { useSubscription } from '../hooks';
 export type SubscriptionProps<
   Data = any,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = UseSubscriptionArgs<Variables, Data> & {
   /** Accepts the {@link SubscriptionHandler} as a prop. */
   handler?: SubscriptionHandler<Data, Result>;
@@ -40,7 +40,7 @@ export type SubscriptionProps<
  */
 export interface SubscriptionState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends UseSubscriptionState<Data, Variables> {
   /** Alias to {@link useSubscription}’s `executeMutation` function. */
   executeSubscription: UseSubscriptionExecute;
@@ -56,7 +56,7 @@ export interface SubscriptionState<
 export function Subscription<
   Data = any,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(props: SubscriptionProps<Data, Result, Variables>): VNode<any> {
   const subscription = useSubscription<Data, Result, Variables>(
     props,

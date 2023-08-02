@@ -10,7 +10,7 @@ import { keyDocument } from './request';
 import type { FormattedNode, TypedDocumentNode } from '../types';
 
 const formatNode = <
-  T extends SelectionNode | DefinitionNode | TypedDocumentNode<any, any>
+  T extends SelectionNode | DefinitionNode | TypedDocumentNode<any, any>,
 >(
   node: T
 ): FormattedNode<T> => {

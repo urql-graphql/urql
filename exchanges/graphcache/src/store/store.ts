@@ -43,7 +43,7 @@ type RootField = 'query' | 'mutation' | 'subscription';
  * @internal
  */
 export class Store<
-  C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
+  C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>,
 > implements Cache
 {
   data: InMemoryData.InMemoryData;

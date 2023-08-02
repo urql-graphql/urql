@@ -66,7 +66,7 @@ const minifyIntrospectionType = (
           value =>
             ({
               name: value.name,
-            } as any)
+            }) as any
         ),
       };
 
@@ -80,7 +80,7 @@ const minifyIntrospectionType = (
               name: field.name,
               type: mapType(field.type),
               defaultValue: field.defaultValue || undefined,
-            } as IntrospectionInputValue)
+            }) as IntrospectionInputValue
         ),
       };
     }
@@ -100,7 +100,7 @@ const minifyIntrospectionType = (
                   name: arg.name,
                   type: mapType(arg.type),
                 })),
-            } as any)
+            }) as any
         ),
         interfaces:
           type.interfaces &&
@@ -125,7 +125,7 @@ const minifyIntrospectionType = (
                   name: arg.name,
                   type: mapType(arg.type),
                 })),
-            } as any)
+            }) as any
         ),
         interfaces:
           type.interfaces &&
@@ -254,7 +254,7 @@ export const minifyIntrospectionQuery = (
           name: arg.name,
           type: mapType(arg.type),
           defaultValue: arg.defaultValue || undefined,
-        } as IntrospectionInputValue)
+        }) as IntrospectionInputValue
     ),
   }));
 

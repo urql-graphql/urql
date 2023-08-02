@@ -67,13 +67,11 @@ describe('createRequest', () => {
   });
 
   it('should return a valid query object with variables', () => {
-    const doc = print(
-      gql`
-        {
-          testF
-        }
-      `
-    );
+    const doc = print(gql`
+      {
+        testF
+      }
+    `);
     const val = createRequest(doc, { test: 5 });
 
     expect(print(val.query)).toBe(doc);

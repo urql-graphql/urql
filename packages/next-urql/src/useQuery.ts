@@ -18,7 +18,7 @@ import { useUrqlValue } from './useUrqlValue';
  */
 export type UseQueryArgs<
   Variables extends AnyVariables = AnyVariables,
-  Data = any
+  Data = any,
 > = {
   /** Updates the {@link RequestPolicy} for the executed GraphQL query operation.
    *
@@ -82,7 +82,7 @@ export type UseQueryArgs<
  */
 export interface UseQueryState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   /** Indicates whether `useQuery` is waiting for a new result.
    *
@@ -156,7 +156,7 @@ export type UseQueryExecute = (opts?: Partial<OperationContext>) => void;
  */
 export type UseQueryResponse<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = [UseQueryState<Data, Variables>, UseQueryExecute];
 
 /** Hook to run a GraphQL query and get updated GraphQL results.
@@ -197,7 +197,7 @@ export type UseQueryResponse<
  */
 export function useQuery<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(args: UseQueryArgs<Variables, Data>): UseQueryResponse<Data, Variables> {
   const request = createRequest(
     args.query,

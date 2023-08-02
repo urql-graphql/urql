@@ -15,7 +15,7 @@ import { useMutation } from '../hooks';
  */
 export interface MutationProps<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   /* The GraphQL mutation document that {@link useMutation} will execute. */
   query: DocumentInput<Data, Variables>;
@@ -31,7 +31,7 @@ export interface MutationProps<
  */
 export interface MutationState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends UseMutationState<Data, Variables> {
   /** Alias to {@link useMutation}’s `executeMutation` function. */
   executeMutation: UseMutationExecute<Data, Variables>;
@@ -46,7 +46,7 @@ export interface MutationState<
  */
 export function Mutation<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(props: MutationProps<Data, Variables>): ReactElement<any> {
   const mutation = useMutation<Data, Variables>(props.query);
   return props.children({ ...mutation[0], executeMutation: mutation[1] });

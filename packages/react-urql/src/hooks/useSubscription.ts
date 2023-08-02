@@ -28,7 +28,7 @@ import {
  */
 export type UseSubscriptionArgs<
   Variables extends AnyVariables = AnyVariables,
-  Data = any
+  Data = any,
 > = {
   /** Prevents {@link useSubscription} from automatically starting GraphQL subscriptions.
    *
@@ -105,7 +105,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
  */
 export interface UseSubscriptionState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   /** Indicates whether `useSubscription`’s subscription is active.
    *
@@ -183,7 +183,7 @@ export type UseSubscriptionExecute = (opts?: Partial<OperationContext>) => void;
  */
 export type UseSubscriptionResponse<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = [UseSubscriptionState<Data, Variables>, UseSubscriptionExecute];
 
 /** Hook to run a GraphQL subscription and get updated GraphQL results.
@@ -225,7 +225,7 @@ export type UseSubscriptionResponse<
 export function useSubscription<
   Data = any,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   args: UseSubscriptionArgs<Variables, Data>,
   handler?: SubscriptionHandler<Data, Result>

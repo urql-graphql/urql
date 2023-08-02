@@ -7,7 +7,7 @@ import { createRequest } from '@urql/core';
  */
 export function useRequest<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   query: DocumentInput<Data, Variables>,
   variables: Variables

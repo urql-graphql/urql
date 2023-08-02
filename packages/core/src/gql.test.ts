@@ -79,19 +79,17 @@ it('warns on duplicate fragment names with different sources', () => {
 
 it('interpolates nested GraphQL Documents', () => {
   expect(
-    print(
-      gql`
-        query {
-          ...Query
-        }
+    print(gql`
+      query {
+        ...Query
+      }
 
-        ${gql`
-          fragment Query on Query {
-            field
-          }
-        `}
-      `
-    )
+      ${gql`
+        fragment Query on Query {
+          field
+        }
+      `}
+    `)
   ).toMatchInlineSnapshot(`
     "{
       ...Query

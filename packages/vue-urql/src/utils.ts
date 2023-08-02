@@ -10,7 +10,7 @@ export function unwrapPossibleProxy<V>(possibleProxy: V | Ref<V>): V {
 
 export interface RequestState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   request: GraphQLRequest<Data, Variables>;
   isPaused: boolean;
@@ -18,7 +18,7 @@ export interface RequestState<
 
 export function createRequestState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   request: GraphQLRequest<Data, Variables>,
   isPaused: boolean

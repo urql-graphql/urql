@@ -19,7 +19,7 @@ import { initialResult } from './common';
  */
 export type MutationArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The {@link Client} using which the subscription will be started.
    *
@@ -89,7 +89,7 @@ export type MutationArgs<
  */
 export function mutationStore<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(args: MutationArgs<Data, Variables>): OperationResultStore<Data, Variables> {
   const request = createRequest(args.query, args.variables as Variables);
   const operation = args.client.createRequestOperation(

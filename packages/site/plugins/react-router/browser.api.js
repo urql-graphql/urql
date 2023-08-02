@@ -38,12 +38,11 @@ const ReactRouterPlugin = ({ RouterProps: userRouterProps = {} }) => ({
         </PreviousRoot>
       );
     },
-  Routes: PreviousRoutes => props =>
-    (
-      <Location>
-        {location => <PreviousRoutes {...props} location={location} />}
-      </Location>
-    ),
+  Routes: PreviousRoutes => props => (
+    <Location>
+      {location => <PreviousRoutes {...props} location={location} />}
+    </Location>
+  ),
 });
 
 export default ReactRouterPlugin;

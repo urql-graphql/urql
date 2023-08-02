@@ -60,7 +60,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
  */
 export type SubscriptionArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The {@link Client} using which the subscription will be started.
    *
@@ -135,7 +135,7 @@ export type SubscriptionArgs<
 export function subscriptionStore<
   Data,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   args: SubscriptionArgs<Data, Variables>,
   handler?: SubscriptionHandler<Data, Result>

@@ -12,7 +12,7 @@ import { createRequest } from '@urql/core';
  */
 export function useRequest<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>,
   variables: Variables

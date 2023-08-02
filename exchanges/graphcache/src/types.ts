@@ -685,7 +685,7 @@ export type CacheExchangeOpts = {
 export type Resolver<
   ParentData = DataFields,
   Args = Variables,
-  Result = ResolverResult
+  Result = ResolverResult,
 > = {
   bivarianceHack(
     parent: ParentData,
@@ -862,7 +862,7 @@ export type MakeFunctional<T> = T extends { __typename: string }
  */
 export type OptimisticMutationResolver<
   Args = Variables,
-  Result = Link<Data> | Scalar
+  Result = Link<Data> | Scalar,
 > = {
   bivarianceHack(
     args: Args,

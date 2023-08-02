@@ -31,7 +31,7 @@ type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
  */
 export type UseQueryArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** Updates the {@link RequestPolicy} for the executed GraphQL query operation.
    *
@@ -193,7 +193,7 @@ export interface UseQueryState<T = any, V extends AnyVariables = AnyVariables> {
  */
 export type UseQueryResponse<
   T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 > = UseQueryState<T, V> & PromiseLike<UseQueryState<T, V>>;
 
 const watchOptions = {
