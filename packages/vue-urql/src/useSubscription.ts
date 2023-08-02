@@ -311,13 +311,13 @@ export function callUseSubscription<
             }),
             subscribe(result => {
               fetching.value = true;
-              (data.value =
+              data.value =
                 result.data !== undefined
                   ? typeof scanHandler.value === 'function'
                     ? scanHandler.value(data.value as any, result.data!)
                     : result.data
-                  : (result.data as any)),
-                (error.value = result.error);
+                  : (result.data as any);
+              error.value = result.error;
               extensions.value = result.extensions;
               stale.value = !!result.stale;
               operation.value = result.operation;

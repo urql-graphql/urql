@@ -99,6 +99,11 @@ module.exports = {
             message:
               'Nullish coalescing assignment (??=) is outside of specified browser support',
           },
+          {
+            selector: 'SequenceExpression',
+            message:
+              'Sequence expressions are to be avoided since they can be confusing',
+          },
         ],
 
         '@typescript-eslint/no-unused-vars': [
