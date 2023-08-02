@@ -261,7 +261,7 @@ export const cacheExchange =
       if (operation.kind === 'subscription' || result.hasNext)
         reserveLayer(store.data, operation.key, true);
 
-      let queryDependencies: void | Dependencies;
+      let queryDependencies: undefined | Dependencies;
       let data: Data | null = result.data;
       if (data) {
         // Write the result to cache and collect all dependencies that need to be

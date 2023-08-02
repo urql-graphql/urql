@@ -269,7 +269,7 @@ const writeSelection = (
 
     // Execute optimistic mutation functions on root fields, or execute recursive functions
     // that have been returned on optimistic objects
-    let resolver: OptimisticMutationResolver | void;
+    let resolver: OptimisticMutationResolver | undefined;
     if (ctx.optimistic && rootField === 'mutation') {
       resolver = ctx.store.optimisticMutations[fieldName];
       if (!resolver) continue;

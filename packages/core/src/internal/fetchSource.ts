@@ -154,7 +154,7 @@ async function* fetchOperation(
 ) {
   let networkMode = true;
   let result: OperationResult | null = null;
-  let response: Response | void;
+  let response: Response | undefined;
 
   try {
     // Delay for a tick to give the Client a chance to cancel the request
