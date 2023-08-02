@@ -94,6 +94,11 @@ module.exports = {
             message:
               'Nullish coalescing (??) operator is outside of specified browser support',
           },
+          {
+            selector: 'AssignmentExpression[operator="??="]',
+            message:
+              'Nullish coalescing assignment (??=) is outside of specified browser support',
+          },
         ],
 
         '@typescript-eslint/no-unused-vars': [
