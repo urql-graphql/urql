@@ -79,8 +79,16 @@ module.exports = {
         'no-restricted-syntax': [
           "error",
           {
-            "selector": "PropertyDefinition[value]",
-            "message": "Property definitions with value initializers aren’t transpiled"
+            selector: 'PropertyDefinition[value]',
+            message: 'Property definitions with value initializers aren’t transpiled',
+          },
+          {
+            selector: 'MemberExpression[optional=true]',
+            message: 'Optional chaining (?.) operator is outside of specified browser support',
+          },
+          {
+            selector: 'LogicalExpression[operator="??"]',
+            message: 'Nullish coalescing (??) operator is outside of specified browser support',
           },
         ],
 
@@ -108,6 +116,7 @@ module.exports = {
       files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
       globals: { vi: true },
       rules: {
+        'no-restricted-syntax': 'off',
         '@typescript-eslint/ban-ts-comment': 'off',
         'react-hooks/rules-of-hooks': 'off',
         'react-hooks/exhaustive-deps': 'off',
