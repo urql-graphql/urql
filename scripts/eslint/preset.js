@@ -112,6 +112,15 @@ module.exports = {
           },
         ],
 
+        '@typescript-eslint/no-import-type-side-effects': 'error',
+        '@typescript-eslint/consistent-type-imports': [
+          'error',
+          {
+            disallowTypeAnnotations: false,
+            fixStyle: 'separate-type-imports',
+          },
+        ],
+
         '@typescript-eslint/no-unused-vars': [
           'error',
           {
@@ -140,6 +149,8 @@ module.exports = {
       rules: {
         'no-restricted-syntax': 'off',
         '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/no-import-type-side-effects': 'off',
+        '@typescript-eslint/consistent-type-imports': 'off',
         'react-hooks/rules-of-hooks': 'off',
         'react-hooks/exhaustive-deps': 'off',
         'es5/no-for-of': 'off',
