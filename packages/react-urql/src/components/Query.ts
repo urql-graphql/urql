@@ -1,12 +1,8 @@
-import { ReactElement } from 'react';
-import { AnyVariables } from '@urql/core';
+import type { ReactElement } from 'react';
+import type { AnyVariables } from '@urql/core';
 
-import {
-  useQuery,
-  UseQueryArgs,
-  UseQueryState,
-  UseQueryExecute,
-} from '../hooks';
+import type { UseQueryArgs, UseQueryState, UseQueryExecute } from '../hooks';
+import { useQuery } from '../hooks';
 
 /** Props accepted by {@link Query}.
  *

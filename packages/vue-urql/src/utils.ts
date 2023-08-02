@@ -1,5 +1,6 @@
-import { GraphQLRequest, AnyVariables } from '@urql/core';
-import { Ref, ShallowRef, isRef } from 'vue';
+import type { GraphQLRequest, AnyVariables } from '@urql/core';
+import type { Ref, ShallowRef } from 'vue';
+import { isRef } from 'vue';
 
 export function unwrapPossibleProxy<V>(possibleProxy: V | Ref<V>): V {
   return possibleProxy && isRef(possibleProxy)

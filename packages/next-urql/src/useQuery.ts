@@ -1,15 +1,14 @@
 'use client';
 
-import {
+import type {
   AnyVariables,
   CombinedError,
   GraphQLRequestParams,
   Operation,
   OperationContext,
   RequestPolicy,
-  createRequest,
-  useQuery as orig_useQuery,
 } from 'urql';
+import { createRequest, useQuery as orig_useQuery } from 'urql';
 import { useUrqlValue } from './useUrqlValue';
 
 /** Input arguments for the {@link useQuery} hook.

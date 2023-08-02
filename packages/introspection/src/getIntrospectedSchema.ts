@@ -1,11 +1,5 @@
-import {
-  IntrospectionQuery,
-  GraphQLSchema,
-  parse,
-  buildSchema,
-  execute,
-  getIntrospectionQuery,
-} from 'graphql';
+import type { IntrospectionQuery, GraphQLSchema } from 'graphql';
+import { parse, buildSchema, execute, getIntrospectionQuery } from 'graphql';
 
 /** Returns an {@link IntrospectionQuery} result for a given GraphQL schema.
  *

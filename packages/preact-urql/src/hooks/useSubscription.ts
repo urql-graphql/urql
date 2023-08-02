@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef, useMemo } from 'preact/hooks';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
-import {
+import type {
   AnyVariables,
   GraphQLRequestParams,
   CombinedError,

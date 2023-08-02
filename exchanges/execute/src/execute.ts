@@ -1,25 +1,22 @@
-import { Source, pipe, filter, takeUntil, mergeMap, merge, make } from 'wonka';
+import type { Source } from 'wonka';
+import { pipe, filter, takeUntil, mergeMap, merge, make } from 'wonka';
 
-import {
+import type {
   GraphQLSchema,
   GraphQLFieldResolver,
   GraphQLTypeResolver,
-  execute,
-  subscribe,
   ExecutionArgs,
   SubscriptionArgs,
-  Kind,
 } from 'graphql';
+import { execute, subscribe, Kind } from 'graphql';
 
-import {
+import type {
   Exchange,
   ExecutionResult,
-  makeResult,
-  makeErrorResult,
-  mergeResultPatch,
   Operation,
   OperationResult,
 } from '@urql/core';
+import { makeResult, makeErrorResult, mergeResultPatch } from '@urql/core';
 
 /** Input parameters for the {@link executeExchange}.
  * @see {@link ExecutionArgs} which this interface mirrors. */

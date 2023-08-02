@@ -1,11 +1,11 @@
-import { DocumentNode } from 'graphql';
+import type { DocumentNode } from 'graphql';
 import { useRef, useMemo } from 'preact/hooks';
-import {
+import type {
   AnyVariables,
   TypedDocumentNode,
   GraphQLRequest,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 /** Creates a request from a query and variables but preserves reference equality if the key isn't changing
  * @internal

@@ -1,7 +1,8 @@
-import { ReactElement } from 'react';
-import { AnyVariables, DocumentInput } from '@urql/core';
+import type { ReactElement } from 'react';
+import type { AnyVariables, DocumentInput } from '@urql/core';
 
-import { useMutation, UseMutationState, UseMutationExecute } from '../hooks';
+import type { UseMutationState, UseMutationExecute } from '../hooks';
+import { useMutation } from '../hooks';
 
 /** Props accepted by {@link Mutation}.
  *

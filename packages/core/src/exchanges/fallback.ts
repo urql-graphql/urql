@@ -1,5 +1,5 @@
 import { filter, pipe, tap } from 'wonka';
-import { ExchangeIO, ExchangeInput } from '../types';
+import type { ExchangeIO, ExchangeInput } from '../types';
 
 /** Used by the `Client` as the last exchange to warn about unhandled operations.
  *

@@ -1,13 +1,13 @@
-import {
+import type {
   Exchange,
-  formatDocument,
-  makeOperation,
   Operation,
   OperationResult,
   RequestPolicy,
   CacheOutcome,
 } from '@urql/core';
+import { formatDocument, makeOperation } from '@urql/core';
 
+import type { Source } from 'wonka';
 import {
   filter,
   map,
@@ -17,7 +17,6 @@ import {
   fromArray,
   mergeMap,
   empty,
-  Source,
 } from 'wonka';
 
 import { _query } from './operations/query';
@@ -25,7 +24,7 @@ import { _write } from './operations/write';
 import { addMetadata, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store } from './store/store';
-import { Data, Dependencies, CacheExchangeOpts } from './types';
+import type { Data, Dependencies, CacheExchangeOpts } from './types';
 
 import {
   initDataState,

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { filter, merge, mergeMap, pipe, takeUntil, onPush } from 'wonka';
 
-import { Exchange } from '../types';
+import type { Exchange } from '../types';
 import {
   makeFetchBody,
   makeFetchURL,

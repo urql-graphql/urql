@@ -1,13 +1,13 @@
-import {
+import type {
   InlineFragmentNode,
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
 
 import { warn, invariant } from '../helpers/help';
 import { getTypeCondition } from './node';
-import { SchemaIntrospector, SchemaObject } from './schema';
+import type { SchemaIntrospector, SchemaObject } from './schema';
 
-import {
+import type {
   KeyingConfig,
   UpdatesConfig,
   ResolverConfig,

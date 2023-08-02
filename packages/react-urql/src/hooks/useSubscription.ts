@@ -3,7 +3,7 @@
 import { pipe, subscribe, onEnd } from 'wonka';
 import * as React from 'react';
 
-import {
+import type {
   GraphQLRequestParams,
   AnyVariables,
   CombinedError,

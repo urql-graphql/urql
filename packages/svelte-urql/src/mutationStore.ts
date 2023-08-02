@@ -1,19 +1,16 @@
 import { pipe, map, scan, subscribe } from 'wonka';
 import { derived, writable } from 'svelte/store';
 
-import {
+import type {
   AnyVariables,
   GraphQLRequestParams,
   Client,
   OperationContext,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
-import {
-  OperationResultState,
-  OperationResultStore,
-  initialResult,
-} from './common';
+import type { OperationResultState, OperationResultStore } from './common';
+import { initialResult } from './common';
 
 /** Input arguments for the {@link mutationStore} function.
  *

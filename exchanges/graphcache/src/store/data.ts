@@ -1,6 +1,6 @@
 import { stringifyVariables } from '@urql/core';
 
-import {
+import type {
   Link,
   EntityField,
   FieldInfo,

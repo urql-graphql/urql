@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
+import type { Source } from 'wonka';
+import { pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
 import * as React from 'react';
 
-import {
+import type {
   GraphQLRequestParams,
   AnyVariables,
   Client,

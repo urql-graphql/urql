@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
+import type { Source, Subscription } from 'wonka';
 import {
   lazy,
   filter,
@@ -9,7 +10,6 @@ import {
   onStart,
   pipe,
   share,
-  Source,
   take,
   takeUntil,
   takeWhile,
@@ -19,13 +19,12 @@ import {
   fromValue,
   merge,
   map,
-  Subscription,
 } from 'wonka';
 
 import { composeExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
-import {
+import type {
   DocumentInput,
   AnyVariables,
   Exchange,

@@ -1,5 +1,5 @@
 import { pipe, tap } from 'wonka';
-import { Exchange } from '../types';
+import type { Exchange } from '../types';
 
 /** Simple log debugger exchange.
  *

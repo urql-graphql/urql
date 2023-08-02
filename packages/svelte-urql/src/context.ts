@@ -1,5 +1,6 @@
 import { setContext, getContext } from 'svelte';
-import { Client, ClientOptions } from '@urql/core';
+import type { ClientOptions } from '@urql/core';
+import { Client } from '@urql/core';
 
 const _contextKey = '$$_urql';
 

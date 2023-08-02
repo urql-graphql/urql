@@ -1,13 +1,13 @@
-import { VNode } from 'preact';
-import { AnyVariables } from '@urql/core';
+import type { VNode } from 'preact';
+import type { AnyVariables } from '@urql/core';
 
-import {
-  useSubscription,
+import type {
   UseSubscriptionArgs,
   UseSubscriptionState,
   UseSubscriptionExecute,
   SubscriptionHandler,
 } from '../hooks';
+import { useSubscription } from '../hooks';
 
 /** Props accepted by {@link Subscription}.
  *

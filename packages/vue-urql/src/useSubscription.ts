@@ -1,18 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { Source, pipe, subscribe, onEnd } from 'wonka';
+import type { Source } from 'wonka';
+import { pipe, subscribe, onEnd } from 'wonka';
 
-import {
-  WatchStopHandle,
-  Ref,
-  ref,
-  shallowRef,
-  watchEffect,
-  reactive,
-  isRef,
-} from 'vue';
+import type { WatchStopHandle, Ref } from 'vue';
+import { ref, shallowRef, watchEffect, reactive, isRef } from 'vue';
 
-import {
+import type {
   Client,
   GraphQLRequestParams,
   AnyVariables,
@@ -20,8 +14,8 @@ import {
   CombinedError,
   OperationContext,
   Operation,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 import { unwrapPossibleProxy, updateShallowRef } from './utils';

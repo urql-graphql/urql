@@ -1,14 +1,14 @@
-import {
+import type {
   Client,
   GraphQLRequestParams,
   AnyVariables,
   OperationContext,
   RequestPolicy,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
+import type { Source } from 'wonka';
 import {
-  Source,
   pipe,
   map,
   fromValue,
@@ -21,14 +21,12 @@ import {
 
 import { derived, writable } from 'svelte/store';
 
-import {
+import type {
   OperationResultState,
   OperationResultStore,
   Pausable,
-  initialResult,
-  createPausable,
-  fromStore,
 } from './common';
+import { initialResult, createPausable, fromStore } from './common';
 
 /** Input arguments for the {@link queryStore} function.
  *

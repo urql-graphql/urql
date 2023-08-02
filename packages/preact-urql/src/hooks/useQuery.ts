@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useMemo } from 'preact/hooks';
 
+import type { Source } from 'wonka';
 import {
-  Source,
   pipe,
   share,
   takeWhile,
@@ -12,7 +12,7 @@ import {
   scan,
 } from 'wonka';
 
-import {
+import type {
   Client,
   GraphQLRequestParams,
   AnyVariables,

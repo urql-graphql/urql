@@ -1,12 +1,8 @@
-import { VNode } from 'preact';
-import { AnyVariables } from '@urql/core';
+import type { VNode } from 'preact';
+import type { AnyVariables } from '@urql/core';
 
-import {
-  useQuery,
-  UseQueryArgs,
-  UseQueryState,
-  UseQueryExecute,
-} from '../hooks';
+import type { UseQueryArgs, UseQueryState, UseQueryExecute } from '../hooks';
+import { useQuery } from '../hooks';
 
 /** Props accepted by {@link Query}.
  *

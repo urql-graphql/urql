@@ -1,6 +1,7 @@
 import type { Readable, Writable } from 'svelte/store';
 import type { AnyVariables, OperationResult } from '@urql/core';
-import { Source, make } from 'wonka';
+import type { Source } from 'wonka';
+import { make } from 'wonka';
 
 /** An {@link OperationResult} with an added {@link OperationResultState.fetching} flag.
  *

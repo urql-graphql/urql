@@ -5,7 +5,7 @@ import {
   extractFiles,
 } from '../utils';
 
-import { AnyVariables, GraphQLRequest, Operation } from '../types';
+import type { AnyVariables, GraphQLRequest, Operation } from '../types';
 
 /** Abstract definition of the JSON data sent during GraphQL HTTP POST requests. */
 export interface FetchBody {

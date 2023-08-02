@@ -1,6 +1,7 @@
-import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
+import type { TypedDocumentNode } from '@urql/core';
+import { formatDocument, createRequest } from '@urql/core';
 
-import {
+import type {
   Cache,
   FieldInfo,
   ResolverConfig,
@@ -26,8 +27,8 @@ import { invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
+import type { SchemaIntrospector } from '../ast';
 import {
-  SchemaIntrospector,
   buildClientSchema,
   expectValidKeyingConfig,
   expectValidUpdatesConfig,

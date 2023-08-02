@@ -1,13 +1,5 @@
-import {
-  filter,
-  make,
-  merge,
-  mergeMap,
-  pipe,
-  Subscription,
-  Source,
-  takeUntil,
-} from 'wonka';
+import type { Subscription, Source } from 'wonka';
+import { filter, make, merge, mergeMap, pipe, takeUntil } from 'wonka';
 
 import {
   makeResult,
@@ -16,14 +8,15 @@ import {
   makeOperation,
 } from '../utils';
 
-import {
+import type {
   Exchange,
   ExecutionResult,
   Operation,
   OperationResult,
 } from '../types';
 
-import { FetchBody, makeFetchBody } from '../internal';
+import type { FetchBody } from '../internal';
+import { makeFetchBody } from '../internal';
 
 /** An abstract observer-like interface.
  *

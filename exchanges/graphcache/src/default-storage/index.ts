@@ -1,4 +1,8 @@
-import { SerializedEntries, SerializedRequest, StorageAdapter } from '../types';
+import type {
+  SerializedEntries,
+  SerializedRequest,
+  StorageAdapter,
+} from '../types';
 
 const getRequestPromise = <T>(request: IDBRequest<T>): Promise<T> => {
   return new Promise((resolve, reject) => {

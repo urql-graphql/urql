@@ -1,4 +1,4 @@
-import { Exchange } from '../types';
+import type { Exchange } from '../types';
 
 /** Default deduplication exchange.
  * @deprecated

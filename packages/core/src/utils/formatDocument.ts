@@ -1,12 +1,13 @@
-import {
-  Kind,
+import type {
   FieldNode,
   SelectionNode,
   DefinitionNode,
   DirectiveNode,
 } from '@0no-co/graphql.web';
-import { KeyedDocumentNode, keyDocument } from './request';
-import { FormattedNode, TypedDocumentNode } from '../types';
+import { Kind } from '@0no-co/graphql.web';
+import type { KeyedDocumentNode } from './request';
+import { keyDocument } from './request';
+import type { FormattedNode, TypedDocumentNode } from '../types';
 
 const formatNode = <
   T extends SelectionNode | DefinitionNode | TypedDocumentNode<any, any>

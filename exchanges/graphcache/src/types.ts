@@ -1,4 +1,4 @@
-import {
+import type {
   AnyVariables,
   DocumentInput,
   RequestExtensions,
@@ -7,8 +7,8 @@ import {
   ErrorLike,
 } from '@urql/core';
 
-import { DocumentNode, FragmentDefinitionNode } from '@0no-co/graphql.web';
-import { IntrospectionData } from './ast';
+import type { DocumentNode, FragmentDefinitionNode } from '@0no-co/graphql.web';
+import type { IntrospectionData } from './ast';
 
 /** Nullable GraphQL list types of `T`.
  *

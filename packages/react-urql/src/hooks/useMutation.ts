@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
-import {
+import type {
   AnyVariables,
   DocumentInput,
   OperationResult,
   OperationContext,
   CombinedError,
-  createRequest,
   Operation,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 import { useClient } from '../context';
 import { deferDispatch, initialState } from './state';

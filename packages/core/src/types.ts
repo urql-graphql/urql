@@ -5,9 +5,9 @@ import type {
   ValueNode,
   TypeNode,
 } from '@0no-co/graphql.web';
-import { Subscription, Source } from 'wonka';
-import { Client } from './client';
-import { CombinedError } from './utils/error';
+import type { Subscription, Source } from 'wonka';
+import type { Client } from './client';
+import type { CombinedError } from './utils/error';
 
 /** A GraphQL `DocumentNode` with attached generics for its result data and variables.
  *

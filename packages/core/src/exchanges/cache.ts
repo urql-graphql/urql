@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { filter, map, merge, pipe, tap } from 'wonka';
 
-import { Client } from '../client';
-import { Exchange, Operation, OperationResult } from '../types';
+import type { Client } from '../client';
+import type { Exchange, Operation, OperationResult } from '../types';
 
 import {
   makeOperation,

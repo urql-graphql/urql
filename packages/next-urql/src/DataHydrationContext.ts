@@ -1,6 +1,6 @@
 import React from 'react';
 import { ServerInsertedHTMLContext } from 'next/navigation';
-import { UrqlResult } from './useUrqlValue';
+import type { UrqlResult } from './useUrqlValue';
 
 interface DataHydrationValue {
   isInjecting: boolean;

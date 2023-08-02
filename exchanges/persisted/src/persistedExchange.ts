@@ -9,9 +9,7 @@ import {
   pipe,
 } from 'wonka';
 
-import {
-  makeOperation,
-  stringifyDocument,
+import type {
   PersistedRequestExtensions,
   TypedDocumentNode,
   OperationResult,
@@ -20,6 +18,7 @@ import {
   Operation,
   OperationContext,
 } from '@urql/core';
+import { makeOperation, stringifyDocument } from '@urql/core';
 
 import { hash } from './sha256';
 

@@ -1,7 +1,8 @@
-import { VNode } from 'preact';
-import { AnyVariables, DocumentInput } from '@urql/core';
+import type { VNode } from 'preact';
+import type { AnyVariables, DocumentInput } from '@urql/core';
 
-import { useMutation, UseMutationState, UseMutationExecute } from '../hooks';
+import type { UseMutationState, UseMutationExecute } from '../hooks';
+import { useMutation } from '../hooks';
 
 /** Props accepted by {@link Mutation}.
  *
