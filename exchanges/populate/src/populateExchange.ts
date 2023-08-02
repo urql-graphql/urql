@@ -1,23 +1,27 @@
-import {
-  buildClientSchema,
+import type {
   FragmentDefinitionNode,
   IntrospectionQuery,
-  isAbstractType,
-  Kind,
-  GraphQLObjectType,
   SelectionNode,
   GraphQLInterfaceType,
-  valueFromASTUntyped,
-  GraphQLScalarType,
   FieldNode,
   InlineFragmentNode,
   FragmentSpreadNode,
   ArgumentNode,
 } from 'graphql';
+import {
+  buildClientSchema,
+  isAbstractType,
+  Kind,
+  GraphQLObjectType,
+  valueFromASTUntyped,
+  GraphQLScalarType,
+} from 'graphql';
 import { pipe, tap, map } from 'wonka';
-import { Exchange, Operation, stringifyVariables } from '@urql/core';
+import type { Exchange, Operation } from '@urql/core';
+import { stringifyVariables } from '@urql/core';
 
-import { getName, GraphQLFlatType, unwrapType } from './helpers/node';
+import type { GraphQLFlatType } from './helpers/node';
+import { getName, unwrapType } from './helpers/node';
 import { traverse } from './helpers/traverse';
 
 /** Configuration options for the {@link populateExchange}'s behaviour */

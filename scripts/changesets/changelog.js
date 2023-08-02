@@ -14,8 +14,7 @@ const getSummaryLines = cs => {
     lines = lines.map(l => l.trim()).filter(Boolean);
     const size = lines.length;
     if (size > 0) {
-      lines[size - 1] = lines[size - 1]
-        .replace(TRAILING_CHAR, '');
+      lines[size - 1] = lines[size - 1].replace(TRAILING_CHAR, '');
     }
   }
   return lines;
@@ -23,12 +22,10 @@ const getSummaryLines = cs => {
 
 /** Creates a "(See X)" string from a template */
 const templateSeeRef = links => {
-  const humanReadableLinks = links
-    .filter(Boolean)
-    .map(link => {
-      if (typeof link === 'string') return link;
-      return link.pull || link.commit;
-    });
+  const humanReadableLinks = links.filter(Boolean).map(link => {
+    if (typeof link === 'string') return link;
+    return link.pull || link.commit;
+  });
 
   const size = humanReadableLinks.length;
   if (size === 0) return '';
@@ -38,10 +35,7 @@ const templateSeeRef = links => {
 };
 
 const changelogFunctions = {
-  getDependencyReleaseLine: async (
-    changesets,
-    dependenciesUpdated,
-  ) => {
+  getDependencyReleaseLine: async (changesets, dependenciesUpdated) => {
     if (dependenciesUpdated.length === 0) return '';
 
     const dependenciesLinks = await Promise.all(
@@ -57,7 +51,7 @@ const changelogFunctions = {
 
         const { links } = await getInfo({
           repo: REPO,
-          commit: cs.commit
+          commit: cs.commit,
         });
 
         return links;
@@ -91,7 +85,7 @@ const changelogFunctions = {
     if (changeset.commit && !pull) {
       const { links } = await getInfo({
         repo: REPO,
-        commit: changeset.commit
+        commit: changeset.commit,
       });
 
       pull = links.pull || undefined;
@@ -122,10 +116,10 @@ const changelogFunctions = {
     }
 
     return str;
-  }
+  },
 };
 
 module.exports = {
   ...changelogFunctions,
-  default: changelogFunctions
+  default: changelogFunctions,
 };

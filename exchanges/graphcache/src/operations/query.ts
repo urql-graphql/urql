@@ -1,15 +1,16 @@
-import { formatDocument, FormattedNode, CombinedError } from '@urql/core';
+import type { FormattedNode, CombinedError } from '@urql/core';
+import { formatDocument } from '@urql/core';
 
-import {
+import type {
   FieldNode,
   DocumentNode,
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
 
+import type { SelectionSet } from '../ast';
 import {
   getSelectionSet,
   getName,
-  SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
   getFragments,
@@ -19,7 +20,7 @@ import {
   getDirectives,
 } from '../ast';
 
-import {
+import type {
   Variables,
   Data,
   DataField,
@@ -30,12 +31,12 @@ import {
 } from '../types';
 
 import { joinKeys, keyOfField } from '../store/keys';
-import { Store } from '../store/store';
+import type { Store } from '../store/store';
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
+import type { Context } from './shared';
 import {
-  Context,
   makeSelectionIterator,
   ensureData,
   makeContext,

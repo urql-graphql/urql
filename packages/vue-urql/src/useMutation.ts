@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { ref, Ref } from 'vue';
-import { DocumentNode } from 'graphql';
+import type { Ref } from 'vue';
+import { ref } from 'vue';
+import type { DocumentNode } from 'graphql';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
-import {
+import type {
   Client,
   AnyVariables,
   TypedDocumentNode,
@@ -12,8 +13,8 @@ import {
   Operation,
   OperationContext,
   OperationResult,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';

@@ -1,5 +1,5 @@
 import { GraphQLError } from '@0no-co/graphql.web';
-import { ErrorLike } from '../types';
+import type { ErrorLike } from '../types';
 
 const generateErrorMessage = (
   networkErr?: Error,

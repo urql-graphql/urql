@@ -1,6 +1,6 @@
 import { gql } from '../gql';
 
-import {
+import type {
   ExecutionResult,
   GraphQLRequest,
   Operation,

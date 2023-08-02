@@ -1,28 +1,23 @@
-import { CombinedError, ErrorLike, FormattedNode } from '@urql/core';
+import type { CombinedError, ErrorLike, FormattedNode } from '@urql/core';
 
-import {
-  Kind,
+import type {
   FieldNode,
   InlineFragmentNode,
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
+import { Kind } from '@0no-co/graphql.web';
 
-import {
-  isDeferred,
-  getTypeCondition,
-  getSelectionSet,
-  getName,
-  SelectionSet,
-} from '../ast';
+import type { SelectionSet } from '../ast';
+import { isDeferred, getTypeCondition, getSelectionSet, getName } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField, currentOperation, currentOptimistic } from '../store/data';
 import { keyOfField } from '../store/keys';
-import { Store } from '../store/store';
+import type { Store } from '../store/store';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
-import {
+import type {
   Fragments,
   Variables,
   DataField,

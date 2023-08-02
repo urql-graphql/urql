@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Client } from '@urql/core';
+import type { Client } from '@urql/core';
 
 /** Function to cache an urql-client across React Server Components.
  *

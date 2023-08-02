@@ -1,11 +1,13 @@
-import { formatDocument, FormattedNode, CombinedError } from '@urql/core';
+import type { FormattedNode, CombinedError } from '@urql/core';
+import { formatDocument } from '@urql/core';
 
-import {
+import type {
   FieldNode,
   DocumentNode,
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
 
+import type { SelectionSet } from '../ast';
 import {
   getFragments,
   getMainOperation,
@@ -14,14 +16,13 @@ import {
   isFieldAvailableOnType,
   getSelectionSet,
   getName,
-  SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
 } from '../ast';
 
 import { invariant, warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
-import {
+import type {
   NullArray,
   Variables,
   Data,
@@ -33,11 +34,11 @@ import {
 } from '../types';
 
 import { joinKeys, keyOfField } from '../store/keys';
-import { Store } from '../store/store';
+import type { Store } from '../store/store';
 import * as InMemoryData from '../store/data';
 
+import type { Context } from './shared';
 import {
-  Context,
   makeSelectionIterator,
   ensureData,
   makeContext,
@@ -268,7 +269,7 @@ const writeSelection = (
 
     // Execute optimistic mutation functions on root fields, or execute recursive functions
     // that have been returned on optimistic objects
-    let resolver: OptimisticMutationResolver | void;
+    let resolver: OptimisticMutationResolver | undefined;
     if (ctx.optimistic && rootField === 'mutation') {
       resolver = ctx.store.optimisticMutations[fieldName];
       if (!resolver) continue;

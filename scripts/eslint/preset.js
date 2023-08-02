@@ -16,7 +16,6 @@ module.exports = {
     'build/',
     'coverage/',
     'benchmark/',
-    'scripts/',
     'docs/',
   ],
 
@@ -28,11 +27,7 @@ module.exports = {
 
   extends: ['eslint:recommended', 'prettier'],
 
-  plugins: [
-    '@typescript-eslint',
-    'prettier',
-    'es5',
-  ],
+  plugins: ['@typescript-eslint', 'prettier', 'es5'],
 
   rules: {
     'no-undef': 'off',
@@ -45,21 +40,27 @@ module.exports = {
     'es5/no-generators': 'off',
     'es5/no-typeof-symbol': 'warn',
 
-    'no-unused-vars': ['warn', {
-      argsIgnorePattern: '^_',
-    }],
+    'no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+      },
+    ],
 
-    'prettier/prettier': ['error', {
-      singleQuote: true,
-      arrowParens: 'avoid',
-      trailingComma: 'es5',
-    }],
+    'prettier/prettier': [
+      'error',
+      {
+        singleQuote: true,
+        arrowParens: 'avoid',
+        trailingComma: 'es5',
+      },
+    ],
   },
 
   overrides: [
     {
       extends: ['plugin:@typescript-eslint/recommended'],
-      files: ['*.ts'],
+      files: ['*.ts', '*.tsx'],
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
@@ -77,23 +78,61 @@ module.exports = {
         'import/no-internal-modules': 'off',
 
         'no-restricted-syntax': [
-          "error",
+          'error',
           {
-            "selector": "PropertyDefinition[value]",
-            "message": "Property definitions with value initializers aren’t transpiled"
+            selector: 'PropertyDefinition[value]',
+            message:
+              'Property definitions with value initializers aren’t transpiled',
+          },
+          {
+            selector: 'MemberExpression[optional=true]',
+            message:
+              'Optional chaining (?.) operator is outside of specified browser support',
+          },
+          {
+            selector: 'LogicalExpression[operator="??"]',
+            message:
+              'Nullish coalescing (??) operator is outside of specified browser support',
+          },
+          {
+            selector: 'AssignmentExpression[operator="??="]',
+            message:
+              'Nullish coalescing assignment (??=) is outside of specified browser support',
+          },
+          {
+            selector: 'SequenceExpression',
+            message:
+              'Sequence expressions are to be avoided since they can be confusing',
+          },
+          {
+            selector:
+              ':not(ForStatement) > VariableDeclaration[declarations.length>1]',
+            message:
+              'Only one variable declarator per variable declaration is preferred',
           },
         ],
 
-        '@typescript-eslint/no-unused-vars': ['error', {
-          argsIgnorePattern: '^_',
-        }],
+        '@typescript-eslint/no-import-type-side-effects': 'error',
+        '@typescript-eslint/consistent-type-imports': [
+          'error',
+          {
+            disallowTypeAnnotations: false,
+            fixStyle: 'separate-type-imports',
+          },
+        ],
+
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            argsIgnorePattern: '^_',
+          },
+        ],
       },
     },
 
     {
-      extends: ['plugin:@typescript-eslint/recommended'],
-      files: ['*.tsx'],
       extends: ['plugin:react/recommended'],
+      files: ['*.tsx'],
       plugins: ['react-hooks'],
       rules: {
         'react-hooks/rules-of-hooks': 'error',
@@ -108,13 +147,16 @@ module.exports = {
       files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
       globals: { vi: true },
       rules: {
+        'no-restricted-syntax': 'off',
         '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/no-import-type-side-effects': 'off',
+        '@typescript-eslint/consistent-type-imports': 'off',
         'react-hooks/rules-of-hooks': 'off',
         'react-hooks/exhaustive-deps': 'off',
         'es5/no-for-of': 'off',
         'es5/no-generators': 'off',
         'es5/no-typeof-symbol': 'off',
-      }
+      },
     },
 
     {

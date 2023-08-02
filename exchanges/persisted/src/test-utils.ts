@@ -1,10 +1,5 @@
-import {
-  gql,
-  GraphQLRequest,
-  OperationContext,
-  Operation,
-  makeOperation,
-} from '@urql/core';
+import type { GraphQLRequest, OperationContext, Operation } from '@urql/core';
+import { gql, makeOperation } from '@urql/core';
 
 const context: OperationContext = {
   fetchOptions: {

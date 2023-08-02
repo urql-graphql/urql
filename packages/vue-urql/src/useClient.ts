@@ -1,5 +1,7 @@
-import { App, getCurrentInstance, inject, provide, Ref, isRef, ref } from 'vue';
-import { Client, ClientOptions } from '@urql/core';
+import type { App, Ref } from 'vue';
+import { getCurrentInstance, inject, provide, isRef, ref } from 'vue';
+import type { ClientOptions } from '@urql/core';
+import { Client } from '@urql/core';
 
 const clientsPerInstance = new WeakMap<{}, Ref<Client>>();
 

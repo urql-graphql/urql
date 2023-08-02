@@ -42,8 +42,9 @@
  * and `split` are the common, cross-compatible base implementations.
  */
 
-import { Source, fromAsyncIterable, onEnd, filter, pipe } from 'wonka';
-import { Operation, OperationResult, ExecutionResult } from '../types';
+import type { Source } from 'wonka';
+import { fromAsyncIterable, onEnd, filter, pipe } from 'wonka';
+import type { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
@@ -153,7 +154,7 @@ async function* fetchOperation(
 ) {
   let networkMode = true;
   let result: OperationResult | null = null;
-  let response: Response | void;
+  let response: Response | undefined;
 
   try {
     // Delay for a tick to give the Client a chance to cancel the request

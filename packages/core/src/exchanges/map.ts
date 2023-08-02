@@ -1,6 +1,6 @@
 import { mergeMap, fromValue, fromPromise, pipe } from 'wonka';
-import { Operation, OperationResult, Exchange } from '../types';
-import { CombinedError } from '../utils';
+import type { Operation, OperationResult, Exchange } from '../types';
+import type { CombinedError } from '../utils';
 
 /** Options for the `mapExchange` allowing it to react to incoming operations, results, or errors. */
 export interface MapExchangeOpts {

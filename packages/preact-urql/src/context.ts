@@ -1,6 +1,6 @@
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
-import { Client } from '@urql/core';
+import type { Client } from '@urql/core';
 
 const OBJ = {};
 

@@ -1,18 +1,20 @@
 import { pipe, share, merge, makeSubject, filter, onPush } from 'wonka';
 
-import {
+import type {
   Operation,
   OperationResult,
   Exchange,
   ExchangeIO,
   CombinedError,
   RequestPolicy,
-  stringifyDocument,
-  createRequest,
-  makeOperation,
 } from '@urql/core';
+import { stringifyDocument, createRequest, makeOperation } from '@urql/core';
 
-import { SerializedRequest, CacheExchangeOpts, StorageAdapter } from './types';
+import type {
+  SerializedRequest,
+  CacheExchangeOpts,
+  StorageAdapter,
+} from './types';
 import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 

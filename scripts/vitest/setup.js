@@ -11,8 +11,12 @@ process.on('unhandledRejection', error => {
 const originalConsole = console;
 global.console = {
   ...originalConsole,
-  warn: vi.SpyInstance = () => { /* noop */ },
-  error: vi.SpyInstance = (message) => { throw new Error(message); }
+  warn: (vi.SpyInstance = () => {
+    /* noop */
+  }),
+  error: (vi.SpyInstance = message => {
+    throw new Error(message);
+  }),
 };
 
 vi.spyOn(console, 'log');

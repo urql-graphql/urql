@@ -1,6 +1,7 @@
 import type { Readable, Writable } from 'svelte/store';
 import type { AnyVariables, OperationResult } from '@urql/core';
-import { Source, make } from 'wonka';
+import type { Source } from 'wonka';
+import { make } from 'wonka';
 
 /** An {@link OperationResult} with an added {@link OperationResultState.fetching} flag.
  *
@@ -10,7 +11,7 @@ import { Source, make } from 'wonka';
  */
 export interface OperationResultState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends OperationResult<Data, Variables> {
   /** Indicates whether the store is waiting for a new {@link OperationResult}.
    *
@@ -28,7 +29,7 @@ export interface OperationResultState<
 /** A Readable store of {@link OperationResultState}. */
 export type OperationResultStore<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = Readable<OperationResultState<Data, Variables>>;
 
 /** Consumes a {@link Readable} as a {@link Source}.

@@ -1,6 +1,7 @@
 import { Kind, parse, print } from '@0no-co/graphql.web';
 import type { DocumentNode, DefinitionNode } from './graphql';
-import { HashValue, phash } from './hash';
+import type { HashValue } from './hash';
+import { phash } from './hash';
 import { stringifyVariables } from './variables';
 
 import type {
@@ -145,7 +146,7 @@ export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
  */
 export const createRequest = <
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   _query: DocumentInput<Data, Variables>,
   _variables: Variables,

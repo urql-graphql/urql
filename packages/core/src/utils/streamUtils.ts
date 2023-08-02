@@ -1,5 +1,6 @@
-import { Sink, Source, subscribe, take, filter, toPromise, pipe } from 'wonka';
-import { OperationResult, OperationResultSource } from '../types';
+import type { Sink, Source } from 'wonka';
+import { subscribe, take, filter, toPromise, pipe } from 'wonka';
+import type { OperationResult, OperationResultSource } from '../types';
 
 /** Patches a `toPromise` method onto the `Source` passed to it.
  * @param source$ - the Wonka {@link Source} to patch.

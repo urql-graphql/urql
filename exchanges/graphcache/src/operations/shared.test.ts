@@ -23,15 +23,13 @@ const ctx = {} as any;
 
 describe('makeSelectionIterator', () => {
   it('emits all fields', () => {
-    const selection = selectionOfDocument(
-      gql`
-        {
-          a
-          b
-          c
-        }
-      `
-    );
+    const selection = selectionOfDocument(gql`
+      {
+        a
+        b
+        c
+      }
+    `);
     const iterate = makeSelectionIterator(
       'Query',
       'Query',

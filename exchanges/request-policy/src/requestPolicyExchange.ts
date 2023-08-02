@@ -1,9 +1,5 @@
-import {
-  makeOperation,
-  Operation,
-  OperationResult,
-  Exchange,
-} from '@urql/core';
+import type { Operation, OperationResult, Exchange } from '@urql/core';
+import { makeOperation } from '@urql/core';
 import { pipe, tap, map } from 'wonka';
 
 const defaultTTL = 5 * 60 * 1000;

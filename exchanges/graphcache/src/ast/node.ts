@@ -1,4 +1,4 @@
-import {
+import type {
   NamedTypeNode,
   NameNode,
   DirectiveNode,
@@ -8,7 +8,7 @@ import {
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
 
-import { FormattedNode } from '@urql/core';
+import type { FormattedNode } from '@urql/core';
 
 export type SelectionSet = readonly FormattedNode<SelectionNode>[];
 

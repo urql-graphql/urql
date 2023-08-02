@@ -1,5 +1,5 @@
+import type { Source } from 'wonka';
 import {
-  Source,
   pipe,
   map,
   filter,
@@ -10,10 +10,7 @@ import {
   merge,
 } from 'wonka';
 
-import {
-  createRequest,
-  makeOperation,
-  makeErrorResult,
+import type {
   Operation,
   OperationContext,
   OperationResult,
@@ -23,6 +20,7 @@ import {
   AnyVariables,
   OperationInstance,
 } from '@urql/core';
+import { createRequest, makeOperation, makeErrorResult } from '@urql/core';
 
 /** Utilities to use while refreshing authentication tokens. */
 export interface AuthUtilities {

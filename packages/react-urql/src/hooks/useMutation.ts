@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
-import {
+import type {
   AnyVariables,
   DocumentInput,
   OperationResult,
   OperationContext,
   CombinedError,
-  createRequest,
   Operation,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 import { useClient } from '../context';
 import { deferDispatch, initialState } from './state';
@@ -26,7 +26,7 @@ import { deferDispatch, initialState } from './state';
  */
 export interface UseMutationState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   /** Indicates whether `useMutation` is currently executing a mutation. */
   fetching: boolean;
@@ -81,7 +81,7 @@ export interface UseMutationState<
  */
 export type UseMutationExecute<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = (
   variables: Variables,
   context?: Partial<OperationContext>
@@ -98,7 +98,7 @@ export type UseMutationExecute<
  */
 export type UseMutationResponse<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = [UseMutationState<Data, Variables>, UseMutationExecute<Data, Variables>];
 
 /** Hook to create a GraphQL mutation, run by passing variables to the returned execute function.
@@ -142,7 +142,7 @@ export type UseMutationResponse<
  */
 export function useMutation<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(query: DocumentInput<Data, Variables>): UseMutationResponse<Data, Variables> {
   const isMounted = React.useRef(true);
   const client = useClient();

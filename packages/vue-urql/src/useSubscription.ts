@@ -1,18 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { Source, pipe, subscribe, onEnd } from 'wonka';
+import type { Source } from 'wonka';
+import { pipe, subscribe, onEnd } from 'wonka';
 
-import {
-  WatchStopHandle,
-  Ref,
-  ref,
-  shallowRef,
-  watchEffect,
-  reactive,
-  isRef,
-} from 'vue';
+import type { WatchStopHandle, Ref } from 'vue';
+import { ref, shallowRef, watchEffect, reactive, isRef } from 'vue';
 
-import {
+import type {
   Client,
   GraphQLRequestParams,
   AnyVariables,
@@ -20,8 +14,8 @@ import {
   CombinedError,
   OperationContext,
   Operation,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 import { unwrapPossibleProxy, updateShallowRef } from './utils';
@@ -36,7 +30,7 @@ type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
  */
 export type UseSubscriptionArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** Prevents {@link useSubscription} from automatically executing GraphQL subscription operations.
    *
@@ -113,7 +107,7 @@ export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
 export interface UseSubscriptionResponse<
   T = any,
   R = T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 > {
   /** Indicates whether `useSubscription`’s subscription is active.
    *
@@ -233,7 +227,7 @@ const watchOptions = {
 export function useSubscription<
   T = any,
   R = T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 >(
   args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>
@@ -244,7 +238,7 @@ export function useSubscription<
 export function callUseSubscription<
   T = any,
   R = T,
-  V extends AnyVariables = AnyVariables
+  V extends AnyVariables = AnyVariables,
 >(
   _args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>,
@@ -311,13 +305,13 @@ export function callUseSubscription<
             }),
             subscribe(result => {
               fetching.value = true;
-              (data.value =
+              data.value =
                 result.data !== undefined
                   ? typeof scanHandler.value === 'function'
                     ? scanHandler.value(data.value as any, result.data!)
                     : result.data
-                  : (result.data as any)),
-                (error.value = result.error);
+                  : (result.data as any);
+              error.value = result.error;
               extensions.value = result.extensions;
               stale.value = !!result.stale;
               operation.value = result.operation;

@@ -1,24 +1,22 @@
-import { DocumentNode } from 'graphql';
-import { AnyVariables, Client, TypedDocumentNode } from '@urql/core';
-import {
-  WatchStopHandle,
-  getCurrentInstance,
-  onMounted,
-  onBeforeUnmount,
-} from 'vue';
+import type { DocumentNode } from 'graphql';
+import type { AnyVariables, Client, TypedDocumentNode } from '@urql/core';
+import type { WatchStopHandle } from 'vue';
+import { getCurrentInstance, onMounted, onBeforeUnmount } from 'vue';
 
 import { useClient } from './useClient';
 
-import { callUseQuery, UseQueryArgs, UseQueryResponse } from './useQuery';
+import type { UseQueryArgs, UseQueryResponse } from './useQuery';
+import { callUseQuery } from './useQuery';
 
-import { callUseMutation, UseMutationResponse } from './useMutation';
+import type { UseMutationResponse } from './useMutation';
+import { callUseMutation } from './useMutation';
 
-import {
-  callUseSubscription,
+import type {
   UseSubscriptionArgs,
   SubscriptionHandlerArg,
   UseSubscriptionResponse,
 } from './useSubscription';
+import { callUseSubscription } from './useSubscription';
 
 /** Handle to create GraphQL operations outside of Vue’s `setup` functions.
  *

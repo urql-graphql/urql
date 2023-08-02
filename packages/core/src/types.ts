@@ -5,9 +5,9 @@ import type {
   ValueNode,
   TypeNode,
 } from '@0no-co/graphql.web';
-import { Subscription, Source } from 'wonka';
-import { Client } from './client';
-import { CombinedError } from './utils/error';
+import type { Subscription, Source } from 'wonka';
+import type { Client } from './client';
+import type { CombinedError } from './utils/error';
 
 /** A GraphQL `DocumentNode` with attached generics for its result data and variables.
  *
@@ -30,7 +30,7 @@ import { CombinedError } from './utils/error';
  */
 export type TypedDocumentNode<
   Result = { [key: string]: any },
-  Variables = { [key: string]: any }
+  Variables = { [key: string]: any },
 > = DocumentNode & {
   /** Type to support `@graphql-typed-document-node/core`
    * @internal
@@ -80,7 +80,7 @@ export type FormattedNode<Node> = Node extends readonly (infer Child)[]
  */
 export type DocumentInput<
   Result = { [key: string]: any },
-  Variables = { [key: string]: any }
+  Variables = { [key: string]: any },
 > = string | DocumentNode | TypedDocumentNode<Result, Variables>;
 
 /** A list of errors on {@link ExecutionResult | ExecutionResults}.
@@ -291,7 +291,7 @@ export type AnyVariables = { [prop: string]: any } | void | undefined;
  */
 export interface GraphQLRequest<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   /** Unique identifier for the `GraphQLRequest`.
    *
@@ -344,7 +344,7 @@ export interface GraphQLRequest<
  */
 export type GraphQLRequestParams<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > =
   | ({
       query: DocumentInput<Data, Variables>;
@@ -589,7 +589,7 @@ export interface OperationContext {
  */
 export interface Operation<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends GraphQLRequest<Data, Variables> {
   /** The `OperationType` describing the kind of `Operation`.
    *
@@ -621,7 +621,7 @@ export interface Operation<
  */
 export interface OperationResult<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > {
   /** The [operation]{@link Operation} which has been executed. */
   /** The `Operation` which this `OperationResult` is for.

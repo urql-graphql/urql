@@ -1,5 +1,5 @@
 import { pipe, tap } from 'wonka';
-import { Exchange, Operation } from '@urql/core';
+import type { Exchange, Operation } from '@urql/core';
 
 /** Exchange factory that reexecutes operations after a user returns to the tab.
  *

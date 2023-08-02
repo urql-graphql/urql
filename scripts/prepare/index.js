@@ -12,24 +12,24 @@ const hasReact = [
   'dependencies',
   'optionalDependencies',
   'peerDependencies',
-].some((dep) => pkg[dep] && pkg[dep].react);
+].some(dep => pkg[dep] && pkg[dep].react);
 
 const hasNext = [
   'dependencies',
   'optionalDependencies',
   'peerDependencies',
-].some((dep) => pkg[dep] && pkg[dep].next);
+].some(dep => pkg[dep] && pkg[dep].next);
 
-const normalize = name => name
-  .replace(/[@\s\/\.]+/g, ' ')
-  .trim()
-  .replace(/\s+/, '-')
-  .toLowerCase();
+const normalize = name =>
+  name
+    .replace(/[@\s/.]+/g, ' ')
+    .trim()
+    .replace(/\s+/, '-')
+    .toLowerCase();
 
 const name = normalize(pkg.name);
 
-const posixPath = x =>
-  path.normalize(x).split(path.sep).join('/');
+const posixPath = x => path.normalize(x).split(path.sep).join('/');
 
 const is = (a, b) => posixPath(a) === posixPath(b);
 
@@ -45,10 +45,7 @@ if (pkg.name.startsWith('@urql/')) {
   );
 }
 
-invariant(
-  !is(cwd, workspaceRoot),
-  'prepare-pkg must be run in a package.'
-);
+invariant(!is(cwd, workspaceRoot), 'prepare-pkg must be run in a package.');
 
 invariant(
   fs.existsSync(pkg.source || 'src/index.ts'),
@@ -83,27 +80,15 @@ invariant(
 );
 
 invariant(
-  is(
-    pkg.repository.directory,
-    path.relative(workspaceRoot, cwd)
-  ),
+  is(pkg.repository.directory, path.relative(workspaceRoot, cwd)),
   'package.json:repository.directory path is invalid'
 );
 
-invariant(
-  pkg.sideEffects === false,
-  'package.json:sideEffects must be false'
-);
+invariant(pkg.sideEffects === false, 'package.json:sideEffects must be false');
 
-invariant(
-  !!pkg.author,
-  'package.json:author must be defined'
-);
+invariant(!!pkg.author, 'package.json:author must be defined');
 
-invariant(
-  pkg.license === 'MIT',
-  'package.json:license must be "MIT"'
-);
+invariant(pkg.license === 'MIT', 'package.json:license must be "MIT"');
 
 invariant(
   Array.isArray(pkg.files) &&
@@ -113,11 +98,20 @@ invariant(
 );
 
 if (hasReact && !hasNext) {
-  invariant(!pkg.exports, 'package.json:exports must not be added for packages depending on React.');
+  invariant(
+    !pkg.exports,
+    'package.json:exports must not be added for packages depending on React.'
+  );
 } else {
-  invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');
+  invariant(
+    !!pkg.exports,
+    'package.json:exports must be added and have a "." entry'
+  );
   invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
-  invariant(!!pkg.exports['./package.json'], 'package.json:exports must have a "./package.json" entry')
+  invariant(
+    !!pkg.exports['./package.json'],
+    'package.json:exports must have a "./package.json" entry'
+  );
 
   for (const key in pkg.exports) {
     const entry = pkg.exports[key];

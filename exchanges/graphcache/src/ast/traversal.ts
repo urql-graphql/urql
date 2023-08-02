@@ -1,17 +1,16 @@
-import {
+import type {
   SelectionNode,
   DocumentNode,
   OperationDefinitionNode,
   FragmentSpreadNode,
   InlineFragmentNode,
-  valueFromASTUntyped,
-  Kind,
 } from '@0no-co/graphql.web';
+import { valueFromASTUntyped, Kind } from '@0no-co/graphql.web';
 
-import { FormattedNode } from '@urql/core';
+import type { FormattedNode } from '@urql/core';
 import { getName, getDirectives } from './node';
 import { invariant } from '../helpers/help';
-import { Fragments, Variables } from '../types';
+import type { Fragments, Variables } from '../types';
 
 function getMainOperation(
   doc: FormattedNode<DocumentNode>

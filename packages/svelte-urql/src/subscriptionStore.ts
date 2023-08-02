@@ -1,13 +1,13 @@
-import {
+import type {
   AnyVariables,
   GraphQLRequestParams,
   Client,
   OperationContext,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
+import type { Source } from 'wonka';
 import {
-  Source,
   pipe,
   map,
   fromValue,
@@ -20,14 +20,12 @@ import {
 
 import { derived, writable } from 'svelte/store';
 
-import {
+import type {
   OperationResultState,
   OperationResultStore,
   Pausable,
-  initialResult,
-  createPausable,
-  fromStore,
 } from './common';
+import { initialResult, createPausable, fromStore } from './common';
 
 /** Combines previous data with an incoming subscription result’s data.
  *
@@ -62,7 +60,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
  */
 export type SubscriptionArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The {@link Client} using which the subscription will be started.
    *
@@ -137,7 +135,7 @@ export type SubscriptionArgs<
 export function subscriptionStore<
   Data,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   args: SubscriptionArgs<Data, Variables>,
   handler?: SubscriptionHandler<Data, Result>

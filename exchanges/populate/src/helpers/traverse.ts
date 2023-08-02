@@ -1,14 +1,13 @@
-import {
+import type {
   SelectionNode,
-  Kind,
   ASTNode,
   DefinitionNode,
   GraphQLSchema,
   GraphQLFieldMap,
-  isAbstractType,
   FragmentDefinitionNode,
   FragmentSpreadNode,
 } from 'graphql';
+import { Kind, isAbstractType } from 'graphql';
 import { unwrapType, getName } from './node';
 
 export function traverse(

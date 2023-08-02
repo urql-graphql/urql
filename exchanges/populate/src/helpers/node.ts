@@ -1,10 +1,5 @@
-import {
-  NameNode,
-  GraphQLOutputType,
-  isWrappingType,
-  GraphQLWrappingType,
-  Kind,
-} from 'graphql';
+import type { NameNode, GraphQLOutputType, GraphQLWrappingType } from 'graphql';
+import { isWrappingType, Kind } from 'graphql';
 
 export type GraphQLFlatType = Exclude<GraphQLOutputType, GraphQLWrappingType>;
 

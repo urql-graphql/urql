@@ -1,9 +1,5 @@
-import {
-  Exchange,
-  makeOperation,
-  Operation,
-  OperationContext,
-} from '@urql/core';
+import type { Exchange, Operation, OperationContext } from '@urql/core';
+import { makeOperation } from '@urql/core';
 
 import { fromPromise, fromValue, mergeMap, pipe } from 'wonka';
 

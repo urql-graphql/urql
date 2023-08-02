@@ -1,4 +1,4 @@
-import {
+import type {
   AnyVariables,
   GraphQLRequest,
   Operation,
@@ -34,7 +34,7 @@ import {
  */
 function makeOperation<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   kind: OperationType,
   request: GraphQLRequest<Data, Variables>,
@@ -43,7 +43,7 @@ function makeOperation<
 
 function makeOperation<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   kind: OperationType,
   request: Operation<Data, Variables>,

@@ -31,13 +31,11 @@ describe('useMutation', () => {
       );
 
     const mutation = reactive(
-      useMutation(
-        gql`
-          mutation {
-            test
-          }
-        `
-      )
+      useMutation(gql`
+        mutation {
+          test
+        }
+      `)
     );
 
     expect(mutation).toMatchObject({

@@ -1,7 +1,7 @@
 /* eslint-disable prefer-rest-params */
 import { Kind } from '@0no-co/graphql.web';
 import type { DocumentNode, DefinitionNode } from './utils/graphql';
-import { AnyVariables, TypedDocumentNode } from './types';
+import type { AnyVariables, TypedDocumentNode } from './types';
 import { keyDocument, stringifyDocument } from './utils';
 
 /** A GraphQL parse function, which may be called as a tagged template literal, returning a parsed {@link DocumentNode}.

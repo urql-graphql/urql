@@ -1,13 +1,13 @@
-import {
+import type {
   FieldNode,
   DirectiveNode,
   OperationDefinitionNode,
-  valueFromASTUntyped,
 } from '@0no-co/graphql.web';
+import { valueFromASTUntyped } from '@0no-co/graphql.web';
 
 import { getName } from './node';
 
-import { Variables } from '../types';
+import type { Variables } from '../types';
 
 /** Evaluates a fields arguments taking vars into account */
 export const getFieldArguments = (

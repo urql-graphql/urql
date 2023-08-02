@@ -2,7 +2,8 @@
 
 import { useMemo, useEffect, useState } from 'preact/hooks';
 
-import { Source, fromValue, makeSubject, pipe, concat, subscribe } from 'wonka';
+import type { Source } from 'wonka';
+import { fromValue, makeSubject, pipe, concat, subscribe } from 'wonka';
 
 type Updater<T> = (input: T) => void;
 

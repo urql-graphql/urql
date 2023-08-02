@@ -1,4 +1,4 @@
-import {
+import type {
   AnyVariables,
   DocumentInput,
   RequestExtensions,
@@ -7,8 +7,8 @@ import {
   ErrorLike,
 } from '@urql/core';
 
-import { DocumentNode, FragmentDefinitionNode } from '@0no-co/graphql.web';
-import { IntrospectionData } from './ast';
+import type { DocumentNode, FragmentDefinitionNode } from '@0no-co/graphql.web';
+import type { IntrospectionData } from './ast';
 
 /** Nullable GraphQL list types of `T`.
  *
@@ -685,7 +685,7 @@ export type CacheExchangeOpts = {
 export type Resolver<
   ParentData = DataFields,
   Args = Variables,
-  Result = ResolverResult
+  Result = ResolverResult,
 > = {
   bivarianceHack(
     parent: ParentData,
@@ -862,7 +862,7 @@ export type MakeFunctional<T> = T extends { __typename: string }
  */
 export type OptimisticMutationResolver<
   Args = Variables,
-  Result = Link<Data> | Scalar
+  Result = Link<Data> | Scalar,
 > = {
   bivarianceHack(
     args: Args,

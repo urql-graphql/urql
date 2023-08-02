@@ -1,13 +1,13 @@
-import { ReactElement } from 'react';
-import { AnyVariables } from '@urql/core';
+import type { ReactElement } from 'react';
+import type { AnyVariables } from '@urql/core';
 
-import {
-  useSubscription,
+import type {
   UseSubscriptionArgs,
   UseSubscriptionState,
   UseSubscriptionExecute,
   SubscriptionHandler,
 } from '../hooks';
+import { useSubscription } from '../hooks';
 
 /** Props accepted by {@link Subscription}.
  *
@@ -24,7 +24,7 @@ import {
 export type SubscriptionProps<
   Data = any,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = UseSubscriptionArgs<Variables, Data> & {
   handler?: SubscriptionHandler<Data, Result>;
   children(arg: SubscriptionState<Result, Variables>): ReactElement<any>;
@@ -39,7 +39,7 @@ export type SubscriptionProps<
  */
 export interface SubscriptionState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > extends UseSubscriptionState<Data, Variables> {
   /** Alias to {@link useSubscription}’s `executeMutation` function. */
   executeSubscription: UseSubscriptionExecute;
@@ -55,7 +55,7 @@ export interface SubscriptionState<
 export function Subscription<
   Data = any,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(props: SubscriptionProps<Data, Result, Variables>): ReactElement<any> {
   const subscription = useSubscription<Data, Result, Variables>(
     props,

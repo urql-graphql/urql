@@ -1,4 +1,8 @@
-import { SerializedEntries, SerializedRequest, StorageAdapter } from '../types';
+import type {
+  SerializedEntries,
+  SerializedRequest,
+  StorageAdapter,
+} from '../types';
 
 const getRequestPromise = <T>(request: IDBRequest<T>): Promise<T> => {
   return new Promise((resolve, reject) => {
@@ -92,12 +96,11 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
 
   const deserializeBatch = (input: string) => {
     const data = {};
-    let char = '',
-      key = '',
-      entry = '',
-      mode = 0,
-      index = 0;
-
+    let char = '';
+    let key = '';
+    let entry = '';
+    let mode = 0;
+    let index = 0;
     while (index < input.length) {
       entry = '';
       while ((char = input[index++]) !== ':' && char) {

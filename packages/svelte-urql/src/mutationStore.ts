@@ -1,19 +1,16 @@
 import { pipe, map, scan, subscribe } from 'wonka';
 import { derived, writable } from 'svelte/store';
 
-import {
+import type {
   AnyVariables,
   GraphQLRequestParams,
   Client,
   OperationContext,
-  createRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
-import {
-  OperationResultState,
-  OperationResultStore,
-  initialResult,
-} from './common';
+import type { OperationResultState, OperationResultStore } from './common';
+import { initialResult } from './common';
 
 /** Input arguments for the {@link mutationStore} function.
  *
@@ -22,7 +19,7 @@ import {
  */
 export type MutationArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The {@link Client} using which the subscription will be started.
    *
@@ -92,7 +89,7 @@ export type MutationArgs<
  */
 export function mutationStore<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(args: MutationArgs<Data, Variables>): OperationResultStore<Data, Variables> {
   const request = createRequest(args.query, args.variables as Variables);
   const operation = args.client.createRequestOperation(

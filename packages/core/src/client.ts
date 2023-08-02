@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
+import type { Source, Subscription } from 'wonka';
 import {
   lazy,
   filter,
@@ -9,7 +10,6 @@ import {
   onStart,
   pipe,
   share,
-  Source,
   take,
   takeUntil,
   takeWhile,
@@ -19,13 +19,12 @@ import {
   fromValue,
   merge,
   map,
-  Subscription,
 } from 'wonka';
 
 import { composeExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
-import {
+import type {
   DocumentInput,
   AnyVariables,
   Exchange,
@@ -288,7 +287,7 @@ export interface Client {
    */
   createRequestOperation<
     Data = any,
-    Variables extends AnyVariables = AnyVariables
+    Variables extends AnyVariables = AnyVariables,
   >(
     kind: OperationType,
     request: GraphQLRequest<Data, Variables>,
@@ -320,7 +319,7 @@ export interface Client {
    */
   executeRequestOperation<
     Data = any,
-    Variables extends AnyVariables = AnyVariables
+    Variables extends AnyVariables = AnyVariables,
   >(
     operation: Operation<Data, Variables>
   ): OperationResultSource<OperationResult<Data, Variables>>;
@@ -480,7 +479,7 @@ export interface Client {
    */
   executeSubscription<
     Data = any,
-    Variables extends AnyVariables = AnyVariables
+    Variables extends AnyVariables = AnyVariables,
   >(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
