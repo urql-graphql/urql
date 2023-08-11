@@ -466,6 +466,13 @@ describe('queuing behavior', () => {
       'cache-first'
     );
 
+    const publishSubscription = pipe(
+      client.executeRequestOperation(queryOperation),
+      subscribe(() => {
+        /*noop*/
+      })
+    );
+
     client.reexecuteOperation(
       makeOperation(queryOperation.kind, queryOperation, {
         ...queryOperation.context,
@@ -486,16 +493,23 @@ describe('queuing behavior', () => {
 
     vi.advanceTimersByTime(1);
 
-    expect(output.length).toBe(3);
+    expect(output.length).toBe(4);
     expect(output[2]).toHaveProperty('data', 2);
     expect(output[2]).toHaveProperty('stale', false);
     expect(output[2]).toHaveProperty('operation.key', queryOperation.key);
+
     expect(output[2]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'cache-first'
+    );
+
+    expect(output[3]).toHaveProperty(
       'operation.context.requestPolicy',
       'network-only'
     );
 
     unsubscribe();
+    publishSubscription.unsubscribe();
   });
 });
 
