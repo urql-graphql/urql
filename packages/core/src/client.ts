@@ -647,6 +647,22 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     } else {
       result$ = pipe(
         result$,
+        // Store replay result
+        onPush(result => {
+          if (result.stale && dispatched.has(operation.key)) {
+            // If the current result has queued up an operation of the same
+            // key, then `stale` refers to it
+            for (const operation of queue) {
+              if (operation.key === result.operation.key) {
+                dispatched.delete(operation.key);
+                break;
+              }
+            }
+          } else if (!result.hasNext) {
+            dispatched.delete(operation.key);
+          }
+          replays.set(operation.key, result);
+        }),
         // Add `stale: true` flag when a new operation is sent for queries
         switchMap(result => {
           const value$ = fromValue(result);
@@ -669,25 +685,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     }
 
     if (operation.kind !== 'mutation') {
+      // Cleanup active states on end of source
       result$ = pipe(
         result$,
-        // Store replay result
-        onPush(result => {
-          if (result.stale) {
-            // If the current result has queued up an operation of the same
-            // key, then `stale` refers to it
-            for (const operation of queue) {
-              if (operation.key === result.operation.key) {
-                dispatched.delete(operation.key);
-                break;
-              }
-            }
-          } else if (!result.hasNext) {
-            dispatched.delete(operation.key);
-          }
-          replays.set(operation.key, result);
-        }),
-        // Cleanup active states on end of source
         onEnd(() => {
           // Delete the active operation handle
           dispatched.delete(operation.key);
@@ -729,6 +729,16 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       if (operation.kind === 'teardown') {
         dispatchOperation(operation);
       } else if (operation.kind === 'mutation' || active.has(operation.key)) {
+        let hasQueuedOperation = false;
+        for (const queuedOperation of queue) {
+          if (queuedOperation.key === operation.key) {
+            hasQueuedOperation = true;
+            break;
+          }
+        }
+        if (!hasQueuedOperation) {
+          dispatched.delete(operation.key);
+        }
         queue.push(operation);
         Promise.resolve().then(dispatchOperation);
       }
