@@ -4,29 +4,20 @@ import {
   type DocumentInput,
   type OperationResult,
   type RequestPolicy,
-  type OperationResultSource,
   createRequest,
 } from '@urql/core';
 import {
-  batch,
   createComputed,
   createMemo,
   createResource,
+  createSignal,
   onCleanup,
 } from 'solid-js';
-import { createStore, unwrap } from 'solid-js/store';
+import { createStore, produce } from 'solid-js/store';
 import { useClient } from './context';
 import { type MaybeAccessor, asAccessor } from '@solid-primitives/utils';
-import {
-  concat,
-  fromValue,
-  makeSubject,
-  map,
-  pipe,
-  scan,
-  subscribe,
-  switchMap,
-} from 'wonka';
+import type { Source, Subscription } from 'wonka';
+import { onEnd, pipe, subscribe } from 'wonka';
 
 /** Triggers {@link createQuery} to execute a new GraphQL query operation.
  *
@@ -63,7 +54,7 @@ export type CreateQueryExecute = (opts?: Partial<OperationContext>) => void;
  */
 export type CreateQueryState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = OperationResult<Data, Variables> & {
   /** Indicates whether `createQuery` is waiting for a new result.
    *
@@ -84,7 +75,7 @@ export type CreateQueryState<
  */
 export type CreateQueryArgs<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The GraphQL query that `createQuery` executes. */
   query: DocumentInput<Data, Variables>;
@@ -139,7 +130,7 @@ export type CreateQueryArgs<
  */
 export type CreateQueryResult<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = [CreateQueryState<Data, Variables>, CreateQueryExecute];
 
 /** Hook to run a GraphQL query and get updated GraphQL results.
@@ -177,19 +168,19 @@ export type CreateQueryResult<
  */
 export const createQuery = <
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   args: CreateQueryArgs<Data, Variables>
 ): CreateQueryResult => {
   const client = useClient();
-  const getContext = asAccessor(args.context),
-    getPause = asAccessor(args.pause),
-    getRequestPolicy = asAccessor(args.requestPolicy),
-    getVariables = asAccessor(args.variables);
+  const getContext = asAccessor(args.context);
+  const getPause = asAccessor(args.pause);
+  const getRequestPolicy = asAccessor(args.requestPolicy);
+  const getVariables = asAccessor(args.variables);
 
-  const resultSourceSubject = makeSubject<
-    OperationResultSource<OperationResult<Data, Variables>> | undefined
-  >();
+  const [source, setSource] = createSignal<
+    Source<OperationResult<Data, Variables>> | undefined
+  >(undefined, { equals: false });
 
   // Combine suspense param coming from context and client with context being priority
   const isSuspense = createMemo(() => {
@@ -220,72 +211,9 @@ export const createQuery = <
   const [result, setResult] =
     createStore<CreateQueryState<Data, Variables>>(initialResult);
 
-  // `createResource` is only way to trigger suspense, suspense handling works as follows:
-  // 1. Calling `dataResource` mounts resource to closes suspense. Thus depending on where it is called
-  // it could mount in same component or parent. For usage convince we call it by proxy when using `data`
-  // 2. After any changes we call `refetch` which results in creation of new promise and depending on `fetching`
-  // value we either discard promise without resolving or resolve it. Discard doesn't result in anything while
-  // resolve finishes suspense
-  const [dataResource, { refetch, mutate }] = createResource<
-    CreateQueryState<Data, Variables>
-  >(() => {
-    return new Promise(resolve => {
-      const got = unwrap(result);
-      if (got.fetching) {
-        return;
-      }
-
-      resolve(got);
-    });
-  });
-
-  const sub = pipe(
-    resultSourceSubject.source,
-    switchMap(subscription$ => {
-      // On pause source is set to undefined
-      if (subscription$ === undefined) {
-        return fromValue({ fetching: false });
-      }
-
-      return concat([
-        // Fetch start state
-        fromValue({ fetching: true, stale: false }),
-        pipe(
-          subscription$,
-          map(({ stale, data, error, extensions, operation }) => ({
-            fetching: false,
-            stale: !!stale,
-            data,
-            error,
-            operation,
-            extensions,
-          }))
-        ),
-        // Fetch finish state
-        fromValue({ fetching: false, stale: false }),
-      ]);
-    }),
-    // Merging partial results into previous
-    scan(
-      (result: CreateQueryState<Data, Variables>, partial: any) => ({
-        ...result,
-        ...partial,
-      }),
-      initialResult
-    ),
-    subscribe(result => {
-      batch(() => {
-        setResult(result);
-        mutate(result);
-        refetch();
-      });
-    })
-  );
-
   createComputed(() => {
-    const pause = getPause();
-    if (pause === true) {
-      resultSourceSubject.next(undefined);
+    if (getPause() === true) {
+      setSource(undefined);
       return;
     }
 
@@ -295,25 +223,95 @@ export const createQuery = <
       ...getContext(),
     };
 
-    resultSourceSubject.next(client.executeQuery(request, context));
+    setSource(() => client.executeQuery(request, context));
   });
 
-  onCleanup(() => sub.unsubscribe());
+  createComputed(() => {
+    const s = source();
+    if (s === undefined) {
+      setResult(
+        produce(draft => {
+          draft.fetching = false;
+          draft.stale = false;
+        })
+      );
 
-  batch(() => {
-    mutate(() => unwrap(result));
-    refetch();
+      return;
+    }
+
+    setResult(
+      produce(draft => {
+        draft.fetching = true;
+        draft.stale = false;
+      })
+    );
+
+    onCleanup(
+      pipe(
+        s,
+        onEnd(() => {
+          setResult(
+            produce(draft => {
+              draft.fetching = false;
+              draft.stale = false;
+            })
+          );
+        }),
+        subscribe(res => {
+          setResult(
+            produce(draft => {
+              draft.data = res.data;
+              draft.stale = !!res.stale;
+              draft.fetching = false;
+              draft.error = res.error;
+              draft.operation = res.operation;
+              draft.extensions = res.extensions;
+            })
+          );
+        })
+      ).unsubscribe
+    );
+  });
+
+  const [dataResource, { refetch }] = createResource<
+    CreateQueryState<Data, Variables>,
+    Source<OperationResult<Data, Variables>> | undefined
+  >(source, source => {
+    let sub: Subscription | void;
+    if (source === undefined) {
+      return Promise.resolve(result);
+    }
+
+    return new Promise<CreateQueryState<Data, Variables>>(resolve => {
+      let hasResult = false;
+      sub = pipe(
+        source,
+        subscribe(() => {
+          if (!result.fetching && !result.stale) {
+            if (sub) sub.unsubscribe();
+            hasResult = true;
+            resolve(result);
+          }
+        })
+      );
+      if (hasResult) {
+        sub.unsubscribe();
+      }
+    });
   });
 
   const executeQuery: CreateQueryExecute = opts => {
     const request = createRequest(args.query, getVariables() as any);
     const context: Partial<OperationContext> = {
-      requestPolicy: opts?.requestPolicy ?? getRequestPolicy(),
+      requestPolicy: getRequestPolicy(),
       ...getContext(),
       ...opts,
     };
 
-    resultSourceSubject.next(client.executeQuery(request, context));
+    setSource(() => client.executeQuery(request, context));
+    if (isSuspense()) {
+      refetch();
+    }
   };
 
   const handler = {
@@ -322,7 +320,12 @@ export const createQuery = <
       prop: keyof CreateQueryState<Data, Variables>
     ): any {
       if (isSuspense() && prop === 'data') {
-        return dataResource()?.data;
+        const resource = dataResource();
+        if (resource !== undefined) {
+          return resource.data;
+        }
+
+        return undefined;
       }
 
       return Reflect.get(target, prop);
