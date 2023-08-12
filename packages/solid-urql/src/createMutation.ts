@@ -5,7 +5,7 @@ import {
   type OperationContext,
   type Operation,
   type OperationResult,
-  CombinedError,
+  type CombinedError,
   createRequest,
 } from '@urql/core';
 import { useClient } from './context';
@@ -13,7 +13,7 @@ import { pipe, onPush, filter, take, toPromise } from 'wonka';
 
 export type CreateMutationState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** Indicates whether `createMutation` is currently executing a mutation. */
   fetching: boolean;
@@ -69,7 +69,7 @@ export type CreateMutationState<
  */
 export type CreateMutationExecute<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = (
   variables: Variables,
   context?: Partial<OperationContext>
@@ -86,10 +86,10 @@ export type CreateMutationExecute<
  */
 export type CreateMutationResult<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = [
   CreateMutationState<Data, Variables>,
-  CreateMutationExecute<Data, Variables>
+  CreateMutationExecute<Data, Variables>,
 ];
 
 /** Hook to create a GraphQL mutation, run by passing variables to the returned execute function.
@@ -131,7 +131,7 @@ export type CreateMutationResult<
  */
 export const createMutation = <
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   query: DocumentInput<Data, Variables>
 ): CreateMutationResult<Data, Variables> => {
@@ -156,7 +156,7 @@ export const createMutation = <
 
     const request = createRequest(query, variables);
     return pipe(
-      client.executeMutation(request, context ?? {}),
+      client.executeMutation(request, context),
       onPush(result => {
         setState({
           fetching: false,

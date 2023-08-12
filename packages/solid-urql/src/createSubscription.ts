@@ -6,7 +6,7 @@ import {
   type OperationContext,
   type OperationResult,
   type OperationResultSource,
-  CombinedError,
+  type CombinedError,
   createRequest,
 } from '@urql/core';
 import { useClient } from './context';
@@ -51,7 +51,7 @@ export type CreateSubscriptionExecute = (
 /** Input arguments for the {@link createSubscription} hook. */
 export type CreateSubscriptionArgs<
   Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** The GraphQL subscription document that `createSubscription` executes. */
   query: DocumentInput<Data, Variables>;
@@ -81,7 +81,7 @@ export type CreateSubscriptionArgs<
 
 export type CreateSubscriptionState<
   Data = any,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = {
   /** Indicates whether `createSubscription`’s subscription is active.
    *
@@ -169,7 +169,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
  */
 export type CreateSubscriptionResult<
   Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 > = [CreateSubscriptionState<Data, Variables>, CreateSubscriptionExecute];
 
 /** Hook to run a GraphQL subscription and get updated GraphQL results.
@@ -212,14 +212,14 @@ export type CreateSubscriptionResult<
 export const createSubscription = <
   Data,
   Result = Data,
-  Variables extends AnyVariables = AnyVariables
+  Variables extends AnyVariables = AnyVariables,
 >(
   args: CreateSubscriptionArgs<Data, Variables>,
   handler?: SubscriptionHandler<Data, Result>
 ): CreateSubscriptionResult<Result, Variables> => {
-  const getContext = asAccessor(args.context),
-    getPause = asAccessor(args.pause),
-    getVariables = asAccessor(args.variables);
+  const getContext = asAccessor(args.context);
+  const getPause = asAccessor(args.pause);
+  const getVariables = asAccessor(args.variables);
 
   const client = useClient();
 
