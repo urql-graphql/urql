@@ -94,7 +94,7 @@ describe('createQuery', () => {
     expect(await findByTestId('value')).not.toBeFalsy();
   });
 
-  it.only('should persist pause after refetch when variable changes', async () => {
+  it('should persist pause after refetch when variable changes', async () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
     const executeQuery = vi

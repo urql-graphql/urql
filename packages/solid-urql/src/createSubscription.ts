@@ -1,4 +1,4 @@
-import { type MaybeAccessor, asAccessor } from '@solid-primitives/utils';
+import { type MaybeAccessor, asAccessor } from './utils';
 import {
   type AnyVariables,
   type DocumentInput,
