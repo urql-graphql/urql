@@ -63,7 +63,6 @@
     "solid-js": "^1.7.7"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^6.2.0",
     "@urql/core": "^4.0.0",
     "wonka": "^6.3.2"
   },
