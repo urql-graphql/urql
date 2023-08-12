@@ -94,6 +94,41 @@ describe('createQuery', () => {
     expect(await findByTestId('value')).not.toBeFalsy();
   });
 
+  it.only('should persist pause after refetch when variable changes', async () => {
+    const subject =
+      makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
+    const executeQuery = vi
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(
+        () => subject.source as OperationResultSource<OperationResult>
+      );
+
+    const [variable, setVariable] = createSignal(1);
+
+    const { result } = renderHook(() =>
+      createQuery<{ variable: number }>({
+        query: '{ test }',
+        pause: true,
+        variables: () => ({
+          variable: variable(),
+        }),
+      })
+    );
+
+    expect(result[0].fetching).toEqual(false);
+
+    result[1]();
+
+    expect(result[0].fetching).toEqual(true);
+    subject.next({ data: { test: true } });
+    expect(result[0].fetching).toEqual(false);
+    expect(executeQuery).toHaveBeenCalledTimes(1);
+
+    setVariable(2);
+    expect(result[0].fetching).toEqual(false);
+    expect(executeQuery).toHaveBeenCalledTimes(1);
+  });
+
   it('should not refetch when paused on variable change', async () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
@@ -154,7 +189,7 @@ describe('createQuery', () => {
     expect(result[0].fetching).toEqual(false);
     expect(executeQuery).not.toBeCalled();
 
-    result[1]();
+    result[1](); // refetch function
 
     expect(result[0].fetching).toEqual(true);
     expect(executeQuery).toHaveBeenCalledOnce();
