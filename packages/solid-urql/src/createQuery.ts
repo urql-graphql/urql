@@ -15,7 +15,7 @@ import {
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { useClient } from './context';
-import { type MaybeAccessor, asAccessor } from '@solid-primitives/utils';
+import { type MaybeAccessor, asAccessor } from './utils';
 import type { Source, Subscription } from 'wonka';
 import { onEnd, pipe, subscribe } from 'wonka';
 
