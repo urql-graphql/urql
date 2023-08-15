@@ -1261,7 +1261,7 @@ describe('optimistic updates', () => {
 });
 
 describe('extra variables', () => {
-  it.only('allows extra variables to be applied to updates', () => {
+  it('allows extra variables to be applied to updates', () => {
     vi.useFakeTimers();
 
     const mutation = gql`
@@ -1320,6 +1320,10 @@ describe('extra variables', () => {
     const forward: ExchangeIO = ops$ =>
       pipe(ops$, delay(3), map(response), share);
 
+    const optimistic = {
+      test: vi.fn() as any,
+    };
+
     const updates = {
       Mutation: {
         test: vi.fn() as any,
@@ -1327,7 +1331,11 @@ describe('extra variables', () => {
     };
 
     pipe(
-      cacheExchange({ updates })({ forward, client, dispatchDebug })(ops$),
+      cacheExchange({ optimistic, updates })({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
       filter(x => x.operation.kind === 'mutation'),
       tap(result),
       publish
@@ -1339,15 +1347,24 @@ describe('extra variables', () => {
     expect(result).toHaveBeenCalledTimes(0);
 
     next(opMutation);
+    vi.advanceTimersByTime(1);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(0);
+    expect(optimistic.test).toHaveBeenCalledTimes(1);
+
+    expect(optimistic.test.mock.calls[0][2].variables).toEqual({
+      test: true,
+      extra: 'extra',
+    });
+
     vi.runAllTimers();
 
     expect(response).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(1);
-    expect(updates.Mutation.test).toHaveBeenCalledTimes(1);
+    expect(updates.Mutation.test).toHaveBeenCalledTimes(2);
 
-    const context = updates.Mutation.test.mock.calls[0][3];
-
-    expect(context.variables).toEqual({
+    expect(updates.Mutation.test.mock.calls[1][3].variables).toEqual({
       test: true,
       extra: 'extra',
     });
