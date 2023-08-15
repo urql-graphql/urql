@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.3.2
+
+### Patch Changes
+
+- ⚠️ Fix extra variables in mutation results regressing by a change made in [#3317](https://github.com/urql-graphql/urql/pull/3317). The original operation wasn't being preserved anymore
+  Submitted by [@kitten](https://github.com/kitten) (See [#3356](https://github.com/urql-graphql/urql/pull/3356))
+
 ## 6.3.1
 
 ### Patch Changes
