@@ -1260,6 +1260,117 @@ describe('optimistic updates', () => {
   });
 });
 
+describe('extra variables', () => {
+  it('allows extra variables to be applied to updates', () => {
+    vi.useFakeTimers();
+
+    const mutation = gql`
+      mutation TestMutation($test: Boolean) {
+        test(test: $test) {
+          id
+        }
+      }
+    `;
+
+    const mutationData = {
+      __typename: 'Mutation',
+      test: {
+        __typename: 'Author',
+        id: '123',
+      },
+    };
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const opQuery = client.createRequestOperation('query', {
+      key: 1,
+      query: queryOne,
+      variables: undefined,
+    });
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+      variables: {
+        test: true,
+        extra: 'extra',
+      },
+    });
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: forwardOp, data: queryOneData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: forwardOp,
+          data: mutationData,
+        };
+      }
+
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(3), map(response), share);
+
+    const optimistic = {
+      test: vi.fn() as any,
+    };
+
+    const updates = {
+      Mutation: {
+        test: vi.fn() as any,
+      },
+    };
+
+    pipe(
+      cacheExchange({ optimistic, updates })({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
+      filter(x => x.operation.kind === 'mutation'),
+      tap(result),
+      publish
+    );
+
+    next(opQuery);
+    vi.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(0);
+
+    next(opMutation);
+    vi.advanceTimersByTime(1);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(0);
+    expect(optimistic.test).toHaveBeenCalledTimes(1);
+
+    expect(optimistic.test.mock.calls[0][2].variables).toEqual({
+      test: true,
+      extra: 'extra',
+    });
+
+    vi.runAllTimers();
+
+    expect(response).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(1);
+    expect(updates.Mutation.test).toHaveBeenCalledTimes(2);
+
+    expect(updates.Mutation.test.mock.calls[1][3].variables).toEqual({
+      test: true,
+      extra: 'extra',
+    });
+  });
+});
+
 describe('custom resolvers', () => {
   it('follows resolvers on initial write', () => {
     const client = createClient({
