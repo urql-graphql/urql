@@ -143,6 +143,7 @@ export const cacheExchange =
 
     // This registers queries with the data layer to ensure commutativity
     const prepareForwardedOperation = (operation: Operation) => {
+      let optimistic = false;
       if (operation.kind === 'query') {
         // Pre-reserve the position of the result layer
         reserveLayer(store.data, operation.key);
@@ -155,22 +156,7 @@ export const cacheExchange =
         // Mark operation layer as done
         noopDataState(store.data, operation.key);
         return operation;
-      }
-
-      const query = formatDocument(operation.query);
-      operation = makeOperation(
-        operation.kind,
-        {
-          key: operation.key,
-          query,
-          variables: operation.variables
-            ? filterVariables(getMainOperation(query), operation.variables)
-            : operation.variables,
-        },
-        { ...operation.context }
-      );
-
-      if (
+      } else if (
         operation.kind === 'mutation' &&
         operation.context.requestPolicy !== 'network-only'
       ) {
@@ -187,21 +173,31 @@ export const cacheExchange =
         if (dependencies.size) {
           // Update blocked optimistic dependencies
           for (const dep of dependencies.values()) blockedDependencies.add(dep);
-
           // Store optimistic dependencies for update
           optimisticKeysToDependencies.set(operation.key, dependencies);
-
           // Update related queries
           const pendingOperations: Operations = new Set();
           collectPendingOperations(pendingOperations, dependencies);
           executePendingOperations(operation, pendingOperations, true);
-
           // Mark operation as optimistic
-          operation.context.optimistic = true;
+          optimistic = true;
         }
       }
 
-      return operation;
+      return makeOperation(
+        operation.kind,
+        {
+          key: operation.key,
+          query: formatDocument(operation.query),
+          variables: operation.variables
+            ? filterVariables(
+                getMainOperation(operation.query),
+                operation.variables
+              )
+            : operation.variables,
+        },
+        { ...operation.context, optimistic }
+      );
     };
 
     // This updates the known dependencies for the passed operation
@@ -250,7 +246,9 @@ export const cacheExchange =
       result: OperationResult,
       pendingOperations: Operations
     ): OperationResult => {
-      const { operation } = result;
+      // Retrieve the original operation to get unfiltered variables
+      const operation =
+        operations.get(result.operation.key) || result.operation;
       if (operation.kind === 'mutation') {
         // Collect previous dependencies that have been written for optimistic updates
         const dependencies = optimisticKeysToDependencies.get(operation.key);
