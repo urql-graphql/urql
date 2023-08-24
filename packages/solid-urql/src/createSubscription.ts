@@ -5,23 +5,13 @@ import {
   type Operation,
   type OperationContext,
   type OperationResult,
-  type OperationResultSource,
   type CombinedError,
   createRequest,
 } from '@urql/core';
 import { useClient } from './context';
-import { createStore } from 'solid-js/store';
-import { createComputed, onCleanup } from 'solid-js';
-import {
-  concat,
-  fromValue,
-  makeSubject,
-  map,
-  pipe,
-  scan,
-  subscribe,
-  switchMap,
-} from 'wonka';
+import { createStore, produce } from 'solid-js/store';
+import { createComputed, createSignal, onCleanup } from 'solid-js';
+import { type Source, onEnd, pipe, subscribe } from 'wonka';
 
 /** Triggers {@link createSubscription} to re-execute a GraphQL subscription operation.
  *
@@ -238,80 +228,72 @@ export const createSubscription = <
     stale: false,
   };
 
-  const resultSourceSubject = makeSubject<
-    OperationResultSource<OperationResult<Data, Variables>> | undefined
-  >();
+  const [source, setSource] = createSignal<
+    Source<OperationResult<Data, Variables>> | undefined
+  >(undefined, { equals: false });
+
   const [state, setState] =
     createStore<CreateSubscriptionState<Result, Variables>>(initialState);
 
-  const sub = pipe(
-    resultSourceSubject.source,
-    switchMap(subscription$ => {
-      if (subscription$ === undefined) {
-        return fromValue({ fetching: false });
-      }
-
-      return concat([
-        fromValue({ fetching: true, stale: false }),
-        pipe(
-          subscription$,
-          map(it => ({
-            fetching: true,
-            stale: !!it.stale,
-            data: it.data,
-            error: it.error,
-            extensions: it.extensions,
-            operation: it.operation,
-          }))
-        ),
-        fromValue({ fetching: false, stale: false }),
-      ]);
-    }),
-    scan((result: CreateSubscriptionState<Result, Variables>, partial: any) => {
-      const data =
-        partial.data !== undefined
-          ? typeof handler === 'function'
-            ? handler(result.data, partial.data)
-            : partial.data
-          : result.data;
-
-      return {
-        ...result,
-        ...partial,
-        data: data,
-      };
-    }, initialState),
-    subscribe(result => {
-      setState(result);
-    })
-  );
-
-  onCleanup(() => {
-    sub.unsubscribe();
-  });
-
   createComputed(() => {
     if (getPause() === true) {
-      resultSourceSubject.next(undefined);
+      setSource(undefined);
       return;
     }
 
-    const ctx = getContext();
-    const req = createRequest(args.query, getVariables() as Variables);
-    resultSourceSubject.next(
-      client.executeSubscription<Data, Variables>(req, ctx)
+    const context = getContext();
+    const request = createRequest(args.query, getVariables() as Variables);
+    setSource(() => client.executeSubscription(request, context));
+  });
+
+  createComputed(() => {
+    const s = source();
+    if (s === undefined) {
+      setState('fetching', false);
+
+      return;
+    }
+
+    setState('fetching', true);
+    onCleanup(
+      pipe(
+        s,
+        onEnd(() => {
+          setState(
+            produce(draft => {
+              draft.fetching = false;
+            })
+          );
+        }),
+        subscribe(res => {
+          setState(
+            produce(draft => {
+              draft.data =
+                res.data !== undefined
+                  ? typeof handler === 'function'
+                    ? handler(draft.data, res.data)
+                    : res.data
+                  : (draft.data as any);
+              draft.stale = !!res.stale;
+              draft.fetching = true;
+              draft.error = res.error;
+              draft.operation = res.operation;
+              draft.extensions = res.extensions;
+            })
+          );
+        })
+      ).unsubscribe
     );
   });
 
   const executeSubscription = (opts?: Partial<OperationContext>) => {
-    const ctx = getContext();
-    const req = createRequest(args.query, getVariables() as Variables);
-    resultSourceSubject.next(
-      client.executeSubscription<Data, Variables>(req, {
-        ...ctx,
-        ...opts,
-      })
-    );
+    const context: Partial<OperationContext> = {
+      ...getContext(),
+      ...opts,
+    };
+    const request = createRequest(args.query, getVariables() as Variables);
+
+    setSource(() => client.executeSubscription(request, context));
   };
 
   return [state, executeSubscription];
