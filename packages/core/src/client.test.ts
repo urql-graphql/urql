@@ -700,6 +700,46 @@ describe('deduplication behavior', () => {
 
     expect(onOperation).toHaveBeenCalledTimes(2);
   });
+
+  it('unblocks operations on call to reexecuteOperation', async () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let hasSent = false;
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        onPush(onOperation),
+        map(op => ({
+          hasNext: false,
+          stale: false,
+          data: 'test',
+          operation: op,
+        })),
+        filter(() => hasSent || !(hasSent = true))
+      );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(0);
+
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('shared sources behavior', () => {
