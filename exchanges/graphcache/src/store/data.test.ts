@@ -13,6 +13,7 @@ describe('garbage collection', () => {
   it('erases orphaned entities', () => {
     InMemoryData.writeRecord('Todo:1', '__typename', 'Todo');
     InMemoryData.writeRecord('Todo:1', 'id', '1');
+    InMemoryData.writeRecord('Todo:2', '__typename', 'Todo');
     InMemoryData.writeRecord('Query', '__typename', 'Query');
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
@@ -27,7 +28,7 @@ describe('garbage collection', () => {
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
 
     expect(InMemoryData.getCurrentDependencies()).toEqual(
-      new Set(['Todo:1', 'Query.todo'])
+      new Set(['Todo:1', 'Todo:2', 'Query.todo'])
     );
   });
 
