@@ -729,6 +729,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       if (operation.kind === 'teardown') {
         dispatchOperation(operation);
       } else if (operation.kind === 'mutation' || active.has(operation.key)) {
+        let queued = false;
+        for (let i = 0; i < queue.length; i++)
+          queued = queued || queue[i].key === operation.key;
+        if (!queued) dispatched.delete(operation.key);
         queue.push(operation);
         Promise.resolve().then(dispatchOperation);
       }
