@@ -1257,6 +1257,145 @@ describe('optimistic updates', () => {
     expect(updates.Mutation.addAuthor).toHaveBeenCalledTimes(2);
     expect(response).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(4);
+    expect(reexec).toHaveBeenCalledTimes(2);
+
+    next(opOne);
+    vi.runAllTimers();
+    expect(result).toHaveBeenCalledTimes(5);
+  });
+
+  it('does not block subsequent query operations', () => {
+    vi.useFakeTimers();
+
+    const authorsQuery = gql`
+      query {
+        authors {
+          id
+          name
+        }
+      }
+    `;
+
+    const authorsQueryData = {
+      __typename: 'Query',
+      authors: [
+        {
+          __typename: 'Author',
+          id: '123',
+          name: 'Author',
+        },
+      ],
+    };
+
+    const mutation = gql`
+      mutation {
+        deleteAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const optimisticMutationData = {
+      __typename: 'Mutation',
+      deleteAuthor: {
+        __typename: 'Author',
+        id: '123',
+        name: '[REDACTED OFFLINE]',
+      },
+    };
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const reexec = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const opOne = client.createRequestOperation('query', {
+      key: 1,
+      query: authorsQuery,
+      variables: undefined,
+    });
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+      variables: undefined,
+    });
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: authorsQueryData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: {
+            __typename: 'Mutation',
+            deleteAuthor: optimisticMutationData.deleteAuthor,
+          },
+        };
+      }
+
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
+
+    const optimistic = {
+      deleteAuthor: vi.fn(() => optimisticMutationData.deleteAuthor) as any,
+    };
+
+    const updates = {
+      Mutation: {
+        deleteAuthor: vi.fn((_data, _, cache) => {
+          cache.invalidate({
+            __typename: 'Author',
+            id: optimisticMutationData.deleteAuthor.id,
+          });
+        }),
+      },
+    };
+
+    pipe(
+      cacheExchange({ optimistic, updates })({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(opOne);
+    vi.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+
+    next(opMutation);
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(optimistic.deleteAuthor).toHaveBeenCalledTimes(1);
+    expect(updates.Mutation.deleteAuthor).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+
+    vi.runAllTimers();
+
+    expect(updates.Mutation.deleteAuthor).toHaveBeenCalledTimes(2);
+    expect(response).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(2);
+    expect(reexec.mock.calls[1][0]).toMatchObject(opOne);
+
+    next(opOne);
+    vi.runAllTimers();
+    expect(result).toHaveBeenCalledTimes(3);
   });
 });
 
