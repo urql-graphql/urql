@@ -238,6 +238,7 @@ const ssr = ssrExchange();
 const client = createClient({
   url: 'https://trygql.formidable.dev/graphql/web-collections',
   exchanges: [cacheExchange, ssr, fetchExchange],
+  suspense: true,
 });
 
 export default function Layout({ children }: React.PropsWithChildren) {
