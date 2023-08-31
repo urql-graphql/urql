@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.1.2
+
+### Patch Changes
+
+- Explicitly unblock `client.reexecuteOperation` calls to allow stalled operations from continuing and re-executing. Previously, this could cause `@urql/exchange-graphcache` to stall if an optimistic mutation led to a cache miss
+  Submitted by [@kitten](https://github.com/kitten) (See [#3363](https://github.com/urql-graphql/urql/pull/3363))
+
 ## 4.1.1
 
 ### Patch Changes
