@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import {
   UrqlProvider,
   ssrExchange,
@@ -8,14 +9,18 @@ import {
   createClient,
 } from '@urql/next';
 
-const ssr = ssrExchange();
-const client = createClient({
-  url: 'https://graphql-pokeapi.graphcdn.app/',
-  exchanges: [cacheExchange, ssr, fetchExchange],
-  suspense: true,
-});
-
 export default function Layout({ children }: React.PropsWithChildren) {
+  const [client, ssr] = useMemo(() => {
+    const ssr = ssrExchange();
+    const client = createClient({
+      url: 'https://graphql-pokeapi.graphcdn.app/',
+      exchanges: [cacheExchange, ssr, fetchExchange],
+      suspense: true,
+    });
+
+    return [client, ssr];
+  }, []);
+
   return (
     <UrqlProvider client={client} ssr={ssr}>
       {children}
