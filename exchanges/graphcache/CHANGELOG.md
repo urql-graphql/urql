@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.3.3
+
+### Patch Changes
+
+- ⚠️ Fix a typo that caused an inverted condition, for checking owned data, to cause incorrect results when handling `null` values and encountering them first
+  Submitted by [@kitten](https://github.com/kitten) (See [#3371](https://github.com/urql-graphql/urql/pull/3371))
+
 ## 6.3.2
 
 ### Patch Changes
