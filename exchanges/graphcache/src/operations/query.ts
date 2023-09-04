@@ -609,7 +609,7 @@ const resolveResolverResult = (
     return hasChanged ? data : prevData;
   } else if (result === null || result === undefined) {
     return result;
-  } else if (!isOwnedData && prevData === null) {
+  } else if (isOwnedData && prevData === null) {
     return null;
   } else if (isDataOrKey(result)) {
     const data = (prevData || InMemoryData.makeData(prevData)) as Data;
