@@ -268,6 +268,76 @@ describe('Query', () => {
     expect(console.error).not.toHaveBeenCalled();
   });
 
+  it('should not allow subsequent reads when first result was null (with resolvers)', () => {
+    const QUERY_WRITE = gql`
+      query writeTodos {
+        __typename
+        todos {
+          __typename
+          ...ValidRead
+        }
+      }
+
+      fragment ValidRead on Todo {
+        id
+      }
+    `;
+
+    const QUERY_READ = gql`
+      query getTodos {
+        __typename
+        todos {
+          __typename
+          ...MissingRead
+        }
+        todos {
+          __typename
+          id
+        }
+      }
+
+      fragment MissingRead on Todo {
+        id
+        text
+      }
+    `;
+
+    const store = new Store({
+      schema,
+      resolvers: {
+        Query: {
+          todos: (_parent, _args, cache) => cache.resolve('Query', 'todos'),
+        },
+      },
+    });
+
+    let { data } = query(store, { query: QUERY_READ });
+    expect(data).toEqual(null);
+
+    write(
+      store,
+      { query: QUERY_WRITE },
+      {
+        todos: [
+          {
+            __typename: 'Todo',
+            id: '0',
+          },
+        ],
+        __typename: 'Query',
+      }
+    );
+
+    ({ data } = query(store, { query: QUERY_READ }));
+    expect(data).toEqual({
+      __typename: 'Query',
+      todos: [null],
+    });
+
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
   it('should not mix references', () => {
     const QUERY_WRITE = gql`
       query writeTodos {
