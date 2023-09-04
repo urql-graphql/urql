@@ -318,7 +318,7 @@ server-component on the client needs refreshing. You can forcefully
 tell the server to do so by using the Next router and calling `.refresh()`.
 
 ```tsx
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Todo = () => {
   const router = useRouter();
