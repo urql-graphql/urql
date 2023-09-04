@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "6.3.2",
+  "version": "6.3.3",
   "description": "A normalized and configurable cache exchange for urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/graphcache",
