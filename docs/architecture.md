@@ -193,7 +193,7 @@ Some more exchanges that we can use with our `Client` are:
 - [`ssrExchange`](./advanced/server-side-rendering.md): Allows for a server-side renderer to
   collect results for client-side rehydration.
 - [`retryExchange`](./advanced/retry-operations.md): Allows operations to be retried on errors
-- [`persistedFetchExchange`](./advanced/persistence-and-uploads.md#automatic-persisted-queries): Provides support for Automatic
+- [`persistedExchange`](./advanced/persistence-and-uploads.md#automatic-persisted-queries): Provides support for Automatic
   Persisted Queries
 - [`authExchange`](./advanced/authentication.md): Allows refresh authentication to be implemented easily.
 - [`requestPolicyExchange`](./api/request-policy-exchange.md): Automatically refreshes results given a TTL.
