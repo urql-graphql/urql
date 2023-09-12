@@ -30,5 +30,5 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React Native app with a client set up in [`src/App.js`](src/App.js)
+- The `urql` bindings and a React Native app with a client set up in [`App.js`](./App.js)
 - A query for pokémon in [`src/screens/PokemonList.js`](src/screens/PokemonList.js)
