@@ -237,14 +237,17 @@ export function makeFetchSource(
   fetchOptions: RequestInit
 ): Source<OperationResult> {
   let abortController: AbortController | void;
+  function abort() {
+    if (abortController) abortController.abort();
+  }
   if (typeof AbortController !== 'undefined') {
+    if (fetchOptions.signal)
+      fetchOptions.signal.addEventListener('abort', abort, { once: true });
     fetchOptions.signal = (abortController = new AbortController()).signal;
   }
   return pipe(
     fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
     filter((result): result is OperationResult => !!result),
-    onEnd(() => {
-      if (abortController) abortController.abort();
-    })
+    onEnd(abort)
   );
 }
