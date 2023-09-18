@@ -222,6 +222,7 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
         ops$,
         filter(
           operation =>
+            operation.kind === 'teardown' ||
             !data[operation.key] ||
             !!data[operation.key]!.hasNext ||
             operation.context.requestPolicy === 'network-only'
@@ -236,6 +237,7 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
         ops$,
         filter(
           operation =>
+            operation.kind !== 'teardown' &&
             !!data[operation.key] &&
             operation.context.requestPolicy !== 'network-only'
         ),
