@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.1.3
+
+### Patch Changes
+
+- ⚠️ Fix missing `teardown` operation handling in the `ssrExchange`. This could lead to duplicate network operations being executed
+  Submitted by [@kitten](https://github.com/kitten) (See [#3386](https://github.com/urql-graphql/urql/pull/3386))
+
 ## 4.1.2
 
 ### Patch Changes
