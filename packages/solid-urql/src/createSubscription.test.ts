@@ -1,4 +1,5 @@
-import { renderHook, waitFor } from '@solidjs/testing-library';
+// @vitest-environment jsdom
+
 import {
   OperationResult,
   OperationResultSource,
@@ -6,10 +7,13 @@ import {
   createRequest,
   gql,
 } from '@urql/core';
+
 import { expect, it, describe, vi } from 'vitest';
+import { renderHook, waitFor } from '@solidjs/testing-library';
 import { makeSubject } from 'wonka';
-import { createSubscription } from './createSubscription';
 import { createSignal } from 'solid-js';
+
+import { createSubscription } from './createSubscription';
 
 const QUERY = gql`
   subscription {
@@ -22,12 +26,9 @@ const client = createClient({
   exchanges: [],
   suspense: false,
 });
-vi.mock('./context', () => {
-  const useClient = () => {
-    return client!;
-  };
 
-  return { useClient };
+vi.mock('./context', () => {
+  return { useClient: () => client };
 });
 
 describe('createSubscription', () => {
@@ -129,11 +130,11 @@ describe('createSubscription', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const [pause, setPause] = createSignal<boolean>(true);
+    const [pause, setPause] = createSignal(true);
     const { result } = renderHook(() =>
       createSubscription<{ value: number }, { variable: number }>({
         query: QUERY,
-        pause: pause,
+        pause,
       })
     );
 

@@ -1,17 +1,21 @@
-import { type MaybeAccessor, asAccessor } from './utils';
-import {
-  type AnyVariables,
-  type DocumentInput,
-  type Operation,
-  type OperationContext,
-  type OperationResult,
-  type CombinedError,
-  createRequest,
+import type {
+  AnyVariables,
+  DocumentInput,
+  Operation,
+  OperationContext,
+  OperationResult,
+  CombinedError,
 } from '@urql/core';
-import { useClient } from './context';
+import { createRequest } from '@urql/core';
+
+import type { MaybeAccessor } from './utils';
+import { asAccessor } from './utils';
 import { createStore, produce } from 'solid-js/store';
 import { createComputed, createSignal, onCleanup } from 'solid-js';
-import { type Source, onEnd, pipe, subscribe } from 'wonka';
+import type { Source } from 'wonka';
+import { onEnd, pipe, subscribe } from 'wonka';
+
+import { useClient } from './context';
 
 /** Triggers {@link createSubscription} to re-execute a GraphQL subscription operation.
  *

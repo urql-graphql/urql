@@ -22,7 +22,7 @@
     "noUnusedLocals": true,
     "noEmit": true,
     "lib": ["dom", "esnext"],
-    "jsx": "react",
+    "jsx": "preserve",
     "module": "es2015",
     "moduleResolution": "node",
     "target": "esnext",

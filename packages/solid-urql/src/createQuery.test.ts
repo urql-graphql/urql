@@ -1,29 +1,26 @@
+// @vitest-environment jsdom
+
 import { expect, it, describe, vi } from 'vitest';
-import { createQuery } from './createQuery';
+import { OperationResult, OperationResultSource } from '@urql/core';
 import { render, renderHook, waitFor } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
 import { Show, Suspense, createSignal } from 'solid-js';
+import h from 'solid-js/h';
 import { makeSubject } from 'wonka';
-import { OperationResult, OperationResultSource } from '@urql/core';
-import '@testing-library/jest-dom';
+
+import { createQuery } from './createQuery';
 
 const client = createClient({
   url: '/graphql',
   exchanges: [],
   suspense: false,
 });
-vi.mock('./context', () => {
-  const useClient = () => {
-    return client!;
-  };
 
-  return { useClient };
+vi.mock('./context', () => {
+  return { useClient: () => client };
 });
 
-type AppProps = {
-  suspense?: boolean;
-};
-const App = (props: AppProps) => {
+const App = (props: { suspense?: boolean }) => {
   const [resource, refetch] = createQuery<
     { test: boolean },
     { variable: number }
@@ -34,18 +31,24 @@ const App = (props: AppProps) => {
     },
   });
 
-  return (
-    <Suspense fallback={<span data-testid="loading">loading</span>}>
-      <Show when={resource.data}>
-        {data => <span data-testid="value">{data().test}</span>}
-      </Show>
-      <button
-        data-testid="refetch"
-        onClick={() => refetch({ variables: { variable: 1 } })}
-      >
-        refetch
-      </button>
-    </Suspense>
+  return h(
+    Suspense,
+    {
+      fallback: h('span', { 'data-testid': 'loading' }, 'loading'),
+    },
+    [
+      h(Show, { when: resource.data }, data =>
+        h('span', { 'data-testid': 'value' }, data().test)
+      ),
+      h(
+        'button',
+        {
+          'data-testid': 'refetch',
+          onClick: () => refetch({ variables: { variable: 1 } }),
+        },
+        'refetch'
+      ),
+    ]
   );
 };
 
@@ -57,18 +60,18 @@ describe('createQuery', () => {
       () => subject.source as OperationResultSource<OperationResult>
     );
 
-    const { findByTestId } = render(() => <App suspense={false} />);
+    const { findByTestId } = render(() => h(App, { suspense: false }));
 
     subject.next({ data: { test: true } });
-    waitFor(async () =>
-      expect((await findByTestId('value')).innerText).toStrictEqual('true')
-    );
+
+    expect((await findByTestId('value')).innerText).toStrictEqual('true');
 
     const refetch = await findByTestId('refetch');
     refetch.click();
 
     subject.next({ data: { test: true } });
-    waitFor(async () =>
+
+    await waitFor(async () =>
       expect((await findByTestId('value')).innerText).toStrictEqual('true')
     );
   });
@@ -80,7 +83,7 @@ describe('createQuery', () => {
       () => subject.source as OperationResultSource<OperationResult>
     );
 
-    const { findByTestId } = render(() => <App suspense={true} />);
+    const { findByTestId } = render(() => h(App, { suspense: true }));
 
     expect(await findByTestId('loading')).not.toBeFalsy();
     subject.next({ data: { test: true } });
@@ -272,6 +275,6 @@ describe('createQuery', () => {
     );
 
     cleanup();
-    waitFor(() => expect(result[0].fetching).toEqual(false));
+    await waitFor(() => expect(result[0].fetching).toEqual(false));
   });
 });

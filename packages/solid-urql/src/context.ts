@@ -4,8 +4,7 @@ import { createContext, useContext } from 'solid-js';
 export const Context = createContext<Client>();
 export const Provider = Context.Provider;
 
-export type UseClient = () => Client;
-export const useClient: UseClient = () => {
+export const useClient = (): Client => {
   const client = useContext(Context);
 
   if (process.env.NODE_ENV !== 'production' && client === undefined) {

@@ -40,7 +40,7 @@
     "dist/"
   ],
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --config ../../vitest.config.ts",
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -50,7 +50,6 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.2",
-    "@testing-library/jest-dom": "^5.16.5",
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
     "jsdom": "^22.1.0",

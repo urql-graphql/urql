@@ -1,11 +1,12 @@
-import {
-  type AnyVariables,
-  type OperationContext,
-  type DocumentInput,
-  type OperationResult,
-  type RequestPolicy,
-  createRequest,
+import type {
+  AnyVariables,
+  OperationContext,
+  DocumentInput,
+  OperationResult,
+  RequestPolicy,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
+
 import {
   createComputed,
   createMemo,
@@ -13,6 +14,7 @@ import {
   createSignal,
   onCleanup,
 } from 'solid-js';
+
 import { createStore, produce } from 'solid-js/store';
 import { useClient } from './context';
 import { type MaybeAccessor, asAccessor } from './utils';
@@ -29,11 +31,11 @@ import { onEnd, pipe, subscribe } from 'wonka';
  * and get a new network result, by passing a new request policy.
  *
  * ```ts
- * const [result, reExecuteQuery] = createQuery({ query });
+ * const [result, reexecuteQuery] = createQuery({ query });
  *
  * const refresh = () => {
  *   // Re-execute the query with a network-only policy, skipping the cache
- *   reExecuteQuery({ requestPolicy: 'network-only' });
+ *   reexecuteQuery({ requestPolicy: 'network-only' });
  * };
  * ```
  *

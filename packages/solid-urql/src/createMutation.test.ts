@@ -1,13 +1,17 @@
-import { renderHook } from '@solidjs/testing-library';
-import { expect, it, describe, vi } from 'vitest';
-import { createMutation } from './createMutation';
+// @vitest-environment jsdom
+
 import {
   OperationResult,
   OperationResultSource,
   createClient,
   gql,
 } from '@urql/core';
+
+import { expect, it, describe, vi } from 'vitest';
+import { renderHook } from '@solidjs/testing-library';
 import { makeSubject } from 'wonka';
+
+import { createMutation } from './createMutation';
 
 const QUERY = gql`
   mutation {
