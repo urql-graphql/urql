@@ -114,6 +114,8 @@ export interface RequestExtensions {
   [extension: string]: any;
 }
 
+type Path = readonly (string | number)[];
+
 /** Incremental Payloads sent as part of "Incremental Delivery" patching prior result data.
  *
  * @remarks
@@ -139,7 +141,7 @@ export interface IncrementalPayload {
    * entry of the `path` will be an index number at which to start setting the range of
    * items.
    */
-  path?: readonly (string | number)[];
+  path?: Path;
   /** An id pointing at an entry in the "pending" set of deferred results
    *
    * @remarks
@@ -148,7 +150,7 @@ export interface IncrementalPayload {
    */
   id?: string;
   /** A path array from the defer/stream fragment to the location of our data. */
-  subPath?: readonly (string | number)[];
+  subPath?: Path;
   /** Data to patch into the result data at the given `path`.
    *
    * @remarks
@@ -181,6 +183,12 @@ export interface IncrementalPayload {
   extensions?: Extensions;
 }
 
+type PendingIncrementalResult = {
+  path: Path;
+  id: string;
+  label?: string;
+};
+
 export interface ExecutionResult {
   /** Payloads we are still waiting for from the server.
    *
@@ -189,11 +197,7 @@ export interface ExecutionResult {
    * Pending can be present on both Incremental as well as normal execution results, the presence of pending on an incremental
    * result points at a nested deferred/streamed fragment.
    */
-  pending?: Array<{
-    path: readonly (string | number)[];
-    id: string;
-    label?: string;
-  }>;
+  pending?: readonly PendingIncrementalResult[];
   /** Incremental patches to be applied to a previous result as part of "Incremental Delivery".
    *
    * @remarks
