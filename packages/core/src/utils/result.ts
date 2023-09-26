@@ -116,9 +116,8 @@ export const mergeResultPatch = (
       let path: readonly (string | number)[] = [];
       if (patch.path) {
         path = patch.path;
-      } else if (pending && patch.completed) {
-        const completed = patch.completed[incremental.indexOf(patch)];
-        const res = pending.find(pendingRes => pendingRes.id === completed.id);
+      } else if (pending) {
+        const res = pending.find(pendingRes => pendingRes.id === patch.id);
         if (patch.subPath) {
           path = [...res!.path, ...patch.subPath];
         } else {

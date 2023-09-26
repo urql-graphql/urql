@@ -177,8 +177,10 @@ async function* fetchOperation(
 
     let pending: ExecutionResult['pending'];
     for await (const payload of results) {
-      if (payload.pending) {
+      if (payload.pending && !result) {
         pending = payload.pending;
+      } else if (payload.pending) {
+        pending = [...pending!, ...payload.pending];
       }
       result = result
         ? mergeResultPatch(result, payload, response, pending)

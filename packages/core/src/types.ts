@@ -140,7 +140,7 @@ export interface IncrementalPayload {
    * items.
    */
   path?: readonly (string | number)[];
-  completed?: Array<{ id: string }>;
+  id?: string;
   subPath?: readonly (string | number)[];
   /** Data to patch into the result data at the given `path`.
    *
