@@ -1,5 +1,5 @@
 ---
-"@urql/core": minor
+"@urql/core": patch
 ---
 
-implement new defer/stream spec
+Implement new `@defer` / `@stream` transport protocol spec changes.
