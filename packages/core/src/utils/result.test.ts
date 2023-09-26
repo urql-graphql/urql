@@ -38,7 +38,125 @@ describe('makeResult', () => {
   });
 });
 
-describe('mergeResultPatch', () => {
+describe('mergeResultPatch (defer/stream latest', () => {
+  it('should read pending and append the result', () => {
+    const pending = [{ id: '0', path: [] }];
+    const prevResult: OperationResult = {
+      operation: queryOperation,
+      stale: false,
+      hasNext: true,
+      data: {
+        f2: {
+          a: 'a',
+          b: 'b',
+          c: {
+            d: 'd',
+            e: 'e',
+            f: { h: 'h', i: 'i' },
+          },
+        },
+      },
+    };
+
+    const merged = mergeResultPatch(
+      prevResult,
+      {
+        incremental: [
+          { id: '0', data: { MyFragment: 'Query' } },
+          { id: '0', subPath: ['f2', 'c', 'f'], data: { j: 'j' } },
+        ],
+        // TODO: not sure if we need this but it's part of the spec
+        // completed: [{ id: '0' }],
+        hasNext: false,
+      },
+      undefined,
+      pending
+    );
+
+    expect(merged.data).toEqual({
+      MyFragment: 'Query',
+      f2: {
+        a: 'a',
+        b: 'b',
+        c: {
+          d: 'd',
+          e: 'e',
+          f: { h: 'h', i: 'i', j: 'j' },
+        },
+      },
+    });
+  });
+
+  it('should read pending and append the result w/ overlapping fields', () => {
+    const pending = [
+      { id: '0', path: [], label: 'D1' },
+      { id: '1', path: ['f2', 'c', 'f'], label: 'D2' },
+    ];
+    const prevResult: OperationResult = {
+      operation: queryOperation,
+      stale: false,
+      hasNext: true,
+      data: {
+        f2: {
+          a: 'A',
+          b: 'B',
+          c: {
+            d: 'D',
+            e: 'E',
+            f: {
+              h: 'H',
+              i: 'I',
+            },
+          },
+        },
+      },
+    };
+
+    const merged = mergeResultPatch(
+      prevResult,
+      {
+        incremental: [
+          { id: '0', subPath: ['f2', 'c', 'f'], data: { j: 'J', k: 'K' } },
+        ],
+        pending: [{ id: '1', path: ['f2', 'c', 'f'], label: 'D2' }],
+        hasNext: true,
+      },
+      undefined,
+      pending
+    );
+
+    const merged2 = mergeResultPatch(
+      merged,
+      {
+        incremental: [{ id: '1', data: { l: 'L', m: 'M' } }],
+        hasNext: false,
+      },
+      undefined,
+      pending
+    );
+
+    expect(merged2.data).toEqual({
+      f2: {
+        a: 'A',
+        b: 'B',
+        c: {
+          d: 'D',
+          e: 'E',
+          f: {
+            h: 'H',
+            i: 'I',
+            j: 'J',
+            k: 'K',
+            l: 'L',
+            m: 'M',
+          },
+        },
+      },
+    });
+  });
+});
+
+describe('mergeResultPatch (defer/stream pre June-2023)', () => {
   it('should default hasNext to true if the last result was set to true', () => {
     const prevResult: OperationResult = {
       operation: subscriptionOperation,

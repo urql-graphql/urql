@@ -114,6 +114,8 @@ export interface RequestExtensions {
   [extension: string]: any;
 }
 
+type Path = readonly (string | number)[];
+
 /** Incremental Payloads sent as part of "Incremental Delivery" patching prior result data.
  *
  * @remarks
@@ -139,7 +141,16 @@ export interface IncrementalPayload {
    * entry of the `path` will be an index number at which to start setting the range of
    * items.
    */
-  path: readonly (string | number)[];
+  path?: Path;
+  /** An id pointing at an entry in the "pending" set of deferred results
+   *
+   * @remarks
+   * When we resolve this id it will give us the path to the deferred Fragment, this
+   * can be afterwards combined with the subPath to get the eventual location of the data.
+   */
+  id?: string;
+  /** A path array from the defer/stream fragment to the location of our data. */
+  subPath?: Path;
   /** Data to patch into the result data at the given `path`.
    *
    * @remarks
@@ -172,7 +183,21 @@ export interface IncrementalPayload {
   extensions?: Extensions;
 }
 
+type PendingIncrementalResult = {
+  path: Path;
+  id: string;
+  label?: string;
+};
+
 export interface ExecutionResult {
+  /** Payloads we are still waiting for from the server.
+   *
+   * @remarks
+   * This was nely introduced in the defer/stream spec iteration of June 2023 https://github.com/graphql/defer-stream-wg/discussions/69
+   * Pending can be present on both Incremental as well as normal execution results, the presence of pending on an incremental
+   * result points at a nested deferred/streamed fragment.
+   */
+  pending?: readonly PendingIncrementalResult[];
   /** Incremental patches to be applied to a previous result as part of "Incremental Delivery".
    *
    * @remarks
