@@ -38,7 +38,7 @@ describe('makeResult', () => {
   });
 });
 
-describe.only('mergeResultPatch (defer/stream latest', () => {
+describe('mergeResultPatch (defer/stream latest', () => {
   it('should read pending and append the result', () => {
     const pending = [{ id: '0', path: [] }];
     const prevResult: OperationResult = {
