@@ -139,7 +139,9 @@ export interface IncrementalPayload {
    * entry of the `path` will be an index number at which to start setting the range of
    * items.
    */
-  path: readonly (string | number)[];
+  path?: readonly (string | number)[];
+  completed?: Array<{ id: string }>;
+  subPath?: readonly (string | number)[];
   /** Data to patch into the result data at the given `path`.
    *
    * @remarks
@@ -173,6 +175,12 @@ export interface IncrementalPayload {
 }
 
 export interface ExecutionResult {
+  /** Payloads we are still waiting for from the server.
+   *
+   * @remarks
+   * This was nely introduced in the defer/stream spec iteration of June 2023 https://github.com/graphql/defer-stream-wg/discussions/69
+   */
+  pending?: Array<{ path: readonly (string | number)[]; id: string }>;
   /** Incremental patches to be applied to a previous result as part of "Incremental Delivery".
    *
    * @remarks

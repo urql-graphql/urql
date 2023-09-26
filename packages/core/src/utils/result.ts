@@ -85,7 +85,8 @@ const deepMerge = (target: any, source: any) => {
 export const mergeResultPatch = (
   prevResult: OperationResult,
   nextResult: ExecutionResult,
-  response?: any
+  response?: any,
+  pending?: ExecutionResult['pending']
 ): OperationResult => {
   let errors = prevResult.error ? prevResult.error.graphQLErrors : [];
   let hasExtensions = !!prevResult.extensions || !!nextResult.extensions;
@@ -112,7 +113,20 @@ export const mergeResultPatch = (
 
       let prop: string | number = 'data';
       let part: Record<string, any> | Array<any> = withData;
-      for (let i = 0, l = patch.path.length; i < l; prop = patch.path[i++]) {
+      let path: readonly (string | number)[] = [];
+      if (patch.path) {
+        path = patch.path;
+      } else if (pending && patch.completed) {
+        const completed = patch.completed[incremental.indexOf(patch)];
+        const res = pending.find(pendingRes => pendingRes.id === completed.id);
+        if (patch.subPath) {
+          path = [...res!.path, ...patch.subPath];
+        } else {
+          path = res!.path;
+        }
+      }
+
+      for (let i = 0, l = path.length; i < l; prop = path[i++]) {
         part = part[prop] = Array.isArray(part[prop])
           ? [...part[prop]]
           : { ...part[prop] };

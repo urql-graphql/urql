@@ -175,9 +175,13 @@ async function* fetchOperation(
       throw new Error(await response.text());
     }
 
+    let pending: ExecutionResult['pending'];
     for await (const payload of results) {
+      if (payload.pending) {
+        pending = payload.pending;
+      }
       result = result
-        ? mergeResultPatch(result, payload, response)
+        ? mergeResultPatch(result, payload, response, pending)
         : makeResult(operation, payload, response);
       networkMode = false;
       yield result;
