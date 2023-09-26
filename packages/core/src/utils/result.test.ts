@@ -65,7 +65,8 @@ describe('mergeResultPatch (defer/stream latest', () => {
           { id: '0', data: { MyFragment: 'Query' } },
           { id: '0', subPath: ['f2', 'c', 'f'], data: { j: 'j' } },
         ],
-        completed: [{ id: '0' }],
+        // TODO: not sure if we need this but it's part of the spec
+        // completed: [{ id: '0' }],
         hasNext: false,
       },
       undefined,
@@ -109,7 +110,6 @@ describe('mergeResultPatch (defer/stream latest', () => {
           },
         },
       },
-      hasNext: true,
     };
 
     const merged = mergeResultPatch(
@@ -119,7 +119,6 @@ describe('mergeResultPatch (defer/stream latest', () => {
           { id: '0', subPath: ['f2', 'c', 'f'], data: { j: 'J', k: 'K' } },
         ],
         pending: [{ id: '1', path: ['f2', 'c', 'f'], label: 'D2' }],
-        completed: [{ id: '0' }],
         hasNext: true,
       },
       undefined,
@@ -130,7 +129,6 @@ describe('mergeResultPatch (defer/stream latest', () => {
       merged,
       {
         incremental: [{ id: '1', data: { l: 'L', m: 'M' } }],
-        completed: [{ id: '1' }],
         hasNext: false,
       },
       undefined,

@@ -189,7 +189,11 @@ export interface ExecutionResult {
    * Pending can be present on both Incremental as well as normal execution results, the presence of pending on an incremental
    * result points at a nested deferred/streamed fragment.
    */
-  pending?: Array<{ path: readonly (string | number)[]; id: string }>;
+  pending?: Array<{
+    path: readonly (string | number)[];
+    id: string;
+    label?: string;
+  }>;
   /** Incremental patches to be applied to a previous result as part of "Incremental Delivery".
    *
    * @remarks
