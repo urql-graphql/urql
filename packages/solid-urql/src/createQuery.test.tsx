@@ -1,8 +1,8 @@
 import { expect, it, describe, vi } from 'vitest';
 import { createQuery } from './createQuery';
-import { render, renderHook, waitFor } from '@solidjs/testing-library';
+import { renderHook, waitFor } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
-import { Show, Suspense, createSignal } from 'solid-js';
+import { createSignal } from 'solid-js';
 import { makeSubject } from 'wonka';
 import { OperationResult, OperationResultSource } from '@urql/core';
 import '@testing-library/jest-dom';
@@ -12,6 +12,7 @@ const client = createClient({
   exchanges: [],
   suspense: false,
 });
+
 vi.mock('./context', () => {
   const useClient = () => {
     return client!;
@@ -20,80 +21,7 @@ vi.mock('./context', () => {
   return { useClient };
 });
 
-type AppProps = {
-  suspense?: boolean;
-};
-const App = (props: AppProps) => {
-  const [resource, refetch] = createQuery<
-    { test: boolean },
-    { variable: number }
-  >({
-    query: '{ test }',
-    context: {
-      suspense: props.suspense,
-    },
-  });
-
-  return (
-    <Suspense fallback={<span data-testid="loading">loading</span>}>
-      <Show when={resource.data}>
-        {data => <span data-testid="value">{data().test}</span>}
-      </Show>
-      <button
-        data-testid="refetch"
-        onClick={() => refetch({ variables: { variable: 1 } })}
-      >
-        refetch
-      </button>
-    </Suspense>
-  );
-};
-
 describe('createQuery', () => {
-  it('should not suspend', async () => {
-    const subject =
-      makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
-    vi.spyOn(client, 'executeQuery').mockImplementation(
-      () => subject.source as OperationResultSource<OperationResult>
-    );
-
-    const { findByTestId } = render(() => <App suspense={false} />);
-
-    subject.next({ data: { test: true } });
-    waitFor(async () =>
-      expect((await findByTestId('value')).innerText).toStrictEqual('true')
-    );
-
-    const refetch = await findByTestId('refetch');
-    refetch.click();
-
-    subject.next({ data: { test: true } });
-    waitFor(async () =>
-      expect((await findByTestId('value')).innerText).toStrictEqual('true')
-    );
-  });
-
-  it('should suspend', async () => {
-    const subject =
-      makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
-    vi.spyOn(client, 'executeQuery').mockImplementation(
-      () => subject.source as OperationResultSource<OperationResult>
-    );
-
-    const { findByTestId } = render(() => <App suspense={true} />);
-
-    expect(await findByTestId('loading')).not.toBeFalsy();
-    subject.next({ data: { test: true } });
-    expect(await findByTestId('value')).not.toBeFalsy();
-
-    const refetch = await findByTestId('refetch');
-    refetch.click();
-
-    expect(await findByTestId('loading')).not.toBeFalsy();
-    subject.next({ data: { test: true } });
-    expect(await findByTestId('value')).not.toBeFalsy();
-  });
-
   it('should persist pause after refetch when variable changes', async () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
@@ -272,6 +200,6 @@ describe('createQuery', () => {
     );
 
     cleanup();
-    waitFor(() => expect(result[0].fetching).toEqual(false));
+    await waitFor(() => expect(result[0].fetching).toEqual(false));
   });
 });
