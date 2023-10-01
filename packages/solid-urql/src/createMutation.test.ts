@@ -1,6 +1,6 @@
-import { renderHook } from '@solidjs/testing-library';
+import { testEffect } from '@solidjs/testing-library';
 import { expect, it, describe, vi } from 'vitest';
-import { createMutation } from './createMutation';
+import { CreateMutationState, createMutation } from './createMutation';
 import {
   OperationResult,
   OperationResultSource,
@@ -8,6 +8,7 @@ import {
   gql,
 } from '@urql/core';
 import { makeSubject } from 'wonka';
+import { createEffect } from 'solid-js';
 
 const QUERY = gql`
   mutation {
@@ -20,6 +21,7 @@ const client = createClient({
   exchanges: [],
   suspense: false,
 });
+
 vi.mock('./context', () => {
   const useClient = () => {
     return client!;
@@ -28,8 +30,19 @@ vi.mock('./context', () => {
   return { useClient };
 });
 
+// Given that it is not possible to directly listen to all store changes it is necessary
+// to access all relevant parts on which `createEffect` should listen on
+const markStateDependencies = (state: CreateMutationState<any, any>) => {
+  state.data;
+  state.error;
+  state.extensions;
+  state.fetching;
+  state.operation;
+  state.stale;
+};
+
 describe('createMutation', () => {
-  it('should have expected state before and after finish', async () => {
+  it('should have expected state before and after finish', () => {
     const subject = makeSubject<any>();
     const clientMutation = vi
       .spyOn(client, 'executeMutation')
@@ -37,42 +50,62 @@ describe('createMutation', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const { result } = renderHook(() =>
-      createMutation<{ test: boolean }, { variable: number }>(QUERY)
-    );
+    return testEffect(done => {
+      const [state, execute] = createMutation<
+        { test: boolean },
+        { variable: number }
+      >(QUERY);
 
-    expect(result[0]).toMatchObject({
-      data: undefined,
-      stale: false,
-      fetching: false,
-      error: undefined,
-      extensions: undefined,
-      operation: undefined,
+      createEffect((run: number = 0) => {
+        markStateDependencies(state);
+
+        switch (run) {
+          case 0: {
+            expect(state).toMatchObject({
+              data: undefined,
+              stale: false,
+              fetching: false,
+              error: undefined,
+              extensions: undefined,
+              operation: undefined,
+            });
+
+            execute({ variable: 1 });
+            break;
+          }
+
+          case 1: {
+            expect(state).toMatchObject({
+              data: undefined,
+              stale: false,
+              fetching: true,
+              error: undefined,
+              extensions: undefined,
+              operation: undefined,
+            });
+
+            expect(clientMutation).toHaveBeenCalledTimes(1);
+            subject.next({ data: { test: true }, stale: false });
+
+            break;
+          }
+
+          case 2: {
+            expect(state).toMatchObject({
+              data: { test: true },
+              stale: false,
+              fetching: false,
+              error: undefined,
+              extensions: undefined,
+            });
+
+            done();
+            break;
+          }
+        }
+
+        return run + 1;
+      });
     });
-
-    const promise = result[1]({ variable: 1 });
-
-    expect(result[0]).toMatchObject({
-      data: undefined,
-      stale: false,
-      fetching: true,
-      error: undefined,
-      extensions: undefined,
-      operation: undefined,
-    });
-
-    expect(clientMutation).toHaveBeenCalledTimes(1);
-
-    subject.next({ data: { test: true }, stale: false });
-    await promise.then(got => {
-      expect(got.stale).toBe(false);
-      expect(got.error).toBe(undefined);
-      expect(got.data).toEqual({ test: true });
-    });
-
-    expect(result[0].fetching).toBe(false);
-    expect(result[0].stale).toBe(false);
-    expect(result[0].error).toBe(undefined);
-    expect(result[0].data).toEqual({ test: true });
   });
 });

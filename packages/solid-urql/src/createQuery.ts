@@ -171,7 +171,7 @@ export const createQuery = <
   Variables extends AnyVariables = AnyVariables,
 >(
   args: CreateQueryArgs<Data, Variables>
-): CreateQueryResult => {
+): CreateQueryResult<Data, Variables> => {
   const client = useClient();
   const getContext = asAccessor(args.context);
   const getPause = asAccessor(args.pause);
