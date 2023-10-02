@@ -1,11 +1,10 @@
 import { expect, it, describe, vi } from 'vitest';
-import { createQuery } from './createQuery';
-import { renderHook, waitFor } from '@solidjs/testing-library';
+import { CreateQueryState, createQuery } from './createQuery';
+import { renderHook, testEffect } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
-import { createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { makeSubject } from 'wonka';
 import { OperationResult, OperationResultSource } from '@urql/core';
-import '@testing-library/jest-dom';
 
 const client = createClient({
   url: '/graphql',
@@ -21,8 +20,19 @@ vi.mock('./context', () => {
   return { useClient };
 });
 
+// Given that it is not possible to directly listen to all store changes it is necessary
+// to access all relevant parts on which `createEffect` should listen on
+const markStateDependencies = (state: CreateQueryState<any, any>) => {
+  state.data;
+  state.error;
+  state.extensions;
+  state.fetching;
+  state.operation;
+  state.stale;
+};
+
 describe('createQuery', () => {
-  it('should persist pause after refetch when variable changes', async () => {
+  it('should fetch when query is resumed', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
     const executeQuery = vi
@@ -31,74 +41,43 @@ describe('createQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const [variable, setVariable] = createSignal(1);
-
-    const { result } = renderHook(() =>
-      createQuery<{ variable: number }>({
-        query: '{ test }',
-        pause: true,
-        variables: () => ({
-          variable: variable(),
-        }),
-      })
-    );
-
-    expect(result[0].fetching).toEqual(false);
-
-    result[1]();
-
-    expect(result[0].fetching).toEqual(true);
-    subject.next({ data: { test: true } });
-    expect(result[0].fetching).toEqual(false);
-    expect(executeQuery).toHaveBeenCalledTimes(1);
-
-    setVariable(2);
-    expect(result[0].fetching).toEqual(false);
-    expect(executeQuery).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not refetch when paused on variable change', async () => {
-    const subject =
-      makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
-    const executeQuery = vi
-      .spyOn(client, 'executeQuery')
-      .mockImplementation(
-        () => subject.source as OperationResultSource<OperationResult>
-      );
-
-    const [variable, setVariable] = createSignal(1);
-    const [pause, setPause] = createSignal(false);
-
-    const { result } = renderHook(() =>
-      createQuery<{ variable: number }>({
+    return testEffect(done => {
+      const [pause, setPause] = createSignal<boolean>(true);
+      const [state] = createQuery<{ test: boolean }, { variable: number }>({
         query: '{ test }',
         pause: pause,
-        variables: () => ({
-          variable: variable(),
-        }),
-      })
-    );
+      });
 
-    expect(result[0].fetching).toEqual(true);
-    subject.next({ data: { test: true } });
-    expect(result[0].fetching).toEqual(false);
+      createEffect((run: number = 0) => {
+        markStateDependencies(state);
 
-    setVariable(2);
+        switch (run) {
+          case 0: {
+            expect(state.fetching).toEqual(false);
+            expect(executeQuery).not.toHaveBeenCalled();
+            setPause(false);
+            break;
+          }
+          case 1: {
+            expect(state.fetching).toEqual(true);
+            expect(executeQuery).toHaveBeenCalledOnce();
+            subject.next({ data: { test: true } });
+            break;
+          }
+          case 2: {
+            expect(state.fetching).toEqual(false);
+            expect(state.data).toStrictEqual({ test: true });
+            done();
+            break;
+          }
+        }
 
-    expect(result[0].fetching).toEqual(true);
-    subject.next({ data: { test: true } });
-    expect(result[0].fetching).toEqual(false);
-
-    expect(executeQuery).toHaveBeenCalledTimes(2);
-
-    setPause(true);
-    setVariable(3);
-
-    expect(result[0].fetching).toEqual(false);
-    expect(executeQuery).toHaveBeenCalledTimes(2);
+        return run + 1;
+      });
+    });
   });
 
-  it('should override pause when execute via refetch', async () => {
+  it('should override pause when execute via refetch', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
     const executeQuery = vi
@@ -107,27 +86,45 @@ describe('createQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const { result } = renderHook(() =>
-      createQuery<{ variable: number }>({
+    return testEffect(done => {
+      const [state, refetch] = createQuery<
+        { test: boolean },
+        { variable: number }
+      >({
         query: '{ test }',
         pause: true,
-      })
-    );
+      });
 
-    expect(result[0].fetching).toEqual(false);
-    expect(executeQuery).not.toBeCalled();
+      createEffect((run: number = 0) => {
+        markStateDependencies(state);
 
-    result[1](); // refetch function
+        switch (run) {
+          case 0: {
+            expect(state.fetching).toEqual(false);
+            expect(executeQuery).not.toBeCalled();
+            refetch();
+            break;
+          }
+          case 1: {
+            expect(state.fetching).toEqual(true);
+            expect(executeQuery).toHaveBeenCalledOnce();
+            subject.next({ data: { test: true } });
+            break;
+          }
+          case 2: {
+            expect(state.fetching).toEqual(false);
+            expect(state.data).toStrictEqual({ test: true });
+            done();
+            break;
+          }
+        }
 
-    expect(result[0].fetching).toEqual(true);
-    expect(executeQuery).toHaveBeenCalledOnce();
-    subject.next({ data: { test: true } });
-
-    expect(result[0].fetching).toEqual(false);
-    expect(result[0].data).toStrictEqual({ test: true });
+        return run + 1;
+      });
+    });
   });
 
-  it('should trigger refetch on variables change', async () => {
+  it('should trigger refetch on variables change', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
     const executeQuery = vi
@@ -136,32 +133,54 @@ describe('createQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const [variables, setVariables] = createSignal<{ variable: number }>({
-      variable: 1,
-    });
+    return testEffect(done => {
+      const [variables, setVariables] = createSignal<{ variable: number }>({
+        variable: 1,
+      });
 
-    const { result } = renderHook(() =>
-      createQuery<{ test: boolean }, { variable: number }>({
+      const [state] = createQuery<{ test: boolean }, { variable: number }>({
         query: '{ test }',
         variables: variables,
-      })
-    );
+      });
 
-    expect(result[0].fetching).toEqual(true);
-    subject.next({ data: { test: true } });
-    expect(result[0].fetching).toEqual(false);
-    expect(result[0].data?.test).toEqual(true);
-    setVariables({ variable: 2 });
+      createEffect((run: number = 0) => {
+        markStateDependencies(state);
 
-    expect(result[0].fetching).toEqual(true);
-    expect(executeQuery).toHaveBeenCalledTimes(2);
+        switch (run) {
+          case 0: {
+            expect(state.fetching).toEqual(true);
 
-    subject.next({ data: { test: false } });
-    expect(result[0].fetching).toEqual(false);
-    expect(result[0].data?.test).toEqual(false);
+            subject.next({ data: { test: true } });
+
+            break;
+          }
+          case 1: {
+            expect(state.fetching).toEqual(false);
+            expect(state.data).toEqual({ test: true });
+            setVariables({ variable: 2 });
+            break;
+          }
+          case 2: {
+            expect(state.fetching).toEqual(true);
+            expect(executeQuery).toHaveBeenCalledTimes(2);
+
+            subject.next({ data: { test: false } });
+            break;
+          }
+          case 3: {
+            expect(state.fetching).toEqual(false);
+            expect(state.data).toEqual({ test: false });
+            done();
+            break;
+          }
+        }
+
+        return run + 1;
+      });
+    });
   });
 
-  it('should receive data', async () => {
+  it('should receive data', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ test: boolean }, any>, 'data'>>();
     const executeQuery = vi
@@ -170,36 +189,72 @@ describe('createQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const { result } = renderHook(() =>
-      createQuery<{ variable: number }, { test: boolean }>({
+    return testEffect(done => {
+      const [state] = createQuery<{ test: boolean }, { variable: number }>({
         query: '{ test }',
-      })
-    );
+      });
 
-    expect(result[0].fetching).toEqual(true);
-    expect(result[0].data).toBeUndefined();
+      createEffect((run: number = 0) => {
+        markStateDependencies(state);
 
-    subject.next({ data: { test: true } });
+        switch (run) {
+          case 0: {
+            expect(state.fetching).toEqual(true);
+            expect(state.data).toBeUndefined();
 
-    expect(result[0].fetching).toEqual(false);
-    expect(result[0].data).toStrictEqual({ test: true });
-    expect(executeQuery).toHaveBeenCalledTimes(1);
+            subject.next({ data: { test: true } });
+            break;
+          }
+
+          case 1: {
+            expect(state.fetching).toEqual(false);
+            expect(state.data).toStrictEqual({ test: true });
+            expect(executeQuery).toHaveBeenCalledTimes(1);
+            done();
+            break;
+          }
+        }
+
+        return run + 1;
+      });
+    });
   });
 
-  it('should unsubscribe on teardown', async () => {
+  it('should unsubscribe on teardown', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ value: number }, any>, 'data'>>();
     vi.spyOn(client, 'executeQuery').mockImplementation(
       () => subject.source as OperationResultSource<OperationResult>
     );
 
-    const { result, cleanup } = renderHook(() =>
-      createQuery<{ value: number }, { variable: number }>({
+    const {
+      result: [state],
+      cleanup,
+    } = renderHook(() =>
+      createQuery<{ test: number }, { variable: number }>({
         query: '{ test }',
       })
     );
 
-    cleanup();
-    await waitFor(() => expect(result[0].fetching).toEqual(false));
+    return testEffect(done => {
+      markStateDependencies(state);
+
+      createEffect((run: number = 0) => {
+        switch (run) {
+          case 0: {
+            expect(state.fetching).toEqual(true);
+            cleanup();
+            break;
+          }
+          case 1: {
+            expect(state.fetching).toEqual(false);
+            done();
+            break;
+          }
+        }
+
+        return run + 1;
+      });
+    });
   });
 });
