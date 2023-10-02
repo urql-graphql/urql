@@ -158,7 +158,7 @@ describe('createSubscription', () => {
     });
   });
 
-  it('should unsubscribe on teardown', async () => {
+  it('should unsubscribe on teardown', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ value: number }, any>, 'data'>>();
     vi.spyOn(client, 'executeSubscription').mockImplementation(
@@ -191,7 +191,7 @@ describe('createSubscription', () => {
     );
   });
 
-  it('should skip executing query when paused', async () => {
+  it('should skip executing query when paused', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ value: number }, any>, 'data'>>();
     vi.spyOn(client, 'executeSubscription').mockImplementation(
@@ -282,7 +282,7 @@ describe('createSubscription', () => {
     });
   });
 
-  it.only('should aggregate results', () => {
+  it('should aggregate results', () => {
     const subject =
       makeSubject<Pick<OperationResult<{ value: number }, any>, 'data'>>();
     vi.spyOn(client, 'executeSubscription').mockImplementation(
