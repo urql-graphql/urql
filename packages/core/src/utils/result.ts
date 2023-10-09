@@ -28,7 +28,10 @@ export const makeResult = (
   result: ExecutionResult,
   response?: any
 ): OperationResult => {
-  if (!('data' in result) && !('errors' in result)) {
+  if (
+    !('data' in result) &&
+    (!('errors' in result) || !Array.isArray(result.errors))
+  ) {
     throw new Error('No Content');
   }
 

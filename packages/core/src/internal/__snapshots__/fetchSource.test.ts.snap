@@ -438,6 +438,152 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
 }
 `;
 
+exports[`on error with non spec-compliant body > handles network errors 1`] = `
+{
+  "data": undefined,
+  "error": [CombinedError: [Network] Forbidden],
+  "extensions": undefined,
+  "hasNext": false,
+  "operation": {
+    "context": {
+      "fetchOptions": {
+        "method": "POST",
+      },
+      "requestPolicy": "cache-first",
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": 2,
+    "kind": "query",
+    "query": {
+      "__key": -2395444236,
+      "definitions": [
+        {
+          "directives": [],
+          "kind": "OperationDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "getUser",
+          },
+          "operation": "query",
+          "selectionSet": {
+            "kind": "SelectionSet",
+            "selections": [
+              {
+                "alias": undefined,
+                "arguments": [
+                  {
+                    "kind": "Argument",
+                    "name": {
+                      "kind": "Name",
+                      "value": "name",
+                    },
+                    "value": {
+                      "kind": "Variable",
+                      "name": {
+                        "kind": "Name",
+                        "value": "name",
+                      },
+                    },
+                  },
+                ],
+                "directives": [],
+                "kind": "Field",
+                "name": {
+                  "kind": "Name",
+                  "value": "user",
+                },
+                "selectionSet": {
+                  "kind": "SelectionSet",
+                  "selections": [
+                    {
+                      "alias": undefined,
+                      "arguments": [],
+                      "directives": [],
+                      "kind": "Field",
+                      "name": {
+                        "kind": "Name",
+                        "value": "id",
+                      },
+                      "selectionSet": undefined,
+                    },
+                    {
+                      "alias": undefined,
+                      "arguments": [],
+                      "directives": [],
+                      "kind": "Field",
+                      "name": {
+                        "kind": "Name",
+                        "value": "firstName",
+                      },
+                      "selectionSet": undefined,
+                    },
+                    {
+                      "alias": undefined,
+                      "arguments": [],
+                      "directives": [],
+                      "kind": "Field",
+                      "name": {
+                        "kind": "Name",
+                        "value": "lastName",
+                      },
+                      "selectionSet": undefined,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+          "variableDefinitions": [
+            {
+              "defaultValue": undefined,
+              "directives": [],
+              "kind": "VariableDefinition",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String",
+                },
+              },
+              "variable": {
+                "kind": "Variable",
+                "name": {
+                  "kind": "Name",
+                  "value": "name",
+                },
+              },
+            },
+          ],
+        },
+      ],
+      "kind": "Document",
+      "loc": {
+        "end": 92,
+        "source": {
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
+          "locationOffset": {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
+        "start": 0,
+      },
+    },
+    "variables": {
+      "name": "Clara",
+    },
+  },
+  "stale": false,
+}
+`;
+
 exports[`on success > returns response data 1`] = `
 {
   "data": {
