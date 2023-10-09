@@ -172,6 +172,27 @@ describe('on unexpected plain text responses', () => {
   });
 });
 
+describe('on error with non spec-compliant body', () => {
+  beforeEach(() => {
+    fetch.mockResolvedValue({
+      status: 400,
+      statusText: 'Forbidden',
+      headers: { get: () => 'application/json' },
+      text: vi.fn().mockResolvedValue('{"errors":{"detail":"Bad Request"}}'),
+    });
+  });
+
+  it('handles network errors', async () => {
+    const data = await pipe(
+      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+    expect(data).toHaveProperty('error.networkError.message', 'Forbidden');
+  });
+});
+
 describe('on teardown', () => {
   const fail = () => {
     expect(true).toEqual(false);
