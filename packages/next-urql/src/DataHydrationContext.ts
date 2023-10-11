@@ -23,12 +23,13 @@ function transportDataToJS(data: any) {
 }
 
 export const DataHydrationContextProvider = ({
+  nonce,
   children,
-}: React.PropsWithChildren<{}>) => {
+}: React.PropsWithChildren<{ nonce?: string }>) => {
   const dataHydrationContext = React.useRef<DataHydrationValue>();
   if (typeof window == 'undefined') {
     if (!dataHydrationContext.current)
-      dataHydrationContext.current = buildContext();
+      dataHydrationContext.current = buildContext({ nonce });
   }
 
   return React.createElement(
@@ -54,7 +55,7 @@ export function useDataHydrationContext(): DataHydrationValue | undefined {
 }
 
 let key = 0;
-function buildContext(): DataHydrationValue {
+function buildContext({ nonce }: { nonce?: string }): DataHydrationValue {
   const dataHydrationContext: DataHydrationValue = {
     isInjecting: false,
     operationValuesByKey: {},
@@ -71,6 +72,7 @@ function buildContext(): DataHydrationValue {
 
       return React.createElement('script', {
         key: key++,
+        nonce: nonce,
         dangerouslySetInnerHTML: { __html },
       });
     },
