@@ -572,7 +572,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     fetchSubscriptions: opts.fetchSubscriptions,
     fetchOptions: opts.fetchOptions,
     fetch: opts.fetch,
-    preferGetMethod: !!opts.preferGetMethod,
+    preferGetMethod: opts.preferGetMethod,
     requestPolicy: opts.requestPolicy || 'cache-first',
   };
 
