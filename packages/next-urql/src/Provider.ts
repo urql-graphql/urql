@@ -47,14 +47,19 @@ export function UrqlProvider({
   children,
   ssr,
   client,
-}: React.PropsWithChildren<{ ssr: SSRExchange; client: Client }>) {
+  nonce,
+}: React.PropsWithChildren<{
+  ssr: SSRExchange;
+  client: Client;
+  nonce?: string;
+}>) {
   return React.createElement(
     Provider,
     { value: client },
     React.createElement(
       SSRContext.Provider,
       { value: ssr },
-      React.createElement(DataHydrationContextProvider, {}, children)
+      React.createElement(DataHydrationContextProvider, { nonce }, children)
     )
   );
 }
