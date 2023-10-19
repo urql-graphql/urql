@@ -1,5 +1,17 @@
 # @urql/core
 
+## 4.1.4
+
+### Patch Changes
+
+- Implement new `@defer` / `@stream` transport protocol spec changes
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3389](https://github.com/urql-graphql/urql/pull/3389))
+- Support non spec-compliant error bodies, i.e. the Shopify API does return `errors` but as an object. Adding
+  a check whether we are really dealing with an Array of errors enables this
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3395](https://github.com/urql-graphql/urql/pull/3395))
+- ⚠️ Fix `preferGetMethod: 'force' | 'within-url-limit'` not being applied correctly by the `Client`
+  Submitted by [@Burbenog](https://github.com/Burbenog) (See [#3403](https://github.com/urql-graphql/urql/pull/3403))
+
 ## 4.1.3
 
 ### Patch Changes
