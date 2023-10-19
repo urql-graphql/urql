@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import * as React from 'react';
 import type { SSRExchange, Client } from 'urql';
 import { Provider } from 'urql';
 import { DataHydrationContextProvider } from './DataHydrationContext';
