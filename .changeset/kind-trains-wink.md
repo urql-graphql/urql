@@ -2,4 +2,4 @@
 '@urql/next': minor
 ---
 
-support for nonce
+Support a `nonce` prop on `DataHydrationContextProvider` that passes it onto its script tags' attributes
