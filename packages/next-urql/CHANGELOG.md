@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Support a `nonce` prop on `DataHydrationContextProvider` that passes it onto its script tags' attributes
+  Submitted by [@Enalmada](https://github.com/Enalmada) (See [#3398](https://github.com/urql-graphql/urql/pull/3398))
+
+### Patch Changes
+
+- ⚠️ Fix invalid CJS by importing react with import-all semantics
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3405](https://github.com/urql-graphql/urql/pull/3405))
+
 ## 1.0.0
 
 ### Major Changes
