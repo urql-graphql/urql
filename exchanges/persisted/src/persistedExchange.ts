@@ -22,11 +22,21 @@ import { makeOperation, stringifyDocument } from '@urql/core';
 
 import { hash } from './sha256';
 
+interface ContentfulExtensions {
+  contentful: {
+    code?: string;
+  };
+}
+
 const isPersistedMiss = (error: CombinedError): boolean =>
   error.graphQLErrors.some(
     x =>
       x.message === 'PersistedQueryNotFound' ||
-      x.message === 'Persisted query not found in the extensions object.'
+      (typeof x.extensions === 'object' &&
+        x.extensions !== null &&
+        'contentful' in x.extensions &&
+        (x.extensions as unknown as ContentfulExtensions).contentful.code ===
+          'PERSISTED_QUERY_NOT_FOUND')
   );
 
 const isPersistedUnsupported = (error: CombinedError): boolean =>
