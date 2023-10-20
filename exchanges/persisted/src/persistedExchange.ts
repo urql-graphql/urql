@@ -23,7 +23,11 @@ import { makeOperation, stringifyDocument } from '@urql/core';
 import { hash } from './sha256';
 
 const isPersistedMiss = (error: CombinedError): boolean =>
-  error.graphQLErrors.some(x => x.message === 'PersistedQueryNotFound');
+  error.graphQLErrors.some(
+    x =>
+      x.message === 'PersistedQueryNotFound' ||
+      x.message === 'Persisted query not found in the extensions object.'
+  );
 
 const isPersistedUnsupported = (error: CombinedError): boolean =>
   error.graphQLErrors.some(x => x.message === 'PersistedQueryNotSupported');

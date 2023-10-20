@@ -91,6 +91,47 @@ it('retries query when persisted query resulted in miss', async () => {
   });
 });
 
+it('retries query when persisted query resulted in miss with alterative error message in extension', async () => {
+  const { result, operations, exchangeArgs } = makeExchangeArgs();
+  // https://www.contentful.com/developers/docs/references/graphql/#/reference/graphql-errors/graphql-errors-explained
+  result.mockImplementationOnce(operation => ({
+    ...queryResponse,
+    operation,
+    error: new CombinedError({
+      graphQLErrors: [
+        {
+          message: 'Persisted query not found in the extensions object.',
+          extensions: {
+            contentful: {
+              code: 'PERSISTED_QUERY_NOT_FOUND',
+              documentationUrl: 'xxxxxx/persisted-query-not-found',
+              requestId: 'xxx',
+            },
+          },
+        },
+      ],
+    }),
+  }));
+
+  const res = await pipe(
+    fromValue(queryOperation),
+    persistedExchange()(exchangeArgs),
+    take(1),
+    toPromise
+  );
+
+  expect(res.operation.context.persistAttempt).toBe(true);
+  expect(operations.length).toBe(2);
+
+  expect(operations[1].extensions).toEqual({
+    persistedQuery: {
+      version: 1,
+      sha256Hash: expect.any(String),
+      miss: true,
+    },
+  });
+});
+
 it('retries query persisted query resulted in unsupported', async () => {
   const { result, operations, exchangeArgs } = makeExchangeArgs();
 
