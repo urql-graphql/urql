@@ -65,3 +65,5 @@ maintainers and supporters. This page is specifically dedicated to all of you!
 - [`urql-custom-scalars-exchange`](https://github.com/clentfort/urql-custom-scalars-exchange): An exchange
   to automatically convert scalars.
 - [`@grafbase/urql-exchange`](https://github.com/grafbase/playground/tree/main/packages/grafbase-urql-exchange): URQL-exchange for handling Server Sent Events (SSE) with Grafbase GraphQL Live Queries.
+  to automatically convert scalars.
+- [`urql-rest-exchange`](https://github.com/iamsavani/urql-rest-exchange): A custom exchange for URQL that supports GraphQL queries/mutations via REST endpoints
