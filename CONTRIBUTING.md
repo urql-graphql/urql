@@ -70,7 +70,7 @@ description, e.g. "Update X" or "Refactor Y."
 
 ## How do I set up the project?
 
-Luckily it's not hard to get started. You can install dependencie
+Luckily it's not hard to get started. You can install dependencies
 [using `pnpm`](https://pnpm.io/installation#using-corepack).
 Please don't use `npm` or `yarn` to respect the lockfile.
 
