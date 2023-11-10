@@ -980,6 +980,8 @@ export interface StorageAdapter {
    * will cause all failed mutations in the queue to be retried.
    */
   onOnline?(cb: () => void): any;
+  /** Called when the cache has been hydrated with the data from `readData` */
+  onCacheHydrated?(): any;
 }
 
 /** Set of keys that have been modified or accessed.
