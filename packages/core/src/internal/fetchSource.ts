@@ -169,7 +169,7 @@ async function* fetchOperation(
       results = parseMultipartMixed(contentType, response);
     } else if (/text\/event-stream/i.test(contentType)) {
       results = parseEventStream(response);
-    } else if (!/text\//i.test(contentType)) {
+    } else if (!/text\//i.test(contentType) || !contentType) {
       results = parseJSON(response);
     } else {
       throw new Error(await response.text());
