@@ -212,7 +212,9 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
 }
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
-  client.suspense && (!context || context.suspense !== false);
+  context && context.suspense !== undefined
+    ? !!context.suspense
+    : client.suspense;
 
 const sources = new Map<number, Source<OperationResult>>();
 

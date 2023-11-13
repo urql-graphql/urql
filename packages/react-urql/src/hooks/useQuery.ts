@@ -175,7 +175,9 @@ export type UseQueryResponse<
 > = [UseQueryState<Data, Variables>, UseQueryExecute];
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
-  client.suspense && (!context || context.suspense !== false);
+  context && context.suspense !== undefined
+    ? !!context.suspense
+    : client.suspense;
 
 /** Hook to run a GraphQL query and get updated GraphQL results.
  *
