@@ -172,7 +172,25 @@ async function* fetchOperation(
     } else if (!/text\//i.test(contentType) || !contentType) {
       results = parseJSON(response);
     } else {
-      throw new Error(await response.text());
+      if (contentType === 'text/plain') {
+        const text = await response.text();
+        if (text.startsWith('{')) {
+          try {
+            results = JSON.parse(text);
+            if (process.env.NODE_ENV !== 'production') {
+              console.warn(
+                `Found response with content-type "text/plain" but it had a valid "application/json" response.`
+              );
+            }
+          } catch (e) {
+            throw new Error(text);
+          }
+        } else {
+          throw new Error(text);
+        }
+      } else {
+        throw new Error(await response.text());
+      }
     }
 
     let pending: ExecutionResult['pending'];
