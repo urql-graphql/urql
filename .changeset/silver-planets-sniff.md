@@ -2,4 +2,4 @@
 '@urql/core': minor
 ---
 
-Try to parse no content-type as JSON because we are dealing with GraphQL
+Try to parse `text/plain` content-type as JSON before bailing out with an error.
