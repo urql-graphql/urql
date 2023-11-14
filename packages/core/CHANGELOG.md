@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.2.0
+
+### Minor Changes
+
+- Try to parse `text/plain` content-type as JSON before bailing out with an error
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3430](https://github.com/urql-graphql/urql/pull/3430))
+
 ## 4.1.4
 
 ### Patch Changes
