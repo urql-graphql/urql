@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.0.1",
-    "@urql/core": ">=4.1.0",
+    "@urql/core": ">=4.2.0",
     "wonka": "^6.3.2"
   },
   "devDependencies": {

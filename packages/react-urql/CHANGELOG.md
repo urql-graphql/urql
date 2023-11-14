@@ -1,5 +1,14 @@
 # urql
 
+## 4.0.6
+
+### Patch Changes
+
+- Prioritise `context.suspense` and fallback to checking `client.suspense`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3427](https://github.com/urql-graphql/urql/pull/3427))
+- Updated dependencies (See [#3430](https://github.com/urql-graphql/urql/pull/3430))
+  - @urql/core@4.2.0
+
 ## 4.0.5
 
 ### Patch Changes
