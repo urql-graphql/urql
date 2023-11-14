@@ -147,6 +147,23 @@ async function* parseMultipartMixed(
   }
 }
 
+async function* parseMaybeJSON(
+  response: Response
+): AsyncIterableIterator<ExecutionResult> {
+  const text = await response.text();
+  try {
+    const result = JSON.parse(text);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `Found response with content-type "text/plain" but it had a valid "application/json" response.`
+      );
+    }
+    yield result;
+  } catch (e) {
+    throw new Error(text);
+  }
+}
+
 async function* fetchOperation(
   operation: Operation,
   url: string,
@@ -172,25 +189,7 @@ async function* fetchOperation(
     } else if (!/text\//i.test(contentType)) {
       results = parseJSON(response);
     } else {
-      if (contentType === 'text/plain') {
-        const text = await response.text();
-        if (text.startsWith('{')) {
-          try {
-            results = JSON.parse(text);
-            if (process.env.NODE_ENV !== 'production') {
-              console.warn(
-                `Found response with content-type "text/plain" but it had a valid "application/json" response.`
-              );
-            }
-          } catch (e) {
-            throw new Error(text);
-          }
-        } else {
-          throw new Error(text);
-        }
-      } else {
-        throw new Error(await response.text());
-      }
+      results = parseMaybeJSON(response);
     }
 
     let pending: ExecutionResult['pending'];
