@@ -158,7 +158,7 @@ export interface UseQueryState<
  * };
  * ```
  */
-export type UseQueryExecute = (opts?: Partial<OperationContext>) => void;
+export type UseQueryExecute = (opts?: Partial<OperationContext>) => Promise<unknown>;
 
 /** Result tuple returned by the {@link useQuery} hook.
  *
@@ -355,7 +355,7 @@ export function useQuery<
   }, [cache, state[0], state[2][1]]);
 
   const executeQuery = React.useCallback(
-    (opts?: Partial<OperationContext>) => {
+    (opts?: Partial<OperationContext>) => new Promise((resolve) => {
       const context = {
         requestPolicy: args.requestPolicy,
         ...args.context,
@@ -371,9 +371,10 @@ export function useQuery<
               })
             )
           : client.executeQuery(request, context);
+        source.then(resolve);
         return [source, state[1], deps];
       });
-    },
+    }),
     [
       client,
       cache,
