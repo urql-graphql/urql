@@ -267,7 +267,9 @@ describe('useQuery', () => {
     expect(client.executeQuery).toBeCalledTimes(1);
 
     const [, executeQuery] = result.current;
-    act(() => executeQuery());
+    act(() => {
+      executeQuery();
+    });
     await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(2);
   });
