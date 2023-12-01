@@ -35,6 +35,8 @@ export interface StorageOptions {
    * @defaultValue `7` days
    */
   maxAge?: number;
+  /** Gets Called when the exchange has hydrated the data from storage. */
+  onCacheHydrated?: () => void;
 }
 
 /** Sample storage adapter persisting to IndexedDB. */
@@ -219,7 +221,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
           () => batch
         );
     },
-
+    onCacheHydrated: opts.onCacheHydrated,
     onOnline(cb: () => void) {
       if (callback) {
         window.removeEventListener('online', callback);

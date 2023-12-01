@@ -178,13 +178,14 @@ the cache's data to persisted storage on the user's device. it
 > **NOTE:** Offline Support is currently experimental! It hasn't been extensively tested yet and
 > may not always behave as expected. Please try it out with caution!
 
-| Method          | Type                                          | Description                                                                                                                                                                            |
-| --------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `writeData`     | `(delta: SerializedEntries) => Promise<void>` | This provided method must be able to accept an object of key-value entries that will be persisted to the storage. This method is called as a batch of updated entries becomes ready.   |
-| `readData`      | `() => Promise<SerializedEntries>`            | This provided method must be able to return a single combined object of previous key-value entries that have been previously preserved using `writeData`. It's only called on startup. |
-| `writeMetadata` | `(json: SerializedRequest[]) => void`         | This provided method must be able to persist metadata for the cache. For backwards compatibility it should be able to accept any JSON data.                                            |
-| `readMetadata`  | `() => Promise<null \| SerializedRequest[]>`  | This provided method must be able to read the persisted metadata that has previously been written using `writeMetadata`. It's only called on startup.                                  |
-| `onOnline`      | `(cb: () => void) => void`                    | This method must be able to accept a callback that is called when the user's device comes back online.                                                                                 |
+| Method            | Type                                          | Description                                                                                                                                                                            |
+| ----------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `writeData`       | `(delta: SerializedEntries) => Promise<void>` | This provided method must be able to accept an object of key-value entries that will be persisted to the storage. This method is called as a batch of updated entries becomes ready.   |
+| `readData`        | `() => Promise<SerializedEntries>`            | This provided method must be able to return a single combined object of previous key-value entries that have been previously preserved using `writeData`. It's only called on startup. |
+| `writeMetadata`   | `(json: SerializedRequest[]) => void`         | This provided method must be able to persist metadata for the cache. For backwards compatibility it should be able to accept any JSON data.                                            |
+| `readMetadata`    | `() => Promise<null \| SerializedRequest[]>`  | This provided method must be able to read the persisted metadata that has previously been written using `writeMetadata`. It's only called on startup.                                  |
+| `onOnline`        | `(cb: () => void) => void`                    | This method must be able to accept a callback that is called when the user's device comes back online.                                                                                 |
+| `onCacheHydrated` | `() => void`                                  | This method will be called when the `cacheExchange` has finished hydrating the data coming from storage.                                                                               |
 
 These options are split into three parts:
 

@@ -73,6 +73,7 @@ export const cacheExchange =
       store.data.hydrating = true;
       opts.storage.readData().then(entries => {
         hydrateData(store.data, opts!.storage!, entries);
+        if (opts.storage!.onCacheHydrated) opts.storage!.onCacheHydrated();
       });
     }
 
