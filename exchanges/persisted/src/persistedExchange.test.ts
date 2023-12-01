@@ -147,6 +147,10 @@ it('fails gracefully when an invalid result with `PersistedQueryNotFound` is alw
       miss: true,
     },
   });
+
+  expect(console.warn).toHaveBeenLastCalledWith(
+    expect.stringMatching(/two misses/i)
+  );
 });
 
 it('skips operation when generateHash returns a nullish value', async () => {
