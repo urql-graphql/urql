@@ -119,6 +119,40 @@ it('retries query persisted query resulted in unsupported', async () => {
   expect(operations[2].extensions).toEqual(undefined);
 });
 
+it('fails gracefully when an invalid result with `PersistedQueryNotFound` is always delivered', async () => {
+  const { result, operations, exchangeArgs } = makeExchangeArgs();
+
+  result.mockImplementation(operation => ({
+    ...queryResponse,
+    operation,
+    error: new CombinedError({
+      graphQLErrors: [{ message: 'PersistedQueryNotFound' }],
+    }),
+  }));
+
+  const res = await pipe(
+    fromValue(queryOperation),
+    persistedExchange()(exchangeArgs),
+    take(1),
+    toPromise
+  );
+
+  expect(res.operation.context.persistAttempt).toBe(true);
+  expect(operations.length).toBe(2);
+
+  expect(operations[1].extensions).toEqual({
+    persistedQuery: {
+      version: 1,
+      sha256Hash: expect.any(String),
+      miss: true,
+    },
+  });
+
+  expect(console.warn).toHaveBeenLastCalledWith(
+    expect.stringMatching(/two misses/i)
+  );
+});
+
 it('skips operation when generateHash returns a nullish value', async () => {
   const { result, operations, exchangeArgs } = makeExchangeArgs();
 
