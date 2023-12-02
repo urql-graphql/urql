@@ -537,6 +537,18 @@ const readSelection = (
       ctx.partial = true;
       dataFieldValue = null;
     } else if (dataFieldValue === null && directives.required) {
+      if (
+        ctx.store.logger &&
+        process.env.NODE_ENV !== 'production' &&
+        InMemoryData.currentOperation === 'read'
+      ) {
+        ctx.store.logger(
+          'debug',
+          `Got value "null" for required field "${fieldName}"${
+            fieldArgs ? ` with args ${JSON.stringify(fieldArgs)}` : ''
+          } on type "${typename}" with id "${entityKey}"`
+        );
+      }
       dataFieldValue = undefined;
     } else {
       hasFields = hasFields || fieldName !== '__typename';
@@ -551,6 +563,18 @@ const readSelection = (
     } else if (deferRef) {
       hasNext = true;
     } else {
+      if (
+        ctx.store.logger &&
+        process.env.NODE_ENV !== 'production' &&
+        InMemoryData.currentOperation === 'read'
+      ) {
+        ctx.store.logger(
+          'debug',
+          `No value for field "${fieldName}"${
+            fieldArgs ? ` with args ${JSON.stringify(fieldArgs)}` : ''
+          } on type "${typename}" with id "${entityKey}"`
+        );
+      }
       // If the field isn't deferred or partial then we have to abort and also reset
       // the partial field
       ctx.partial = hasPartials;
