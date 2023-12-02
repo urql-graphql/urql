@@ -541,10 +541,20 @@ export type ResolverResult =
   | null
   | undefined;
 
-export type Logger = (severity: 'error' | 'warn', message: string) => void;
+export type Logger = (
+  severity: 'debug' | 'error' | 'warn',
+  message: string
+) => void;
 
 /** Input parameters for the {@link cacheExchange}. */
 export type CacheExchangeOpts = {
+  /** Configure a custom-logger for graphcache, this function wll be called with a severity and a message.
+   *
+   * @remarks
+   * By default we will invoke `console.warn` for warnings during development, however you might want to opt
+   * out of this because you are re-using urql for a different library. This setting allows you to stub the logger
+   * function or filter to only logs you want.
+   */
   logger?: Logger;
   /** Configures update functions which are called when the mapped fields are written to the cache.
    *
