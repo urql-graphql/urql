@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 6.4.0
+
+### Minor Changes
+
+- Allow the user to debug cache-misses by means of the new `logger` interface on the `cacheExchange`. A field miss will dispatch a `debug` log when it's not marked with `@_optional` or when it's non-nullable in the `schema`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3446](https://github.com/urql-graphql/urql/pull/3446))
+- Add `onCacheHydrated` as an option for the `StorageAdapter`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3428](https://github.com/urql-graphql/urql/pull/3428))
+- Add optional `logger` to the options, this allows you to filter out warnings or disable them all together
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3444](https://github.com/urql-graphql/urql/pull/3444))
+
 ## 6.3.3
 
 ### Patch Changes
