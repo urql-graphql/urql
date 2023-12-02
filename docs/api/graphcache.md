@@ -32,6 +32,7 @@ options and returns an [`Exchange`](./core.md#exchange).
 | `optimistic` | A mapping of mutation fields to resolvers that may be used to provide _Graphcache_ with an optimistic result for a given mutation field that should be applied to the cached data temporarily.                                |
 | `schema`     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, interfaces, and enums. The schema also used to provide helpful warnings for [schema awareness](../graphcache/schema-awareness.md).          |
 | `storage`    | A persisted storage interface that may be provided to preserve cache data for [offline support](../graphcache/offline.md).                                                                                                    |
+| `logger`     | A function that will be invoked for warning/debug/... logs                                                                                                                                                                    |
 
 The `@urql/exchange-graphcache` package also exports the `offlineExchange`; which is identical to
 the `cacheExchange` but activates [offline support](../graphcache/offline.md) when the `storage` option is passed.

@@ -57,13 +57,13 @@ describe('SchemaPredicates', () => {
 
   it('should indicate nullability', () => {
     expect(
-      SchemaPredicates.isFieldNullable(schema, 'Todo', 'text')
+      SchemaPredicates.isFieldNullable(schema, 'Todo', 'text', undefined)
     ).toBeFalsy();
     expect(
-      SchemaPredicates.isFieldNullable(schema, 'Todo', 'complete')
+      SchemaPredicates.isFieldNullable(schema, 'Todo', 'complete', undefined)
     ).toBeTruthy();
     expect(
-      SchemaPredicates.isFieldNullable(schema, 'Todo', 'author')
+      SchemaPredicates.isFieldNullable(schema, 'Todo', 'author', undefined)
     ).toBeTruthy();
   });
 
@@ -89,7 +89,12 @@ describe('SchemaPredicates', () => {
 
   it('should throw if a requested type does not exist', () => {
     expect(() =>
-      SchemaPredicates.isFieldNullable(schema, 'SomeInvalidType', 'complete')
+      SchemaPredicates.isFieldNullable(
+        schema,
+        'SomeInvalidType',
+        'complete',
+        undefined
+      )
     ).toThrow(
       'The type `SomeInvalidType` is not an object in the defined schema, but the GraphQL document is traversing it.\nhttps://bit.ly/2XbVrpR#3'
     );
@@ -97,7 +102,7 @@ describe('SchemaPredicates', () => {
 
   it('should warn in console if a requested field does not exist', () => {
     expect(
-      SchemaPredicates.isFieldNullable(schema, 'Todo', 'goof')
+      SchemaPredicates.isFieldNullable(schema, 'Todo', 'goof', undefined)
     ).toBeFalsy();
 
     expect(console.warn).toBeCalledTimes(1);

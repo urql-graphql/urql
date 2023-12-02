@@ -25,6 +25,7 @@ import type {
   Link,
   Entity,
   Data,
+  Logger,
 } from '../types';
 
 export interface Context {
@@ -117,7 +118,8 @@ const isFragmentHeuristicallyMatching = (
   node: FormattedNode<InlineFragmentNode | FragmentDefinitionNode>,
   typename: void | string,
   entityKey: string,
-  vars: Variables
+  vars: Variables,
+  logger?: Logger
 ) => {
   if (!typename) return false;
   const typeCondition = getTypeCondition(node);
@@ -134,7 +136,8 @@ const isFragmentHeuristicallyMatching = (
       '` may be an ' +
       'interface.\nA schema needs to be defined for this match to be deterministic, ' +
       'otherwise the fragment will be matched heuristically!',
-    16
+    16,
+    logger
   );
 
   return (
@@ -192,7 +195,8 @@ export const makeSelectionIterator = (
                     fragment,
                     typename,
                     entityKey,
-                    ctx.variables
+                    ctx.variables,
+                    ctx.store.logger
                   ));
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
@@ -234,7 +238,8 @@ export const ensureLink = (store: Store, ref: Link<Entity>): Link => {
         '\nYou have to pass an `id` or `_id` field or create a custom `keys` config for `' +
         ref.__typename +
         '`.',
-      12
+      12,
+      store.logger
     );
   }
 
