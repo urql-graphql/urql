@@ -12,6 +12,7 @@ import type {
   UpdatesConfig,
   ResolverConfig,
   OptimisticMutationConfig,
+  Logger,
 } from '../types';
 
 const BUILTIN_NAME = '__';
@@ -19,18 +20,20 @@ const BUILTIN_NAME = '__';
 export const isFieldNullable = (
   schema: SchemaIntrospector,
   typename: string,
-  fieldName: string
+  fieldName: string,
+  logger: Logger | undefined
 ): boolean => {
-  const field = getField(schema, typename, fieldName);
+  const field = getField(schema, typename, fieldName, logger);
   return !!field && field.type.kind !== 'NON_NULL';
 };
 
 export const isListNullable = (
   schema: SchemaIntrospector,
   typename: string,
-  fieldName: string
+  fieldName: string,
+  logger: Logger | undefined
 ): boolean => {
-  const field = getField(schema, typename, fieldName);
+  const field = getField(schema, typename, fieldName, logger);
   if (!field) return false;
   const ofType =
     field.type.kind === 'NON_NULL' ? field.type.ofType : field.type;
@@ -40,11 +43,12 @@ export const isListNullable = (
 export const isFieldAvailableOnType = (
   schema: SchemaIntrospector,
   typename: string,
-  fieldName: string
+  fieldName: string,
+  logger: Logger | undefined
 ): boolean =>
   fieldName.indexOf(BUILTIN_NAME) === 0 ||
   typename.indexOf(BUILTIN_NAME) === 0 ||
-  !!getField(schema, typename, fieldName);
+  !!getField(schema, typename, fieldName, logger);
 
 export const isInterfaceOfType = (
   schema: SchemaIntrospector,
@@ -70,7 +74,8 @@ export const isInterfaceOfType = (
 const getField = (
   schema: SchemaIntrospector,
   typename: string,
-  fieldName: string
+  fieldName: string,
+  logger: Logger | undefined
 ) => {
   if (
     fieldName.indexOf(BUILTIN_NAME) === 0 ||
@@ -90,7 +95,8 @@ const getField = (
         '`, ' +
         'but the GraphQL document expects it to exist.\n' +
         'Traversal will continue, however this may lead to undefined behavior!',
-      4
+      4,
+      logger
     );
   }
 
@@ -124,7 +130,8 @@ function expectAbstractType(schema: SchemaIntrospector, typename: string) {
 
 export function expectValidKeyingConfig(
   schema: SchemaIntrospector,
-  keys: KeyingConfig
+  keys: KeyingConfig,
+  logger: Logger | undefined
 ): void {
   if (process.env.NODE_ENV !== 'production') {
     for (const key in keys) {
@@ -133,7 +140,8 @@ export function expectValidKeyingConfig(
           'Invalid Object type: The type `' +
             key +
             '` is not an object in the defined schema, but the `keys` option is referencing it.',
-          20
+          20,
+          logger
         );
       }
     }
@@ -142,7 +150,8 @@ export function expectValidKeyingConfig(
 
 export function expectValidUpdatesConfig(
   schema: SchemaIntrospector,
-  updates: UpdatesConfig
+  updates: UpdatesConfig,
+  logger: Logger | undefined
 ): void {
   if (process.env.NODE_ENV === 'production') {
     return;
@@ -175,7 +184,8 @@ export function expectValidUpdatesConfig(
           typename +
           '` is not an object in the defined schema, but the `updates` config is referencing it.' +
           addition,
-        21
+        21,
+        logger
       );
     }
 
@@ -188,35 +198,40 @@ export function expectValidUpdatesConfig(
             '` on `' +
             typename +
             '` is not in the defined schema, but the `updates` config is referencing it.',
-          22
+          22,
+          logger
         );
       }
     }
   }
 }
 
-function warnAboutResolver(name: string): void {
+function warnAboutResolver(name: string, logger: Logger | undefined): void {
   warn(
     `Invalid resolver: \`${name}\` is not in the defined schema, but the \`resolvers\` option is referencing it.`,
-    23
+    23,
+    logger
   );
 }
 
 function warnAboutAbstractResolver(
   name: string,
-  kind: 'UNION' | 'INTERFACE'
+  kind: 'UNION' | 'INTERFACE',
+  logger: Logger | undefined
 ): void {
   warn(
     `Invalid resolver: \`${name}\` does not match to a concrete type in the schema, but the \`resolvers\` option is referencing it. Implement the resolver for the types that ${
       kind === 'UNION' ? 'make up the union' : 'implement the interface'
     } instead.`,
-    26
+    26,
+    logger
   );
 }
 
 export function expectValidResolversConfig(
   schema: SchemaIntrospector,
-  resolvers: ResolverConfig
+  resolvers: ResolverConfig,
+  logger: Logger | undefined
 ): void {
   if (process.env.NODE_ENV === 'production') {
     return;
@@ -230,22 +245,23 @@ export function expectValidResolversConfig(
         ).fields();
         for (const resolverQuery in resolvers.Query || {}) {
           if (!validQueries[resolverQuery]) {
-            warnAboutResolver('Query.' + resolverQuery);
+            warnAboutResolver('Query.' + resolverQuery, logger);
           }
         }
       } else {
-        warnAboutResolver('Query');
+        warnAboutResolver('Query', logger);
       }
     } else {
       if (!schema.types!.has(key)) {
-        warnAboutResolver(key);
+        warnAboutResolver(key, logger);
       } else if (
         schema.types!.get(key)!.kind === 'INTERFACE' ||
         schema.types!.get(key)!.kind === 'UNION'
       ) {
         warnAboutAbstractResolver(
           key,
-          schema.types!.get(key)!.kind as 'INTERFACE' | 'UNION'
+          schema.types!.get(key)!.kind as 'INTERFACE' | 'UNION',
+          logger
         );
       } else {
         const validTypeProperties = (
@@ -253,7 +269,7 @@ export function expectValidResolversConfig(
         ).fields();
         for (const resolverProperty in resolvers[key] || {}) {
           if (!validTypeProperties[resolverProperty]) {
-            warnAboutResolver(key + '.' + resolverProperty);
+            warnAboutResolver(key + '.' + resolverProperty, logger);
           }
         }
       }
@@ -263,7 +279,8 @@ export function expectValidResolversConfig(
 
 export function expectValidOptimisticMutationsConfig(
   schema: SchemaIntrospector,
-  optimisticMutations: OptimisticMutationConfig
+  optimisticMutations: OptimisticMutationConfig,
+  logger: Logger | undefined
 ): void {
   if (process.env.NODE_ENV === 'production') {
     return;
@@ -277,7 +294,8 @@ export function expectValidOptimisticMutationsConfig(
       if (!validMutations[mutation]) {
         warn(
           `Invalid optimistic mutation field: \`${mutation}\` is not a mutation field in the defined schema, but the \`optimistic\` option is referencing it.`,
-          24
+          24,
+          logger
         );
       }
     }

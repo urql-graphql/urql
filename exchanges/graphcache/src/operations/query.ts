@@ -235,7 +235,8 @@ export const _queryFragment = (
           ' but could only find ' +
           Object.keys(fragments).join(', ') +
           '.',
-        6
+        6,
+        store.logger
       );
 
       return null;
@@ -247,7 +248,8 @@ export const _queryFragment = (
       warn(
         'readFragment(...) was called with an empty fragment.\n' +
           'You have to call it with at least one fragment in your GraphQL document.',
-        6
+        6,
+        store.logger
       );
 
       return null;
@@ -264,7 +266,8 @@ export const _queryFragment = (
         'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
         typename +
         '`.',
-      7
+      7,
+      store.logger
     );
 
     return null;
@@ -327,7 +330,8 @@ function getFieldResolver(
   if (fieldResolver && directiveResolver) {
     warn(
       `A resolver and directive is being used at "${typename}.${fieldName}" simultaneously. Only the directive will apply.`,
-      28
+      28,
+      ctx.store.logger
     );
   }
 
@@ -356,7 +360,8 @@ const readSelection = (
         ctx.store.rootFields.subscription +
         '` types are special ' +
         'Operation Root Types and cannot be read back from the cache.',
-      25
+      25,
+      store.logger
     );
   }
 
@@ -373,7 +378,8 @@ const readSelection = (
         entityKey +
         '` returned an ' +
         'invalid typename that could not be reconciled with the cache.',
-      8
+      8,
+      store.logger
     );
 
     return;
@@ -406,7 +412,12 @@ const readSelection = (
     const resultValue = result ? result[fieldName] : undefined;
 
     if (process.env.NODE_ENV !== 'production' && store.schema && typename) {
-      isFieldAvailableOnType(store.schema, typename, fieldName);
+      isFieldAvailableOnType(
+        store.schema,
+        typename,
+        fieldName,
+        ctx.store.logger
+      );
     }
 
     // Add the current alias to the walked path before processing the field's value
@@ -466,7 +477,7 @@ const readSelection = (
       if (
         store.schema &&
         dataFieldValue === null &&
-        !isFieldNullable(store.schema, typename, fieldName)
+        !isFieldNullable(store.schema, typename, fieldName, ctx.store.logger)
       ) {
         // Special case for when null is not a valid value for the
         // current field
@@ -519,7 +530,8 @@ const readSelection = (
       dataFieldValue === undefined &&
       (directives.optional ||
         !!getFieldError(ctx) ||
-        (store.schema && isFieldNullable(store.schema, typename, fieldName)))
+        (store.schema &&
+          isFieldNullable(store.schema, typename, fieldName, ctx.store.logger)))
     ) {
       // The field is uncached or has errored, so it'll be set to null and skipped
       ctx.partial = true;
@@ -570,7 +582,7 @@ const resolveResolverResult = (
     // Check whether values of the list may be null; for resolvers we assume
     // that they can be, since it's user-provided data
     const _isListNullable = store.schema
-      ? isListNullable(store.schema, typename, fieldName)
+      ? isListNullable(store.schema, typename, fieldName, ctx.store.logger)
       : false;
     const hasPartials = ctx.partial;
     const data = InMemoryData.makeData(prevData, true);
@@ -622,7 +634,8 @@ const resolveResolverResult = (
         key +
         '` is a scalar (number, boolean, etc)' +
         ', but the GraphQL query expects a selection set for this field.',
-      9
+      9,
+      ctx.store.logger
     );
 
     return undefined;
@@ -641,7 +654,7 @@ const resolveLink = (
   if (Array.isArray(link)) {
     const { store } = ctx;
     const _isListNullable = store.schema
-      ? isListNullable(store.schema, typename, fieldName)
+      ? isListNullable(store.schema, typename, fieldName, ctx.store.logger)
       : false;
     const newLink = InMemoryData.makeData(prevData, true);
     const hasPartials = ctx.partial;

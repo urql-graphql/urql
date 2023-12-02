@@ -17,6 +17,7 @@ import type {
   Entity,
   CacheExchangeOpts,
   DirectivesConfig,
+  Logger,
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -48,6 +49,7 @@ export class Store<
 {
   data: InMemoryData.InMemoryData;
 
+  logger?: Logger;
   directives: DirectivesConfig;
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
@@ -62,6 +64,7 @@ export class Store<
   constructor(opts?: C) {
     if (!opts) opts = {} as C;
 
+    this.logger = opts.logger;
     this.resolvers = opts.resolvers || {};
     this.directives = opts.directives || {};
     this.optimisticMutations = opts.optimistic || {};
@@ -100,12 +103,13 @@ export class Store<
     this.data = InMemoryData.make(queryName);
 
     if (this.schema && process.env.NODE_ENV !== 'production') {
-      expectValidKeyingConfig(this.schema, this.keys);
-      expectValidUpdatesConfig(this.schema, this.updates);
-      expectValidResolversConfig(this.schema, this.resolvers);
+      expectValidKeyingConfig(this.schema, this.keys, this.logger);
+      expectValidUpdatesConfig(this.schema, this.updates, this.logger);
+      expectValidResolversConfig(this.schema, this.resolvers, this.logger);
       expectValidOptimisticMutationsConfig(
         this.schema,
-        this.optimisticMutations
+        this.optimisticMutations,
+        this.logger
       );
     }
   }

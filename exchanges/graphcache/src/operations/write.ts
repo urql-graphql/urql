@@ -147,7 +147,8 @@ export const _writeFragment = (
           ' but could only find ' +
           Object.keys(fragments).join(', ') +
           '.',
-        11
+        11,
+        store.logger
       );
 
       return null;
@@ -159,7 +160,8 @@ export const _writeFragment = (
       warn(
         'writeFragment(...) was called with an empty fragment.\n' +
           'You have to call it with at least one fragment in your GraphQL document.',
-        11
+        11,
+        store.logger
       );
 
       return null;
@@ -175,7 +177,8 @@ export const _writeFragment = (
         'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
         typename +
         '`.',
-      12
+      12,
+      store.logger
     );
   }
 
@@ -223,7 +226,8 @@ const writeSelection = (
     warn(
       "Couldn't find __typename when writing.\n" +
         "If you're writing to the cache manually have to pass a `__typename` property on each entity in your data.",
-      14
+      14,
+      ctx.store.logger
     );
     return;
   } else if (!isRoot && entityKey) {
@@ -260,7 +264,12 @@ const writeSelection = (
 
     if (process.env.NODE_ENV !== 'production') {
       if (ctx.store.schema && typename && fieldName !== '__typename') {
-        isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
+        isFieldAvailableOnType(
+          ctx.store.schema,
+          typename,
+          fieldName,
+          ctx.store.logger
+        );
       }
     }
 
@@ -309,7 +318,8 @@ const writeSelection = (
               '` is `undefined`, but the GraphQL query expects a ' +
               expected +
               ' for this field.',
-            13
+            13,
+            ctx.store.logger
           );
         }
       }
@@ -426,7 +436,8 @@ const writeField = (
         'If this is intentional, create a `keys` config for `' +
         typename +
         '` that always returns null.',
-      15
+      15,
+      ctx.store.logger
     );
   }
 

@@ -7,6 +7,7 @@ import type {
   ExecutableDefinitionNode,
   InlineFragmentNode,
 } from '@0no-co/graphql.web';
+import type { Logger } from '../types';
 import { Kind } from '@0no-co/graphql.web';
 
 export type ErrorCode =
@@ -89,9 +90,17 @@ export function invariant(
   }
 }
 
-export function warn(message: string, code: ErrorCode) {
+export function warn(
+  message: string,
+  code: ErrorCode,
+  logger: Logger | undefined
+) {
   if (!cache.has(message)) {
-    console.warn(message + getDebugOutput() + helpUrl + code);
+    if (logger) {
+      logger('warn', message + getDebugOutput() + helpUrl + code);
+    } else {
+      console.warn(message + getDebugOutput() + helpUrl + code);
+    }
     cache.add(message);
   }
 }

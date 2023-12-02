@@ -541,8 +541,11 @@ export type ResolverResult =
   | null
   | undefined;
 
+export type Logger = (severity: 'error' | 'warn', message: string) => void;
+
 /** Input parameters for the {@link cacheExchange}. */
 export type CacheExchangeOpts = {
+  logger?: Logger;
   /** Configures update functions which are called when the mapped fields are written to the cache.
    *
    * @remarks
