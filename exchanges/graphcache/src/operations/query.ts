@@ -546,7 +546,7 @@ const readSelection = (
           'debug',
           `Got value "null" for required field "${fieldName}"${
             fieldArgs ? ` with args ${JSON.stringify(fieldArgs)}` : ''
-          } on type "${typename}" with id "${entityKey}"`
+          } on entity "${entityKey}"`
         );
       }
       dataFieldValue = undefined;
@@ -572,7 +572,7 @@ const readSelection = (
           'debug',
           `No value for field "${fieldName}"${
             fieldArgs ? ` with args ${JSON.stringify(fieldArgs)}` : ''
-          } on type "${typename}" with id "${entityKey}"`
+          } on entity "${entityKey}"`
         );
       }
       // If the field isn't deferred or partial then we have to abort and also reset
