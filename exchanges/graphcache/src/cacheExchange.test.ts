@@ -110,6 +110,82 @@ describe('data dependencies', () => {
     expect(result.mock.calls[1][0].data).toBe(result.mock.calls[0][0].data);
   });
 
+  it('logs cache misses', () => {
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const op = client.createRequestOperation('query', {
+      key: 1,
+      query: queryOne,
+      variables: undefined,
+    });
+
+    const expected = {
+      __typename: 'Query',
+      author: {
+        id: '123',
+        name: 'Author',
+        __typename: 'Author',
+      },
+      unrelated: {
+        id: 'unrelated',
+        __typename: 'Unrelated',
+      },
+    };
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      return { ...queryResponse, operation: forwardOp, data: expected };
+    });
+
+    const { source: ops$, next } = makeSubject<Operation>();
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    const messages: string[] = [];
+    pipe(
+      cacheExchange({
+        logger(severity, message) {
+          if (severity === 'debug') {
+            messages.push(message);
+          }
+        },
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(op);
+    next(op);
+    next({
+      ...op,
+      query: gql`
+        query ($id: ID!) {
+          author(id: $id) {
+            id
+            name
+          }
+        }
+      `,
+      variables: { id: '123' },
+    });
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(2);
+
+    expect(expected).toMatchObject(result.mock.calls[0][0].data);
+    expect(result.mock.calls[1][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'hit'
+    );
+    expect(expected).toMatchObject(result.mock.calls[1][0].data);
+    expect(result.mock.calls[1][0].data).toBe(result.mock.calls[0][0].data);
+    expect(messages).toEqual([
+      'No value for field "author" on entity "Query"',
+      'No value for field "author" with args {"id":"123"} on entity "Query"',
+    ]);
+  });
+
   it('respects cache-only operations', () => {
     const client = createClient({
       url: 'http://0.0.0.0',
