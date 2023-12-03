@@ -1,5 +1,12 @@
 # @urql/exchange-persisted-fetch
 
+## 4.1.1
+
+### Patch Changes
+
+- Warn about cached persisted-miss results in development, when a `persistedExchange()` sees a persisted-miss error for a result that's already seen a persisted-miss error (i.e. two misses). This shouldn't happen unless something is caching persisted errors and we should warn about this appropriately
+  Submitted by [@kitten](https://github.com/kitten) (See [#3442](https://github.com/urql-graphql/urql/pull/3442))
+
 ## 4.1.0
 
 ### Minor Changes
