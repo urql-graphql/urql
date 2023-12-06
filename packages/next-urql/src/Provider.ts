@@ -9,6 +9,15 @@ export const SSRContext = React.createContext<SSRExchange | undefined>(
   undefined
 );
 
+const SuspenseWarning = () => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(
+      'urql suspended but there was no boundary to catch it, add a <Suspense> component under your urql Provider.'
+    );
+  }
+  return null;
+};
+
 /** Provider for `@urql/next` during non-rsc interactions.
  *
  * @remarks
@@ -59,7 +68,15 @@ export function UrqlProvider({
     React.createElement(
       SSRContext.Provider,
       { value: ssr },
-      React.createElement(DataHydrationContextProvider, { nonce }, children)
+      React.createElement(
+        DataHydrationContextProvider,
+        { nonce },
+        React.createElement(
+          React.Suspense,
+          { fallback: React.createElement(SuspenseWarning) },
+          children
+        )
+      )
     )
   );
 }
