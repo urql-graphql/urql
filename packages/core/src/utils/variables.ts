@@ -29,7 +29,7 @@ const stringify = (x: any): string => {
   if (
     !keys.length &&
     x.constructor &&
-    Object.getPrototypeOf(x).constructor.name === 'Object'
+    Object.getPrototypeOf(x).constructor.name !== 'Object'
   ) {
     const key = cache.get(x) || Math.random().toString(36).slice(2);
     cache.set(x, key);
