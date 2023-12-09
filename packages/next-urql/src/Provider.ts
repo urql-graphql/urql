@@ -71,11 +71,13 @@ export function UrqlProvider({
       React.createElement(
         DataHydrationContextProvider,
         { nonce },
-        React.createElement(
-          React.Suspense,
-          { fallback: React.createElement(SuspenseWarning) },
-          children
-        )
+        typeof window === 'undefined'
+          ? children
+          : React.createElement(
+              React.Suspense,
+              { fallback: React.createElement(SuspenseWarning) },
+              children
+            )
       )
     )
   );
