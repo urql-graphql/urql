@@ -2,6 +2,7 @@
 
 import { stringifyVariables, extractFiles } from './variables';
 import { describe, it, expect } from 'vitest';
+import { Script } from 'vm';
 
 describe('stringifyVariables', () => {
   it('stringifies objects stabily', () => {
@@ -40,10 +41,42 @@ describe('stringifyVariables', () => {
     expect(stringifyVariables(Object.create(null))).toBe('{}');
   });
 
+  it('recovers if the root object is a dictionary (Object.create(null)) and nests a plain object', () => {
+    const root = Object.create(null);
+    root.data = { test: true };
+    expect(stringifyVariables(root)).toBe('{"data":{"test":true}}');
+  });
+
+  it('recovers if the root object contains a dictionary (Object.create(null))', () => {
+    const data = Object.create(null);
+    data.test = true;
+    const root = { data };
+    expect(stringifyVariables(root)).toBe('{"data":{"test":true}}');
+  });
+
+  it('replaces non-plain objects at the root with keyed replacements', () => {
+    expect(stringifyVariables(new (class Test {})())).toMatch(
+      /^{"__key":"\w+"}$/
+    );
+    expect(stringifyVariables(new Map())).toMatch(/^{"__key":"\w+"}$/);
+  });
+
   it('stringifies files correctly', () => {
     const file = new File([0] as any, 'test.js');
     const str = stringifyVariables(file);
     expect(str).toBe('null');
+  });
+
+  it('stringifies plain objects from foreign JS contexts correctly', () => {
+    const global: typeof globalThis = new Script(
+      'exports = globalThis'
+    ).runInNewContext({}).exports;
+
+    const plain = new global.Function('return { test: true }')();
+    expect(stringifyVariables(plain)).toBe('{"test":true}');
+
+    const data = new global.Function('return new (class Test {})')();
+    expect(stringifyVariables(data)).toMatch(/^{"__key":"\w+"}$/);
   });
 });
 
