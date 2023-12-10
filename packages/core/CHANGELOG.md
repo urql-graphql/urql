@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.2.1
+
+### Patch Changes
+
+- ⚠️ Fix incorrect JSON stringification of objects from different JS contexts. This could lead to invalid variables being generated in the Vercel Edge runtime specifically
+  Submitted by [@SoraKumo001](https://github.com/SoraKumo001) (See [#3453](https://github.com/urql-graphql/urql/pull/3453))
+
 ## 4.2.0
 
 ### Minor Changes
