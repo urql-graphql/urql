@@ -40,6 +40,26 @@ describe('stringifyVariables', () => {
     expect(stringifyVariables(Object.create(null))).toBe('{}');
   });
 
+  it('recovers if the root object is a dictionary (Object.create(null)) and nests a plain object', () => {
+    const root = Object.create(null);
+    root.data = { test: true };
+    expect(stringifyVariables(root)).toBe('{"data":{"test":true}}');
+  });
+
+  it('recovers if the root object contains a dictionary (Object.create(null))', () => {
+    const data = Object.create(null);
+    data.test = true;
+    const root = { data };
+    expect(stringifyVariables(root)).toBe('{"data":{"test":true}}');
+  });
+
+  it('replaces non-plain objects at the root with keyed replacements', () => {
+    expect(stringifyVariables(new (class Test {})())).toMatch(
+      /^{"__key":"\w+"}$/
+    );
+    expect(stringifyVariables(new Map())).toMatch(/^{"__key":"\w+"}$/);
+  });
+
   it('stringifies files correctly', () => {
     const file = new File([0] as any, 'test.js');
     const str = stringifyVariables(file);
