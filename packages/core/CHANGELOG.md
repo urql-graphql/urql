@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.2.2
+
+### Patch Changes
+
+- ⚠️ Fix the default `cacheExchange` crashing on `cache-only` request policies with cache misses due to `undefined` results
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3459](https://github.com/urql-graphql/urql/pull/3459))
+
 ## 4.2.1
 
 ### Patch Changes
