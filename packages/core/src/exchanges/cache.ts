@@ -9,6 +9,7 @@ import {
   addMetadata,
   collectTypenames,
   formatDocument,
+  makeResult,
 } from '../utils';
 
 type ResultCache = Map<number, OperationResult>;
@@ -79,7 +80,12 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
               }),
         });
 
-        let result: OperationResult = cachedResult!;
+        let result: OperationResult =
+          cachedResult ||
+          makeResult(operation, {
+            data: null,
+          });
+
         if (process.env.NODE_ENV !== 'production') {
           result = {
             ...result,
