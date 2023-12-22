@@ -80,26 +80,6 @@ const config: CodegenConfig = {
 export default config;
 ```
 
-#### Svelte project configuration
-
-Create the following `codegen.ts` configuration file:
-
-```ts
-const config: CodegenConfig = {
-  schema: '<YOUR_GRAPHQL_API_URL>',
-  documents: ['src/**/*.svelte'],
-  ignoreNoDocuments: true, // for better experience with the watcher
-  generates: {
-    './src/gql/': {
-      preset: 'client',
-      plugins: [],
-    },
-  },
-};
-
-export default config;
-```
-
 ## Typing queries, mutations and subscriptions
 
 Now that your project is properly configured, let's start codegen in watch mode:
