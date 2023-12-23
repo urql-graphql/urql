@@ -135,6 +135,7 @@ export const populateExchange =
         return op;
       }
 
+      let fieldCounter = 0;
       const document = traverse(op.query, node => {
         if (node.kind === Kind.FIELD) {
           if (!node.directives) return;
@@ -259,9 +260,16 @@ export const populateExchange =
                         } as ArgumentNode;
                       })
                     : [];
+
                   const field: FieldNode = {
                     kind: Kind.FIELD,
                     arguments: args,
+                    alias: args.length
+                      ? {
+                          kind: Kind.NAME,
+                          value: value.fieldName + '_' + fieldCounter++,
+                        }
+                      : undefined,
                     name: {
                       kind: Kind.NAME,
                       value: value.fieldName,

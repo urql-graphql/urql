@@ -271,7 +271,64 @@ describe('on query -> mutation', () => {
             __typename
             id
             text
-            createdAt(timezone: \\"GMT+1\\")
+            createdAt_0: createdAt(timezone: \\"GMT+1\\")
+          }
+        }"
+      `);
+    });
+  });
+});
+
+describe('on query -> mutation', () => {
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      variables: undefined,
+      query: gql`
+        query {
+          todos {
+            id
+            text
+            gmt: createdAt(timezone: "GMT+1")
+            utc: createdAt(timezone: "UTC")
+          }
+        }
+      `,
+    },
+    context
+  );
+
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      variables: undefined,
+      query: gql`
+        mutation MyMutation {
+          addTodo @populate
+        }
+      `,
+    },
+    context
+  );
+
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            __typename
+            id
+            text
+            createdAt_0: createdAt(timezone: \\"GMT+1\\")
+            createdAt_1: createdAt(timezone: \\"UTC\\")
           }
         }"
       `);
@@ -821,15 +878,15 @@ describe('nested fragment', () => {
     );
 
     expect(print(response[1].query)).toMatchInlineSnapshot(`
-    "mutation MyMutation {
-      updateTodo {
-        ... on Todo {
-          __typename
-          id
+      "mutation MyMutation {
+        updateTodo {
+          ... on Todo {
+            __typename
+            id
+          }
         }
-      }
-    }"
-  `);
+      }"
+    `);
   });
 });
 
