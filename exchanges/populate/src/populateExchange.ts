@@ -135,7 +135,7 @@ export const populateExchange =
         return op;
       }
 
-      let fieldCounter = 0;
+      const fieldCounter = {};
       const document = traverse(op.query, node => {
         if (node.kind === Kind.FIELD) {
           if (!node.directives) return;
@@ -264,17 +264,24 @@ export const populateExchange =
                   const field: FieldNode = {
                     kind: Kind.FIELD,
                     arguments: args,
-                    alias: args.length
-                      ? {
-                          kind: Kind.NAME,
-                          value: value.fieldName + '_' + fieldCounter++,
-                        }
-                      : undefined,
+                    alias:
+                      args.length && fieldCounter[value.fieldName]
+                        ? {
+                            kind: Kind.NAME,
+                            value:
+                              value.fieldName +
+                              '_' +
+                              fieldCounter[value.fieldName]++,
+                          }
+                        : undefined,
                     name: {
                       kind: Kind.NAME,
                       value: value.fieldName,
                     },
                   };
+                  if (args.length) {
+                    fieldCounter[value.fieldName] = 1;
+                  }
 
                   typeSelections.push(field);
                 } else if (

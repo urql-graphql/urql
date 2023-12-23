@@ -271,7 +271,7 @@ describe('on query -> mutation', () => {
             __typename
             id
             text
-            createdAt_0: createdAt(timezone: \\"GMT+1\\")
+            createdAt(timezone: \\"GMT+1\\")
           }
         }"
       `);
@@ -327,7 +327,7 @@ describe('on query -> mutation', () => {
             __typename
             id
             text
-            createdAt_0: createdAt(timezone: \\"GMT+1\\")
+            createdAt(timezone: \\"GMT+1\\")
             createdAt_1: createdAt(timezone: \\"UTC\\")
           }
         }"
