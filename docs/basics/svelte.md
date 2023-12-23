@@ -362,9 +362,7 @@ Sometimes we'll need to arbitrarly reexecute a query to check for new data on th
   });
 
   function refresh() {
-    queryStore({
-      client,
-      query,
+    todos.reexecute({
       requestPolicy: 'network-only'
     });
   }

@@ -19,6 +19,10 @@
   function nextPage() {
     skip = skip + 10;
   }
+
+  function reexcute() {
+    pokemons.reexecute({ requestPolicy: 'network-only' })
+  }
 </script>
 
 <div>
@@ -34,4 +38,5 @@
     </ul>
   {/if}
   <button on:click={nextPage}>Next Page</button>
+  <button on:click={reexcute}>Reexec</button>
 </div>

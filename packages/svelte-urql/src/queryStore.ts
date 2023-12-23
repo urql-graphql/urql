@@ -119,7 +119,8 @@ export function queryStore<
   Variables extends AnyVariables = AnyVariables,
 >(
   args: QueryArgs<Data, Variables>
-): OperationResultStore<Data, Variables> & Pausable {
+): OperationResultStore<Data, Variables> &
+  Pausable & { reexecute: (context: Partial<OperationContext>) => void } {
   const request = createRequest(args.query, args.variables as Variables);
 
   const context: Partial<OperationContext> = {
@@ -132,6 +133,9 @@ export function queryStore<
     request,
     context
   );
+
+  const operation$ = writable(operation);
+
   const initialState: OperationResultState<Data, Variables> = {
     ...initialResult,
     operation,
@@ -151,15 +155,20 @@ export function queryStore<
           return concat<Partial<OperationResultState<Data, Variables>>>([
             fromValue({ fetching: true, stale: false }),
             pipe(
-              args.client.executeRequestOperation(operation),
-              map(({ stale, data, error, extensions, operation }) => ({
-                fetching: false,
-                stale: !!stale,
-                data,
-                error,
-                operation,
-                extensions,
-              }))
+              fromStore(operation$),
+              switchMap(operation => {
+                return pipe(
+                  args.client.executeRequestOperation(operation),
+                  map(({ stale, data, error, extensions, operation }) => ({
+                    fetching: false,
+                    stale: !!stale,
+                    data,
+                    error,
+                    operation,
+                    extensions,
+                  }))
+                );
+              })
             ),
             fromValue({ fetching: false }),
           ]);
@@ -178,10 +187,21 @@ export function queryStore<
     ).unsubscribe;
   });
 
+  const reexecute = (context: Partial<OperationContext>) => {
+    const newContext = { ...context, ...args.context };
+    const operation = args.client.createRequestOperation(
+      'query',
+      request,
+      newContext
+    );
+    operation$.set(operation);
+  };
+
   return {
     ...derived(result$, (result, set) => {
       set(result);
     }),
     ...createPausable(isPaused$),
+    reexecute,
   };
 }
