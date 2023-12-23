@@ -264,24 +264,21 @@ export const populateExchange =
                   const field: FieldNode = {
                     kind: Kind.FIELD,
                     arguments: args,
-                    alias:
-                      args.length && fieldCounter[value.fieldName]
-                        ? {
-                            kind: Kind.NAME,
-                            value:
-                              value.fieldName +
-                              '_' +
-                              fieldCounter[value.fieldName]++,
-                          }
-                        : undefined,
+                    alias: fieldCounter[typeName + value.fieldName]
+                      ? {
+                          kind: Kind.NAME,
+                          value:
+                            value.fieldName +
+                            '_' +
+                            fieldCounter[typeName + value.fieldName]++,
+                        }
+                      : undefined,
                     name: {
                       kind: Kind.NAME,
                       value: value.fieldName,
                     },
                   };
-                  if (args.length) {
-                    fieldCounter[value.fieldName] = 1;
-                  }
+                  fieldCounter[typeName + value.fieldName] = 1;
 
                   typeSelections.push(field);
                 } else if (
