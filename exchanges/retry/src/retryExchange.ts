@@ -111,7 +111,7 @@ interface RetryState {
 export const retryExchange = (options: RetryExchangeOptions): Exchange => {
   const { retryIf, retryWith } = options;
   const MIN_DELAY = options.initialDelayMs || 1000;
-  const MAX_DELAY = options.maxDelayMs || 15000;
+  const MAX_DELAY = options.maxDelayMs || 15_000;
   const MAX_ATTEMPTS = options.maxNumberAttempts || 2;
   const RANDOM_DELAY =
     options.randomDelay != null ? !!options.randomDelay : true;
@@ -133,11 +133,21 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
           let delayAmount = retry.delay || MIN_DELAY;
 
           const backoffFactor = Math.random() + 1.5;
-          // if randomDelay is enabled and it won't exceed the max delay, apply a random
-          // amount to the delay to avoid thundering herd problem
-          if (RANDOM_DELAY && delayAmount * backoffFactor < MAX_DELAY) {
-            delayAmount *= backoffFactor;
+          if (RANDOM_DELAY) {
+            // if randomDelay is enabled and it won't exceed the max delay, apply a random
+            // amount to the delay to avoid thundering herd problem
+            if (delayAmount * backoffFactor < MAX_DELAY) {
+              delayAmount *= backoffFactor;
+            } else {
+              delayAmount = MAX_DELAY;
+            }
+          } else {
+            // otherwise, increase the delay proportionately by the initial delay
+            delayAmount = Math.min(retryCount * MIN_DELAY, MAX_DELAY);
           }
+
+          // ensure the delay is carried over to the next context
+          retry.delay = delayAmount;
 
           // We stop the retries if a teardown event for this operation comes in
           // But if this event comes through regularly we also stop the retries, since it's
@@ -158,6 +168,7 @@ export const retryExchange = (options: RetryExchangeOptions): Exchange => {
             operation,
             data: {
               retryCount,
+              delayAmount,
             },
           });
 
