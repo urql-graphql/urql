@@ -1,5 +1,12 @@
 # @urql/core
 
+## 4.2.3
+
+### Patch Changes
+
+- Add back our cache-outcome on the document-cache, this was behind a development flag however in our normalized cache we always add it already
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3464](https://github.com/urql-graphql/urql/pull/3464))
+
 ## 4.2.2
 
 ### Patch Changes

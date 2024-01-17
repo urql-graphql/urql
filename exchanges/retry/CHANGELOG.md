@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+---
+
+Fixed the delay amount not increasing as retry count increases
+Submitted by [@DoisKoh](https://github.com/DoisKoh) (See [#3478](https://github.com/urql-graphql/urql/pull/3478))
+
 ## 1.2.0
 
 ### Minor Changes
