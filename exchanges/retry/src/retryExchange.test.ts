@@ -211,15 +211,15 @@ it('should reset the retry counter if an operation succeeded first', () => {
       return fromArray([
         {
           operation: forwardOp,
-          data: queryOneData,
+          error: queryOneError,
         } as any,
         {
           operation: forwardOp,
-          error: queryOneError,
+          data: queryOneData,
         } as any,
       ]);
     } else {
-      expect(forwardOp.context.retry).toEqual({ count: 1, delay: null });
+      expect(forwardOp.context.retry).toEqual({ count: 0, delay: null });
 
       return fromValue({
         operation: forwardOp,
@@ -395,4 +395,62 @@ it('should allow retryWhen to return new operations when retrying', () => {
 
   expect(response.mock.calls[1][0]).toHaveProperty('context.counter', 1);
   expect(response.mock.calls[2][0]).toHaveProperty('context.counter', 2);
+});
+
+it('should increase retries by initialDelayMs for each subsequent failure', () => {
+  const errorWithNetworkError = {
+    ...queryOneError,
+    networkError: 'scary network error',
+  };
+  const response = vi.fn((forwardOp: Operation): OperationResult => {
+    expect(forwardOp.key).toBe(op.key);
+    return {
+      operation: forwardOp,
+      // @ts-ignore
+      error: errorWithNetworkError,
+    };
+  });
+
+  const result = vi.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
+
+  const retryWith = vi.fn((_error, operation) => {
+    return makeOperation(operation.kind, operation, {
+      ...operation.context,
+      counter: (operation.context?.counter || 0) + 1,
+    });
+  });
+
+  const fixedDelayMs = 50;
+
+  const fixedDelayOptions = {
+    ...mockOptions,
+    randomDelay: false,
+    initialDelayMs: fixedDelayMs,
+  };
+
+  pipe(
+    retryExchange({
+      ...fixedDelayOptions,
+      retryIf: undefined,
+      retryWith,
+    })({
+      forward,
+      client,
+      dispatchDebug,
+    })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(op);
+
+  // delay between each call should be increased by initialDelayMs
+  // (e.g. if initialDelayMs is 5s, first retry is waits 5 seconds, second retry waits 10 seconds)
+  for (let i = 1; i <= fixedDelayOptions.maxNumberAttempts; i++) {
+    expect(response).toHaveBeenCalledTimes(i);
+    vi.advanceTimersByTime(i * fixedDelayOptions.initialDelayMs);
+  }
 });
