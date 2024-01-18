@@ -25,16 +25,28 @@ const mapType = (fromType: any): IntrospectionTypeRef => {
       };
 
     case 'SCALAR':
-      _hasAnyType = _hasAnyType || _includeScalars;
-      return _includeScalars ? fromType : anyType;
+      if (_includeScalars) {
+        return fromType;
+      } else {
+        _hasAnyType = true;
+        return anyType;
+      }
 
     case 'INPUT_OBJECT':
-      _hasAnyType = _hasAnyType || _includeInputs;
-      return _includeInputs ? fromType : anyType;
+      if (_includeInputs) {
+        return fromType;
+      } else {
+        _hasAnyType = true;
+        return anyType;
+      }
 
     case 'ENUM':
-      _hasAnyType = _hasAnyType || _includeEnums;
-      return _includeEnums ? fromType : anyType;
+      if (_includeEnums) {
+        return fromType;
+      } else {
+        _hasAnyType = true;
+        return anyType;
+      }
 
     case 'OBJECT':
     case 'INTERFACE':
@@ -258,7 +270,7 @@ export const minifyIntrospectionQuery = (
     ),
   }));
 
-  if (!_includeScalars || !_includeEnums || !_includeInputs || _hasAnyType) {
+  if (_hasAnyType) {
     minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
   }
 
