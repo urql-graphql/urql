@@ -1,5 +1,12 @@
 # @urql/introspection
 
+## 1.0.3
+
+### Patch Changes
+
+- ⚠️ Fix `Any` type being included, even when it isn’t needed
+  Submitted by [@kitten](https://github.com/kitten) (See [#3481](https://github.com/urql-graphql/urql/pull/3481))
+
 ## 1.0.2
 
 ### Patch Changes
