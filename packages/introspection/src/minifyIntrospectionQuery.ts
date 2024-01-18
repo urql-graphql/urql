@@ -3,6 +3,7 @@ import type {
   IntrospectionType,
   IntrospectionTypeRef,
   IntrospectionInputValue,
+  IntrospectionDirective,
 } from 'graphql';
 
 let _includeScalars = false;
@@ -25,16 +26,28 @@ const mapType = (fromType: any): IntrospectionTypeRef => {
       };
 
     case 'SCALAR':
-      _hasAnyType = _hasAnyType || _includeScalars;
-      return _includeScalars ? fromType : anyType;
+      if (_includeScalars) {
+        return fromType;
+      } else {
+        _hasAnyType = true;
+        return anyType;
+      }
 
     case 'INPUT_OBJECT':
-      _hasAnyType = _hasAnyType || _includeInputs;
-      return _includeInputs ? fromType : anyType;
+      if (_includeInputs) {
+        return fromType;
+      } else {
+        _hasAnyType = true;
+        return anyType;
+      }
 
     case 'ENUM':
-      _hasAnyType = _hasAnyType || _includeEnums;
-      return _includeEnums ? fromType : anyType;
+      if (_includeEnums) {
+        return fromType;
+      } else {
+        _hasAnyType = true;
+        return anyType;
+      }
 
     case 'OBJECT':
     case 'INTERFACE':
@@ -244,22 +257,25 @@ export const minifyIntrospectionQuery = (
     })
     .map(minifyIntrospectionType);
 
-  const minifiedDirectives = (directives || []).map(directive => ({
-    name: directive.name,
-    isRepeatable: directive.isRepeatable ? true : undefined,
-    locations: directive.locations,
-    args: directive.args.map(
-      arg =>
-        ({
-          name: arg.name,
-          type: mapType(arg.type),
-          defaultValue: arg.defaultValue || undefined,
-        }) as IntrospectionInputValue
-    ),
-  }));
-
-  if (!_includeScalars || !_includeEnums || !_includeInputs || _hasAnyType) {
+  if (_hasAnyType) {
     minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
+  }
+
+  let minifiedDirectives: IntrospectionDirective[] = [];
+  if (opts.includeDirectives) {
+    minifiedDirectives = (directives || []).map(directive => ({
+      name: directive.name,
+      isRepeatable: directive.isRepeatable ? true : undefined,
+      locations: directive.locations,
+      args: directive.args.map(
+        arg =>
+          ({
+            name: arg.name,
+            type: mapType(arg.type),
+            defaultValue: arg.defaultValue || undefined,
+          }) as IntrospectionInputValue
+      ),
+    }));
   }
 
   return {
@@ -268,7 +284,7 @@ export const minifyIntrospectionQuery = (
       mutationType,
       subscriptionType,
       types: minifiedTypes,
-      directives: opts.includeDirectives ? minifiedDirectives : [],
+      directives: minifiedDirectives,
     },
   };
 };
