@@ -3,6 +3,7 @@ import type {
   IntrospectionType,
   IntrospectionTypeRef,
   IntrospectionInputValue,
+  IntrospectionDirective,
 } from 'graphql';
 
 let _includeScalars = false;
@@ -256,22 +257,25 @@ export const minifyIntrospectionQuery = (
     })
     .map(minifyIntrospectionType);
 
-  const minifiedDirectives = (directives || []).map(directive => ({
-    name: directive.name,
-    isRepeatable: directive.isRepeatable ? true : undefined,
-    locations: directive.locations,
-    args: directive.args.map(
-      arg =>
-        ({
-          name: arg.name,
-          type: mapType(arg.type),
-          defaultValue: arg.defaultValue || undefined,
-        }) as IntrospectionInputValue
-    ),
-  }));
-
   if (_hasAnyType) {
     minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
+  }
+
+  let minifiedDirectives: IntrospectionDirective[] = [];
+  if (opts.includeDirectives) {
+    minifiedDirectives = (directives || []).map(directive => ({
+      name: directive.name,
+      isRepeatable: directive.isRepeatable ? true : undefined,
+      locations: directive.locations,
+      args: directive.args.map(
+        arg =>
+          ({
+            name: arg.name,
+            type: mapType(arg.type),
+            defaultValue: arg.defaultValue || undefined,
+          }) as IntrospectionInputValue
+      ),
+    }));
   }
 
   return {
@@ -280,7 +284,7 @@ export const minifyIntrospectionQuery = (
       mutationType,
       subscriptionType,
       types: minifiedTypes,
-      directives: opts.includeDirectives ? minifiedDirectives : [],
+      directives: minifiedDirectives,
     },
   };
 };
