@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Bump peer-dependency of `@react-native-community/netinfo` to allow v11
+  Submitted by [@albinhubsch](https://github.com/albinhubsch) (See [#3485](https://github.com/urql-graphql/urql/pull/3485))
+
 ## 1.0.3
 
 ### Patch Changes
