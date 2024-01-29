@@ -78,8 +78,8 @@ import { relayPagination } from '@urql/exchange-graphcache/extras';
 
 cacheExchange({
   directives: {
-    simplePagination: () => simplePagination(),
-    relayPagination: () => relayPagination(),
+    simplePagination: (options) => simplePagination({ ...options }),
+    relayPagination: (options) => relayPagination({ ...options }),
   },
 });
 ```
