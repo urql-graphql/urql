@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ServerInsertedHTMLContext } from 'next/navigation';
 import type { UrqlResult } from './useUrqlValue';
+import { htmlEscapeJsonString } from './htmlescape';
 
 interface DataHydrationValue {
   isInjecting: boolean;
@@ -19,7 +20,7 @@ const DataHydrationContext = React.createContext<
 
 function transportDataToJS(data: any) {
   const key = 'urql_transport';
-  return `(window[Symbol.for("${key}")] ??= []).push(${JSON.stringify(data)})`;
+  return `(window[Symbol.for("${key}")] ??= []).push(${htmlEscapeJsonString(JSON.stringify(data))})`;
 }
 
 export const DataHydrationContextProvider = ({
