@@ -22,14 +22,14 @@ const NPM_SEARCH = gql`
 `;
 
 const PaginatedNpmSearch = () => {
-  const [after, setAfter] = useState('');
+  const [after, setAfter] = useState(null);
 
   const [result] = useQuery({
     query: NPM_SEARCH,
     variables: { query, first: limit, after },
   });
 
-  const { data, fetching, error } = result;
+  const { data, stale, fetching, error } = result;
 
   const searchResults = data?.search;
 
@@ -37,7 +37,7 @@ const PaginatedNpmSearch = () => {
     <div>
       {error && <p>Oh no... {error.message}</p>}
 
-      {fetching && <p>Loading...</p>}
+      {(fetching || stale) && <p>Loading...</p>}
 
       {searchResults && (
         <>
@@ -52,6 +52,8 @@ const PaginatedNpmSearch = () => {
               load more
             </button>
           )}
+
+          <button onClick={() => setAfter(null)}>start over</button>
         </>
       )}
     </div>
