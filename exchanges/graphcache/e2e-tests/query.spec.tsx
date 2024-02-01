@@ -31,7 +31,8 @@ const schema = buildSchema(`
 `);
 
 const rootValue = {
-  movie: () => {
+  movie: async () => {
+    await new Promise(resolve => setTimeout(resolve, 50));
     return {
       id: 'foo',
       title: 'title',
