@@ -384,6 +384,7 @@ export const cacheExchange =
             requestPolicy !== 'cache-only' &&
             (shouldReexecute ||
               (res.outcome === 'partial' &&
+                reexecutingOperations.has(res.operation.key) &&
                 hasLayer(store.data, res.operation.key)));
 
           const result: OperationResult = {
