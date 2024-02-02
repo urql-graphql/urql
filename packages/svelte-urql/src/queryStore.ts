@@ -194,6 +194,7 @@ export function queryStore<
       request,
       newContext
     );
+    isPaused$.set(false);
     operation$.set(operation);
   };
 
