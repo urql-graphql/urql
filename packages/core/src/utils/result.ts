@@ -153,7 +153,7 @@ export const mergeResultPatch = (
     withData.data = (nextResult.payload || nextResult).data || prevResult.data;
     errors =
       (nextResult.errors as any[]) ||
-      (nextResult.payload && nextResult.payload.errors) || 
+      (nextResult.payload && nextResult.payload.errors) ||
       errors;
   }
 
