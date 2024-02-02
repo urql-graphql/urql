@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 6.4.1
+
+### Patch Changes
+
+- Set `stale: true` on cache results, even if a reexecution has been blocked by the loop protection, if the operation is already pending and in-flight
+  Submitted by [@kitten](https://github.com/kitten) (See [#3493](https://github.com/urql-graphql/urql/pull/3493))
+- ⚠️ Fix `@defer` state leaking into following operations
+  Submitted by [@kitten](https://github.com/kitten) (See [#3497](https://github.com/urql-graphql/urql/pull/3497))
+
 ## 6.4.0
 
 ### Minor Changes
