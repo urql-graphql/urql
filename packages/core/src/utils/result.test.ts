@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { OperationResult } from '../types';
 import { queryOperation, subscriptionOperation } from '../test-utils';
 import { makeResult, mergeResultPatch } from './result';
+import { GraphQLError } from '@0no-co/graphql.web';
+import { CombinedError } from './error';
 
 describe('makeResult', () => {
   it('adds extensions and errors correctly', () => {
@@ -177,6 +179,62 @@ describe('mergeResultPatch (defer/stream pre June-2023)', () => {
 
     expect(merged.data).not.toBe(prevResult.data);
     expect(merged.data.event).toBe(2);
+    expect(merged.hasNext).toBe(true);
+  });
+
+  it('should work with the payload property', () => {
+    const prevResult: OperationResult = {
+      operation: subscriptionOperation,
+      data: {
+        __typename: 'Subscription',
+        event: 1,
+      },
+      stale: false,
+      hasNext: true,
+    };
+
+    const merged = mergeResultPatch(prevResult, {
+      payload: {
+        data: {
+          __typename: 'Subscription',
+          event: 2,
+        },
+      },
+    });
+
+    expect(merged.data).not.toBe(prevResult.data);
+    expect(merged.data.event).toBe(2);
+    expect(merged.hasNext).toBe(true);
+  });
+
+  it('should work with the payload property and errors', () => {
+    const prevResult: OperationResult = {
+      operation: subscriptionOperation,
+      data: {
+        __typename: 'Subscription',
+        event: 1,
+      },
+      stale: false,
+      hasNext: true,
+    };
+
+    const merged = mergeResultPatch(prevResult, {
+      payload: {
+        data: {
+          __typename: 'Subscription',
+          event: 2,
+        },
+      },
+      errors: [new GraphQLError('Something went horribly wrong')],
+    });
+
+    expect(merged.data).not.toBe(prevResult.data);
+    expect(merged.data.event).toBe(2);
+    expect(merged.error).toEqual(
+      new CombinedError({
+        graphQLErrors: [new GraphQLError('Something went horribly wrong')],
+      })
+    );
     expect(merged.hasNext).toBe(true);
   });
 

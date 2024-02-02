@@ -92,8 +92,12 @@ export const mergeResultPatch = (
   pending?: ExecutionResult['pending']
 ): OperationResult => {
   let errors = prevResult.error ? prevResult.error.graphQLErrors : [];
-  let hasExtensions = !!prevResult.extensions || !!nextResult.extensions;
-  const extensions = { ...prevResult.extensions, ...nextResult.extensions };
+  let hasExtensions =
+    !!prevResult.extensions || !!(nextResult.payload || nextResult).extensions;
+  const extensions = {
+    ...prevResult.extensions,
+    ...(nextResult.payload || nextResult).extensions,
+  };
 
   let incremental = nextResult.incremental;
 
@@ -146,7 +150,7 @@ export const mergeResultPatch = (
       }
     }
   } else {
-    withData.data = nextResult.data || prevResult.data;
+    withData.data = (nextResult.payload || nextResult).data || prevResult.data;
     errors = (nextResult.errors as any[]) || errors;
   }
 
