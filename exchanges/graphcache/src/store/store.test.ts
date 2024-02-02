@@ -844,6 +844,15 @@ describe('Store with OptimisticMutationConfig', () => {
       expect(data).toBe(null);
     });
   });
+
+  describe('Invalidating a type', () => {
+    it('removes an entity from a list.', () => {
+      InMemoryData.initDataState('write', store.data, null);
+      store.invalidate('Todo');
+      const { data } = query(store, { query: Todos });
+      expect(data).toBe(null);
+    });
+  });
 });
 
 describe('Store with storage', () => {
