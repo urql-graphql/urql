@@ -170,11 +170,8 @@ export class Store<
 
   invalidate(entity: Entity, field?: string, args?: FieldArgs) {
     const entityKey = this.keyOfEntity(entity);
-    if (
-      entity &&
-      (typeof entity === 'string' || Object.keys(entity).length === 1) &&
-      !entityKey
-    ) {
+    const shouldInvalidateType = entity && (typeof entity === 'string' || Object.keys(entity).length === 1) && !field && !args
+    if (shouldInvalidateType) {
       invalidateType(typeof entity === 'string' ? entity : entity.__typename);
     } else {
       invariant(
