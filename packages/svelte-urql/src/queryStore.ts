@@ -152,12 +152,12 @@ export function queryStore<
             return never as any;
           }
 
-          return concat<Partial<OperationResultState<Data, Variables>>>([
-            fromValue({ fetching: true, stale: false }),
-            pipe(
-              fromStore(operation$),
-              switchMap(operation => {
-                return pipe(
+          return pipe(
+            fromStore(operation$),
+            switchMap(operation => {
+              return concat<Partial<OperationResultState<Data, Variables>>>([
+                fromValue({ fetching: true, stale: false }),
+                pipe(
                   args.client.executeRequestOperation(operation),
                   map(({ stale, data, error, extensions, operation }) => ({
                     fetching: false,
@@ -167,11 +167,11 @@ export function queryStore<
                     operation,
                     extensions,
                   }))
-                );
-              })
-            ),
-            fromValue({ fetching: false }),
-          ]);
+                ),
+                fromValue({ fetching: false }),
+              ]);
+            })
+          );
         }
       ),
       scan(
