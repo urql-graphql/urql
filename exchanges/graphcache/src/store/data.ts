@@ -528,6 +528,11 @@ export const reserveLayer = (
   data.commutativeKeys.add(layerKey);
 };
 
+/** Checks whether a given layer exists */
+export const hasLayer = (data: InMemoryData, layerKey: number) =>
+  data.commutativeKeys.has(layerKey) ||
+  data.optimisticOrder.indexOf(layerKey) > -1;
+
 /** Creates an optimistic layer of links and records */
 const createLayer = (data: InMemoryData, layerKey: number) => {
   if (data.optimisticOrder.indexOf(layerKey) === -1) {
