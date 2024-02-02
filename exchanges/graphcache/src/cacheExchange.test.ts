@@ -3007,4 +3007,75 @@ describe('commutativity', () => {
     expect(combinedData).toHaveProperty('data.deferred.id', 1);
     expect(combinedData).toHaveProperty('data.node.id', 2);
   });
+
+  it('applies deferred logic only to deferred operations', () => {
+    let failingData: OperationResult | undefined;
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$ } = makeSubject<OperationResult>();
+
+    const deferredQuery = gql`
+      {
+        ... @defer {
+          deferred {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const failingQuery = gql`
+      {
+        deferred {
+          id
+          name
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
+
+    pipe(
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
+      tap(result => {
+        if (result.operation.kind === 'query') {
+          if (result.operation.key === 1) {
+            failingData = result;
+          }
+        }
+      }),
+      publish
+    );
+
+    const failingOp = client.createRequestOperation('query', {
+      key: 1,
+      query: failingQuery,
+      variables: undefined,
+    });
+    const deferredOp = client.createRequestOperation('query', {
+      key: 2,
+      query: deferredQuery,
+      variables: undefined,
+    });
+
+    nextOp(deferredOp);
+    nextOp(failingOp);
+
+    expect(failingData).not.toMatchObject({ hasNext: true });
+  });
 });
