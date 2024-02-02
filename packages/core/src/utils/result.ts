@@ -151,7 +151,11 @@ export const mergeResultPatch = (
     }
   } else {
     withData.data = (nextResult.payload || nextResult).data || prevResult.data;
-    errors = (nextResult.errors as any[]) || errors;
+    errors =
+      [
+        ...((nextResult.errors || []) as any[]),
+        ...((nextResult.payload && nextResult.payload.errors) || []),
+      ] || errors;
   }
 
   return {
