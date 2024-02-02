@@ -411,10 +411,13 @@ export const gc = () => {
     const rc = currentData!.refCount.get(entityKey) || 0;
     if (rc > 0) continue;
 
+    const record = currentData!.records.base.get(entityKey);
     // Delete the reference count, and delete the entity from the GC batch
     currentData!.refCount.delete(entityKey);
     currentData!.records.base.delete(entityKey);
-    const typename = entityKey.split(':')[0];
+
+    const typename = ((record && record.__typename) ||
+      entityKey.split(':')[0]) as string;
     const type = currentData!.types.get(typename);
     if (type) {
       const index = type.indexOf(entityKey);
