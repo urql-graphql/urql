@@ -6,8 +6,8 @@ import {
   OperationResult,
   CombinedError,
 } from '@urql/core';
-import { print, stripIgnoredCharacters } from 'graphql';
 
+import { print, stripIgnoredCharacters } from 'graphql';
 import { vi, expect, it, describe } from 'vitest';
 
 import {
@@ -2197,6 +2197,156 @@ describe('schema awareness', () => {
   });
 });
 
+describe('looping protection', () => {
+  it('applies stale to blocked looping queries', () => {
+    let normalData: OperationResult | undefined;
+    let extendedData: OperationResult | undefined;
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+
+    const normalQuery = gql`
+      {
+        __typename
+        item {
+          __typename
+          id
+        }
+      }
+    `;
+
+    const extendedQuery = gql`
+      {
+        __typename
+        item {
+          __typename
+          extended: id
+          extra @_optional
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      share(
+        merge([
+          pipe(
+            ops$,
+            filter(() => false)
+          ) as any,
+          res$,
+        ])
+      );
+
+    pipe(
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
+      tap(result => {
+        if (result.operation.kind === 'query') {
+          if (result.operation.key === 1) {
+            normalData = result;
+          } else if (result.operation.key === 2) {
+            extendedData = result;
+          }
+        }
+      }),
+      publish
+    );
+
+    const normalOp = client.createRequestOperation(
+      'query',
+      {
+        key: 1,
+        query: normalQuery,
+        variables: undefined,
+      },
+      {
+        requestPolicy: 'cache-first',
+      }
+    );
+
+    const extendedOp = client.createRequestOperation(
+      'query',
+      {
+        key: 2,
+        query: extendedQuery,
+        variables: undefined,
+      },
+      {
+        requestPolicy: 'cache-first',
+      }
+    );
+
+    nextOp(normalOp);
+
+    nextRes({
+      operation: normalOp,
+      data: {
+        __typename: 'Query',
+        item: {
+          __typename: 'Node',
+          id: 'id',
+        },
+      },
+      stale: false,
+      hasNext: false,
+    });
+
+    expect(normalData).toMatchObject({ stale: false });
+    expect(client.reexecuteOperation).toHaveBeenCalledTimes(0);
+
+    nextOp(extendedOp);
+
+    expect(extendedData).toMatchObject({ stale: true });
+    expect(client.reexecuteOperation).toHaveBeenCalledTimes(1);
+
+    // Out of band re-execute first operation
+    nextOp(normalOp);
+    nextRes({
+      ...queryResponse,
+      operation: normalOp,
+      data: {
+        __typename: 'Query',
+        item: {
+          __typename: 'Node',
+          id: 'id',
+        },
+      },
+    });
+
+    expect(normalData).toMatchObject({ stale: false });
+    expect(extendedData).toMatchObject({ stale: true });
+    expect(client.reexecuteOperation).toHaveBeenCalledTimes(3);
+
+    nextOp(extendedOp);
+
+    expect(normalData).toMatchObject({ stale: false });
+    expect(extendedData).toMatchObject({ stale: true });
+    expect(client.reexecuteOperation).toHaveBeenCalledTimes(3);
+
+    nextRes({
+      ...queryResponse,
+      operation: extendedOp,
+      data: {
+        __typename: 'Query',
+        item: {
+          __typename: 'Node',
+          extended: 'id',
+          extra: 'extra',
+        },
+      },
+    });
+
+    expect(extendedData).toMatchObject({ stale: false });
+    expect(client.reexecuteOperation).toHaveBeenCalledTimes(4);
+  });
+});
+
 describe('commutativity', () => {
   it('applies results that come in out-of-order commutatively and consistently', () => {
     vi.useFakeTimers();
@@ -2873,8 +3023,7 @@ describe('commutativity', () => {
     });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
-
-    vi.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+    client.reexecuteOperation = nextOp;
 
     const normalQuery = gql`
       {
@@ -2911,11 +3060,11 @@ describe('commutativity', () => {
       }
     `;
 
-    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+    const forward = (operations$: Source<Operation>): Source<OperationResult> =>
       share(
         merge([
           pipe(
-            ops$,
+            operations$,
             filter(() => false)
           ) as any,
           res$,
