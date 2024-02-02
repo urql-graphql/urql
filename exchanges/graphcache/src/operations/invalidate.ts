@@ -24,3 +24,10 @@ export const invalidateEntity = (
     }
   }
 };
+
+export const invalidateType = (typename: string) => {
+  const types = InMemoryData.getEntitiesForType(typename) || [];
+  for (let i = 0, l = types.length; i < l; i++) {
+    invalidateEntity(types[i]);
+  }
+};

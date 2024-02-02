@@ -47,6 +47,7 @@ export interface InMemoryData {
   records: NodeMap<EntityField>;
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
+  types: Map<string, string[]>;
   /** A set of Query operation keys that are in-flight and deferred/streamed */
   deferredKeys: Set<number>;
   /** A set of Query operation keys that are in-flight and awaiting a result */
@@ -238,6 +239,7 @@ export const make = (queryRootKey: string): InMemoryData => ({
   hydrating: false,
   defer: false,
   gc: new Set(),
+  types: new Map(),
   persist: new Set(),
   queryRootKey,
   refCount: new Map(),
@@ -403,6 +405,12 @@ export const gc = () => {
   for (const entityKey of currentData!.gc.keys()) {
     // Remove the current key from the GC batch
     currentData!.gc.delete(entityKey);
+    const typename = entityKey.split(':')[0];
+    const type = currentData!.types.get(typename);
+    if (type) {
+      const index = type.indexOf(entityKey);
+      if (index > -1) type.splice(index, 1);
+    }
 
     // Check first whether the entity has any references,
     // if so, we skip it from the GC run
@@ -450,6 +458,18 @@ export const readLink = (
 ): Link | undefined => {
   updateDependencies(entityKey, fieldKey);
   return getNode(currentData!.links, entityKey, fieldKey);
+};
+
+export const getEntitiesForType = (typename: string) =>
+  currentData!.types.get(typename);
+
+export const writeType = (typename: string, entityKey: string) => {
+  const existingTypes = currentData!.types.get(typename);
+  if (!existingTypes) {
+    currentData!.types.set(typename, [entityKey]);
+  } else {
+    existingTypes.push(entityKey);
+  }
 };
 
 /** Writes an entity's field (a "record") to data */
