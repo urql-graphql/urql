@@ -43,6 +43,7 @@ import {
   updateContext,
   getFieldError,
   deferRef,
+  optionalRef,
 } from './shared';
 
 import {
@@ -145,6 +146,7 @@ const readRoot = (
     entityKey,
     entityKey,
     deferRef,
+    optionalRef,
     select,
     ctx
   );
@@ -389,6 +391,7 @@ const readSelection = (
     typename,
     entityKey,
     deferRef,
+    optionalRef,
     select,
     ctx
   );
@@ -529,6 +532,7 @@ const readSelection = (
       !deferRef &&
       dataFieldValue === undefined &&
       (directives.optional ||
+        (optionalRef && !directives.required) ||
         !!getFieldError(ctx) ||
         (store.schema &&
           isFieldNullable(store.schema, typename, fieldName, ctx.store.logger)))

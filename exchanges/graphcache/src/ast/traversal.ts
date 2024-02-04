@@ -93,3 +93,19 @@ export const isDeferred = (
 
   return false;
 };
+
+/** Resolves @_optional and @_required directive to determine whether the fields in a fragment are conaidered optional. */
+export const isOptional = (
+  node: FormattedNode<FragmentSpreadNode | InlineFragmentNode>
+): boolean | undefined => {
+  const { optional, required } = getDirectives(node);
+  if (required) {
+    return false;
+  }
+
+  if (optional) {
+    return true;
+  }
+
+  return undefined;
+};

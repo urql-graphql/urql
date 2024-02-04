@@ -8,7 +8,13 @@ import type {
 import { Kind } from '@0no-co/graphql.web';
 
 import type { SelectionSet } from '../ast';
-import { isDeferred, getTypeCondition, getSelectionSet, getName } from '../ast';
+import {
+  isDeferred,
+  getTypeCondition,
+  getSelectionSet,
+  getName,
+  isOptional,
+} from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField, currentOperation, currentOptimistic } from '../store/data';
@@ -49,6 +55,7 @@ export interface Context {
 
 export let contextRef: Context | null = null;
 export let deferRef = false;
+export let optionalRef = false;
 
 // Checks whether the current data field is a cache miss because of a GraphQLError
 export const getFieldError = (ctx: Context): ErrorLike | undefined =>
@@ -160,6 +167,7 @@ export const makeSelectionIterator = (
   typename: void | string,
   entityKey: string,
   defer: boolean,
+  optional: boolean,
   selectionSet: FormattedNode<SelectionSet>,
   ctx: Context
 ): SelectionIterator => {
@@ -171,6 +179,7 @@ export const makeSelectionIterator = (
     while (child || index < selectionSet.length) {
       node = undefined;
       deferRef = defer;
+      optionalRef = optional;
       if (child) {
         if ((node = child())) {
           return node;
@@ -203,10 +212,15 @@ export const makeSelectionIterator = (
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
+
+              const isFragmentOptional = isOptional(select);
               child = makeSelectionIterator(
                 typename,
                 entityKey,
                 defer || isDeferred(select, ctx.variables),
+                isFragmentOptional === undefined
+                  ? optional
+                  : isFragmentOptional,
                 getSelectionSet(fragment),
                 ctx
               );
