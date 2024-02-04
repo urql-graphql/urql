@@ -47,6 +47,7 @@ export interface InMemoryData {
   records: NodeMap<EntityField>;
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
+  /** A map of typename to a list of entity-keys belonging to said type */
   types: Map<string, string[]>;
   /** A set of Query operation keys that are in-flight and deferred/streamed */
   deferredKeys: Set<number>;
