@@ -72,6 +72,7 @@ export const makeContext = (
   error: CombinedError | undefined
 ): Context => {
   deferRef = false;
+  optionalRef = false;
 
   const ctx: Context = {
     store,
