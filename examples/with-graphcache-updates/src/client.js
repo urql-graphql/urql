@@ -29,8 +29,13 @@ const cache = cacheExchange({
               variables: { first: lastField.arguments.first },
             },
             data => {
-              data.links.nodes.push(result.createLink.node);
-              return data;
+              return {
+                ...data,
+                links: {
+                  ...data.links,
+                  nodes: [...data.links.nodes, result.createLink.node],
+                },
+              };
             }
           );
         }
