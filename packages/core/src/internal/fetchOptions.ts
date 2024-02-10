@@ -131,9 +131,15 @@ export const makeFetchOptions = (
       : operation.context.fetchOptions) || {};
   if (extraOptions.headers) {
     if (extraOptions.headers.forEach) {
-      (extraOptions.headers as Headers).forEach((value, key) => {
-        headers[key] = value;
-      });
+      (extraOptions.headers as Headers | [[string, string]]).forEach(
+        (value, key) => {
+          if (Array.isArray(value)) {
+            headers[value[0]] = value[1];
+          } else {
+            headers[key] = value;
+          }
+        }
+      );
     } else {
       for (const key in extraOptions.headers) {
         headers[key.toLowerCase()] = extraOptions.headers[key];
