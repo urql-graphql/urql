@@ -129,18 +129,9 @@ export const makeFetchOptions = (
     (typeof operation.context.fetchOptions === 'function'
       ? operation.context.fetchOptions()
       : operation.context.fetchOptions) || {};
-  if (extraOptions.headers) {
-    if (extraOptions.headers.forEach) {
-      (extraOptions.headers as Headers).forEach((value, key) => {
-        headers[key] = value;
-      });
-    } else {
-      for (const key in extraOptions.headers) {
-        headers[key.toLowerCase()] = extraOptions.headers[key];
-      }
-    }
-  }
-
+  if (extraOptions.headers)
+    for (const key in extraOptions.headers)
+      headers[key.toLowerCase()] = extraOptions.headers[key];
   const serializedBody = serializeBody(operation, body);
   if (typeof serializedBody === 'string' && !headers['content-type'])
     headers['content-type'] = 'application/json';
