@@ -35,7 +35,7 @@ Specifically, `urql` simplifies three common aspects of using GraphQL:
 - Abstracting _caching_ and state management internally
 - Providing a central point of _extensibility_ and integration with your API
 
-In the following sections we'll talk about the way that `urql` solves these three problems and how the logic abstracted away internally.
+In the following sections we'll talk about the way that `urql` solves these three problems and how the logic is abstracted away internally.
 
 ## Requests and Operations on the Client
 
