@@ -45,6 +45,7 @@ import {
   updateContext,
   getFieldError,
   deferRef,
+  optionalRef,
 } from './shared';
 
 export interface WriteResult {
