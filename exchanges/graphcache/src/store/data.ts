@@ -417,13 +417,15 @@ export const gc = () => {
     currentData!.refCount.delete(entityKey);
     currentData!.records.base.delete(entityKey);
 
-    const typename = ((record && record.__typename) ||
-      entityKey.split(':')[0]) as string;
-    const type = currentData!.types.get(typename);
-    if (type) {
-      const index = type.indexOf(entityKey);
-      if (index > -1) type.splice(index, 1);
+    const typename = (record && record.__typename) as string | undefined;
+    if (typename) {
+      const type = currentData!.types.get(typename);
+      if (type) {
+        const index = type.indexOf(entityKey);
+        if (index > -1) type.splice(index, 1);
+      }
     }
+
     const linkNode = currentData!.links.base.get(entityKey);
     if (linkNode) {
       currentData!.links.base.delete(entityKey);
