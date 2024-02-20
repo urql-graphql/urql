@@ -48,7 +48,7 @@ export interface InMemoryData {
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
   /** A map of typename to a list of entity-keys belonging to said type */
-  types: Map<string, string[]>;
+  types: Map<string, Set<string>>;
   /** A set of Query operation keys that are in-flight and deferred/streamed */
   deferredKeys: Set<number>;
   /** A set of Query operation keys that are in-flight and awaiting a result */
@@ -420,9 +420,8 @@ export const gc = () => {
     const typename = (record && record.__typename) as string | undefined;
     if (typename) {
       const type = currentData!.types.get(typename);
-      if (type) {
-        const index = type.indexOf(entityKey);
-        if (index > -1) type.splice(index, 1);
+      if (type && type.has(entityKey)) {
+        type.delete(entityKey);
       }
     }
 
@@ -472,9 +471,11 @@ export const getEntitiesForType = (typename: string) =>
 export const writeType = (typename: string, entityKey: string) => {
   const existingTypes = currentData!.types.get(typename);
   if (!existingTypes) {
-    currentData!.types.set(typename, [entityKey]);
+    const typeSet = new Set<string>();
+    typeSet.add(entityKey);
+    currentData!.types.set(typename, typeSet);
   } else {
-    existingTypes.push(entityKey);
+    existingTypes.add(entityKey);
   }
 };
 
