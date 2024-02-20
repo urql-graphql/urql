@@ -134,7 +134,11 @@ export const makeFetchOptions = (
       (extraOptions.headers as Headers | [[string, string]]).forEach(
         (value, key) => {
           if (Array.isArray(value)) {
-            headers[value[0]] = value[1];
+            if (headers[value[0]]) {
+              headers[value[0]] = `${headers[value[0]]},${value[1]}`;
+            } else {
+              headers[value[0]] = value[1];
+            }
           } else {
             headers[key] = value;
           }
