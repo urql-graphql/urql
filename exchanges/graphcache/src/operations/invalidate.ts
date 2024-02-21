@@ -28,8 +28,8 @@ export const invalidateEntity = (
 export const invalidateType = (typename: string) => {
   const types = InMemoryData.getEntitiesForType(typename);
   if (types) {
-    for (let i = 0, l = types.size; i < l; i++) {
-      invalidateEntity(types[i]);
+    for (const entity of types.values()) {
+      invalidateEntity(entity);
     }
   }
 };
