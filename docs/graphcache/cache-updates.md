@@ -493,8 +493,8 @@ invalidate only these fields, which causes all queries using these listing field
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
 
-Additionally to the `updates` configuration we may also pass an `optimistic` option to the
-`cacheExchange` which is a factory function using, which we can create a "virtual" result for a
+In addition to the `updates` configuration, we can also pass an `optimistic` option to the
+`cacheExchange`. This option is a factory function that allows us to create a "virtual" result for a
 mutation. This temporary result can be applied immediately to the cache to give our users the
 illusion that mutations were executed immediately, which is a great method to reduce waiting time
 and to make our apps feel snappier.
