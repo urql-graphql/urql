@@ -1,5 +1,17 @@
 # @urql/svelte
 
+## 4.1.0
+
+### Minor Changes
+
+- Add back the `reexecute` function
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3472](https://github.com/urql-graphql/urql/pull/3472))
+
+### Patch Changes
+
+- Updated dependencies (See [#3514](https://github.com/urql-graphql/urql/pull/3514), [#3505](https://github.com/urql-graphql/urql/pull/3505), [#3499](https://github.com/urql-graphql/urql/pull/3499), and [#3515](https://github.com/urql-graphql/urql/pull/3515))
+  - @urql/core@4.3.0
+
 ## 4.0.4
 
 ### Patch Changes
