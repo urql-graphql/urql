@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { expect, describe, it } from 'vitest';
+import { Kind } from '@0no-co/graphql.web';
 import { makeOperation } from '../utils/operation';
 import { queryOperation, mutationOperation } from '../test-utils';
 import { makeFetchBody, makeFetchURL, makeFetchOptions } from './fetchOptions';
@@ -10,6 +11,7 @@ describe('makeFetchBody', () => {
     const body = makeFetchBody(queryOperation);
     expect(body).toMatchInlineSnapshot(`
       {
+        "documentId": undefined,
         "extensions": undefined,
         "operationName": "getUser",
         "query": "query getUser($name: String) {
@@ -41,6 +43,22 @@ describe('makeFetchBody', () => {
 
     apqOperation.extensions.persistedQuery!.miss = true;
     expect(makeFetchBody(apqOperation).query).not.toBe(undefined);
+  });
+
+  it('omits the query property when query is a persisted document', () => {
+    // A persisted documents is one that carries a `documentId` property and
+    // has no definitions
+    const persistedOperation = makeOperation(queryOperation.kind, {
+      ...queryOperation,
+      query: {
+        kind: Kind.DOCUMENT,
+        definitions: [],
+        documentId: 'TestDocumentId',
+      },
+    });
+
+    expect(makeFetchBody(persistedOperation).query).toBe(undefined);
+    expect(makeFetchBody(persistedOperation).documentId).toBe('TestDocumentId');
   });
 });
 
