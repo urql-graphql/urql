@@ -45,6 +45,7 @@ import {
   updateContext,
   getFieldError,
   deferRef,
+  optionalRef,
 } from './shared';
 
 export interface WriteResult {
@@ -239,6 +240,7 @@ const writeSelection = (
     typename,
     entityKey || typename,
     deferRef,
+    optionalRef,
     select,
     ctx
   );
