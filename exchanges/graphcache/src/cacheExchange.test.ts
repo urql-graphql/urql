@@ -827,7 +827,7 @@ describe('directives', () => {
     });
   });
 
-  it.only('returns partial results when an inline-fragment is marked as optional', () => {
+  it('returns partial results when an inline-fragment is marked as optional', () => {
     const client = createClient({
       url: 'http://0.0.0.0',
       exchanges: [],
