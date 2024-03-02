@@ -420,9 +420,7 @@ export const gc = () => {
     const typename = (record && record.__typename) as string | undefined;
     if (typename) {
       const type = currentData!.types.get(typename);
-      if (type && type.has(entityKey)) {
-        type.delete(entityKey);
-      }
+      if (type) type.delete(entityKey);
     }
 
     const linkNode = currentData!.links.base.get(entityKey);
