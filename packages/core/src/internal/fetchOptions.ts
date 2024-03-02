@@ -55,24 +55,34 @@ export const makeFetchURL = (
     operation.kind === 'query' && operation.context.preferGetMethod;
   if (!useGETMethod || !body) return operation.context.url;
 
-  const url = new URL(operation.context.url);
+  const [url, params] = extractParams(operation.context.url);
   for (const key in body) {
     const value = body[key];
     if (value) {
-      url.searchParams.set(
+      params.set(
         key,
         typeof value === 'object' ? stringifyVariables(value) : value
       );
     }
   }
 
-  const finalUrl = url.toString();
+  const serialized = params.toString();
+  const finalUrl = serialized.length > 0 ? `${url}?${serialized}` : url;
   if (finalUrl.length > 2047 && useGETMethod !== 'force') {
     operation.context.preferGetMethod = false;
     return operation.context.url;
   }
 
   return finalUrl;
+};
+
+/** Extract the query parameters from a URL, without using {@link URL} to support partial URLs */
+const extractParams = (url: string): [string, URLSearchParams] => {
+  const start = url.indexOf('?');
+  if (start === -1) return [url, new URLSearchParams()];
+
+  const raw = url.slice(start + 1);
+  return [url.slice(0, start), new URLSearchParams(raw)];
 };
 
 /** Serializes a {@link FetchBody} into a {@link RequestInit.body} format. */
