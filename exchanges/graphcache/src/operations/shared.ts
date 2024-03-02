@@ -168,7 +168,6 @@ export const makeSelectionIterator = (
   typename: void | string,
   entityKey: string,
   defer: boolean,
-  optional: boolean,
   selectionSet: FormattedNode<SelectionSet>,
   ctx: Context
 ): SelectionIterator => {
@@ -180,7 +179,6 @@ export const makeSelectionIterator = (
     while (child || index < selectionSet.length) {
       node = undefined;
       deferRef = defer;
-      optionalRef = optional;
       if (child) {
         if ((node = child())) {
           return node;
@@ -215,13 +213,12 @@ export const makeSelectionIterator = (
                 pushDebugNode(typename, fragment);
 
               const isFragmentOptional = isOptional(select);
+              optionalRef =
+                isFragmentOptional === undefined ? false : isFragmentOptional;
               child = makeSelectionIterator(
                 typename,
                 entityKey,
                 defer || isDeferred(select, ctx.variables),
-                isFragmentOptional === undefined
-                  ? false
-                  : isFragmentOptional,
                 getSelectionSet(fragment),
                 ctx
               );

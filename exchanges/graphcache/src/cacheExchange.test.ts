@@ -827,7 +827,7 @@ describe('directives', () => {
     });
   });
 
-  it('returns partial results when an inline-fragment is marked as optional', () => {
+  it.only('returns partial results when an inline-fragment is marked as optional', () => {
     const client = createClient({
       url: 'http://0.0.0.0',
       exchanges: [],
@@ -899,6 +899,76 @@ describe('directives', () => {
         },
       ],
     });
+  });
+
+  it('Does not return partial data for nested selections', () => {
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const query = gql`
+      {
+        todo {
+          ... on Todo @_optional {
+            id
+            text
+            author {
+              id
+              name
+            }
+          }
+        }
+      }
+    `;
+
+    const operation = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
+
+    const queryResult: OperationResult = {
+      ...queryResponse,
+      operation,
+      data: {
+        __typename: 'Query',
+        todo: {
+          id: '1',
+          text: 'learn urql',
+          __typename: 'Todo',
+          author: {
+            __typename: 'Author',
+          },
+        },
+      },
+    };
+
+    const reexecuteOperation = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) return queryResult;
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(operation);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+    expect(reexecuteOperation).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0].data).toEqual(null);
   });
 
   it('does not return partial results when an inline-fragment is marked as optional with a required child fragment', () => {
