@@ -2,4 +2,4 @@
 '@urql/core': patch
 ---
 
-Allow URLs consisting of only a path (i.e. `/api/graphql`) to be passed to `fetch` when using GET requests
+Allow `url` to be a plain, non-URL pathname (i.e. `/api/graphql`) to be used with `preferGetMethod`

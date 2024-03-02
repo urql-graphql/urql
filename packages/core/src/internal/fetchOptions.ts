@@ -55,19 +55,17 @@ export const makeFetchURL = (
     operation.kind === 'query' && operation.context.preferGetMethod;
   if (!useGETMethod || !body) return operation.context.url;
 
-  const [url, params] = extractParams(operation.context.url);
+  const urlParts = splitOutSearchParams(operation.context.url);
   for (const key in body) {
     const value = body[key];
     if (value) {
-      params.set(
+      urlParts[1].set(
         key,
         typeof value === 'object' ? stringifyVariables(value) : value
       );
     }
   }
-
-  const serialized = params.toString();
-  const finalUrl = serialized.length > 0 ? `${url}?${serialized}` : url;
+  const finalUrl = urlParts.join('?');
   if (finalUrl.length > 2047 && useGETMethod !== 'force') {
     operation.context.preferGetMethod = false;
     return operation.context.url;
@@ -76,13 +74,13 @@ export const makeFetchURL = (
   return finalUrl;
 };
 
-/** Extract the query parameters from a URL, without using {@link URL} to support partial URLs */
-const extractParams = (url: string): [string, URLSearchParams] => {
+const splitOutSearchParams = (
+  url: string
+): readonly [string, URLSearchParams] => {
   const start = url.indexOf('?');
-  if (start === -1) return [url, new URLSearchParams()];
-
-  const raw = url.slice(start + 1);
-  return [url.slice(0, start), new URLSearchParams(raw)];
+  return start > -1
+    ? [url.slice(0, start), new URLSearchParams(url.slice(start + 1))]
+    : [url, new URLSearchParams()];
 };
 
 /** Serializes a {@link FetchBody} into a {@link RequestInit.body} format. */
