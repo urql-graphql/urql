@@ -909,8 +909,10 @@ describe('directives', () => {
         todos {
           id
           text
-          ... on Todo @_optional {
-            completed
+          ... @_optional {
+            ... on Todo {
+              completed
+            }
           }
         }
       }
