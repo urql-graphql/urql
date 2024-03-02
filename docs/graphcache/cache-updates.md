@@ -260,8 +260,10 @@ cacheExchange({
         `;
 
         cache.updateQuery({ query: TodoList }, data => {
-          data.todos.push(result.createTodo);
-          return data;
+          return {
+            ...data,
+            todos: [...data.todos, result.createTodo],
+          };
         });
       },
     },
@@ -299,8 +301,7 @@ cacheExchange({
       createTodo(result, _args, cache, _info) {
         const todos = cache.resolve('Query', 'todos');
         if (Array.isArray(todos)) {
-          todos.push(result.createTodo);
-          cache.link('Query', 'todos', todos);
+          cache.link('Query', 'todos', [...todos, result.createTodo]);
         }
       },
     },
