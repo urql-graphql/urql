@@ -146,7 +146,7 @@ const readRoot = (
     entityKey,
     entityKey,
     deferRef,
-    false,
+    undefined,
     select,
     ctx
   );
@@ -391,7 +391,7 @@ const readSelection = (
     typename,
     entityKey,
     deferRef,
-    false,
+    undefined,
     select,
     ctx
   );
@@ -540,7 +540,10 @@ const readSelection = (
       // The field is uncached or has errored, so it'll be set to null and skipped
       ctx.partial = true;
       dataFieldValue = null;
-    } else if (dataFieldValue === null && directives.required) {
+    } else if (
+      dataFieldValue === null &&
+      (directives.required || optionalRef === false)
+    ) {
       if (
         ctx.store.logger &&
         process.env.NODE_ENV !== 'production' &&

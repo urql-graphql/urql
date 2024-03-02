@@ -34,7 +34,7 @@ describe('makeSelectionIterator', () => {
       'Query',
       'Query',
       false,
-      false,
+      undefined,
       selection,
       ctx
     );
@@ -94,7 +94,7 @@ describe('makeSelectionIterator', () => {
       'Query',
       'Query',
       false,
-      false,
+      undefined,
       selection,
       ctx
     );
@@ -125,7 +125,7 @@ describe('makeSelectionIterator', () => {
       'Query',
       'Query',
       false,
-      false,
+      undefined,
       selection,
       ctx
     );
@@ -211,7 +211,7 @@ describe('makeSelectionIterator', () => {
       'Query',
       'Query',
       false,
-      false,
+      undefined,
       selection,
       ctx
     );
@@ -247,7 +247,7 @@ describe('makeSelectionIterator', () => {
       'Query',
       'Query',
       true,
-      false,
+      undefined,
       selection,
       ctx
     );

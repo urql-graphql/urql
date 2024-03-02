@@ -55,7 +55,7 @@ export interface Context {
 
 export let contextRef: Context | null = null;
 export let deferRef = false;
-export let optionalRef = false;
+export let optionalRef: boolean | undefined = undefined;
 
 // Checks whether the current data field is a cache miss because of a GraphQLError
 export const getFieldError = (ctx: Context): ErrorLike | undefined =>
@@ -167,7 +167,7 @@ export const makeSelectionIterator = (
   typename: void | string,
   entityKey: string,
   defer: boolean,
-  optional: boolean,
+  optional: boolean | undefined,
   selectionSet: FormattedNode<SelectionSet>,
   ctx: Context
 ): SelectionIterator => {
@@ -218,7 +218,7 @@ export const makeSelectionIterator = (
                 typename,
                 entityKey,
                 defer || isDeferred(select, ctx.variables),
-                isFragmentOptional === undefined ? false : isFragmentOptional,
+                isFragmentOptional,
                 getSelectionSet(fragment),
                 ctx
               );
