@@ -10,6 +10,7 @@ import type { AnyVariables, GraphQLRequest, Operation } from '../types';
 /** Abstract definition of the JSON data sent during GraphQL HTTP POST requests. */
 export interface FetchBody {
   query?: string;
+  documentId?: string;
   operationName: string | undefined;
   variables: undefined | Record<string, any>;
   extensions: undefined | Record<string, any>;
@@ -24,16 +25,31 @@ export function makeFetchBody<
   Data = any,
   Variables extends AnyVariables = AnyVariables,
 >(request: Omit<GraphQLRequest<Data, Variables>, 'key'>): FetchBody {
-  const isAPQ =
-    request.extensions &&
-    request.extensions.persistedQuery &&
-    !request.extensions.persistedQuery.miss;
-  return {
-    query: isAPQ ? undefined : stringifyDocument(request.query),
+  const body: FetchBody = {
+    query: undefined,
+    documentId: undefined,
     operationName: getOperationName(request.query),
     variables: request.variables || undefined,
     extensions: request.extensions,
   };
+
+  if (
+    'documentId' in request.query &&
+    request.query.documentId &&
+    // NOTE: We have to check that the document will definitely be sent
+    // as a persisted document to avoid breaking changes
+    (!request.query.definitions || !request.query.definitions.length)
+  ) {
+    body.documentId = request.query.documentId;
+  } else if (
+    !request.extensions ||
+    !request.extensions.persistedQuery ||
+    !!request.extensions.persistedQuery.miss
+  ) {
+    body.query = stringifyDocument(request.query);
+  }
+
+  return body;
 }
 
 /** Creates a URL that will be called for a GraphQL HTTP request.
