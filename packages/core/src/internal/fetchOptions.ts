@@ -118,6 +118,9 @@ const serializeBody = (
   }
 };
 
+const isHeaders = (headers: HeadersInit): headers is Headers =>
+  'has' in headers && !Object.keys(headers).length;
+
 /** Creates a `RequestInit` object for a given `Operation`.
  *
  * @param operation - An {@link Operation} for which to make the request.
@@ -145,9 +148,32 @@ export const makeFetchOptions = (
     (typeof operation.context.fetchOptions === 'function'
       ? operation.context.fetchOptions()
       : operation.context.fetchOptions) || {};
-  if (extraOptions.headers)
-    for (const key in extraOptions.headers)
-      headers[key.toLowerCase()] = extraOptions.headers[key];
+  if (extraOptions.headers) {
+    if (isHeaders(extraOptions.headers)) {
+      extraOptions.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else if (Array.isArray(extraOptions.headers)) {
+      (extraOptions.headers as Array<[string, string]>).forEach(
+        (value, key) => {
+          if (Array.isArray(value)) {
+            if (headers[value[0]]) {
+              headers[value[0]] = `${headers[value[0]]},${value[1]}`;
+            } else {
+              headers[value[0]] = value[1];
+            }
+          } else {
+            headers[key] = value;
+          }
+        }
+      );
+    } else {
+      for (const key in extraOptions.headers) {
+        headers[key.toLowerCase()] = extraOptions.headers[key];
+      }
+    }
+  }
+
   const serializedBody = serializeBody(operation, body);
   if (typeof serializedBody === 'string' && !headers['content-type'])
     headers['content-type'] = 'application/json';

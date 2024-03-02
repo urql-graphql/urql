@@ -125,6 +125,52 @@ describe('makeFetchOptions', () => {
     `);
   });
 
+  it('handles the Headers object', () => {
+    const headers = new Headers();
+    headers.append('x-test', 'true');
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      ...queryOperation.context,
+      fetchOptions: {
+        headers,
+      },
+    });
+    const body = makeFetchBody(operation);
+
+    expect(makeFetchOptions(operation, body)).toMatchInlineSnapshot(`
+      {
+        "body": "{\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
+          "content-type": "application/json",
+          "x-test": "true",
+        },
+        "method": "POST",
+      }
+    `);
+  });
+
+  it('handles an Array headers init', () => {
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      ...queryOperation.context,
+      fetchOptions: {
+        headers: [['x-test', 'true']],
+      },
+    });
+    const body = makeFetchBody(operation);
+
+    expect(makeFetchOptions(operation, body)).toMatchInlineSnapshot(`
+      {
+        "body": "{\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
+          "content-type": "application/json",
+          "x-test": "true",
+        },
+        "method": "POST",
+      }
+    `);
+  });
+
   it('creates a GET request when preferred for query operations', () => {
     const operation = makeOperation(queryOperation.kind, queryOperation, {
       ...queryOperation.context,
