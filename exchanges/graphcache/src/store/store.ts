@@ -159,7 +159,10 @@ export class Store<
       const fieldKey = keyOfField(field, args);
       fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
       if (fieldValue === undefined)
-        fieldValue = InMemoryData.readLink(entityKey, fieldKey);
+        fieldValue = ensureLink(
+          this,
+          InMemoryData.readLink(entityKey, fieldKey)
+        );
     }
     return fieldValue;
   }
