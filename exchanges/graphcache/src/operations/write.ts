@@ -46,6 +46,7 @@ import {
   getFieldError,
   deferRef,
 } from './shared';
+import { invalidateEntity } from './invalidate';
 
 export interface WriteResult {
   data: null | Data;
@@ -373,6 +374,26 @@ const writeSelection = (
 
       data[fieldName] = fieldValue;
       updater(data, fieldArgs || {}, ctx.store, ctx);
+    } else if (typename === ctx.store.rootFields['mutation']) {
+      // If we're on a mutation that doesn't have an updater, we'll see
+      // whether we can find the entity returned by the mutation in the cache.
+      // if we don't we'll assume this is a create mutation and invalidate
+      // the found __typename.
+      if (fieldValue && Array.isArray(fieldValue)) {
+        for (let i = 0, l = fieldValue.length; i < l; i++) {
+          const key = ctx.store.keyOfEntity(fieldValue[i]);
+          if (key && fieldValue[i].__typename) {
+            const resolved = InMemoryData.readRecord(key, '__typename');
+            if (!resolved) invalidateEntity(fieldValue[i].__typename);
+          }
+        }
+      } else if (fieldValue && typeof fieldValue === 'object') {
+        const key = ctx.store.keyOfEntity(fieldValue as any);
+        if (key) {
+          const resolved = InMemoryData.readRecord(key, '__typename');
+          if (!resolved) invalidateEntity(fieldValue.__typeaname);
+        }
+      }
     }
 
     // After processing the field, remove the current alias from the path again
