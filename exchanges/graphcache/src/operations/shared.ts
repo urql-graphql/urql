@@ -72,7 +72,6 @@ export const makeContext = (
   error: CombinedError | undefined
 ): Context => {
   deferRef = false;
-  optionalRef = false;
 
   const ctx: Context = {
     store,
@@ -219,9 +218,7 @@ export const makeSelectionIterator = (
                 typename,
                 entityKey,
                 defer || isDeferred(select, ctx.variables),
-                isFragmentOptional === undefined
-                  ? false
-                  : isFragmentOptional,
+                isFragmentOptional === undefined ? false : isFragmentOptional,
                 getSelectionSet(fragment),
                 ctx
               );

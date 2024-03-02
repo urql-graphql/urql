@@ -146,7 +146,7 @@ const readRoot = (
     entityKey,
     entityKey,
     deferRef,
-    optionalRef,
+    false,
     select,
     ctx
   );
@@ -391,7 +391,7 @@ const readSelection = (
     typename,
     entityKey,
     deferRef,
-    optionalRef,
+    false,
     select,
     ctx
   );
