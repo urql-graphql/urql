@@ -490,6 +490,25 @@ In this example we've attached an updater to a `Mutation.updateTodo` field. We r
 mutation by enumerating all `todos` listing fields using `cache.inspectFields` and targetedly
 invalidate only these fields, which causes all queries using these listing fields to be refetched.
 
+### Invalidating a type
+
+We can also invalidate all the entities of a given type, this could be handy in the case of a
+list update or when you aren't sure what entity is affected.
+
+This can be done by only passing the relevant `__typename` to the `invalidate` function.
+
+```js
+cacheExchange({
+  updates: {
+    Mutation: {
+      deleteTodo(_result, args, cache, _info) {
+        cache.invalidate('Todo');
+      },
+    },
+  },
+});
+```
+
 ## Optimistic updates
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?

@@ -24,7 +24,7 @@ import { invariant } from '../helpers/help';
 import { contextRef, ensureLink } from '../operations/shared';
 import { _query, _queryFragment } from '../operations/query';
 import { _write, _writeFragment } from '../operations/write';
-import { invalidateEntity } from '../operations/invalidate';
+import { invalidateEntity, invalidateType } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
@@ -170,18 +170,24 @@ export class Store<
 
   invalidate(entity: Entity, field?: string, args?: FieldArgs) {
     const entityKey = this.keyOfEntity(entity);
+    const shouldInvalidateType =
+      entity && typeof entity === 'string' && !field && !args;
 
-    invariant(
-      entityKey,
-      "Can't generate a key for invalidate(...).\n" +
-        'You have to pass an id or _id field or create a custom `keys` field for `' +
-        (typeof entity === 'object'
-          ? (entity as Data).__typename
-          : entity + '`.'),
-      19
-    );
+    if (shouldInvalidateType) {
+      invalidateType(entity);
+    } else {
+      invariant(
+        entityKey,
+        "Can't generate a key for invalidate(...).\n" +
+          'You have to pass an id or _id field or create a custom `keys` field for `' +
+          (typeof entity === 'object'
+            ? (entity as Data).__typename
+            : entity + '`.'),
+        19
+      );
 
-    invalidateEntity(entityKey, field, args);
+      invalidateEntity(entityKey, field, args);
+    }
   }
 
   inspectFields(entity: Entity): FieldInfo[] {

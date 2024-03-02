@@ -16,16 +16,21 @@ describe('garbage collection', () => {
     InMemoryData.writeRecord('Todo:2', '__typename', 'Todo');
     InMemoryData.writeRecord('Query', '__typename', 'Query');
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
+    InMemoryData.writeType('Todo', 'Todo:1');
 
     InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'todo')).toBe('Todo:1');
+    expect(InMemoryData.getEntitiesForType('Todo')).toEqual(
+      new Set(['Todo:1'])
+    );
 
     InMemoryData.writeLink('Query', 'todo', undefined);
     InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'todo')).toBe(undefined);
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
+    expect(InMemoryData.getEntitiesForType('Todo')).toEqual(new Set());
 
     expect(InMemoryData.getCurrentDependencies()).toEqual(
       new Set(['Todo:1', 'Todo:2', 'Query.todo'])
@@ -39,12 +44,16 @@ describe('garbage collection', () => {
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
     InMemoryData.writeLink('Query', 'todo', undefined);
     InMemoryData.writeLink('Query', 'newTodo', 'Todo:1');
+    InMemoryData.writeType('Todo', 'Todo:1');
 
     InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'newTodo')).toBe('Todo:1');
     expect(InMemoryData.readLink('Query', 'todo')).toBe(undefined);
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
+    expect(InMemoryData.getEntitiesForType('Todo')).toEqual(
+      new Set(['Todo:1'])
+    );
 
     expect(InMemoryData.getCurrentDependencies()).toEqual(
       new Set(['Todo:1', 'Query.todo', 'Query.newTodo'])
@@ -101,12 +110,22 @@ describe('garbage collection', () => {
     InMemoryData.writeRecord('Todo:1', '__typename', 'Todo');
     InMemoryData.writeRecord('Todo:1', 'id', '1');
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
+    InMemoryData.writeType('Todo', 'Todo:1');
+    InMemoryData.writeType('Author', 'Author:1');
 
     InMemoryData.writeLink('Query', 'todo', undefined);
+    expect(InMemoryData.getEntitiesForType('Todo')).toEqual(
+      new Set(['Todo:1'])
+    );
+    expect(InMemoryData.getEntitiesForType('Author')).toEqual(
+      new Set(['Author:1'])
+    );
     InMemoryData.gc();
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
     expect(InMemoryData.readRecord('Author:1', 'id')).toBe(undefined);
+    expect(InMemoryData.getEntitiesForType('Todo')).toEqual(new Set());
+    expect(InMemoryData.getEntitiesForType('Author')).toEqual(new Set());
 
     expect(InMemoryData.getCurrentDependencies()).toEqual(
       new Set(['Author:1', 'Todo:1', 'Query.todo'])

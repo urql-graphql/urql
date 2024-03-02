@@ -47,6 +47,8 @@ export interface InMemoryData {
   records: NodeMap<EntityField>;
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
+  /** A map of typename to a list of entity-keys belonging to said type */
+  types: Map<string, Set<string>>;
   /** A set of Query operation keys that are in-flight and deferred/streamed */
   deferredKeys: Set<number>;
   /** A set of Query operation keys that are in-flight and awaiting a result */
@@ -234,10 +236,12 @@ export const getCurrentDependencies = (): Dependencies => {
   return currentDependencies;
 };
 
+const DEFAULT_EMPTY_SET = new Set<string>();
 export const make = (queryRootKey: string): InMemoryData => ({
   hydrating: false,
   defer: false,
   gc: new Set(),
+  types: new Map(),
   persist: new Set(),
   queryRootKey,
   refCount: new Map(),
@@ -409,9 +413,17 @@ export const gc = () => {
     const rc = currentData!.refCount.get(entityKey) || 0;
     if (rc > 0) continue;
 
+    const record = currentData!.records.base.get(entityKey);
     // Delete the reference count, and delete the entity from the GC batch
     currentData!.refCount.delete(entityKey);
     currentData!.records.base.delete(entityKey);
+
+    const typename = (record && record.__typename) as string | undefined;
+    if (typename) {
+      const type = currentData!.types.get(typename);
+      if (type) type.delete(entityKey);
+    }
+
     const linkNode = currentData!.links.base.get(entityKey);
     if (linkNode) {
       currentData!.links.base.delete(entityKey);
@@ -450,6 +462,20 @@ export const readLink = (
 ): Link | undefined => {
   updateDependencies(entityKey, fieldKey);
   return getNode(currentData!.links, entityKey, fieldKey);
+};
+
+export const getEntitiesForType = (typename: string): Set<string> =>
+  currentData!.types.get(typename) || DEFAULT_EMPTY_SET;
+
+export const writeType = (typename: string, entityKey: string) => {
+  const existingTypes = currentData!.types.get(typename);
+  if (!existingTypes) {
+    const typeSet = new Set<string>();
+    typeSet.add(entityKey);
+    currentData!.types.set(typename, typeSet);
+  } else {
+    existingTypes.add(entityKey);
+  }
 };
 
 /** Writes an entity's field (a "record") to data */

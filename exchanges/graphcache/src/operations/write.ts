@@ -232,6 +232,7 @@ const writeSelection = (
     return;
   } else if (!isRoot && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);
+    InMemoryData.writeType(typename, entityKey);
   }
 
   const updates = ctx.store.updates[typename];
