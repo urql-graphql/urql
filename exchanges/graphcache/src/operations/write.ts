@@ -239,7 +239,7 @@ const writeSelection = (
   const iterate = makeSelectionIterator(
     typename,
     entityKey || typename,
-    deferRef,
+    false,
     undefined,
     select,
     ctx

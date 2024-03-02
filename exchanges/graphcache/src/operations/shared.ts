@@ -71,7 +71,7 @@ export const makeContext = (
   entityKey: string,
   error: CombinedError | undefined
 ): Context => {
-  deferRef = false;
+  //deferRef = false;
 
   const ctx: Context = {
     store,

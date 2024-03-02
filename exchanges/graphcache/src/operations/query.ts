@@ -145,7 +145,7 @@ const readRoot = (
   const iterate = makeSelectionIterator(
     entityKey,
     entityKey,
-    deferRef,
+    false,
     undefined,
     select,
     ctx
@@ -390,7 +390,7 @@ const readSelection = (
   const iterate = makeSelectionIterator(
     typename,
     entityKey,
-    deferRef,
+    false,
     undefined,
     select,
     ctx
