@@ -163,14 +163,33 @@ interface SelectionIterator {
   (): FormattedNode<FieldNode> | undefined;
 }
 
-export const makeSelectionIterator = (
-  typename: void | string,
+// NOTE: Outside of this file, we expect `_defer` to always be reset to `false`
+export function makeSelectionIterator(
+  typename: undefined | string,
   entityKey: string,
-  defer: boolean,
-  optional: boolean | undefined,
+  _defer: false,
+  _optional: undefined,
   selectionSet: FormattedNode<SelectionSet>,
   ctx: Context
-): SelectionIterator => {
+): SelectionIterator;
+// NOTE: Inside this file we expect the state to be recursively passed on
+export function makeSelectionIterator(
+  typename: undefined | string,
+  entityKey: string,
+  _defer: boolean,
+  _optional: undefined | boolean,
+  selectionSet: FormattedNode<SelectionSet>,
+  ctx: Context
+): SelectionIterator;
+
+export function makeSelectionIterator(
+  typename: undefined | string,
+  entityKey: string,
+  _defer: boolean,
+  _optional: boolean | undefined,
+  selectionSet: FormattedNode<SelectionSet>,
+  ctx: Context
+): SelectionIterator {
   let child: SelectionIterator | void;
   let index = 0;
 
@@ -178,8 +197,8 @@ export const makeSelectionIterator = (
     let node: FormattedNode<FieldNode> | undefined;
     while (child || index < selectionSet.length) {
       node = undefined;
-      deferRef = defer;
-      optionalRef = optional;
+      deferRef = _defer;
+      optionalRef = _optional;
       if (child) {
         if ((node = child())) {
           return node;
@@ -212,13 +231,11 @@ export const makeSelectionIterator = (
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
-
-              const isFragmentOptional = isOptional(select);
               child = makeSelectionIterator(
                 typename,
                 entityKey,
-                defer || isDeferred(select, ctx.variables),
-                isFragmentOptional,
+                _defer || isDeferred(select, ctx.variables),
+                isOptional(select),
                 getSelectionSet(fragment),
                 ctx
               );
@@ -230,7 +247,7 @@ export const makeSelectionIterator = (
       }
     }
   };
-};
+}
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x == null ? null : (x as Data | NullArray<Data>);
