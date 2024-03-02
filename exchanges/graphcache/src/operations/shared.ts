@@ -231,11 +231,14 @@ export function makeSelectionIterator(
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
+              const isFragmentOptional = isOptional(select);
               child = makeSelectionIterator(
                 typename,
                 entityKey,
                 _defer || isDeferred(select, ctx.variables),
-                isOptional(select),
+                isFragmentOptional !== undefined
+                  ? isFragmentOptional
+                  : _optional,
                 getSelectionSet(fragment),
                 ctx
               );
