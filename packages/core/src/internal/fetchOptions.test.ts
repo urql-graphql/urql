@@ -70,6 +70,14 @@ describe('makeFetchURL', () => {
     );
   });
 
+  it('returns the URL by default when only a path is provided', () => {
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      url: '/graphql',
+    });
+    const body = makeFetchBody(operation);
+    expect(makeFetchURL(operation, body)).toBe('/graphql');
+  });
+
   it('returns a query parameter URL when GET is preferred', () => {
     const operation = makeOperation(queryOperation.kind, queryOperation, {
       ...queryOperation.context,
@@ -79,6 +87,18 @@ describe('makeFetchURL', () => {
     const body = makeFetchBody(operation);
     expect(makeFetchURL(operation, body)).toMatchInlineSnapshot(
       '"http://localhost:3000/graphql?query=query+getUser%28%24name%3A+String%29+%7B%0A++user%28name%3A+%24name%29+%7B%0A++++id%0A++++firstName%0A++++lastName%0A++%7D%0A%7D&operationName=getUser&variables=%7B%22name%22%3A%22Clara%22%7D"'
+    );
+  });
+
+  it('returns a query parameter URL when GET is preferred and only a path is provided', () => {
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      url: '/graphql',
+      preferGetMethod: true,
+    });
+
+    const body = makeFetchBody(operation);
+    expect(makeFetchURL(operation, body)).toMatchInlineSnapshot(
+      '"/graphql?query=query+getUser%28%24name%3A+String%29+%7B%0A++user%28name%3A+%24name%29+%7B%0A++++id%0A++++firstName%0A++++lastName%0A++%7D%0A%7D&operationName=getUser&variables=%7B%22name%22%3A%22Clara%22%7D"'
     );
   });
 

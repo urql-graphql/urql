@@ -71,24 +71,32 @@ export const makeFetchURL = (
     operation.kind === 'query' && operation.context.preferGetMethod;
   if (!useGETMethod || !body) return operation.context.url;
 
-  const url = new URL(operation.context.url);
+  const urlParts = splitOutSearchParams(operation.context.url);
   for (const key in body) {
     const value = body[key];
     if (value) {
-      url.searchParams.set(
+      urlParts[1].set(
         key,
         typeof value === 'object' ? stringifyVariables(value) : value
       );
     }
   }
-
-  const finalUrl = url.toString();
+  const finalUrl = urlParts.join('?');
   if (finalUrl.length > 2047 && useGETMethod !== 'force') {
     operation.context.preferGetMethod = false;
     return operation.context.url;
   }
 
   return finalUrl;
+};
+
+const splitOutSearchParams = (
+  url: string
+): readonly [string, URLSearchParams] => {
+  const start = url.indexOf('?');
+  return start > -1
+    ? [url.slice(0, start), new URLSearchParams(url.slice(start + 1))]
+    : [url, new URLSearchParams()];
 };
 
 /** Serializes a {@link FetchBody} into a {@link RequestInit.body} format. */
