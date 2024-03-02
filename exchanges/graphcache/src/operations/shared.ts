@@ -220,7 +220,7 @@ export const makeSelectionIterator = (
                 entityKey,
                 defer || isDeferred(select, ctx.variables),
                 isFragmentOptional === undefined
-                  ? optional
+                  ? false
                   : isFragmentOptional,
                 getSelectionSet(fragment),
                 ctx
