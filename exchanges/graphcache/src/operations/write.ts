@@ -240,6 +240,7 @@ const writeSelection = (
     typename,
     entityKey || typename,
     deferRef,
+    undefined,
     select,
     ctx
   );
