@@ -223,6 +223,7 @@ export interface ExecutionResult {
    * @see {@link https://github.com/graphql/graphql-wg/blob/main/rfcs/DeferStream.md#payload-format} for the DeferStream spec
    */
   hasNext?: boolean;
+  payload?: Omit<ExecutionResult, 'payload'>;
 }
 
 /** A source of {@link OperationResult | OperationResults}, convertable to a promise, subscribable, or Wonka Source.
