@@ -236,6 +236,7 @@ export const getCurrentDependencies = (): Dependencies => {
   return currentDependencies;
 };
 
+const DEFAULT_EMPTY_SET = new Set<string>();
 export const make = (queryRootKey: string): InMemoryData => ({
   hydrating: false,
   defer: false,
@@ -463,8 +464,8 @@ export const readLink = (
   return getNode(currentData!.links, entityKey, fieldKey);
 };
 
-export const getEntitiesForType = (typename: string) =>
-  currentData!.types.get(typename);
+export const getEntitiesForType = (typename: string): Set<string> =>
+  currentData!.types.get(typename) || DEFAULT_EMPTY_SET;
 
 export const writeType = (typename: string, entityKey: string) => {
   const existingTypes = currentData!.types.get(typename);
