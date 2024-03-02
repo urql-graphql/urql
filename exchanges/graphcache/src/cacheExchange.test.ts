@@ -1823,6 +1823,113 @@ describe('optimistic updates', () => {
   });
 });
 
+describe('mutation updates', () => {
+  it('invalidates the type when the entity is not present in the cache', () => {
+    vi.useFakeTimers();
+
+    const authorsQuery = gql`
+      query {
+        authors {
+          id
+          name
+        }
+      }
+    `;
+
+    const authorsQueryData = {
+      __typename: 'Query',
+      authors: [
+        {
+          __typename: 'Author',
+          id: '1',
+          name: 'Author',
+        },
+      ],
+    };
+
+    const mutation = gql`
+      mutation {
+        addAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const reexec = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const opOne = client.createRequestOperation('query', {
+      key: 1,
+      query: authorsQuery,
+      variables: undefined,
+    });
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+      variables: undefined,
+    });
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: authorsQueryData };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: {
+            __typename: 'Mutation',
+            addAuthor: { id: '2', name: 'Author 2', __typename: 'Author' },
+          },
+        };
+      }
+
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
+
+    pipe(
+      cacheExchange()({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(opOne);
+    vi.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+
+    next(opMutation);
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(0);
+
+    vi.runAllTimers();
+
+    expect(response).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(1);
+
+    next(opOne);
+    vi.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(3);
+    expect(result).toHaveBeenCalledTimes(3);
+  });
+});
+
 describe('extra variables', () => {
   it('allows extra variables to be applied to updates', () => {
     vi.useFakeTimers();

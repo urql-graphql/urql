@@ -46,7 +46,7 @@ import {
   getFieldError,
   deferRef,
 } from './shared';
-import { invalidateEntity } from './invalidate';
+import { invalidateType } from './invalidate';
 
 export interface WriteResult {
   data: null | Data;
@@ -384,14 +384,20 @@ const writeSelection = (
           const key = ctx.store.keyOfEntity(fieldValue[i]);
           if (key && fieldValue[i].__typename) {
             const resolved = InMemoryData.readRecord(key, '__typename');
-            if (!resolved) invalidateEntity(fieldValue[i].__typename);
+            const count = InMemoryData!.getRefCount(key);
+            if (resolved && !count) {
+              invalidateType(fieldValue[i].__typename);
+            }
           }
         }
       } else if (fieldValue && typeof fieldValue === 'object') {
         const key = ctx.store.keyOfEntity(fieldValue as any);
         if (key) {
           const resolved = InMemoryData.readRecord(key, '__typename');
-          if (!resolved) invalidateEntity(fieldValue.__typeaname);
+          const count = InMemoryData!.getRefCount(key);
+          if (resolved && !count) {
+            invalidateType(fieldValue.__typename);
+          }
         }
       }
     }

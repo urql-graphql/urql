@@ -338,6 +338,10 @@ const getNode = <T>(
   return node !== undefined ? node[fieldKey] : undefined;
 };
 
+export function getRefCount(entityKey: string): number {
+  return currentData!.refCount.get(entityKey) || 0;
+}
+
 /** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gc */
 const updateRCForEntity = (entityKey: string, by: number): void => {
   // Retrieve the reference count and adjust it by "by"
