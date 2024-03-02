@@ -102,6 +102,9 @@ const serializeBody = (
   }
 };
 
+const isHeaders = (headers: HeadersInit): headers is Headers =>
+  'has' in headers && !Object.keys(headers).length;
+
 /** Creates a `RequestInit` object for a given `Operation`.
  *
  * @param operation - An {@link Operation} for which to make the request.
@@ -130,8 +133,12 @@ export const makeFetchOptions = (
       ? operation.context.fetchOptions()
       : operation.context.fetchOptions) || {};
   if (extraOptions.headers) {
-    if (extraOptions.headers.forEach) {
-      (extraOptions.headers as Headers | [[string, string]]).forEach(
+    if (isHeaders(extraOptions.headers)) {
+      extraOptions.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else if (Array.isArray(extraOptions.headers)) {
+      (extraOptions.headers as Array<[string, string]>).forEach(
         (value, key) => {
           if (Array.isArray(value)) {
             if (headers[value[0]]) {
