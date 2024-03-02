@@ -153,18 +153,15 @@ export class Store<
     field: string,
     args?: FieldArgs
   ): DataField | undefined {
-    let fieldValue: DataField | undefined = null;
     const entityKey = this.keyOfEntity(entity);
     if (entityKey) {
       const fieldKey = keyOfField(field, args);
-      fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
-      if (fieldValue === undefined)
-        fieldValue = ensureLink(
-          this,
-          InMemoryData.readLink(entityKey, fieldKey)
-        );
+      const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
+      if (fieldValue !== undefined) return fieldValue;
+      let fieldLink = InMemoryData.readLink(entityKey, fieldKey);
+      if (fieldLink !== undefined) fieldLink = ensureLink(this, fieldLink);
+      return fieldLink;
     }
-    return fieldValue;
   }
 
   resolveFieldByKey(entity: Entity, field: string, args?: FieldArgs) {
