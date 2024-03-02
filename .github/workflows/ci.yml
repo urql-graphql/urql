@@ -98,7 +98,7 @@ jobs:
         run: pnpm -F @urql/core build && pnpm -F urql build
 
       - name: e2e tests 🧪
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v6
         with:
           install: false
           command: pnpm cypress run --component
@@ -147,7 +147,7 @@ jobs:
         run: pnpm -F "@urql/core" -F urql -F "@urql/exchange-execute" build
 
       - name: e2e tests 🧪
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v6
         with:
           install: false
           command: pnpm cypress run --component
