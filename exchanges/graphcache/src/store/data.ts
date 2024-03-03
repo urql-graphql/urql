@@ -345,7 +345,7 @@ export function getRefCount(entityKey: string): number {
 /** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gc */
 const updateRCForEntity = (entityKey: string, by: number): void => {
   // Retrieve the reference count and adjust it by "by"
-  const count = currentData!.refCount.get(entityKey) || 0;
+  const count = getRefCount(entityKey);
   const newCount = count + by > 0 ? count + by : 0;
   currentData!.refCount.set(entityKey, newCount);
   // Add it to the garbage collection batch if it needs to be deleted or remove it
@@ -414,7 +414,7 @@ export const gc = () => {
 
     // Check first whether the entity has any references,
     // if so, we skip it from the GC run
-    const rc = currentData!.refCount.get(entityKey) || 0;
+    const rc = getRefCount(entityKey);
     if (rc > 0) continue;
 
     const record = currentData!.records.base.get(entityKey);
