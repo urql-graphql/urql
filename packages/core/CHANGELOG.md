@@ -1,5 +1,21 @@
 # @urql/core
 
+## 4.3.0
+
+### Minor Changes
+
+- Support [Apollo Federation's format](https://www.apollographql.com/docs/router/executing-operations/subscription-multipart-protocol/) for subscription results in `multipart/mixed` responses (result properties essentially are namespaced on a `payload` key)
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3499](https://github.com/urql-graphql/urql/pull/3499))
+- Add support for sending persisted documents. Any `DocumentNode` with no/empty definitions and a `documentId` property is considered a persisted document. When this is detected a `documentId` parameter rather than a `query` string is sent to the GraphQL API, similar to Automatic Persisted Queries (APQs). However, APQs are only supported via `@urql/exchange-persisted`, while support for `documentId` is now built-in
+  Submitted by [@kitten](https://github.com/kitten) (See [#3515](https://github.com/urql-graphql/urql/pull/3515))
+
+### Patch Changes
+
+- Allow `url` to be a plain, non-URL pathname (i.e. `/api/graphql`) to be used with `preferGetMethod`
+  Submitted by [@akrantz01](https://github.com/akrantz01) (See [#3514](https://github.com/urql-graphql/urql/pull/3514))
+- Correctly support the `Headers` class being used in `fetchOptions`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3505](https://github.com/urql-graphql/urql/pull/3505))
+
 ## 4.2.3
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # @urql/exchange-graphcache
 
+## 6.5.0
+
+### Minor Changes
+
+- Allow `@_optional` and `@_required` to be placed on fragment definitions and inline fragments
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3502](https://github.com/urql-graphql/urql/pull/3502))
+- Track list of entity keys for a given type name. This enables enumerating and invalidating all entities of a given type within the normalized cache
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3501](https://github.com/urql-graphql/urql/pull/3501))
+
+### Patch Changes
+
+- Prevent `@defer` from being applied in child field selections. Previously, a child field (i.e. a nested field) under a `@defer`-ed fragment would also become optional, which was based on a prior version of the DeferStream spec which didn't require deferred fields to be delivered as a group
+  Submitted by [@kitten](https://github.com/kitten) (See [#3517](https://github.com/urql-graphql/urql/pull/3517))
+- ⚠️ Fix `store.resolve()` returning the exact link array that’s used by the cache. This can lead to subtle bugs when a user mutates the result returned by `cache.resolve()`, since this directly mutates what’s in the cache at that layer
+  Submitted by [@kitten](https://github.com/kitten) (See [#3516](https://github.com/urql-graphql/urql/pull/3516))
+- Updated dependencies (See [#3514](https://github.com/urql-graphql/urql/pull/3514), [#3505](https://github.com/urql-graphql/urql/pull/3505), [#3499](https://github.com/urql-graphql/urql/pull/3499), and [#3515](https://github.com/urql-graphql/urql/pull/3515))
+  - @urql/core@4.3.0
+
 ## 6.4.1
 
 ### Patch Changes

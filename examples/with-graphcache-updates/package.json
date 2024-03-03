@@ -6,9 +6,9 @@
     "start": "vite"
   },
   "dependencies": {
-    "@urql/core": "^4.2.3",
+    "@urql/core": "^4.3.0",
     "@urql/exchange-auth": "^2.1.6",
-    "@urql/exchange-graphcache": "^6.4.1",
+    "@urql/exchange-graphcache": "^6.5.0",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
