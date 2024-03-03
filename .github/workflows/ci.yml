@@ -13,17 +13,17 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v3
         with:
           version: 8
           run_install: false
@@ -33,7 +33,7 @@ jobs:
         run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: pnpm-cache
         with:
           path: |
@@ -61,17 +61,17 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v3
         with:
           version: 8
           run_install: false
@@ -81,7 +81,7 @@ jobs:
         run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: pnpm-cache
         with:
           path: |
@@ -98,7 +98,7 @@ jobs:
         run: pnpm -F @urql/core build && pnpm -F urql build
 
       - name: e2e tests 🧪
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v6
         with:
           install: false
           command: pnpm cypress run --component
@@ -110,17 +110,17 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v3
         with:
           version: 8
           run_install: false
@@ -130,7 +130,7 @@ jobs:
         run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: pnpm-cache
         with:
           path: |
@@ -147,7 +147,7 @@ jobs:
         run: pnpm -F "@urql/core" -F urql -F "@urql/exchange-execute" build
 
       - name: e2e tests 🧪
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v6
         with:
           install: false
           command: pnpm cypress run --component
@@ -165,17 +165,17 @@ jobs:
       NODE_INDEX: ${{matrix.node}}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v3
         with:
           version: 8
           run_install: false
@@ -185,7 +185,7 @@ jobs:
         run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: pnpm-cache
         with:
           path: |
