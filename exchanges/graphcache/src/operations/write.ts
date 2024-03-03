@@ -374,7 +374,10 @@ const writeSelection = (
 
       data[fieldName] = fieldValue;
       updater(data, fieldArgs || {}, ctx.store, ctx);
-    } else if (typename === ctx.store.rootFields['mutation']) {
+    } else if (
+      typename === ctx.store.rootFields['mutation'] &&
+      !ctx.optimistic
+    ) {
       // If we're on a mutation that doesn't have an updater, we'll see
       // whether we can find the entity returned by the mutation in the cache.
       // if we don't we'll assume this is a create mutation and invalidate
@@ -395,7 +398,7 @@ const writeSelection = (
         if (key) {
           const resolved = InMemoryData.readRecord(key, '__typename');
           const count = InMemoryData.getRefCount(key);
-          if (resolved && !count) {
+          if ((!resolved || !count) && fieldValue.__typename) {
             invalidateType(fieldValue.__typename);
           }
         }
