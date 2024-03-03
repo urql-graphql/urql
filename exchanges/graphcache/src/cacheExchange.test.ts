@@ -3116,7 +3116,7 @@ describe('commutativity', () => {
     expect(data).toHaveProperty('node.name', 'mutation');
   });
 
-  it.only('applies optimistic updates on top of commutative queries until mutation resolves', () => {
+  it('applies optimistic updates on top of commutative queries until mutation resolves', () => {
     let data: any;
     const client = createClient({
       url: 'http://0.0.0.0',
