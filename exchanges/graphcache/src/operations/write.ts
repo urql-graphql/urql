@@ -394,7 +394,7 @@ const writeSelection = (
         const key = ctx.store.keyOfEntity(fieldValue as any);
         if (key) {
           const resolved = InMemoryData.readRecord(key, '__typename');
-          const count = InMemoryData!.getRefCount(key);
+          const count = InMemoryData.getRefCount(key);
           if (resolved && !count) {
             invalidateType(fieldValue.__typename);
           }
