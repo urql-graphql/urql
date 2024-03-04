@@ -118,7 +118,7 @@ export interface ClientOptions {
    * This is the basis for how `urql` handles GraphQL operations, and exchanges handle the creation, execution,
    * and control flow of exchanges for the `Client`.
    *
-   * To easily get started you should consider using the {@link dedupExchange}, {@link cacheExchange} and {@link fetchExchange}
+   * To easily get started you should consider using the {@link cacheExchange} and {@link fetchExchange}
    * these are all exported from the core package.
    *
    * @see {@link https://urql.dev/goto/docs/architecture/#the-client-and-exchanges} for more information
