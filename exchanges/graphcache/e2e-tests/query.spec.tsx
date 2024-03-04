@@ -6,7 +6,6 @@ import {
   Provider,
   createClient,
   useQuery,
-  dedupExchange,
   debugExchange,
 } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
@@ -48,7 +47,6 @@ describe('Graphcache Queries', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       exchanges: [
-        dedupExchange,
         cacheExchange({}),
         debugExchange,
         executeExchange({ schema, rootValue }),
@@ -121,7 +119,6 @@ describe('Graphcache Queries', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       exchanges: [
-        dedupExchange,
         cacheExchange({ schema: introspectionFromSchema(schema) }),
         debugExchange,
         executeExchange({ schema, rootValue }),

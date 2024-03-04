@@ -9,7 +9,6 @@ import {
   gql,
   useQuery,
   useMutation,
-  dedupExchange,
   debugExchange,
 } from 'urql';
 
@@ -52,7 +51,6 @@ describe('Graphcache updates', () => {
     client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       exchanges: [
-        dedupExchange,
         cacheExchange({}),
         debugExchange,
         executeExchange({ schema, rootValue }),

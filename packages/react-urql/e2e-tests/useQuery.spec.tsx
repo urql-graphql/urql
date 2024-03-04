@@ -9,7 +9,6 @@ import {
   createClient,
   gql,
   useQuery,
-  dedupExchange,
   cacheExchange,
   fetchExchange,
   Exchange,
@@ -70,7 +69,7 @@ describe('Suspense', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       suspense: true,
-      exchanges: [dedupExchange, cacheExchange, delayExchange, fetchExchange],
+      exchanges: [cacheExchange, delayExchange, fetchExchange],
     });
 
     // eslint-disable-next-line
@@ -200,7 +199,7 @@ describe('executeQuery', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       suspense: false,
-      exchanges: [dedupExchange, cacheExchange, delayExchange, fetchExchange],
+      exchanges: [cacheExchange, delayExchange, fetchExchange],
     });
 
     // eslint-disable-next-line

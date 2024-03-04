@@ -7,7 +7,6 @@ import {
   gql,
   Client,
   Exchange,
-  dedupExchange,
   cacheExchange,
   ssrExchange,
   OperationContext,
@@ -96,7 +95,7 @@ describe('server-side rendering', () => {
     client = new Client({
       url,
       // We include the SSR exchange after the cache
-      exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
+      exchanges: [cacheExchange, ssr, fetchExchange],
       suspense: true,
     });
   });
@@ -136,7 +135,7 @@ describe('client-side rehydration', () => {
     client = new Client({
       url,
       // We include the SSR exchange after the cache
-      exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
+      exchanges: [cacheExchange, ssr, fetchExchange],
       suspense: false,
     });
   });
