@@ -29,13 +29,12 @@ It'll typically replace the `fetchExchange` or similar exchanges and must be use
 since it'll handle operations and return results.
 
 ```js
-import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { createClient, cacheExchange } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     executeExchange({
       /* config */

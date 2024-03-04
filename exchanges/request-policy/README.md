@@ -16,13 +16,12 @@ npm install --save @urql/exchange-request-policy
 Then add it to your client.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { createClient, cacheExchange, fetchExchange } from 'urql';
 import { requestPolicyExchange } from '@urql/exchange-request-policy';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     requestPolicyExchange({
       // The amount of time in ms that has to go by before upgrading, default is 5 minutes.
       ttl: 60 * 1000, // 1 minute.

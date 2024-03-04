@@ -17,12 +17,12 @@ npm install --save @urql/exchange-populate
 You'll then need to add the `populateExchange`, that this package exposes.
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { createClient, cacheExchange, fetchExchange } from 'urql';
 import { populateExchange } from '@urql/exchange-populate';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
-  exchanges: [dedupExchange, populateExchange({ schema }), cacheExchange, fetchExchange],
+  exchanges: [populateExchange({ schema }), cacheExchange, fetchExchange],
 });
 ```
 

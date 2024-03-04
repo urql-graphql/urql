@@ -29,11 +29,11 @@ The usage is a 1:1 mapping of the React usage found [here](https://formidable.co
 small example:
 
 ```jsx
-import { createClient, dedupExchange, cacheExchange, fetchExchange, Provider, useQuery } from '@urql/preact';
+import { createClient, cacheExchange, fetchExchange, Provider, useQuery } from '@urql/preact';
 
 const client = createClient({
   url: 'https://myHost/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [cacheExchange, fetchExchange],
 });
 
 const App = () => (

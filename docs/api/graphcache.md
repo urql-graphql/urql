@@ -273,9 +273,7 @@ cache.resolve({ __typename: 'Query' }, cache.keyOfField('todo', { id: 1 })); // 
 ```
 
 This specialized case is likely only going to be useful in combination with
-[`cache.inspectFields`](#inspectfields). Previously a specialised method existed for this
-case specifically and was called `cache.resolveFieldByKey`, which is now deprecated, since
-`cache.resolve` may be called with a field key and no extra arguments.
+[`cache.inspectFields`](#inspectfields).
 
 ### inspectFields
 

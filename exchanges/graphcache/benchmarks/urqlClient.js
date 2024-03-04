@@ -1,4 +1,4 @@
-import { createClient, dedupExchange } from '@urql/core';
+import { createClient } from '@urql/core';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { executeExchange } from '@urql/exchange-execute';
 import { buildSchema } from 'graphql';
@@ -85,7 +85,7 @@ const schema = buildSchema(`
     input NewTodosInput {
         todos: [NewTodo]!
     }
-    
+
     input NewWriter {
         id: ID!
         name: String
@@ -139,11 +139,11 @@ const schema = buildSchema(`
         book: NewBook!
     }
 
-    
+
     input NewAuthorsInput {
         authors: [NewAuthor]!
     }
-    
+
     input NewReview {
         id: ID!
         score: Int!
@@ -165,7 +165,7 @@ const schema = buildSchema(`
         employees: [Employee]!
         authors: [Author]!
     }
-    
+
     type Mutation {
         addTodo( text: String!, complete: Boolean! ): Todo!
         updateTodo( id: ID!, complete: Boolean! ): Todo!
@@ -251,7 +251,6 @@ const rootValue = {
 const client = createClient({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
     cache,
     // cacheExchange({}),
     executeExchange({ schema, rootValue }),

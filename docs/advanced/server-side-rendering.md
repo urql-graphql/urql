@@ -383,13 +383,13 @@ injects the `ssrExchange` automatically at the right location. If you're setting
 you'll need to instead provide them in the `exchanges` property of the returned client object.
 
 ```js
-import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+import { cacheExchange, fetchExchange } from '@urql/core';
 
 import { withUrqlClient } from 'next-urql';
 
 export default withUrqlClient(ssrExchange => ({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
+  exchanges: [cacheExchange, ssrExchange, fetchExchange],
 }))(Index);
 ```
 
@@ -407,14 +407,14 @@ To enable SSR, the easiest way is specifying the `{ ssr: true }` option as a sec
 argument to `withUrqlClient`:
 
 ```js
-import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+import { cacheExchange, fetchExchange } from '@urql/core';
 
 import { withUrqlClient } from 'next-urql';
 
 export default withUrqlClient(
   ssrExchange => ({
     url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
+    exchanges: [cacheExchange, ssrExchange, fetchExchange],
   }),
   { ssr: true } // Enables server-side rendering using `getInitialProps`
 )(Index);
@@ -438,7 +438,7 @@ with the extracted data from the `ssrExchange`:
 
 ```js
 import { withUrqlClient, initUrqlClient } from 'next-urql';
-import { ssrExchange, dedupExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
+import { ssrExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
 
 const TODOS_QUERY = `
   query { todos { id text } }
@@ -462,7 +462,7 @@ export async function getStaticProps(ctx) {
   const client = initUrqlClient(
     {
       url: 'your-url',
-      exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
+      exchanges: [cacheExchange, ssrCache, fetchExchange],
     },
     false
   );
@@ -499,7 +499,7 @@ our schema directly** using `@urql/exchange-execute` if we have access to our Gr
 
 ```js
 import { withUrqlClient, initUrqlClient } from 'next-urql';
-import { ssrExchange, dedupExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
+import { ssrExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
 
 import { schema } from '@/server/graphql'; // our GraphQL server's executable schema
@@ -527,7 +527,6 @@ export async function getServerSideProps(ctx) {
     {
       url: '', // not needed without `fetchExchange`
       exchanges: [
-        dedupExchange,
         cacheExchange,
         ssrCache,
         executeExchange({ schema }), // replaces `fetchExchange`
@@ -601,7 +600,6 @@ import { renderToString } from '@vue/server-renderer';
 
 import urql, {
   createClient,
-  dedupExchange,
   cacheExchange,
   fetchExchange,
   ssrExchange
@@ -614,7 +612,7 @@ const handleRequest = async (req, res) => {
   // NOTE: All we care about here is that the SSR Exchange is included
   const ssr = ssrExchange({ isClient: false });
   app.use(urql, {
-    exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange]
+    exchanges: [cacheExchange, ssr, fetchExchange]
   });
 
   const markup = await renderToString(app);

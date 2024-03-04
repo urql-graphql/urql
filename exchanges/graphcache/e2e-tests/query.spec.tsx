@@ -2,12 +2,7 @@
 
 import * as React from 'react';
 import { mount } from '@cypress/react';
-import {
-  Provider,
-  createClient,
-  useQuery,
-  debugExchange,
-} from 'urql';
+import { Provider, createClient, useQuery, debugExchange } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
 import { buildSchema, introspectionFromSchema } from 'graphql';
 

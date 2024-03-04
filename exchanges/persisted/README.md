@@ -17,13 +17,12 @@ You'll then need to add the `persistedExchange` function, that this package expo
 to your `exchanges`.
 
 ```js
-import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
+import { createClient, fetchExchange, cacheExchange } from 'urql';
 import { persistedExchange } from '@urql/exchange-persisted';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     persistedExchange({
       /* optional config */
@@ -46,13 +45,12 @@ If you want to generate hashes at build-time you can use a [webpack-loader](http
 when using this all you need to do in this exchange is the following:
 
 ```js
-import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
+import { createClient, fetchExchange, cacheExchange } from 'urql';
 import { persistedExchange } from '@urql/exchange-persisted';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     persistedExchange({
       generateHash: (_, document) => document.documentId,

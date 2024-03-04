@@ -34,7 +34,6 @@ It accepts several options on creation.
 | `suspense`        | `?boolean`                                  | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                                                                                                                                                                |
 | `requestPolicy`   | `?RequestPolicy`                            | Changes the default request policy that will be used. By default, this will be `cache-first`.                                                                                                                                                                                                                  |
 | `preferGetMethod` | `?boolean \| 'force' \| 'within-url-limit'` | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST if the length of the resulting URL doesn't exceed 2048 characters. When `'force'` is passed a GET request is always sent regardless of how long the resulting URL is. |
-| `maskTypename`    | `?boolean`                                  | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on [`OperationResult`s](#operationresult). This makes the `__typename` properties non-enumerable.                                                                                                                         |
 
 ### client.executeQuery
 
@@ -251,7 +250,7 @@ They're small building blocks and similar to "middleware".
 An exchange is defined to be a function that receives [`ExchangeInput`](#exchangeinput) and returns
 an `ExchangeIO` function. The `ExchangeIO` function in turn will receive a stream of operations, and
 must return a stream of results. If the exchange is purely transforming data, like the
-`dedupExchange` for instance, it'll call `forward`, which is the next Exchange's `ExchangeIO`
+`mapExchange` for instance, it'll call `forward`, which is the next Exchange's `ExchangeIO`
 function to get a stream of results.
 
 ```js
@@ -329,13 +328,6 @@ writes completed `OperationResult`s to `console.log`.
 
 This exchange is disabled in production and is based on the `mapExchange`.
 If you'd like to customise it, you can replace it with a custom `mapExchange`.
-
-### dedupExchange
-
-An exchange that keeps track of ongoing `Operation`s that haven't returned had
-a corresponding `OperationResult` yet. Any duplicate `Operation` that it
-receives is filtered out if the same `Operation` has already been received
-and is still waiting for a result.
 
 ### fetchExchange
 
@@ -515,18 +507,6 @@ for debugging as arguments, in that order.
 
 This utility is used by the [`cacheExchange`](#cacheexchange) and by
 [Graphcache](../graphcache/README.md) to add `__typename` fields to GraphQL `DocumentNode`s.
-
-### maskTypename
-
-This utility accepts a GraphQL `data` object, like `data` on [`OperationResult`s](#operationresult)
-and marks every `__typename` property as non-enumerable.
-
-The [`formatDocument`](#formatdocument) is often used by `urql` automatically and adds `__typename`
-fields to all results. However, this means that data often cannot be passed back into variables or
-inputs on mutations, which is a common use-case. This utility hides these fields, which can solve
-this problem.
-
-It's used by the [`Client`](#client) when the `maskTypename` option is enabled.
 
 ### composeExchanges
 
