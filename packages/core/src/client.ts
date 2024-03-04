@@ -43,7 +43,6 @@ import type {
 import {
   createRequest,
   withPromise,
-  maskTypename,
   noop,
   makeOperation,
   getOperationType,
@@ -168,28 +167,6 @@ export interface ClientOptions {
    * requests for queries.
    */
   preferGetMethod?: boolean | 'force' | 'within-url-limit';
-  /** Instructs the `Client` to remove `__typename` properties on all results.
-   *
-   * @deprecated Not recommended over modelling inputs manually (See #3299)
-   *
-   * @remarks
-   * By default, cache exchanges will alter your GraphQL documents to request `__typename` fields
-   * for all selections. However, this means that your GraphQL data will now contain `__typename` fields you
-   * didn't ask for. This is why the {@link Client} supports “masking” this field by marking it
-   * as non-enumerable via this option.
-   *
-   * Only use this option if you absolutely have to. It's popular to model mutation inputs in
-   * GraphQL schemas after the object types they modify, and if you're using this option to make
-   * it possible to directly pass objects from results as inputs to your mutation variables, it's
-   * more performant and idomatic to instead create a new input object.
-   *
-   * Hint: With `@urql/exchange-graphcache` you will never need this option, as it selects fields on
-   * the client-side according to which fields you specified, rather than the fields it modified.
-   *
-   * @see {@link https://spec.graphql.org/October2021/#sec-Type-Name-Introspection} for more information
-   * on typename introspection via the `__typename` field.
-   */
-  maskTypename?: boolean;
 }
 
 /** The `Client` is the central hub for your GraphQL operations and holds `urql`'s state.
@@ -629,14 +606,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         )
       )
     );
-
-    // Mask typename properties if the option for it is turned on
-    if (opts.maskTypename) {
-      result$ = pipe(
-        result$,
-        map(res => ({ ...res, data: maskTypename(res.data, true) }))
-      );
-    }
 
     if (operation.kind !== 'query') {
       // Interrupt subscriptions and mutations when they have no more results

@@ -13,6 +13,5 @@ export {
   makeErrorResult,
   mergeResultPatch,
   formatDocument,
-  maskTypename,
   makeOperation,
 } from './utils';
