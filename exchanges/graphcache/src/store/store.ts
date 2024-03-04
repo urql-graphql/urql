@@ -164,10 +164,6 @@ export class Store<
     }
   }
 
-  resolveFieldByKey(entity: Entity, field: string, args?: FieldArgs) {
-    return this.resolve(entity, field, args);
-  }
-
   invalidate(entity: Entity, field?: string, args?: FieldArgs) {
     const entityKey = this.keyOfEntity(entity);
     const shouldInvalidateType =
