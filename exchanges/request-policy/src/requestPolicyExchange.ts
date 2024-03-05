@@ -92,6 +92,9 @@ export const requestPolicyExchange =
       // lower than the current time we see this as a miss.
       const lastDispatched = dispatched.get(result.operation.key) || 0;
       if (incomingTime !== lastDispatched) {
+        // We only delete in the case of a miss to ensure that cache-and-network
+        // is properly taken care of
+        dispatched.delete(result.operation.key);
         operations.set(result.operation.key, new Date().getTime());
       }
     };
