@@ -58,6 +58,7 @@ export const requestPolicyExchange =
     const operations = new Map();
     const TTL = (options || {}).ttl || defaultTTL;
     const dispatched = new Map<number, number>();
+    let counter = 0;
 
     const processIncomingOperation = (operation: Operation): Operation => {
       if (
@@ -70,7 +71,10 @@ export const requestPolicyExchange =
 
       const currentTime = new Date().getTime();
       // When an operation passes by we track the current time
-      dispatched.set(operation.key, currentTime);
+      dispatched.set(operation.key, counter);
+      queueMicrotask(() => {
+        counter = (counter + 1) | 0;
+      });
       const lastOccurrence = operations.get(operation.key) || 0;
       if (
         currentTime - lastOccurrence > TTL &&
@@ -86,12 +90,11 @@ export const requestPolicyExchange =
     };
 
     const processIncomingResults = (result: OperationResult): void => {
-      const incomingTime = new Date().getTime();
       // When we get a result for the operation we check whether it resolved
-      // synchronously by checking when it was last dispatched and if it's
-      // lower than the current time we see this as a miss.
+      // synchronously by checking whether the counter is different from the
+      // dispatched counter.
       const lastDispatched = dispatched.get(result.operation.key) || 0;
-      if (incomingTime !== lastDispatched) {
+      if (counter !== lastDispatched) {
         // We only delete in the case of a miss to ensure that cache-and-network
         // is properly taken care of
         dispatched.delete(result.operation.key);
