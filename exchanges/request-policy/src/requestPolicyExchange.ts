@@ -57,6 +57,7 @@ export const requestPolicyExchange =
   ({ forward }) => {
     const operations = new Map();
     const TTL = (options || {}).ttl || defaultTTL;
+    const dispatched = new Map<number, number>();
 
     const processIncomingOperation = (operation: Operation): Operation => {
       if (
@@ -68,6 +69,8 @@ export const requestPolicyExchange =
       }
 
       const currentTime = new Date().getTime();
+      // When an operation passes by we track the current time
+      dispatched.set(operation.key, currentTime);
       const lastOccurrence = operations.get(operation.key) || 0;
       if (
         currentTime - lastOccurrence > TTL &&
@@ -83,9 +86,12 @@ export const requestPolicyExchange =
     };
 
     const processIncomingResults = (result: OperationResult): void => {
-      const meta = result.operation.context.meta;
-      const isMiss = !meta || meta.cacheOutcome === 'miss';
-      if (isMiss) {
+      const incomingTime = new Date().getTime();
+      // When we get a result for the operation we check whether it resolved
+      // synchronously by checking when it was last dispatched and if it's
+      // lower than the current time we see this as a miss.
+      const lastDispatched = dispatched.get(result.operation.key) || 0;
+      if (incomingTime !== lastDispatched) {
         operations.set(result.operation.key, new Date().getTime());
       }
     };
