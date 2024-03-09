@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Change the request-policy exchange not to rely on OperationMeta set by the cache exchanges
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3521](https://github.com/urql-graphql/urql/pull/3521))
+
 ## 1.0.2
 
 ### Patch Changes
