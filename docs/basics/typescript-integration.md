@@ -3,7 +3,59 @@ title: TypeScript integration
 order: 7
 ---
 
-# URQL and TypeScript
+# Gql.tada
+
+In urql, we can use [`gql.tada`](https://gql-tada.0no.co/) to get static typings for the documents we write, these will be derived
+on the fly as you are writing your GraphQL documents.
+
+## Getting started
+
+To get and running, install the following packages:
+
+```sh
+yarn add -D graphql typescript @0no-co/graphqlsp gql.tada
+# or
+npm install -D graphql typescript @0no-co/graphqlsp gql.tada
+```
+
+Then, add the following to your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "plugins": [
+      {
+        "name": "@0no-co/graphqlsp",
+        "schema": "./schema.graphql",
+        "tadaOutputLocation": "./src/graphql-env.d.ts"
+      }
+    ]
+  }
+}
+```
+
+> You can read more about the specific options [here](https://gql-tada.0no.co/reference/graphqlsp-config/)
+
+To get the LSP to start we'll need to ensure that our IDE is using the workspace version of TypeScript. When
+this is working, after restarting your TypeScript server a `graphql-env.d.ts` file will be generated. We
+can use this now to setup `gql.tada`
+
+```ts
+import { initGraphQLTada } from 'gql.tada';
+import type { introspection } from './graphql-env.d.ts';
+
+export const graphql = initGraphQLTada<{
+  introspection: introspection;
+}>();
+
+export type { FragmentOf, ResultOf, VariablesOf } from 'gql.tada';
+export { readFragment } from 'gql.tada';
+```
+
+From now on when we import `graphql` from the above we'll automatically have typed documents!
+
+# GraphQL Code Generator
 
 URQL, with the help of [GraphQL Code Generator](https://www.the-guild.dev/graphql/codegen), can leverage the typed-design of GraphQL Schemas to generate TypeScript types on the flight.
 
