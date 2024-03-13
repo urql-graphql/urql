@@ -106,7 +106,7 @@ function that `authExchange` is async, i.e. must return a `Promise`.
 ```js
 async function initializeAuthState() {
   const token = await AsyncStorage.getItem(TOKEN_KEY);
-  const refreshToken = await AyncStorage.getItem(REFRESH_KEY);
+  const refreshToken = await AsyncStorage.getItem(REFRESH_KEY);
   return { token, refreshToken };
 }
 
@@ -130,7 +130,7 @@ be editing the `Operation` context here using `makeOperation`.
 ```js
 authExchange(async utils => {
   let token = await AsyncStorage.getItem(TOKEN_KEY);
-  let refreshToken = await AyncStorage.getItem(REFRESH_KEY);
+  let refreshToken = await AsyncStorage.getItem(REFRESH_KEY);
 
   return {
     addAuthToOperation(operation) {
@@ -346,13 +346,13 @@ To do this, we'll need to add the `mapExchange` to the exchanges array, _before_
 The order is very important here:
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange, errorExchange } from 'urql';
+import { createClient, debugExchange, cacheExchange, fetchExchange, errorExchange } from 'urql';
 import { authExchange } from '@urql/exchange-auth';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
+    debugExchange,
     cacheExchange,
     mapExchange({
       onError(error, _operation) {
