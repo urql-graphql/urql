@@ -346,13 +346,13 @@ To do this, we'll need to add the `mapExchange` to the exchanges array, _before_
 The order is very important here:
 
 ```js
-import { createClient, debugExchange, cacheExchange, fetchExchange, errorExchange } from 'urql';
+import { createClient, dedupExchange, cacheExchange, fetchExchange, errorExchange, mapExchange } from 'urql';
 import { authExchange } from '@urql/exchange-auth';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    debugExchange,
+    dedupExchange,
     cacheExchange,
     mapExchange({
       onError(error, _operation) {
