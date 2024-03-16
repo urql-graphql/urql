@@ -69,7 +69,7 @@ This function will be called with the previous data (or `undefined`) and the new
 incoming from a subscription event, and may be used to "reduce" the data over time, altering the
 value of `result.data`.
 
-This hook returns a tuple of the shape `[result, executeQuery]`.
+This hook returns a tuple of the shape `[result, executeSubscription]`.
 
 - The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult).
 - The `executeSubscription` function optionally accepts
