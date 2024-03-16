@@ -23,15 +23,14 @@ yarn add @urql/exchange-refocus
 npm install --save @urql/exchange-refocus
 ```
 
-Then add it to your `Client`, preferably after the `dedupExchange` but in front of any asynchronous
-exchanges, like the `fetchExchange`:
+Then add it to your `Client`, preferably in front of your `cacheExchange`
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { createClient, cacheExchange, fetchExchange } from 'urql';
 import { refocusExchange } from '@urql/exchange-refocus';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, refocusExchange(), cacheExchange, fetchExchange],
+  exchanges: [refocusExchange(), cacheExchange, fetchExchange],
 });
 ```

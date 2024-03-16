@@ -333,16 +333,6 @@ export interface Cache {
     args?: FieldArgs
   ): DataField | undefined;
 
-  /** Returns a cached value on a given entity’s field by its field key.
-   *
-   * @deprecated
-   * Use {@link cache.resolve} instead.
-   */
-  resolveFieldByKey(
-    entity: Entity | undefined,
-    fieldKey: string
-  ): DataField | undefined;
-
   /** Returns a list of cached fields for a given GraphQL object (“entity”).
    *
    * @param entity - a GraphQL object (“entity”) or an entity key.

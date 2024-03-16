@@ -2,7 +2,6 @@ export { ssrExchange } from './ssr';
 export { cacheExchange } from './cache';
 export { subscriptionExchange } from './subscription';
 export { debugExchange } from './debug';
-export { dedupExchange } from './dedup';
 export { fetchExchange } from './fetch';
 export { composeExchanges } from './compose';
 

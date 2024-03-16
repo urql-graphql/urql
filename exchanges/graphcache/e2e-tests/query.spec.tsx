@@ -2,13 +2,7 @@
 
 import * as React from 'react';
 import { mount } from '@cypress/react';
-import {
-  Provider,
-  createClient,
-  useQuery,
-  dedupExchange,
-  debugExchange,
-} from 'urql';
+import { Provider, createClient, useQuery, debugExchange } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
@@ -48,7 +42,6 @@ describe('Graphcache Queries', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       exchanges: [
-        dedupExchange,
         cacheExchange({}),
         debugExchange,
         executeExchange({ schema, rootValue }),
@@ -121,7 +114,6 @@ describe('Graphcache Queries', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       exchanges: [
-        dedupExchange,
         cacheExchange({ schema: introspectionFromSchema(schema) }),
         debugExchange,
         executeExchange({ schema, rootValue }),

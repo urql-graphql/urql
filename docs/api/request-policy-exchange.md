@@ -32,17 +32,16 @@ yarn add @urql/exchange-request-policy
 npm install --save @urql/exchange-request-policy
 ```
 
-Then add it to your `Client`, preferably after the `dedupExchange` but in front of any asynchronous
+Then add it to your `Client`, preferably in front of the `cacheExchange` and in front of any asynchronous
 exchanges, like the `fetchExchange`:
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { createClient, cacheExchange, fetchExchange } from 'urql';
 import { requestPolicyExchange } from '@urql/exchange-request-policy';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
   exchanges: [
-    dedupExchange,
     requestPolicyExchange({
       /* config */
     }),

@@ -19,7 +19,7 @@ npm install --save @urql/storage-rn
 Then add it to the offline exchange:
 
 ```js
-import { createClient, dedupExchange, fetchExchange } from 'urql';
+import { createClient, fetchExchange } from 'urql';
 import { offlineExchange } from '@urql/exchange-graphcache';
 import { makeAsyncStorage } from '@urql/storage-rn';
 
@@ -42,6 +42,6 @@ const cache = offlineExchange({
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
-  exchanges: [dedupExchange, cache, fetchExchange],
+  exchanges: [cache, fetchExchange],
 });
 ```

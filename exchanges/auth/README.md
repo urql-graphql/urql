@@ -17,14 +17,13 @@ npm install --save @urql/exchange-auth
 You'll then need to add the `authExchange`, that this package exposes to your `urql` Client
 
 ```js
-import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { createClient, cacheExchange, fetchExchange } from 'urql';
 import { makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     authExchange(async utils => {
       // called on initial launch,
