@@ -196,7 +196,6 @@ In a server component we will import from `@urql/next/rsc`
 ```ts
 // app/page.tsx
 import React from 'react';
-import Head from 'next/head';
 import { cacheExchange, createClient, fetchExchange, gql } from '@urql/core';
 import { registerUrql } from '@urql/next/rsc';
 
@@ -358,7 +357,6 @@ we wrap `_app.js` we won't have to wrap any individual page.
 ```js
 // pages/index.js
 import React from 'react';
-import Head from 'next/head';
 import { useQuery } from 'urql';
 import { withUrqlClient } from 'next-urql';
 
