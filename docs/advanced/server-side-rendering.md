@@ -257,7 +257,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
 }
 ```
 
-It is important that we pas both a client as well as the `ssrExchange` to the `Provider`
+It is important that we pass both a client as well as the `ssrExchange` to the `Provider`
 this way we will be able to restore the data that Next streams to the client later on
 when we are hydrating.
 
