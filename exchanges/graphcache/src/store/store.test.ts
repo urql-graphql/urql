@@ -837,9 +837,16 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   describe('Invalidating an entity', () => {
-    it('removes an entity from a list.', () => {
+    it('removes an entity from a list by object-key.', () => {
       InMemoryData.initDataState('write', store.data, null);
       store.invalidate(todosData.todos[1]);
+      const { data } = query(store, { query: Todos });
+      expect(data).toBe(null);
+    });
+
+    it('removes an entity from a list by string-key.', () => {
+      InMemoryData.initDataState('write', store.data, null);
+      store.invalidate(store.keyOfEntity(todosData.todos[1]));
       const { data } = query(store, { query: Todos });
       expect(data).toBe(null);
     });
