@@ -22,6 +22,7 @@ import {
   currentOperation,
   currentOptimistic,
   writeAbstractType,
+  getConcreteTypesForAbstractType,
 } from '../store/data';
 import { keyOfField } from '../store/keys';
 import type { Store } from '../store/store';
@@ -224,7 +225,12 @@ export function makeSelectionIterator(
               !fragment.typeCondition ||
               (ctx.store.schema
                 ? isInterfaceOfType(ctx.store.schema, fragment, typename)
-                : isFragmentHeuristicallyMatching(
+                : (currentOperation === 'read' &&
+                    isFragmentMatching(
+                      fragment.typeCondition.name.value,
+                      typename!
+                    )) ||
+                  isFragmentHeuristicallyMatching(
                     fragment,
                     typename,
                     entityKey,
@@ -262,6 +268,12 @@ export function makeSelectionIterator(
     }
   };
 }
+
+const isFragmentMatching = (typeCondition: string, typename: string) => {
+  if (typeCondition === typename) return true;
+  const types = getConcreteTypesForAbstractType(typeCondition);
+  return types.size && types.has(typename);
+};
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x == null ? null : (x as Data | NullArray<Data>);
