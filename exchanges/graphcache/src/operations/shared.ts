@@ -17,7 +17,12 @@ import {
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
-import { hasField, currentOperation, currentOptimistic } from '../store/data';
+import {
+  hasField,
+  currentOperation,
+  currentOptimistic,
+  writeAbstractType,
+} from '../store/data';
 import { keyOfField } from '../store/keys';
 import type { Store } from '../store/store';
 
@@ -226,10 +231,18 @@ export function makeSelectionIterator(
                     ctx.variables,
                     ctx.store.logger
                   ));
+
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
               const isFragmentOptional = isOptional(select);
+              if (
+                fragment.typeCondition &&
+                typename !== fragment.typeCondition.name.value
+              ) {
+                writeAbstractType(fragment.typeCondition.name.value, typename!);
+              }
+
               child = makeSelectionIterator(
                 typename,
                 entityKey,

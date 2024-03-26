@@ -5,6 +5,7 @@ import { minifyIntrospectionQuery } from '@urql/introspection';
 import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
 import { __initAnd_write as write } from './write';
+import { __initAnd_query as query } from './query';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store/store';
 
@@ -249,5 +250,40 @@ describe('Query', () => {
       'Todo:1',
     ]);
     expect(InMemoryData.readLink('Query', 'todo')).toEqual(undefined);
+  });
+
+  it.only('should write interfaces to the abstract-mapping', () => {
+    const schemalessStore = new Store();
+    const document = gql`
+      {
+        todos {
+          ... on Todo {
+            id
+            completed
+          }
+        }
+      }
+    `;
+
+    const res = {
+      todos: [
+        { __typename: 'SmallTodo', id: 1, completed: true },
+        { __typename: 'BigTodo', id: 2, completed: true },
+      ],
+    };
+
+    write(schemalessStore, { query: document }, res as any, undefined);
+
+    InMemoryData.initDataState('read', schemalessStore.data, null);
+    expect(InMemoryData.readLink('Query', 'todos')).toEqual([
+      'SmallTodo:1',
+      'BigTodo:2',
+    ]);
+    expect(InMemoryData.getConcreteTypesForAbstractType('Todo')).toEqual(
+      new Set(['SmallTodo', 'BigTodo'])
+    );
+
+    const result = query(schemalessStore, { query: document });
+    expect(result.data).toEqual(res);
   });
 });
