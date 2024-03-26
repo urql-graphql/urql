@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 6.5.1
+
+### Patch Changes
+
+- ⚠️ Fix `invalidate` not applying when using a string to invalidate an entity
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3544](https://github.com/urql-graphql/urql/pull/3544))
+
 ## 6.5.0
 
 ### Minor Changes
