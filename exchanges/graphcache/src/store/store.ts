@@ -171,7 +171,11 @@ export class Store<
   invalidate(entity: Entity, field?: string, args?: FieldArgs) {
     const entityKey = this.keyOfEntity(entity);
     const shouldInvalidateType =
-      entity && typeof entity === 'string' && !field && !args;
+      entity &&
+      typeof entity === 'string' &&
+      !field &&
+      !args &&
+      !this.resolve(entity, '__typename');
 
     if (shouldInvalidateType) {
       invalidateType(entity);
