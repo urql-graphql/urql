@@ -485,12 +485,10 @@ export const writeType = (typename: string, entityKey: string) => {
   }
 };
 
-export const getConcreteTypesForAbstractType = (
-  typename: string
-): Set<string> =>
+export const getConcreteTypes = (typename: string): Set<string> =>
   currentData!.abstractToConcreteMap.get(typename) || DEFAULT_EMPTY_SET;
 
-export const writeAbstractType = (
+export const writeConcreteType = (
   abstractType: string,
   concreteType: string
 ) => {

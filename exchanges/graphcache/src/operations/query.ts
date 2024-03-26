@@ -258,32 +258,9 @@ export const _queryFragment = (
     }
   }
 
-  let typename = getFragmentTypeName(fragment);
+  const typename = getFragmentTypeName(fragment);
   if (typeof entity !== 'string' && !entity.__typename)
     entity.__typename = typename;
-  const mapped = InMemoryData.getConcreteTypesForAbstractType(typename);
-  if (mapped.size) {
-    typename =
-      [...mapped].find(concreteTypename => {
-        const entityKey = store.keyOfEntity({
-          ...(entity as Data),
-          __typename: concreteTypename,
-        });
-        if (!entityKey) {
-          warn(
-            "Can't generate a key for readFragment(...).\n" +
-              'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
-              typename +
-              '`.',
-            7,
-            store.logger
-          );
-
-          return null;
-        }
-        if (InMemoryData.hasField(entityKey, '__typename')) return true;
-      }) || typename;
-  }
   const entityKey = store.keyOfEntity(entity as Data);
   if (!entityKey) {
     warn(

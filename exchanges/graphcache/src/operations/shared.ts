@@ -21,8 +21,8 @@ import {
   hasField,
   currentOperation,
   currentOptimistic,
-  writeAbstractType,
-  getConcreteTypesForAbstractType,
+  writeConcreteType,
+  getConcreteTypes,
 } from '../store/data';
 import { keyOfField } from '../store/keys';
 import type { Store } from '../store/store';
@@ -228,7 +228,7 @@ export function makeSelectionIterator(
                 : (currentOperation === 'read' &&
                     isFragmentMatching(
                       fragment.typeCondition.name.value,
-                      typename!
+                      typename
                     )) ||
                   isFragmentHeuristicallyMatching(
                     fragment,
@@ -246,7 +246,7 @@ export function makeSelectionIterator(
                 fragment.typeCondition &&
                 typename !== fragment.typeCondition.name.value
               ) {
-                writeAbstractType(fragment.typeCondition.name.value, typename!);
+                writeConcreteType(fragment.typeCondition.name.value, typename!);
               }
 
               child = makeSelectionIterator(
@@ -269,9 +269,10 @@ export function makeSelectionIterator(
   };
 }
 
-const isFragmentMatching = (typeCondition: string, typename: string) => {
+const isFragmentMatching = (typeCondition: string, typename: string | void) => {
+  if (!typename) return false;
   if (typeCondition === typename) return true;
-  const types = getConcreteTypesForAbstractType(typeCondition);
+  const types = getConcreteTypes(typeCondition);
   return types.size && types.has(typename);
 };
 
