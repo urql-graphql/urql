@@ -169,31 +169,7 @@ export const _writeFragment = (
     }
   }
 
-  let typename = getFragmentTypeName(fragment);
-  const mapped = InMemoryData.getConcreteTypesForAbstractType(typename);
-  if (mapped.size) {
-    typename =
-      [...mapped].find(concreteTypename => {
-        const entityKey = store.keyOfEntity({
-          ...data,
-          __typename: concreteTypename,
-        });
-        if (!entityKey) {
-          warn(
-            "Can't generate a key for readFragment(...).\n" +
-              'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
-              typename +
-              '`.',
-            7,
-            store.logger
-          );
-
-          return null;
-        }
-        if (InMemoryData.hasField(entityKey, '__typename')) return true;
-      }) || typename;
-  }
-
+  const typename = getFragmentTypeName(fragment);
   const dataToWrite = { __typename: typename, ...data } as Data;
   const entityKey = store.keyOfEntity(dataToWrite);
   if (!entityKey) {
