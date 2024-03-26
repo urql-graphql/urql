@@ -36,6 +36,20 @@ you can take it from getting started with your first GraphQL project all the way
 
 **📃 For more information, [check out the docs](https://formidable.com/open-source/urql/docs/).**
 
+## 💙 [Sponsors](https://github.com/sponsors/urql-graphql)
+
+<table>
+  <tr>
+   <td align="center"><a href="https://bigcommerce.com/"><img src="https://avatars.githubusercontent.com/u/186342?s=200&v=4" width="150" alt="BigCommerce"/><br />BigCommerce</a></td>
+   <td align="center"><a href="https://wundergraph.com/"><img src="https://avatars.githubusercontent.com/u/64281914?s=200&v=4" width="150" alt="WunderGraph"/><br />WunderGraph</a></td>
+  </tr>
+</table>
+<table>
+  <tr>
+   <td align="center"><a href="https://beatgig.com/"><img src="https://avatars.githubusercontent.com/u/51333382?s=200&v=4" width="100" alt="BeatGig"/><br />BeatGig</a></td>
+  </tr>
+</table>
+
 ## 🙌 Contributing
 
 **The urql project was founded by [Formidable](https://formidable.com/) and is actively developed
