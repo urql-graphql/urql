@@ -2,7 +2,8 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - legacy
+
 jobs:
   release:
     name: Release
@@ -57,6 +58,7 @@ jobs:
         with:
           version: pnpm changeset:version
           publish: pnpm changeset:publish
+          title: Version Packages (Legacy)
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
