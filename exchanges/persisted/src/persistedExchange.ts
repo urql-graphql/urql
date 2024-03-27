@@ -89,6 +89,16 @@ export interface PersistedExchangeOptions {
    * their GraphQL APIs.
    */
   enableForMutation?: boolean;
+  /** Enables persisted queries to be used for subscriptions.
+   *
+   * @remarks
+   * When enabled, the `persistedExchange` will also use the persisted queries
+   * logic for subscription operations.
+   *
+   * This is disabled by default, but often used on APIs that obfuscate
+   * their GraphQL APIs.
+   */
+  enableForSubscriptions?: boolean;
 }
 
 /** Exchange factory that adds support for Persisted Queries.
@@ -131,12 +141,13 @@ export const persistedExchange =
     const enforcePersistedQueries = !!options.enforcePersistedQueries;
     const hashFn = options.generateHash || hash;
     const enableForMutation = !!options.enableForMutation;
+    const enableForSubscriptions = !!options.enableForSubscriptions;
     let supportsPersistedQueries = true;
 
     const operationFilter = (operation: Operation) =>
       supportsPersistedQueries &&
       !operation.context.persistAttempt &&
-      ((enableForMutation && operation.kind === 'mutation') ||
+      ((enableForMutation && operation.kind === 'mutation') || (enableForSubscriptions && operation.kind === 'subscription') ||
         operation.kind === 'query');
 
     const getPersistedOperation = async (operation: Operation) => {
