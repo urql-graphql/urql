@@ -147,7 +147,8 @@ export const persistedExchange =
     const operationFilter = (operation: Operation) =>
       supportsPersistedQueries &&
       !operation.context.persistAttempt &&
-      ((enableForMutation && operation.kind === 'mutation') || (enableForSubscriptions && operation.kind === 'subscription') ||
+      ((enableForMutation && operation.kind === 'mutation') ||
+        (enableForSubscriptions && operation.kind === 'subscription') ||
         operation.kind === 'query');
 
     const getPersistedOperation = async (operation: Operation) => {
