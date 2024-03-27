@@ -1,5 +1,12 @@
 # @urql/exchange-persisted-fetch
 
+## 4.2.0
+
+### Minor Changes
+
+- Add option to enable persisted-operations for subscriptions
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3549](https://github.com/urql-graphql/urql/pull/3549))
+
 ## 4.1.1
 
 ### Patch Changes
