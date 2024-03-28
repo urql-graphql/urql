@@ -1,5 +1,14 @@
 # @urql/core
 
+## 5.0.0
+
+### Major Changes
+
+- Remove deprecated `dedupExchange`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3520](https://github.com/urql-graphql/urql/pull/3520))
+- Remove deprecated `maskTypename`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3520](https://github.com/urql-graphql/urql/pull/3520))
+
 ## 4.3.0
 
 ### Minor Changes

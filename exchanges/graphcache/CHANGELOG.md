@@ -1,5 +1,19 @@
 # @urql/exchange-graphcache
 
+## 7.0.0
+
+### Major Changes
+
+- Add a default updater for mutation fields who are lacking an updater and where the returned entity is not present in the cache
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3518](https://github.com/urql-graphql/urql/pull/3518))
+- Remove deprecated `resolveFieldByKey`, use `cache.resolve` instead
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3520](https://github.com/urql-graphql/urql/pull/3520))
+
+### Patch Changes
+
+- Updated dependencies (See [#3520](https://github.com/urql-graphql/urql/pull/3520) and [#3520](https://github.com/urql-graphql/urql/pull/3520))
+  - @urql/core@5.0.0
+
 ## 6.5.0
 
 ### Minor Changes
