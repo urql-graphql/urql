@@ -17,7 +17,13 @@ import {
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
-import { hasField, currentOperation, currentOptimistic } from '../store/data';
+import {
+  hasField,
+  currentOperation,
+  currentOptimistic,
+  writeConcreteType,
+  getConcreteTypes,
+} from '../store/data';
 import { keyOfField } from '../store/keys';
 import type { Store } from '../store/store';
 
@@ -219,17 +225,30 @@ export function makeSelectionIterator(
               !fragment.typeCondition ||
               (ctx.store.schema
                 ? isInterfaceOfType(ctx.store.schema, fragment, typename)
-                : isFragmentHeuristicallyMatching(
+                : (currentOperation === 'read' &&
+                    isFragmentMatching(
+                      fragment.typeCondition.name.value,
+                      typename
+                    )) ||
+                  isFragmentHeuristicallyMatching(
                     fragment,
                     typename,
                     entityKey,
                     ctx.variables,
                     ctx.store.logger
                   ));
+
             if (isMatching) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
               const isFragmentOptional = isOptional(select);
+              if (
+                fragment.typeCondition &&
+                typename !== fragment.typeCondition.name.value
+              ) {
+                writeConcreteType(fragment.typeCondition.name.value, typename!);
+              }
+
               child = makeSelectionIterator(
                 typename,
                 entityKey,
@@ -249,6 +268,13 @@ export function makeSelectionIterator(
     }
   };
 }
+
+const isFragmentMatching = (typeCondition: string, typename: string | void) => {
+  if (!typename) return false;
+  if (typeCondition === typename) return true;
+  const types = getConcreteTypes(typeCondition);
+  return types.size && types.has(typename);
+};
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x == null ? null : (x as Data | NullArray<Data>);

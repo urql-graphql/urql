@@ -59,6 +59,8 @@ export interface InMemoryData {
   optimisticOrder: number[];
   /** This may be a persistence adapter that will receive changes in a batch */
   storage: StorageAdapter | null;
+  /** A map of all the types we have encountered that did not map directly to a concrete type */
+  abstractToConcreteMap: Map<string, Set<string>>;
 }
 
 let currentOwnership: null | WeakSet<any> = null;
@@ -249,6 +251,7 @@ export const make = (queryRootKey: string): InMemoryData => ({
     optimistic: new Map(),
     base: new Map(),
   },
+  abstractToConcreteMap: new Map(),
   records: {
     optimistic: new Map(),
     base: new Map(),
@@ -479,6 +482,23 @@ export const writeType = (typename: string, entityKey: string) => {
     currentData!.types.set(typename, typeSet);
   } else {
     existingTypes.add(entityKey);
+  }
+};
+
+export const getConcreteTypes = (typename: string): Set<string> =>
+  currentData!.abstractToConcreteMap.get(typename) || DEFAULT_EMPTY_SET;
+
+export const writeConcreteType = (
+  abstractType: string,
+  concreteType: string
+) => {
+  const existingTypes = currentData!.abstractToConcreteMap.get(abstractType);
+  if (!existingTypes) {
+    const typeSet = new Set<string>();
+    typeSet.add(concreteType);
+    currentData!.abstractToConcreteMap.set(abstractType, typeSet);
+  } else {
+    existingTypes.add(concreteType);
   }
 };
 
