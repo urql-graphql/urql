@@ -42,6 +42,7 @@ you can take it from getting started with your first GraphQL project all the way
   <tr>
    <td align="center"><a href="https://bigcommerce.com/"><img src="https://avatars.githubusercontent.com/u/186342?s=200&v=4" width="150" alt="BigCommerce"/><br />BigCommerce</a></td>
    <td align="center"><a href="https://wundergraph.com/"><img src="https://avatars.githubusercontent.com/u/64281914?s=200&v=4" width="150" alt="WunderGraph"/><br />WunderGraph</a></td>
+   <td align="center"><a href="https://the-guild.dev/"><img src="https://avatars.githubusercontent.com/u/42573040?s=200&v=4" width="150" alt="The Guild "/><br />The Guild</a></td>
   </tr>
 </table>
 <table>
