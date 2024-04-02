@@ -47,8 +47,8 @@ describe('makeSelectionIterator', () => {
       [
         {
           "alias": undefined,
-          "arguments": [],
-          "directives": [],
+          "arguments": undefined,
+          "directives": undefined,
           "kind": "Field",
           "name": {
             "kind": "Name",
@@ -58,8 +58,8 @@ describe('makeSelectionIterator', () => {
         },
         {
           "alias": undefined,
-          "arguments": [],
-          "directives": [],
+          "arguments": undefined,
+          "directives": undefined,
           "kind": "Field",
           "name": {
             "kind": "Name",
@@ -69,8 +69,8 @@ describe('makeSelectionIterator', () => {
         },
         {
           "alias": undefined,
-          "arguments": [],
-          "directives": [],
+          "arguments": undefined,
+          "directives": undefined,
           "kind": "Field",
           "name": {
             "kind": "Name",
@@ -138,8 +138,8 @@ describe('makeSelectionIterator', () => {
       [
         {
           "alias": undefined,
-          "arguments": [],
-          "directives": [],
+          "arguments": undefined,
+          "directives": undefined,
           "kind": "Field",
           "name": {
             "kind": "Name",
@@ -149,8 +149,8 @@ describe('makeSelectionIterator', () => {
         },
         {
           "alias": undefined,
-          "arguments": [],
-          "directives": [],
+          "arguments": undefined,
+          "directives": undefined,
           "kind": "Field",
           "name": {
             "kind": "Name",
@@ -160,8 +160,8 @@ describe('makeSelectionIterator', () => {
         },
         {
           "alias": undefined,
-          "arguments": [],
-          "directives": [],
+          "arguments": undefined,
+          "directives": undefined,
           "kind": "Field",
           "name": {
             "kind": "Name",

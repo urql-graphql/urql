@@ -20,7 +20,7 @@ exports[`on error > returns error data 1`] = `
       "__key": -2395444236,
       "definitions": [
         {
-          "directives": [],
+          "directives": undefined,
           "kind": "OperationDefinition",
           "name": {
             "kind": "Name",
@@ -48,7 +48,7 @@ exports[`on error > returns error data 1`] = `
                     },
                   },
                 ],
-                "directives": [],
+                "directives": undefined,
                 "kind": "Field",
                 "name": {
                   "kind": "Name",
@@ -59,8 +59,8 @@ exports[`on error > returns error data 1`] = `
                   "selections": [
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -70,8 +70,8 @@ exports[`on error > returns error data 1`] = `
                     },
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -81,8 +81,8 @@ exports[`on error > returns error data 1`] = `
                     },
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -98,7 +98,7 @@ exports[`on error > returns error data 1`] = `
           "variableDefinitions": [
             {
               "defaultValue": undefined,
-              "directives": [],
+              "directives": undefined,
               "kind": "VariableDefinition",
               "type": {
                 "kind": "NamedType",
@@ -176,7 +176,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
       "__key": -2395444236,
       "definitions": [
         {
-          "directives": [],
+          "directives": undefined,
           "kind": "OperationDefinition",
           "name": {
             "kind": "Name",
@@ -204,7 +204,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
                     },
                   },
                 ],
-                "directives": [],
+                "directives": undefined,
                 "kind": "Field",
                 "name": {
                   "kind": "Name",
@@ -215,8 +215,8 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
                   "selections": [
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -226,8 +226,8 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
                     },
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -237,8 +237,8 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
                     },
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -254,7 +254,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
           "variableDefinitions": [
             {
               "defaultValue": undefined,
-              "directives": [],
+              "directives": undefined,
               "kind": "VariableDefinition",
               "type": {
                 "kind": "NamedType",
@@ -334,7 +334,7 @@ exports[`on success > returns response data 1`] = `
       "__key": -2395444236,
       "definitions": [
         {
-          "directives": [],
+          "directives": undefined,
           "kind": "OperationDefinition",
           "name": {
             "kind": "Name",
@@ -362,7 +362,7 @@ exports[`on success > returns response data 1`] = `
                     },
                   },
                 ],
-                "directives": [],
+                "directives": undefined,
                 "kind": "Field",
                 "name": {
                   "kind": "Name",
@@ -373,8 +373,8 @@ exports[`on success > returns response data 1`] = `
                   "selections": [
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -384,8 +384,8 @@ exports[`on success > returns response data 1`] = `
                     },
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -395,8 +395,8 @@ exports[`on success > returns response data 1`] = `
                     },
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -412,7 +412,7 @@ exports[`on success > returns response data 1`] = `
           "variableDefinitions": [
             {
               "defaultValue": undefined,
-              "directives": [],
+              "directives": undefined,
               "kind": "VariableDefinition",
               "type": {
                 "kind": "NamedType",
