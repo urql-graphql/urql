@@ -1,5 +1,12 @@
 # @urql/svelte
 
+## 4.1.1
+
+### Patch Changes
+
+- Updated dependencies (See [#3520](https://github.com/urql-graphql/urql/pull/3520), [#3553](https://github.com/urql-graphql/urql/pull/3553), and [#3520](https://github.com/urql-graphql/urql/pull/3520))
+  - @urql/core@5.0.0
+
 ## 4.1.0
 
 ### Minor Changes
