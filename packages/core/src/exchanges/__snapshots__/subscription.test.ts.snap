@@ -20,7 +20,7 @@ exports[`should return response data from forwardSubscription observable 1`] = `
       "__key": 7623921801,
       "definitions": [
         {
-          "directives": [],
+          "directives": undefined,
           "kind": "OperationDefinition",
           "name": {
             "kind": "Name",
@@ -48,7 +48,7 @@ exports[`should return response data from forwardSubscription observable 1`] = `
                     },
                   },
                 ],
-                "directives": [],
+                "directives": undefined,
                 "kind": "Field",
                 "name": {
                   "kind": "Name",
@@ -59,8 +59,8 @@ exports[`should return response data from forwardSubscription observable 1`] = `
                   "selections": [
                     {
                       "alias": undefined,
-                      "arguments": [],
-                      "directives": [],
+                      "arguments": undefined,
+                      "directives": undefined,
                       "kind": "Field",
                       "name": {
                         "kind": "Name",
@@ -76,7 +76,7 @@ exports[`should return response data from forwardSubscription observable 1`] = `
           "variableDefinitions": [
             {
               "defaultValue": undefined,
-              "directives": [],
+              "directives": undefined,
               "kind": "VariableDefinition",
               "type": {
                 "kind": "NamedType",

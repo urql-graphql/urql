@@ -129,7 +129,7 @@ describe('formatDocument', () => {
       {
         test: {
           kind: Kind.DIRECTIVE,
-          arguments: [],
+          arguments: undefined,
           name: {
             kind: Kind.NAME,
             value: '_test',

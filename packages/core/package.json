@@ -54,7 +54,7 @@
     "prepublishOnly": "run-s clean build"
   },
   "dependencies": {
-    "@0no-co/graphql.web": "^1.0.1",
+    "@0no-co/graphql.web": "^1.0.5",
     "wonka": "^6.3.2"
   },
   "publishConfig": {
