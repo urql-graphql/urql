@@ -1,5 +1,28 @@
 # @urql/exchange-graphcache
 
+## 7.0.0
+
+### Major Changes
+
+- Add a default updater for mutation fields who are lacking an updater and where the returned entity is not present in the cache
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3518](https://github.com/urql-graphql/urql/pull/3518))
+- Remove deprecated `resolveFieldByKey`, use `cache.resolve` instead
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3520](https://github.com/urql-graphql/urql/pull/3520))
+
+### Minor Changes
+
+- Track abstract types being written so that we have a more reliable way of matching abstract fragments
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3548](https://github.com/urql-graphql/urql/pull/3548))
+
+### Patch Changes
+
+- ⚠️ Fix `invalidate` not applying when using a string to invalidate an entity
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3545](https://github.com/urql-graphql/urql/pull/3545))
+- Upgrade `@0no-co/graphql.web` to `1.0.5`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3553](https://github.com/urql-graphql/urql/pull/3553))
+- Updated dependencies (See [#3520](https://github.com/urql-graphql/urql/pull/3520), [#3553](https://github.com/urql-graphql/urql/pull/3553), and [#3520](https://github.com/urql-graphql/urql/pull/3520))
+  - @urql/core@5.0.0
+
 ## 6.5.0
 
 ### Minor Changes
