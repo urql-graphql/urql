@@ -7,7 +7,7 @@ order: 4
 
 As we've learned [on the page on "Normalized
 Caching"](./normalized-caching.md#normalizing-relational-data), when Graphcache receives an API
-result it will traverse and store all its data to its cache in a normalised structure. Each entity
+result it will traverse and store all its data to its cache in a normalized structure. Each entity
 that is found in a result will be stored under the entity's key.
 
 A query's result is represented as a graph, which can also be understood as a tree structure,

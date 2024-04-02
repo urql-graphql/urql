@@ -224,7 +224,7 @@ Please make sure that you include enough properties on your data so that `write`
 This error occurs when the cache can't generate a key for an entity. The key
 would then effectively be `null`, and the entity won't be cached by a key.
 
-Conceptually this means that an entity won't be normalised but will indeed
+Conceptually this means that an entity won't be normalized but will indeed
 be cached by the parent's key and field, which is displayed in the first
 part of the warning.
 
