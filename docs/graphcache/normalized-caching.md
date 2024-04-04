@@ -100,7 +100,7 @@ From the above document we can assume the following relations:
 However, this isn't quite enough yet to store the relations from GraphQL results. The normalized
 cache must also generate primary keys for each entity so that it can store them in table-like data
 structures. This is for instance why [Relay
-enforces](https://relay.dev/docs/en/graphql-server-specification.html#object-identification) that
+enforces](https://relay.dev/docs/guides/graphql-server-specification/#object-identification) that
 each entity must have an `id` field. This allows it to assume that there's an obvious primary key
 for each entity it may query. Instead, `urql`'s Graphcache and Apollo assume that there _may_ be an
 `id` or `_id` field in a given selection set. If Graphcache can't find these two fields it'll issue
