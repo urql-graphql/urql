@@ -383,13 +383,16 @@ const writeSelection = (
       // if we don't we'll assume this is a create mutation and invalidate
       // the found __typename.
       if (fieldValue && Array.isArray(fieldValue)) {
+        const excludedEntities: string[] = fieldValue.map(
+          entity => ctx.store.keyOfEntity(entity) || ''
+        );
         for (let i = 0, l = fieldValue.length; i < l; i++) {
-          const key = ctx.store.keyOfEntity(fieldValue[i]);
+          const key = excludedEntities[i];
           if (key && fieldValue[i].__typename) {
             const resolved = InMemoryData.readRecord(key, '__typename');
             const count = InMemoryData!.getRefCount(key);
             if (resolved && !count) {
-              invalidateType(fieldValue[i].__typename);
+              invalidateType(fieldValue[i].__typename, excludedEntities);
             }
           }
         }
@@ -399,7 +402,7 @@ const writeSelection = (
           const resolved = InMemoryData.readRecord(key, '__typename');
           const count = InMemoryData.getRefCount(key);
           if ((!resolved || !count) && fieldValue.__typename) {
-            invalidateType(fieldValue.__typename);
+            invalidateType(fieldValue.__typename, [key]);
           }
         }
       }

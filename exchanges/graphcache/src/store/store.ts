@@ -174,7 +174,7 @@ export class Store<
       !this.resolve(entity, '__typename');
 
     if (shouldInvalidateType) {
-      invalidateType(entity);
+      invalidateType(entity, []);
     } else {
       invariant(
         entityKey,
