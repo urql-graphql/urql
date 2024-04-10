@@ -1927,6 +1927,12 @@ describe('mutation updates', () => {
     vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(3);
     expect(result).toHaveBeenCalledTimes(3);
+    expect(result.mock.calls[1][0].data).toEqual({
+      addAuthor: {
+        id: '2',
+        name: 'Author 2',
+      },
+    });
   });
 });
 

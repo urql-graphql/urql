@@ -389,7 +389,7 @@ const writeSelection = (
             const resolved = InMemoryData.readRecord(key, '__typename');
             const count = InMemoryData!.getRefCount(key);
             if (resolved && !count) {
-              invalidateType(fieldValue[i].__typename);
+              invalidateType(fieldValue[i].__typename, key);
             }
           }
         }
@@ -399,7 +399,7 @@ const writeSelection = (
           const resolved = InMemoryData.readRecord(key, '__typename');
           const count = InMemoryData.getRefCount(key);
           if ((!resolved || !count) && fieldValue.__typename) {
-            invalidateType(fieldValue.__typename);
+            invalidateType(fieldValue.__typename, key);
           }
         }
       }

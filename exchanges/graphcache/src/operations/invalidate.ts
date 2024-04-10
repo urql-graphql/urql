@@ -25,9 +25,10 @@ export const invalidateEntity = (
   }
 };
 
-export const invalidateType = (typename: string) => {
+export const invalidateType = (typename: string, excludedEntity: string) => {
   const types = InMemoryData.getEntitiesForType(typename);
   for (const entity of types) {
+    if (entity === excludedEntity) continue;
     invalidateEntity(entity);
   }
 };
