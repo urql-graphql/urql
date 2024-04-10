@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.0.1
+
+### Patch Changes
+
+- When invoking the automatic creation updater ignore the entity we are currently on in the mutation
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3560](https://github.com/urql-graphql/urql/pull/3560))
+
 ## 7.0.0
 
 ### Major Changes
