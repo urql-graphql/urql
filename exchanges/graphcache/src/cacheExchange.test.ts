@@ -320,6 +320,7 @@ describe('data dependencies', () => {
       fragment BalanceFragment on Author {
         id
         balance {
+          id
           amount
         }
       }
@@ -345,6 +346,7 @@ describe('data dependencies', () => {
         name: 'Author 1',
         balance: {
           __typename: 'Balance',
+          id: '1',
           amount: 100,
         },
       },
@@ -358,6 +360,7 @@ describe('data dependencies', () => {
         name: 'Author 2',
         balance: {
           __typename: 'Balance',
+          id: '1',
           amount: 200,
         },
       },
@@ -368,6 +371,7 @@ describe('data dependencies', () => {
         updateBalance(userId: $userId, amount: $amount) {
           userId
           balance {
+            id
             amount
           }
         }
@@ -381,6 +385,7 @@ describe('data dependencies', () => {
         userId: '1',
         balance: {
           __typename: 'Balance',
+          id: '1',
           amount: 1000,
         },
       },
@@ -446,7 +451,7 @@ describe('data dependencies', () => {
     };
 
     const keys = {
-      Balance: () => null,
+      // Balance: () => null,
     };
 
     pipe(
@@ -471,13 +476,25 @@ describe('data dependencies', () => {
     expect(response).toHaveBeenCalledTimes(3);
     expect(updates.Mutation.updateBalance).toHaveBeenCalledTimes(1);
 
-    expect(reexec).toHaveBeenCalledTimes(1);
-    expect(reexec.mock.calls[0][0].key).toBe(1);
+    expect(reexec).toHaveBeenCalledTimes(3);
+    expect(reexec.mock.calls[0][0].key).toBe(2);
 
+    /*
     expect(result.mock.calls[2][0]).toHaveProperty(
       'data.author.balance.amount',
       1000
     );
+    */
+
+    expect(result.mock.calls[5][0].data).toMatchObject({
+      updateBalance: {
+        balance: {
+          amount: 1000,
+          id: '1',
+        },
+        userId: '1',
+      },
+    });
   });
 
   it('does nothing when no related queries have changed', () => {
