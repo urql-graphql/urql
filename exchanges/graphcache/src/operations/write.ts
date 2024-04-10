@@ -126,7 +126,10 @@ export const _write = (
     popDebugNode();
   }
 
-  return result;
+  return {
+    ...result,
+    updates: ctx.__internal.updates,
+  };
 };
 
 export const _writeFragment = (
@@ -373,7 +376,9 @@ const writeSelection = (
       );
 
       data[fieldName] = fieldValue;
-      updater(data, fieldArgs || {}, ctx.store, ctx);
+      ctx.__internal.updates.push(() =>
+        updater({ ...data }, fieldArgs || {}, ctx.store, { ...ctx })
+      );
     } else if (
       typename === ctx.store.rootFields['mutation'] &&
       !ctx.optimistic
@@ -389,7 +394,10 @@ const writeSelection = (
             const resolved = InMemoryData.readRecord(key, '__typename');
             const count = InMemoryData!.getRefCount(key);
             if (resolved && !count) {
-              invalidateType(fieldValue[i].__typename);
+              const value = fieldValue[i];
+              ctx.__internal.updates.push(() => {
+                invalidateType(value.__typename);
+              });
             }
           }
         }
@@ -399,7 +407,10 @@ const writeSelection = (
           const resolved = InMemoryData.readRecord(key, '__typename');
           const count = InMemoryData.getRefCount(key);
           if ((!resolved || !count) && fieldValue.__typename) {
-            invalidateType(fieldValue.__typename);
+            const val = fieldValue;
+            ctx.__internal.updates.push(() => {
+              invalidateType(val.__typename);
+            });
           }
         }
       }

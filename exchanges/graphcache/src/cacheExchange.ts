@@ -24,6 +24,7 @@ import { _write } from './operations/write';
 import { addMetadata, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store } from './store/store';
+import { currentDependencies } from './store/data';
 import type { Data, Dependencies, CacheExchangeOpts } from './types';
 
 import {
@@ -165,13 +166,23 @@ export const cacheExchange =
         operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
         initDataState('write', store.data, operation.key, true, false);
-        const { dependencies } = _write(
+        const { dependencies, updates } = _write(
           store,
           operation as any,
           undefined,
           undefined
         );
         clearDataState();
+        if (updates.length) {
+          initDataState('write', store.data, operation.key, true, false);
+          updates.forEach(fn => {
+            fn();
+          });
+          currentDependencies!.forEach(dep => {
+            dependencies.add(dep);
+          });
+          clearDataState();
+        }
         if (dependencies.size) {
           // Update blocked optimistic dependencies
           for (const dep of dependencies.values()) blockedDependencies.add(dep);
@@ -267,14 +278,13 @@ export const cacheExchange =
         // Write the result to cache and collect all dependencies that need to be
         // updated
         initDataState('write', store.data, operation.key, false, false);
-        const writeDependencies = _write(
+        const { dependencies: writeDependencies, updates } = _write(
           store,
           operation,
           data,
           result.error
-        ).dependencies;
+        );
         clearDataState();
-        collectPendingOperations(pendingOperations, writeDependencies);
         const prevData =
           operation.kind === 'query' ? results.get(operation.key) : null;
         initDataState(
@@ -292,6 +302,17 @@ export const cacheExchange =
         );
         clearDataState();
         data = queryResult.data;
+        if (updates.length) {
+          initDataState('write', store.data, operation.key, false, false);
+          updates.forEach(fn => {
+            fn();
+          });
+          currentDependencies!.forEach(dep => {
+            writeDependencies.add(dep);
+          });
+          clearDataState();
+        }
+        collectPendingOperations(pendingOperations, writeDependencies);
         if (operation.kind === 'query') {
           // Collect the query's dependencies for future pending operation updates
           queryDependencies = queryResult.dependencies;

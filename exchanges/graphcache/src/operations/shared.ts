@@ -54,6 +54,7 @@ export interface Context {
   hasNext: boolean;
   optimistic: boolean;
   __internal: {
+    updates: Array<() => void>;
     path: Array<string | number>;
     errorMap: { [path: string]: ErrorLike } | undefined;
   };
@@ -91,6 +92,7 @@ export const makeContext = (
     hasNext: false,
     optimistic: currentOptimistic,
     __internal: {
+      updates: [],
       path: [],
       errorMap: undefined,
     },
