@@ -263,7 +263,8 @@ export const cacheExchange =
 
       let queryDependencies: undefined | Dependencies;
       let data: Data | null = result.data;
-      if (data) {
+      if (data && operation.kind === 'query') {
+        const prevData = results.get(operation.key);
         // Write the result to cache and collect all dependencies that need to be
         // updated
         initDataState('write', store.data, operation.key, false, false);
@@ -275,8 +276,6 @@ export const cacheExchange =
         ).dependencies;
         clearDataState();
         collectPendingOperations(pendingOperations, writeDependencies);
-        const prevData =
-          operation.kind === 'query' ? results.get(operation.key) : null;
         initDataState(
           'read',
           store.data,
@@ -292,12 +291,24 @@ export const cacheExchange =
         );
         clearDataState();
         data = queryResult.data;
-        if (operation.kind === 'query') {
-          // Collect the query's dependencies for future pending operation updates
-          queryDependencies = queryResult.dependencies;
-          collectPendingOperations(pendingOperations, queryDependencies);
-          results.set(operation.key, data);
-        }
+        // Collect the query's dependencies for future pending operation updates
+        queryDependencies = queryResult.dependencies;
+        collectPendingOperations(pendingOperations, queryDependencies);
+        results.set(operation.key, data);
+      } else if (data) {
+        initDataState('read', store.data, operation.key, false, true);
+        const queryResult = _query(store, operation, data, result.error);
+        clearDataState();
+        initDataState('write', store.data, operation.key, false, false);
+        const writeDependencies = _write(
+          store,
+          operation,
+          data,
+          result.error
+        ).dependencies;
+        clearDataState();
+        collectPendingOperations(pendingOperations, writeDependencies);
+        if (queryResult.data) data = queryResult.data;
       } else {
         noopDataState(store.data, operation.key);
       }
