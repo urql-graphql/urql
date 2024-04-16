@@ -5,9 +5,48 @@ import fetch from 'node-fetch';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const WEBHOOK_URL = process.env.DISCORD_URQL_WEBHOOK_URL;
 
-async function main() {
-  const octokit = github.getOctokit(GITHUB_TOKEN);
+const octokit = github.getOctokit(GITHUB_TOKEN);
 
+const formatBody = (input) => {
+  const titleRe = /(?:^|\n)#+[^\n]+/g;
+  const updatedDepsRe = /\n-\s*Updated dependencies[\s\S]+\n(\n\s+-[\s\S]+)*/ig;
+  const markdownLinkRe = /\[([^\]]+)\]\(([^\)]+)\)/g;
+  const creditRe = new RegExp(`Submitted by (?:undefined|${markdownLinkRe.source})`, 'ig');
+  const repeatedNewlineRe = /(\n[ ]*)+/g;
+  return input
+    .replace(titleRe, '')
+    .replace(updatedDepsRe, '')
+    .replace(creditRe, (_match, text, url) => {
+      if (!text || /@kitten|@JoviDeCroock/i.test(text))
+        return '';
+      return `Submitted by [${text}](${url})`;
+    })
+    .replace(markdownLinkRe, (_match, text, url) => {
+      return `[${text}](<${url}>)`;
+    })
+    .replace(repeatedNewlineRe, '\n')
+    .trim();
+};
+
+async function getReleaseBody(name, version) {
+  const tag = `${name}@${version}`;
+  const result = await octokit.rest.repos.getReleaseByTag({
+    owner: 'urql-graphql',
+    repo: 'urql',
+    tag,
+  });
+
+  const release = result.status === 200 ? result.data : undefined;
+  if (!release || !release.body) return;
+
+  const title = ':package: [${tag}](<${release.html_url}>)\n';
+  const body = formatBody(release.body);
+  if (!body) return;
+
+  return `${title}\n${body}`;
+}
+
+async function main() {
   const inputPackages = core.getInput("publishedPackages");
   let packages;
 
@@ -20,31 +59,21 @@ async function main() {
 
   // Get releases
   const releasePromises = packages.map(entry => {
-    return octokit.rest.repos.getReleaseByTag({
-      owner: 'urql-graphql',
-      repo: 'urql',
-      tag: `${entry.name}@${entry.version}`
-    })
-  })
+    return getReleaseBody(entry.name, entry.version);
+  });
 
-  const releases = (await Promise.allSettled(releasePromises))
-    .map(x => x.status === 'fulfilled' && x.value.status === 200 ? x.value.data : undefined)
+  const content = (await Promise.allSettled(releasePromises))
+    .map(x => x.status === 'fulfilled' && x.value)
     .filter(Boolean)
-
-  // Construct message
-  const text = releases.map((release) => {
-    const { name: title, body: changes, html_url: url } = release;
-
-    return `:package: ${title}\n${changes}\n${url}`;
-  }, '').join('\n\n')
+    .join('\n\n');
 
   // Send message through a discord webhook or bot
   const response = fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: {
-        'Content-Type': 'application/json',
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ username: 'philpl', content: `:bell: urql Release day!\n${text}` })
+    body: JSON.stringify({ content })
   })
 
   if (!response.ok) {
