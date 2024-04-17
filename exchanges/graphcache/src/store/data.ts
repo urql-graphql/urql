@@ -633,8 +633,9 @@ const squashLayer = (layerKey: number) => {
     for (const entry of links.entries()) {
       const entityKey = entry[0];
       const keyMap = entry[1];
-      for (const fieldKey in keyMap)
+      for (const fieldKey in keyMap) {
         writeLink(entityKey, fieldKey, keyMap[fieldKey]);
+      }
     }
   }
 
@@ -643,8 +644,9 @@ const squashLayer = (layerKey: number) => {
     for (const entry of records.entries()) {
       const entityKey = entry[0];
       const keyMap = entry[1];
-      for (const fieldKey in keyMap)
+      for (const fieldKey in keyMap) {
         writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
+      }
     }
   }
 

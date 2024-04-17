@@ -232,8 +232,11 @@ const writeSelection = (
     );
     return;
   } else if (!isRoot && entityKey) {
-    InMemoryData.writeRecord(entityKey, '__typename', typename);
-    InMemoryData.writeType(typename, entityKey);
+    const existingTypename = InMemoryData.readRecord(entityKey, '__typename');
+    if (existingTypename !== typename) {
+      InMemoryData.writeRecord(entityKey, '__typename', typename);
+      InMemoryData.writeType(typename, entityKey);
+    }
   }
 
   const updates = ctx.store.updates[typename];
@@ -347,7 +350,6 @@ const writeSelection = (
           entityKey || typename,
           fieldKey
         );
-        console.log('[LINK]', existingLink, link, isEqualLinkOrScalar(existingLink, link))
         if (!isEqualLinkOrScalar(existingLink, link)) {
           InMemoryData.writeLink(entityKey || typename, fieldKey, link);
         }
@@ -362,7 +364,6 @@ const writeSelection = (
       const value = (
         fieldValue !== null || !getFieldError(ctx) ? fieldValue : undefined
       ) as EntityField;
-      console.log('[SCALAR]', existingRecord, value, isEqualLinkOrScalar(existingRecord, value))
       if (!isEqualLinkOrScalar(existingRecord, value)) {
         // This is a leaf node, so we're setting the field's value directly
         InMemoryData.writeRecord(entityKey || typename, fieldKey, value);

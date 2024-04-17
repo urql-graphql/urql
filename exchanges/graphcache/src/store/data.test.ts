@@ -101,7 +101,7 @@ describe('garbage collection', () => {
     // TODO: is it a problem that this fails, we are reading from Todo
     // but we are not updating anything
     expect(InMemoryData.getCurrentDependencies()).toEqual(
-      new Set(['Query.todo', 'Todo:1'])
+      new Set(['Query.todo'])
     );
   });
 
