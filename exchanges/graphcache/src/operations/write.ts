@@ -232,11 +232,8 @@ const writeSelection = (
     );
     return;
   } else if (!isRoot && entityKey) {
-    const existingTypename = InMemoryData.readRecord(entityKey, '__typename');
-    if (existingTypename !== typename) {
-      InMemoryData.writeRecord(entityKey, '__typename', typename);
-      InMemoryData.writeType(typename, entityKey);
-    }
+    InMemoryData.writeRecord(entityKey, '__typename', typename);
+    InMemoryData.writeType(typename, entityKey);
   }
 
   const updates = ctx.store.updates[typename];
@@ -346,28 +343,20 @@ const writeSelection = (
             ? InMemoryData.readLink(entityKey || typename, fieldKey)
             : undefined
         );
-        const existingLink = InMemoryData.readLink(
-          entityKey || typename,
-          fieldKey
-        );
-        if (!isEqualLinkOrScalar(existingLink, link)) {
-          InMemoryData.writeLink(entityKey || typename, fieldKey, link);
-        }
+
+        InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       } else {
         writeField(ctx, getSelectionSet(node), ensureData(fieldValue));
       }
     } else if (entityKey && rootField === 'query') {
-      const existingRecord = InMemoryData.readRecord(
+      // This is a leaf node, so we're setting the field's value directly
+      InMemoryData.writeRecord(
         entityKey || typename,
-        fieldKey
+        fieldKey,
+        (fieldValue !== null || !getFieldError(ctx)
+          ? fieldValue
+          : undefined) as EntityField
       );
-      const value = (
-        fieldValue !== null || !getFieldError(ctx) ? fieldValue : undefined
-      ) as EntityField;
-      if (!isEqualLinkOrScalar(existingRecord, value)) {
-        // This is a leaf node, so we're setting the field's value directly
-        InMemoryData.writeRecord(entityKey || typename, fieldKey, value);
-      }
     }
 
     // We run side-effect updates after the default, normalized updates
@@ -421,20 +410,6 @@ const writeSelection = (
     ctx.__internal.path.pop();
   }
 };
-
-function isEqualLinkOrScalar(
-  a: Link | EntityField | undefined,
-  b: Link | EntityField | undefined
-) {
-  if (typeof a !== typeof b) return false;
-  if (a !== b) return false;
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    return !a.some((el, index) => el !== b[index]);
-  }
-
-  return true;
-}
 
 // A pattern to match typenames of types that are likely never keyable
 const KEYLESS_TYPE_RE = /^__|PageInfo|(Connection|Edge)$/;

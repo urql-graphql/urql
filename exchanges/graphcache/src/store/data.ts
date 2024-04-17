@@ -512,8 +512,12 @@ export const writeRecord = (
   fieldKey: string,
   value?: EntityField
 ) => {
-  updateDependencies(entityKey, fieldKey);
-  updatePersist(entityKey, fieldKey);
+  const existing = getNode(currentData!.records, entityKey, fieldKey);
+  if (!isEqualLinkOrScalar(existing, value)) {
+    updateDependencies(entityKey, fieldKey);
+    updatePersist(entityKey, fieldKey);
+  }
+
   setNode(currentData!.records, entityKey, fieldKey, value);
 };
 
@@ -537,9 +541,12 @@ export const writeLink = (
     updateRCForLink(entityLinks && entityLinks[fieldKey], -1);
     updateRCForLink(link, 1);
   }
-  // Update persistence batch and dependencies
-  updateDependencies(entityKey, fieldKey);
-  updatePersist(entityKey, fieldKey);
+  const existing = getNode(currentData!.links, entityKey, fieldKey);
+  if (!isEqualLinkOrScalar(existing, link)) {
+    updateDependencies(entityKey, fieldKey);
+    updatePersist(entityKey, fieldKey);
+  }
+
   // Update the link
   setNode(currentData!.links, entityKey, fieldKey, link);
 };
@@ -716,3 +723,17 @@ export const hydrateData = (
   data.hydrating = false;
   clearDataState();
 };
+
+function isEqualLinkOrScalar(
+  a: Link | EntityField | undefined,
+  b: Link | EntityField | undefined
+) {
+  if (typeof a !== typeof b) return false;
+  if (a !== b) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return !a.some((el, index) => el !== b[index]);
+  }
+
+  return true;
+}
