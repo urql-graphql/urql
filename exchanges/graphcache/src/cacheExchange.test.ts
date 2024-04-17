@@ -480,6 +480,173 @@ describe('data dependencies', () => {
     );
   });
 
+  it.only('does not notify related queries when a mutation update does not change the data', () => {
+    vi.useFakeTimers();
+
+    const balanceFragment = gql`
+      fragment BalanceFragment on Author {
+        id
+        balance {
+          amount
+        }
+      }
+    `;
+
+    const queryById = gql`
+      query ($id: ID!) {
+        author(id: $id) {
+          id
+          name
+          ...BalanceFragment
+        }
+      }
+
+      ${balanceFragment}
+    `;
+
+    const queryByIdDataA = {
+      __typename: 'Query',
+      author: {
+        __typename: 'Author',
+        id: '1',
+        name: 'Author 1',
+        balance: {
+          __typename: 'Balance',
+          amount: 100,
+        },
+      },
+    };
+
+    const queryByIdDataB = {
+      __typename: 'Query',
+      author: {
+        __typename: 'Author',
+        id: '2',
+        name: 'Author 2',
+        balance: {
+          __typename: 'Balance',
+          amount: 200,
+        },
+      },
+    };
+
+    const mutation = gql`
+      mutation ($userId: ID!, $amount: Int!) {
+        updateBalance(userId: $userId, amount: $amount) {
+          userId
+          balance {
+            amount
+          }
+        }
+      }
+    `;
+
+    const mutationData = {
+      __typename: 'Mutation',
+      updateBalance: {
+        __typename: 'UpdateBalanceResult',
+        userId: '1',
+        balance: {
+          __typename: 'Balance',
+          amount: 100,
+        },
+      },
+    };
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const reexec = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const opOne = client.createRequestOperation('query', {
+      key: 1,
+      query: queryById,
+      variables: { id: 1 },
+    });
+
+    const opTwo = client.createRequestOperation('query', {
+      key: 2,
+      query: queryById,
+      variables: { id: 2 },
+    });
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 3,
+      query: mutation,
+      variables: { userId: '1', amount: 1000 },
+    });
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { ...queryResponse, operation: opOne, data: queryByIdDataA };
+      } else if (forwardOp.key === 2) {
+        return { ...queryResponse, operation: opTwo, data: queryByIdDataB };
+      } else if (forwardOp.key === 3) {
+        return {
+          ...queryResponse,
+          operation: opMutation,
+          data: mutationData,
+        };
+      }
+
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ =>
+      pipe(ops$, delay(1), map(response), share);
+
+    const updates = {
+      Mutation: {
+        updateBalance: vi.fn((result, _args, cache) => {
+          const {
+            updateBalance: { userId, balance },
+          } = result;
+          cache.writeFragment(balanceFragment, { id: userId, balance });
+        }),
+      },
+    };
+
+    const keys = {
+      Balance: () => null,
+    };
+
+    pipe(
+      cacheExchange({ updates, keys })({ forward, client, dispatchDebug })(
+        ops$
+      ),
+      tap(result),
+      publish
+    );
+
+    next(opTwo);
+    vi.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+
+    next(opOne);
+    vi.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(2);
+
+    next(opMutation);
+    vi.runAllTimers();
+
+    expect(response).toHaveBeenCalledTimes(3);
+    expect(updates.Mutation.updateBalance).toHaveBeenCalledTimes(1);
+
+    expect(reexec).toHaveBeenCalledTimes(0);
+    expect(reexec.mock.calls[0][0].key).toBe(1);
+
+    expect(result.mock.calls[2][0]).toHaveProperty(
+      'data.author.balance.amount',
+      100
+    );
+  });
+
   it('does nothing when no related queries have changed', () => {
     const queryUnrelated = gql`
       {

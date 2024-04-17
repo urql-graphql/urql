@@ -273,6 +273,7 @@ export const cacheExchange =
           data,
           result.error
         ).dependencies;
+        console.log(writeDependencies)
         clearDataState();
         collectPendingOperations(pendingOperations, writeDependencies);
         const prevData =

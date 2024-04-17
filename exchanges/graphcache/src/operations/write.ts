@@ -347,6 +347,7 @@ const writeSelection = (
           entityKey || typename,
           fieldKey
         );
+        console.log('[LINK]', existingLink, link, isEqualLinkOrScalar(existingLink, link))
         if (!isEqualLinkOrScalar(existingLink, link)) {
           InMemoryData.writeLink(entityKey || typename, fieldKey, link);
         }
@@ -361,6 +362,7 @@ const writeSelection = (
       const value = (
         fieldValue !== null || !getFieldError(ctx) ? fieldValue : undefined
       ) as EntityField;
+      console.log('[SCALAR]', existingRecord, value, isEqualLinkOrScalar(existingRecord, value))
       if (!isEqualLinkOrScalar(existingRecord, value)) {
         // This is a leaf node, so we're setting the field's value directly
         InMemoryData.writeRecord(entityKey || typename, fieldKey, value);
@@ -427,7 +429,7 @@ function isEqualLinkOrScalar(
   if (a !== b) return false;
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
-    return a.every((el, index) => el === b[index]);
+    return !a.some((el, index) => el !== b[index]);
   }
 
   return true;
