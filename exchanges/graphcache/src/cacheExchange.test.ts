@@ -1607,7 +1607,6 @@ describe('optimistic updates', () => {
     vi.advanceTimersByTime(1);
     next(opMutationTwo);
 
-    // TODO: verify why this changed
     expect(response).toHaveBeenCalledTimes(1);
     expect(optimistic.concealAuthor).toHaveBeenCalledTimes(2);
     expect(reexec).toHaveBeenCalledTimes(1);
@@ -1615,10 +1614,12 @@ describe('optimistic updates', () => {
 
     vi.advanceTimersByTime(2);
     expect(response).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(1);
 
     vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(3);
+    expect(reexec).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(2);
   });
 
