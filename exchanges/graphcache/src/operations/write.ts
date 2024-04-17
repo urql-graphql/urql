@@ -343,19 +343,28 @@ const writeSelection = (
             ? InMemoryData.readLink(entityKey || typename, fieldKey)
             : undefined
         );
-        InMemoryData.writeLink(entityKey || typename, fieldKey, link);
+        const existingLink = InMemoryData.readLink(
+          entityKey || typename,
+          fieldKey
+        );
+        if (!isEqualLinkOrScalar(existingLink, link)) {
+          InMemoryData.writeLink(entityKey || typename, fieldKey, link);
+        }
       } else {
         writeField(ctx, getSelectionSet(node), ensureData(fieldValue));
       }
     } else if (entityKey && rootField === 'query') {
-      // This is a leaf node, so we're setting the field's value directly
-      InMemoryData.writeRecord(
+      const existingRecord = InMemoryData.readRecord(
         entityKey || typename,
-        fieldKey,
-        (fieldValue !== null || !getFieldError(ctx)
-          ? fieldValue
-          : undefined) as EntityField
+        fieldKey
       );
+      const value = (
+        fieldValue !== null || !getFieldError(ctx) ? fieldValue : undefined
+      ) as EntityField;
+      if (!isEqualLinkOrScalar(existingRecord, value)) {
+        // This is a leaf node, so we're setting the field's value directly
+        InMemoryData.writeRecord(entityKey || typename, fieldKey, value);
+      }
     }
 
     // We run side-effect updates after the default, normalized updates
@@ -409,6 +418,20 @@ const writeSelection = (
     ctx.__internal.path.pop();
   }
 };
+
+function isEqualLinkOrScalar(
+  a: Link | EntityField | undefined,
+  b: Link | EntityField | undefined
+) {
+  if (typeof a !== typeof b) return false;
+  if (a !== b) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((el, index) => el === b[index]);
+  }
+
+  return true;
+}
 
 // A pattern to match typenames of types that are likely never keyable
 const KEYLESS_TYPE_RE = /^__|PageInfo|(Connection|Edge)$/;

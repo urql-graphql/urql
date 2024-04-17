@@ -458,7 +458,9 @@ export const readRecord = (
   entityKey: string,
   fieldKey: string
 ): EntityField => {
-  updateDependencies(entityKey, fieldKey);
+  if (currentOperation === 'read') {
+    updateDependencies(entityKey, fieldKey);
+  }
   return getNode(currentData!.records, entityKey, fieldKey);
 };
 
@@ -467,7 +469,9 @@ export const readLink = (
   entityKey: string,
   fieldKey: string
 ): Link | undefined => {
-  updateDependencies(entityKey, fieldKey);
+  if (currentOperation === 'read') {
+    updateDependencies(entityKey, fieldKey);
+  }
   return getNode(currentData!.links, entityKey, fieldKey);
 };
 
