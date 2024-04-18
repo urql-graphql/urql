@@ -12,7 +12,7 @@ function cleanup() {
       if (dtsFilter(chunk.fileName)) {
         return input
           .replace(emptyImportRe, '')
-          .replace(gqlImportRe, x => '/*!@ts-ignore*/\n' + x);
+          .replace(gqlImportRe, x => '/*@ts-ignore*/\n' + x);
       }
     },
   };
