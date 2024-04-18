@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.0.1
+
+### Patch Changes
+
+- ⚠️ Fix `@ts-ignore` on TypeScript peer dependency import in typings not being applied due to a leading `!` character
+  Submitted by [@kitten](https://github.com/kitten) (See [#3567](https://github.com/urql-graphql/urql/pull/3567))
+
 ## 5.0.0
 
 ### Major Changes
