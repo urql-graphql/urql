@@ -114,14 +114,13 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  * };
  * ```
  */
-export function useFragment<Data = any>(
-  args: UseFragmentArgs<Data>
-): UseFragmentResponse<Data> {
-  const { query, data } = args;
+export function useFragment<
+  Data extends Record<string, any> = Record<string, any>,
+>(args: UseFragmentArgs<Data>): UseFragmentResponse<Data> {
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  const request = useRequest(query, {});
+  const request = useRequest(args.query, args.data);
 
   const getSnapshot = React.useCallback(
     (
@@ -135,11 +134,17 @@ export function useFragment<Data = any>(
           x =>
             x.kind === 'FragmentDefinition' &&
             ((args.name && x.name.value === args.name) || !args.name)
-        );
-        const newResult = maskFragment(
-          data as any,
-          (fragment as FragmentDefinitionNode).selectionSet
-        );
+        ) as FragmentDefinitionNode | undefined;
+
+        if (!fragment) {
+          throw new Error(
+            'Passed document did not contain a fragment definition' + args.name
+              ? ` for ${args.name}`
+              : ''
+          );
+        }
+
+        const newResult = maskFragment<Data>(data, fragment.selectionSet);
         if (newResult.fulfilled) {
           cache.set(request.key, newResult.data as any);
           return { data: newResult.data as any, fetching: false };
@@ -148,23 +153,26 @@ export function useFragment<Data = any>(
           cache.set(request.key, promise);
           throw promise;
         } else {
-          return { fetching: true, data: newResult.data as any };
+          return { fetching: true, data: newResult.data };
         }
       } else if (suspense && cached != null && 'then' in cached) {
         throw cached;
       }
 
-      return (cached as OperationResult<Data>) || { fetching: true };
+      return { fetching: false, data: (cached as OperationResult).data };
     },
     [cache, request]
   );
 
-  const deps = [client, request, args.context, data] as const;
+  const deps = [client, request, args.context, args.data] as const;
 
   const [state, setState] = React.useState(
     () =>
       [
-        computeNextState(initialState, getSnapshot(request, data, suspense)),
+        computeNextState(
+          initialState,
+          getSnapshot(request, args.data, suspense)
+        ),
         deps,
       ] as const
   );
@@ -174,7 +182,7 @@ export function useFragment<Data = any>(
     setState([
       (currentResult = computeNextState(
         state[0],
-        getSnapshot(request, data, suspense)
+        getSnapshot(request, args.data, suspense)
       )),
       deps,
     ]);
@@ -183,10 +191,10 @@ export function useFragment<Data = any>(
   return currentResult;
 }
 
-const maskFragment = (
-  data: Record<string, any>,
+const maskFragment = <Data extends Record<string, any>>(
+  data: Data,
   selectionSet: SelectionSetNode
-): { data: Record<string, any>; fulfilled: boolean } => {
+): { data: Data; fulfilled: boolean } => {
   const maskedData = {};
   let isDataComplete = true;
   selectionSet.selections.forEach(selection => {
@@ -232,5 +240,5 @@ const maskFragment = (
     }
   });
 
-  return { data: maskedData, fulfilled: isDataComplete };
+  return { data: maskedData as Data, fulfilled: isDataComplete };
 };
