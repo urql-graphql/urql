@@ -343,6 +343,7 @@ const writeSelection = (
             ? InMemoryData.readLink(entityKey || typename, fieldKey)
             : undefined
         );
+
         InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       } else {
         writeField(ctx, getSelectionSet(node), ensureData(fieldValue));
