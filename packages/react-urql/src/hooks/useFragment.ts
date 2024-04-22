@@ -22,13 +22,7 @@ import { getCacheForClient } from './cache';
 
 import { initialState, computeNextState, hasDepsChanged } from './state';
 
-/** Input arguments for the {@link useQuery} hook.
- *
- * @param query - The GraphQL query that `useQuery` executes.
- * @param query - The GraphQL query that `useQuery` executes.
- * @param query - The GraphQL query that `useQuery` executes.
- * @param query - The GraphQL query that `useQuery` executes.
- */
+/** Input arguments for the {@link useFragment} hook. */
 export type UseFragmentArgs<Data = any> = {
   /** Updates the {@link OperationContext} for the executed GraphQL query operation.
    *
@@ -91,7 +85,7 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
     ? !!context.suspense
     : client.suspense;
 
-/** Hook to mask a GraphQL Fragment given its data.
+/** Hook to mask a GraphQL Fragment given its data. (BETA)
  *
  * @param args - a {@link UseFragmentArgs} object, to pass a `fragment` and `data`.
  * @returns a {@link UseFragmentState} result.
