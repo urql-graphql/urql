@@ -13,6 +13,7 @@ const cache = cacheExchange({
 });
 
 const client = new Client({
+  suspense: true,
   url: 'http://localhost:3004/graphql',
   exchanges: [cache, fetchExchange],
 });

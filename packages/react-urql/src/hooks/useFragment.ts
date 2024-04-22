@@ -1,16 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import * as React from 'react';
+import type {
+  FragmentDefinitionNode,
+  SelectionSetNode,
+} from '@0no-co/graphql.web';
+import { Kind } from '@0no-co/graphql.web';
 
 import type {
   GraphQLRequestParams,
   AnyVariables,
   Client,
-  DocumentInput,
   OperationContext,
-  RequestPolicy,
   OperationResult,
-  Operation,
   GraphQLRequest,
 } from '@urql/core';
 
@@ -18,19 +20,13 @@ import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { getCacheForClient } from './cache';
 
-import {
-  deferDispatch,
-  initialState,
-  computeNextState,
-  hasDepsChanged,
-} from './state';
-import { FragmentDefinitionNode, Kind, SelectionSetNode } from 'graphql';
+import { initialState, computeNextState, hasDepsChanged } from './state';
 
 /** Input arguments for the {@link useQuery} hook.
  *
  * @param query - The GraphQL query that `useQuery` executes.
  */
-export type UseQueryArgs<Data = any> = {
+export type UseFragmentArgs<Data = any> = {
   context: Partial<OperationContext>;
   query: GraphQLRequestParams<Data, AnyVariables>['query'];
   data: Data;
@@ -75,7 +71,7 @@ export interface UseFragmentState<Data = any> {
  * and the second is used to imperatively re-execute the query
  * via a {@link UseQueryExecute} function.
  */
-export type UseQueryResponse<Data = any> = UseFragmentState<Data>;
+export type UseFragmentResponse<Data = any> = UseFragmentState<Data>;
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   context && context.suspense !== undefined
@@ -84,12 +80,12 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
 
 /** Hook to mask a GraphQL Fragment given its data.
  *
- * @param args - a {@link UseQueryArgs} object, to pass a `fragment` and `data`.
- * @returns a {@link UseQueryResponse} tuple of a {@link UseQueryState} result, and re-execute function.
+ * @param args - a {@link UseFragmentArgs} object, to pass a `fragment` and `data`.
+ * @returns a {@link UseFragmentResponse} tuple of a {@link UseQueryState} result, and re-execute function.
  *
  * @remarks
  * `useQuery` allows GraphQL queries to be defined and executed.
- * Given {@link UseQueryArgs.query}, it executes the GraphQL query with the
+ * Given {@link UseFragmentArgs.query}, it executes the GraphQL query with the
  * context’s {@link Client}.
  *
  * The returned result updates when the `Client` has new results
@@ -119,8 +115,8 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  * ```
  */
 export function useFragment<Data = any>(
-  args: UseQueryArgs<Data>
-): UseQueryResponse<Data> {
+  args: UseFragmentArgs<Data>
+): UseFragmentResponse<Data> {
   const { query, data } = args;
   const client = useClient();
   const cache = getCacheForClient(client);
@@ -141,15 +137,18 @@ export function useFragment<Data = any>(
             ((args.name && x.name.value === args.name) || !args.name)
         );
         const newResult = maskFragment(
-          data,
+          data as any,
           (fragment as FragmentDefinitionNode).selectionSet
         );
-        if (newResult == null && suspense) {
+        if (newResult.fulfilled) {
+          cache.set(request.key, newResult.data as any);
+          return { data: newResult.data as any, fetching: false };
+        } else if (suspense) {
           const promise = new Promise(() => {});
           cache.set(request.key, promise);
           throw promise;
         } else {
-          return { fetching: true, data: newResult.data };
+          return { fetching: true, data: newResult.data as any };
         }
       } else if (suspense && cached != null && 'then' in cached) {
         throw cached;
