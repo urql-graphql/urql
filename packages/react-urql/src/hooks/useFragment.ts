@@ -240,6 +240,21 @@ const maskFragment = <Data extends Record<string, any>>(
         }
       }
       maskedData[selection.name.value] = data[selection.name.value];
+    } else if (selection.kind === Kind.INLINE_FRAGMENT) {
+      if (
+        selection.typeCondition &&
+        selection.typeCondition.name.value !== data.__typename
+      ) {
+        return;
+      }
+
+      const result = maskFragment(data, selection.selectionSet);
+      if (!result.fulfilled) {
+        isDataComplete = false;
+      }
+      Object.assign(maskedData, result.data);
+    } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
+      // TODO: do we want to support this?
     }
   });
 
