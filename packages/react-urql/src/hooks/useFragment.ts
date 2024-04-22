@@ -25,53 +25,66 @@ import { initialState, computeNextState, hasDepsChanged } from './state';
 /** Input arguments for the {@link useQuery} hook.
  *
  * @param query - The GraphQL query that `useQuery` executes.
+ * @param query - The GraphQL query that `useQuery` executes.
+ * @param query - The GraphQL query that `useQuery` executes.
+ * @param query - The GraphQL query that `useQuery` executes.
  */
 export type UseFragmentArgs<Data = any> = {
+  /** Updates the {@link OperationContext} for the executed GraphQL query operation.
+   *
+   * @remarks
+   * `context` may be passed to {@link useFragment}, to update the {@link OperationContext}
+   * of a query operation. This may be used to update the `context` that exchanges
+   * will receive for a single hook.
+   *
+   * Hint: This should be wrapped in a `useMemo` hook, to make sure that your
+   * component doesn’t infinitely update.
+   *
+   * @example
+   * ```ts
+   * const result = useFragment({
+   *   query,
+   *   data,
+   *   context: useMemo(() => ({
+   *     suspense: true,
+   *   }), [])
+   * });
+   * ```
+   */
   context: Partial<OperationContext>;
+  /** A GraphQL document to mask this fragment against.
+   *
+   * @remarks
+   * This Document should contain atleast one FragmentDefinitionNode or
+   * a FragmentDefinitionNode with the same name as the `name` property.
+   */
   query: GraphQLRequestParams<Data, AnyVariables>['query'];
+  /** A JSON object which we will extract properties from to get to the
+   * masked fragment.
+   */
   data: Data;
+  /** An optional name of the fragment to use. */
   name?: string;
 };
 
-/** State of the current query, your {@link useQuery} hook is executing.
+/** State of the current query, your {@link useFragment} hook is executing.
  *
  * @remarks
- * `UseQueryState` is returned (in a tuple) by {@link useQuery} and
- * gives you the updating {@link OperationResult} of GraphQL queries.
- *
- * Even when the query and variables passed to {@link useQuery} change,
- * this state preserves the prior state and sets the `fetching` flag to
- * `true`.
- * This allows you to display the previous state, while implementing
- * a separate loading indicator separately.
+ * `UseFragmentState` is returned by {@link useFragment} and
+ * gives you the masked data for the fragment.
  */
 export interface UseFragmentState<Data = any> {
-  /** Indicates whether `useQuery` is waiting for a new result.
+  /** Indicates whether `useFragment` is waiting for a new result.
    *
    * @remarks
-   * When `useQuery` is passed a new query and/or variables, it will
+   * When `useFragment` is passed a new query and/or variables, it will
    * start executing the new query operation and `fetching` is set to
    * `true` until a result arrives.
-   *
-   * Hint: This is subtly different than whether the query is actually
-   * fetching, and doesn’t indicate whether a query is being re-executed
-   * in the background. For this, see {@link UseQueryState.stale}.
    */
   fetching: boolean;
-  /** The {@link OperationResult.data} for the executed query. */
+  /** The {@link OperationResult.data} for the masked fragment. */
   data?: Data;
 }
-
-/** Result tuple returned by the {@link useQuery} hook.
- *
- * @remarks
- * Similarly to a `useState` hook’s return value,
- * the first element is the {@link useQuery}’s result and state,
- * a {@link UseQueryState} object,
- * and the second is used to imperatively re-execute the query
- * via a {@link UseQueryExecute} function.
- */
-export type UseFragmentResponse<Data = any> = UseFragmentState<Data>;
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   context && context.suspense !== undefined
@@ -81,33 +94,29 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
 /** Hook to mask a GraphQL Fragment given its data.
  *
  * @param args - a {@link UseFragmentArgs} object, to pass a `fragment` and `data`.
- * @returns a {@link UseFragmentResponse} tuple of a {@link UseQueryState} result, and re-execute function.
+ * @returns a {@link UseFragmentState} result.
  *
  * @remarks
- * `useQuery` allows GraphQL queries to be defined and executed.
- * Given {@link UseFragmentArgs.query}, it executes the GraphQL query with the
- * context’s {@link Client}.
- *
- * The returned result updates when the `Client` has new results
- * for the query, and changes when your input `args` change.
+ * `useFragments` allows GraphQL fragments to mask their data.
+ * Given {@link UseFragmentArgs.query} and {@link UseFragmentArgs.data}, it will
+ * return the masked data for the fragment contained in query.
  *
  * Additionally, if the `suspense` option is enabled on the `Client`,
- * the `useQuery` hook will suspend instead of indicating that it’s
- * waiting for a result via {@link UseQueryState.fetching}.
- *
- * @see {@link https://urql.dev/goto/urql/docs/basics/react-preact/#queries} for `useQuery` docs.
+ * the `useFragment` hook will suspend instead of indicating that it’s
+ * waiting for a result via {@link UseFragmentState.fetching}.
  *
  * @example
  * ```ts
- * import { gql, useQuery } from 'urql';
+ * import { gql, useFragment } from 'urql';
  *
- * const TodosQuery = gql`
- *   query { todos { id, title } }
+ * const TodoFields = gql`
+ *   fragment TodoFields on Todo { id name }
  * `;
  *
- * const Todos = () => {
- *   const [result, reexecuteQuery] = useQuery({
- *     query: TodosQuery,
+ * const Todo = (props) => {
+ *   const result = useQuery({
+ *     data: props.todo,
+ *     query: TodoFields,
  *     variables: {},
  *   });
  *   // ...
@@ -116,7 +125,7 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  */
 export function useFragment<
   Data extends Record<string, any> = Record<string, any>,
->(args: UseFragmentArgs<Data>): UseFragmentResponse<Data> {
+>(args: UseFragmentArgs<Data>): UseFragmentState<Data> {
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
@@ -132,7 +141,7 @@ export function useFragment<
       if (!cached) {
         const fragment = request.query.definitions.find(
           x =>
-            x.kind === 'FragmentDefinition' &&
+            x.kind === Kind.FRAGMENT_DEFINITION &&
             ((args.name && x.name.value === args.name) || !args.name)
         ) as FragmentDefinitionNode | undefined;
 
