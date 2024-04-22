@@ -31,7 +31,6 @@ const Song = React.memo(function Song({ song }) {
 });
 
 const DeferredSong = ({ data }) => {
-  console.log(data, SecondVerseFragment)
   const result = useFragment({
     query: SecondVerseFragment,
     data,
