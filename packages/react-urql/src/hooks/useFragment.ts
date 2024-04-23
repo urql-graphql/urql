@@ -3,6 +3,7 @@
 import * as React from 'react';
 import type {
   FragmentDefinitionNode,
+  InlineFragmentNode,
   SelectionSetNode,
 } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
@@ -222,6 +223,7 @@ const maskFragment = <Data extends Record<string, any>>(
         selection.directives.some(
           x => x.name.value === 'include' || x.name.value === 'skip'
         );
+
       if (selection.selectionSet) {
         if (data[fieldAlias] === undefined) {
           if (hasIncludeOrSkip) return;
@@ -229,10 +231,28 @@ const maskFragment = <Data extends Record<string, any>>(
         } else if (data[fieldAlias] === null) {
           maskedData[fieldAlias] = null;
         } else if (Array.isArray(data[fieldAlias])) {
-          maskedData[fieldAlias] = data[fieldAlias].map(item => {
+          if (selection.selectionSet) {
+            maskedData[fieldAlias] = data[fieldAlias].map(item => {
+              const result = maskFragment(
+                item,
+                selection.selectionSet as SelectionSetNode,
+                fragments
+              );
+
+              if (!result.fulfilled) {
+                isDataComplete = false;
+              }
+
+              return result.data;
+            });
+          } else {
+            maskedData[fieldAlias] = data[fieldAlias].map(item => item);
+          }
+        } else {
+          if (selection.selectionSet) {
             const result = maskFragment(
-              item,
-              selection.selectionSet as SelectionSetNode,
+              data[fieldAlias],
+              selection.selectionSet,
               fragments
             );
 
@@ -240,38 +260,15 @@ const maskFragment = <Data extends Record<string, any>>(
               isDataComplete = false;
             }
 
-            return result.data;
-          });
-        } else {
-          const result = maskFragment(
-            data[fieldAlias],
-            selection.selectionSet,
-            fragments
-          );
-          if (!result.fulfilled) {
-            isDataComplete = false;
+            maskedData[fieldAlias] = result.data;
+          } else {
+            maskedData[fieldAlias] = data[fieldAlias];
           }
-          maskedData[fieldAlias] = result.data;
-        }
-      } else {
-        if (data[fieldAlias] === undefined) {
-          if (hasIncludeOrSkip) return;
-          isDataComplete = false;
-        } else if (data[fieldAlias] === null) {
-          maskedData[fieldAlias] = null;
-        } else if (Array.isArray(data[fieldAlias])) {
-          maskedData[fieldAlias] = data[fieldAlias].map(item => item);
-        } else {
-          maskedData[fieldAlias] = data[fieldAlias];
         }
       }
       maskedData[selection.name.value] = data[selection.name.value];
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
-      // TODO: add heuristic fragment matching
-      if (
-        selection.typeCondition &&
-        selection.typeCondition.name.value !== data.__typename
-      ) {
+      if (isHeuristicFragmentMatch(selection, data, fragments)) {
         return;
       }
 
@@ -284,19 +281,14 @@ const maskFragment = <Data extends Record<string, any>>(
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
       const fragment = fragments[selection.name.value];
 
-      // TODO: add heuristic fragment matching
-      if (
-        !fragment ||
-        (fragment.typeCondition &&
-          fragment.typeCondition.name.value !== data.__typename)
-      ) {
-        return;
-      }
-
       if (
         selection.directives &&
         selection.directives.find(x => x.name.value === 'defer')
       ) {
+        return;
+      }
+
+      if (!fragment || isHeuristicFragmentMatch(fragment, data, fragments)) {
         return;
       }
 
@@ -310,4 +302,38 @@ const maskFragment = <Data extends Record<string, any>>(
   });
 
   return { data: maskedData as Data, fulfilled: isDataComplete };
+};
+
+const isHeuristicFragmentMatch = (
+  fragment: InlineFragmentNode | FragmentDefinitionNode,
+  data: Record<string, unknown>,
+  fragments: Record<string, FragmentDefinitionNode>
+): boolean => {
+  if (
+    !fragment.typeCondition ||
+    fragment.typeCondition.name.value === data.__typename
+  )
+    return true;
+
+  return fragment.selectionSet.selections.every(selection => {
+    if (selection.kind === Kind.FIELD) {
+      const fieldAlias = selection.alias
+        ? selection.alias.value
+        : selection.name.value;
+      const couldBeExcluded =
+        selection.directives &&
+        selection.directives.some(
+          x =>
+            x.name.value === 'include' ||
+            x.name.value === 'skip' ||
+            x.name.value === 'defer'
+        );
+      return Object.hasOwn(data, fieldAlias) && !couldBeExcluded;
+    } else if (selection.kind === Kind.INLINE_FRAGMENT) {
+      return isHeuristicFragmentMatch(selection, data, fragments);
+    } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
+      const fragment = fragments[selection.name.value];
+      return isHeuristicFragmentMatch(fragment, data, fragments);
+    }
+  });
 };
