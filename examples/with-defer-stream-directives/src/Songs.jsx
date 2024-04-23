@@ -13,6 +13,9 @@ const SONGS_QUERY = gql`
       firstVerse
       ...secondVerseFields @defer
     }
+    alphabet @stream(initialCount: 3) {
+      char
+    }
   }
 
   ${SecondVerseFragment}
@@ -50,6 +53,9 @@ const LocationsList = () => {
       {data && (
         <>
           <Song song={data.song} />
+          {data.alphabet.map(i => (
+            <div key={i.char}>{i.char}</div>
+          ))}
         </>
       )}
     </div>

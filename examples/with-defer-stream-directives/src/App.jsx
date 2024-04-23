@@ -21,7 +21,9 @@ const client = new Client({
 function App() {
   return (
     <Provider value={client}>
-      <Songs />
+      <React.Suspense fallback={<p>Loading...</p>}>
+        <Songs />
+      </React.Suspense>
     </Provider>
   );
 }

@@ -1,7 +1,15 @@
 import { pipe, subscribe } from 'wonka';
 import type { Client, OperationResult } from '@urql/core';
 
-type CacheEntry = OperationResult | Promise<unknown> | undefined;
+export type FragmentPromise = Promise<unknown> & {
+  _resolve: () => void;
+  _resolved: boolean;
+};
+type CacheEntry =
+  | OperationResult
+  | Promise<unknown>
+  | FragmentPromise
+  | undefined;
 
 interface Cache {
   get(key: number): CacheEntry;

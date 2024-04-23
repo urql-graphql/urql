@@ -19,6 +19,7 @@ import type {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
+import type { FragmentPromise } from './cache';
 import { getCacheForClient } from './cache';
 
 import { hasDepsChanged } from './state';
@@ -172,7 +173,12 @@ export function useFragment<Data>(
           cache.set(request.key, newResult.data as any);
           return { data: newResult.data as any, fetching: false };
         } else if (suspense) {
-          const promise = new Promise(() => {});
+          let _resolve;
+          const promise = new Promise(res => {
+            _resolve = res;
+          }) as FragmentPromise;
+          promise._resolve = _resolve;
+          promise._resolved = false;
           cache.set(request.key, promise);
           throw promise;
         } else {
@@ -182,6 +188,15 @@ export function useFragment<Data>(
         throw cached;
       }
 
+      if (
+        '_resolve' in cached &&
+        '_resolved' in cached &&
+        !cached._resolved &&
+        typeof cached._resolve == 'function'
+      ) {
+        cached._resolve();
+        cached._resolved = true;
+      }
       return { fetching: false, data: (cached as OperationResult).data };
     },
     [cache, request]
