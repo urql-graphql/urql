@@ -211,16 +211,16 @@ const maskFragment = <Data>(
   const maskedData = {};
   let isDataComplete = true;
   selectionSet.selections.forEach(selection => {
+    const hasIncludeOrSkip =
+      selection.directives &&
+      selection.directives.some(
+        x => x.name.value === 'include' || x.name.value === 'skip'
+      );
+
     if (selection.kind === Kind.FIELD) {
       const fieldAlias = selection.alias
         ? selection.alias.value
         : selection.name.value;
-
-      const hasIncludeOrSkip =
-        selection.directives &&
-        selection.directives.some(
-          x => x.name.value === 'include' || x.name.value === 'skip'
-        );
 
       if (selection.selectionSet) {
         if (data[fieldAlias] === undefined) {
@@ -266,15 +266,15 @@ const maskFragment = <Data>(
       }
       maskedData[selection.name.value] = data[selection.name.value];
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
-      if (isHeuristicFragmentMatch(selection, data, fragments)) {
+      if (!isHeuristicFragmentMatch(selection, data, fragments)) {
         return;
       }
 
       const result = maskFragment(data, selection.selectionSet, fragments);
-      // TODO: how do we handle inline-fragments with a skip/include directive?
-      if (!result.fulfilled) {
+      if (!result.fulfilled && !hasIncludeOrSkip) {
         isDataComplete = false;
       }
+
       Object.assign(maskedData, result.data);
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
       const fragment = fragments[selection.name.value];
@@ -286,13 +286,12 @@ const maskFragment = <Data>(
         return;
       }
 
-      if (!fragment || isHeuristicFragmentMatch(fragment, data, fragments)) {
+      if (!fragment || !isHeuristicFragmentMatch(fragment, data, fragments)) {
         return;
       }
 
       const result = maskFragment(data, fragment.selectionSet, fragments);
-      // TODO: how do we handle inline-fragments with a skip/include directive?
-      if (!result.fulfilled) {
+      if (!result.fulfilled && !hasIncludeOrSkip) {
         isDataComplete = false;
       }
       Object.assign(maskedData, result.data);
