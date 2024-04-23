@@ -53,6 +53,33 @@ describe('useFragment', () => {
     });
   });
 
+  it('should correctly take a different fragment to mask data', () => {
+    const { result } = renderHook(
+      () =>
+        useFragment({
+          query: `fragment x on X { foo bar } fragment TodoFields on Todo { id name __typename }`,
+          name: 'TodoFields',
+          data: {
+            __typename: 'Todo',
+            id: '1',
+            name: 'Learn urql',
+            completed: true,
+          },
+        }),
+      { initialProps: { query: mockQuery } }
+    );
+
+    const state = result.current;
+    expect(state).toEqual({
+      fetching: false,
+      data: {
+        __typename: 'Todo',
+        id: '1',
+        name: 'Learn urql',
+      },
+    });
+  });
+
   it('should correctly mask data w/ null attribute', () => {
     const { result } = renderHook(
       ({ query }) =>
