@@ -147,7 +147,17 @@ export function useFragment<
           );
         }
 
-        const newResult = maskFragment<Data>(data, fragment.selectionSet);
+        const fragments = request.query.definitions.reduce((acc, frag) => {
+          if (frag.kind === Kind.FRAGMENT_DEFINITION) {
+            acc[frag.name.value] = frag;
+          }
+          return acc;
+        }, {});
+        const newResult = maskFragment<Data>(
+          data,
+          fragment.selectionSet,
+          fragments
+        );
         if (newResult.fulfilled) {
           cache.set(request.key, newResult.data as any);
           return { data: newResult.data as any, fetching: false };
@@ -196,7 +206,8 @@ export function useFragment<
 
 const maskFragment = <Data extends Record<string, any>>(
   data: Data,
-  selectionSet: SelectionSetNode
+  selectionSet: SelectionSetNode,
+  fragments: Record<string, FragmentDefinitionNode>
 ): { data: Data; fulfilled: boolean } => {
   const maskedData = {};
   let isDataComplete = true;
@@ -205,8 +216,15 @@ const maskFragment = <Data extends Record<string, any>>(
       const fieldAlias = selection.alias
         ? selection.alias.value
         : selection.name.value;
+
+      const hasIncludeOrSkip =
+        selection.directives &&
+        selection.directives.some(
+          x => x.name.value === 'include' || x.name.value === 'skip'
+        );
       if (selection.selectionSet) {
         if (data[fieldAlias] === undefined) {
+          if (hasIncludeOrSkip) return;
           isDataComplete = false;
         } else if (data[fieldAlias] === null) {
           maskedData[fieldAlias] = null;
@@ -214,15 +232,22 @@ const maskFragment = <Data extends Record<string, any>>(
           maskedData[fieldAlias] = data[fieldAlias].map(item => {
             const result = maskFragment(
               item,
-              selection.selectionSet as SelectionSetNode
+              selection.selectionSet as SelectionSetNode,
+              fragments
             );
+
             if (!result.fulfilled) {
               isDataComplete = false;
             }
+
             return result.data;
           });
         } else {
-          const result = maskFragment(data[fieldAlias], selection.selectionSet);
+          const result = maskFragment(
+            data[fieldAlias],
+            selection.selectionSet,
+            fragments
+          );
           if (!result.fulfilled) {
             isDataComplete = false;
           }
@@ -230,6 +255,7 @@ const maskFragment = <Data extends Record<string, any>>(
         }
       } else {
         if (data[fieldAlias] === undefined) {
+          if (hasIncludeOrSkip) return;
           isDataComplete = false;
         } else if (data[fieldAlias] === null) {
           maskedData[fieldAlias] = null;
@@ -241,6 +267,7 @@ const maskFragment = <Data extends Record<string, any>>(
       }
       maskedData[selection.name.value] = data[selection.name.value];
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
+      // TODO: add heuristic fragment matching
       if (
         selection.typeCondition &&
         selection.typeCondition.name.value !== data.__typename
@@ -248,13 +275,37 @@ const maskFragment = <Data extends Record<string, any>>(
         return;
       }
 
-      const result = maskFragment(data, selection.selectionSet);
+      const result = maskFragment(data, selection.selectionSet, fragments);
+      // TODO: how do we handle inline-fragments with a skip/include directive?
       if (!result.fulfilled) {
         isDataComplete = false;
       }
       Object.assign(maskedData, result.data);
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
-      // TODO: do we want to support this?
+      const fragment = fragments[selection.name.value];
+
+      // TODO: add heuristic fragment matching
+      if (
+        !fragment ||
+        (fragment.typeCondition &&
+          fragment.typeCondition.name.value !== data.__typename)
+      ) {
+        return;
+      }
+
+      if (
+        selection.directives &&
+        selection.directives.find(x => x.name.value === 'defer')
+      ) {
+        return;
+      }
+
+      const result = maskFragment(data, fragment.selectionSet, fragments);
+      // TODO: how do we handle inline-fragments with a skip/include directive?
+      if (!result.fulfilled) {
+        isDataComplete = false;
+      }
+      Object.assign(maskedData, result.data);
     }
   });
 
