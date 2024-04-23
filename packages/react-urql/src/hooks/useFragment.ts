@@ -58,7 +58,7 @@ export type UseFragmentArgs<Data = any> = {
   /** A JSON object which we will extract properties from to get to the
    * masked fragment.
    */
-  data: Data;
+  data: Data | null;
   /** An optional name of the fragment to use from the passed Document. */
   name?: string;
 };
@@ -79,7 +79,7 @@ export interface UseFragmentState<Data> {
    */
   fetching: boolean;
   /** The {@link OperationResult.data} for the masked fragment. */
-  data?: Data;
+  data?: Data | null;
 }
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
@@ -124,7 +124,7 @@ export function useFragment<Data>(
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  const request = useRequest(args.query, args.data as any);
+  const request = useRequest(args.query, args.data || {});
 
   const fragments = React.useMemo(() => {
     return request.query.definitions.reduce<
@@ -156,11 +156,15 @@ export function useFragment<Data>(
   const getSnapshot = React.useCallback(
     (
       request: GraphQLRequest<Data, AnyVariables>,
-      data: Data,
+      data: Data | null,
       suspense: boolean
     ): UseFragmentState<Data> => {
       const cached = cache.get(request.key);
       if (!cached) {
+        if (data === null) {
+          cache.set(request.key, null as any);
+          return { data: null, fetching: false };
+        }
         const newResult = maskFragment<Data>(
           data,
           fragment.selectionSet,
@@ -169,7 +173,7 @@ export function useFragment<Data>(
 
         if (newResult.fulfilled) {
           cache.set(request.key, newResult.data as any);
-          return { data: newResult.data as any, fetching: false };
+          return { data: newResult.data, fetching: false };
         } else if (suspense) {
           let _resolve;
           const promise = new Promise(res => {
