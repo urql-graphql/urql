@@ -46,7 +46,7 @@ export type UseFragmentArgs<Data = any> = {
    * });
    * ```
    */
-  context: Partial<OperationContext>;
+  context?: Partial<OperationContext>;
   /** A GraphQL document to mask this fragment against.
    *
    * @remarks
@@ -109,10 +109,9 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  * `;
  *
  * const Todo = (props) => {
- *   const result = useQuery({
+ *   const result = useFragment({
  *     data: props.todo,
  *     query: TodoFields,
- *     variables: {},
  *   });
  *   // ...
  * };
@@ -124,9 +123,36 @@ export function useFragment<Data>(
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  // We use args.variables here for the key to differentiate
+  // We use args.data here for the key to differentiate
   // in cases where components in i.e. a list
   const request = useRequest(args.query, args.data as any);
+
+  const fragments = React.useMemo(() => {
+    return request.query.definitions.reduce<
+      Record<string, FragmentDefinitionNode>
+    >((acc, frag) => {
+      if (frag.kind === Kind.FRAGMENT_DEFINITION) {
+        acc[frag.name.value] = frag;
+      }
+      return acc;
+    }, {});
+  }, [request.query]);
+
+  const fragment = React.useMemo(() => {
+    return request.query.definitions.find(
+      x =>
+        x.kind === Kind.FRAGMENT_DEFINITION &&
+        ((args.name && x.name.value === args.name) || !args.name)
+    ) as FragmentDefinitionNode | undefined;
+  }, [request.query, args.name]);
+
+  if (!fragment) {
+    throw new Error(
+      'Passed document did not contain a fragment definition' + args.name
+        ? ` for ${args.name}.`
+        : '.'
+    );
+  }
 
   const getSnapshot = React.useCallback(
     (
@@ -136,27 +162,6 @@ export function useFragment<Data>(
     ): UseFragmentState<Data> => {
       const cached = cache.get(request.key);
       if (!cached) {
-        const fragment = request.query.definitions.find(
-          x =>
-            x.kind === Kind.FRAGMENT_DEFINITION &&
-            ((args.name && x.name.value === args.name) || !args.name)
-        ) as FragmentDefinitionNode | undefined;
-
-        if (!fragment) {
-          throw new Error(
-            'Passed document did not contain a fragment definition' + args.name
-              ? ` for ${args.name}`
-              : ''
-          );
-        }
-
-        const fragments = request.query.definitions.reduce((acc, frag) => {
-          if (frag.kind === Kind.FRAGMENT_DEFINITION) {
-            acc[frag.name.value] = frag;
-          }
-          return acc;
-        }, {});
-
         const newResult = maskFragment<Data>(
           data,
           fragment.selectionSet,
@@ -183,7 +188,7 @@ export function useFragment<Data>(
   );
 
   // TODO: either we use request here or args.query and args.data
-  const deps = [client, args.context, args.data, args.query] as const;
+  const deps = [client, args.context, args.data, request.query] as const;
 
   // In essence we could opt to not use state and always get snapshot
   const [state, setState] = React.useState(
