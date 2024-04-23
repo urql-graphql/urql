@@ -279,19 +279,16 @@ const maskFragment = <Data>(
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
       const fragment = fragments[selection.name.value];
 
-      if (
+      const hasDefer =
         selection.directives &&
-        selection.directives.find(x => x.name.value === 'defer')
-      ) {
-        return;
-      }
+        selection.directives.find(x => x.name.value === 'defer');
 
       if (!fragment || !isHeuristicFragmentMatch(fragment, data, fragments)) {
         return;
       }
 
       const result = maskFragment(data, fragment.selectionSet, fragments);
-      if (!result.fulfilled && !hasIncludeOrSkip) {
+      if (!result.fulfilled && !hasIncludeOrSkip && !hasDefer) {
         isDataComplete = false;
       }
       Object.assign(maskedData, result.data);
