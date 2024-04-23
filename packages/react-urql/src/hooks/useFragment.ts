@@ -57,7 +57,7 @@ export type UseFragmentArgs<Data = any> = {
    * masked fragment.
    */
   data: Data;
-  /** An optional name of the fragment to use. */
+  /** An optional name of the fragment to use from the passed Document. */
   name?: string;
 };
 
