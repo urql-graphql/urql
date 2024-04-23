@@ -124,8 +124,6 @@ export function useFragment<Data>(
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  // We use args.data here for the key to differentiate
-  // in cases where components in i.e. a list
   const request = useRequest(args.query, args.data as any);
 
   const fragments = React.useMemo(() => {
@@ -202,10 +200,8 @@ export function useFragment<Data>(
     [cache, request]
   );
 
-  // TODO: either we use request here or args.query and args.data
   const deps = [client, args.context, args.data, request.query] as const;
 
-  // In essence we could opt to not use state and always get snapshot
   const [state, setState] = React.useState(
     () => [getSnapshot(request, args.data, suspense), deps] as const
   );
