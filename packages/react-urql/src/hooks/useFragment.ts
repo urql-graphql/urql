@@ -13,14 +13,12 @@ import type {
   AnyVariables,
   Client,
   OperationContext,
-  OperationResult,
   GraphQLRequest,
 } from '@urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import type { FragmentPromise } from './cache';
-import { getCacheForClient } from './cache';
+import { getFragmentCacheForClient } from './cache';
 
 import { hasDepsChanged } from './state';
 
@@ -78,7 +76,7 @@ export interface UseFragmentState<Data> {
    * `true` until a result arrives.
    */
   fetching: boolean;
-  /** The {@link OperationResult.data} for the masked fragment. */
+  /** The data for the masked fragment. */
   data?: Data | null;
 }
 
@@ -122,7 +120,7 @@ export function useFragment<Data>(
   args: UseFragmentArgs<Data>
 ): UseFragmentState<Data> {
   const client = useClient();
-  const cache = getCacheForClient(client);
+  const cache = getFragmentCacheForClient(client);
   const suspense = isSuspense(client, args.context);
   const request = useRequest(args.query, args.data || {});
 
@@ -159,12 +157,12 @@ export function useFragment<Data>(
       data: Data | null,
       suspense: boolean
     ): UseFragmentState<Data> => {
+      if (data === null) {
+        return { data: null, fetching: false };
+      }
+
       const cached = cache.get(request.key);
       if (!cached) {
-        if (data === null) {
-          cache.set(request.key, null as any);
-          return { data: null, fetching: false };
-        }
         const newResult = maskFragment<Data>(
           data,
           fragment.selectionSet,
@@ -172,39 +170,41 @@ export function useFragment<Data>(
         );
 
         if (newResult.fulfilled) {
-          cache.set(request.key, newResult.data as any);
           return { data: newResult.data, fetching: false };
         } else if (suspense) {
-          let _resolve;
-          const promise = new Promise(res => {
-            _resolve = res;
-          }) as FragmentPromise;
-          promise._resolve = _resolve;
-          promise._resolved = false;
+          const promise = new Promise(() => {});
           cache.set(request.key, promise);
           throw promise;
         } else {
           return { fetching: true, data: newResult.data };
         }
       } else if (suspense && cached != null && 'then' in cached) {
-        throw cached;
+        const newResult = maskFragment<Data>(
+          data,
+          fragment.selectionSet,
+          fragments
+        );
+
+        if (!newResult.fulfilled) {
+          throw cached;
+        } else {
+          cache.dispose(request.key);
+          return { data: newResult.data, fetching: false };
+        }
       }
 
-      if (
-        '_resolve' in cached &&
-        '_resolved' in cached &&
-        !cached._resolved &&
-        typeof cached._resolve == 'function'
-      ) {
-        cached._resolve();
-        cached._resolved = true;
-      }
-      return { fetching: false, data: (cached as OperationResult).data };
+      const newResult = maskFragment<Data>(
+        data,
+        fragment.selectionSet,
+        fragments
+      );
+
+      return { fetching: false, data: newResult.data };
     },
     [cache, request]
   );
 
-  const deps = [client, args.context, args.data, request.query] as const;
+  const deps = [client, request, args.data, args.context] as const;
 
   const [state, setState] = React.useState(
     () => [getSnapshot(request, args.data, suspense), deps] as const
@@ -237,35 +237,17 @@ const maskFragment = <Data>(
         ? selection.alias.value
         : selection.name.value;
 
-      if (selection.selectionSet) {
-        if (data[fieldAlias] === undefined) {
-          if (hasIncludeOrSkip) return;
-          isDataComplete = false;
-        } else if (data[fieldAlias] === null) {
-          maskedData[fieldAlias] = null;
-        } else if (Array.isArray(data[fieldAlias])) {
-          if (selection.selectionSet) {
-            maskedData[fieldAlias] = data[fieldAlias].map(item => {
-              const result = maskFragment(
-                item,
-                selection.selectionSet as SelectionSetNode,
-                fragments
-              );
-
-              if (!result.fulfilled) {
-                isDataComplete = false;
-              }
-
-              return result.data;
-            });
-          } else {
-            maskedData[fieldAlias] = data[fieldAlias].map(item => item);
-          }
-        } else {
-          if (selection.selectionSet) {
+      if (data[fieldAlias] === undefined) {
+        if (hasIncludeOrSkip) return;
+        isDataComplete = false;
+      } else if (data[fieldAlias] === null) {
+        maskedData[fieldAlias] = null;
+      } else if (Array.isArray(data[fieldAlias])) {
+        if (selection.selectionSet) {
+          maskedData[fieldAlias] = data[fieldAlias].map(item => {
             const result = maskFragment(
-              data[fieldAlias],
-              selection.selectionSet,
+              item,
+              selection.selectionSet as SelectionSetNode,
               fragments
             );
 
@@ -273,13 +255,28 @@ const maskFragment = <Data>(
               isDataComplete = false;
             }
 
-            maskedData[fieldAlias] = result.data;
-          } else {
-            maskedData[fieldAlias] = data[fieldAlias];
+            return result.data;
+          });
+        } else {
+          maskedData[fieldAlias] = data[fieldAlias].map(item => item);
+        }
+      } else {
+        if (selection.selectionSet) {
+          const result = maskFragment(
+            data[fieldAlias],
+            selection.selectionSet,
+            fragments
+          );
+
+          if (!result.fulfilled) {
+            isDataComplete = false;
           }
+
+          maskedData[fieldAlias] = result.data;
+        } else {
+          maskedData[fieldAlias] = data[fieldAlias];
         }
       }
-      maskedData[selection.name.value] = data[selection.name.value];
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
       if (!isHeuristicFragmentMatch(selection, data, fragments)) {
         return;
