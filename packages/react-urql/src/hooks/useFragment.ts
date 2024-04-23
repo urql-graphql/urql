@@ -293,7 +293,7 @@ const maskFragment = <Data>(
 
       const hasDefer =
         selection.directives &&
-        selection.directives.find(x => x.name.value === 'defer');
+        selection.directives.some(x => x.name.value === 'defer');
 
       if (!fragment || !isHeuristicFragmentMatch(fragment, data, fragments)) {
         return;
