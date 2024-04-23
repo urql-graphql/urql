@@ -21,7 +21,7 @@ import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { getCacheForClient } from './cache';
 
-import { initialState, computeNextState, hasDepsChanged } from './state';
+import { hasDepsChanged } from './state';
 
 /** Input arguments for the {@link useFragment} hook. */
 export type UseFragmentArgs<Data = any> = {
@@ -68,7 +68,7 @@ export type UseFragmentArgs<Data = any> = {
  * `UseFragmentState` is returned by {@link useFragment} and
  * gives you the masked data for the fragment.
  */
-export interface UseFragmentState<Data = any> {
+export interface UseFragmentState<Data> {
   /** Indicates whether `useFragment` is waiting for a new result.
    *
    * @remarks
@@ -118,20 +118,22 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  * };
  * ```
  */
-export function useFragment<
-  Data extends Record<string, any> = Record<string, any>,
->(args: UseFragmentArgs<Data>): UseFragmentState<Data> {
+export function useFragment<Data>(
+  args: UseFragmentArgs<Data>
+): UseFragmentState<Data> {
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  const request = useRequest(args.query, args.data);
+  // We use args.variables here for the key to differentiate
+  // in cases where components in i.e. a list
+  const request = useRequest(args.query, args.data as any);
 
   const getSnapshot = React.useCallback(
     (
       request: GraphQLRequest<Data, AnyVariables>,
       data: Data,
       suspense: boolean
-    ): Partial<UseFragmentState<Data>> => {
+    ): UseFragmentState<Data> => {
       const cached = cache.get(request.key);
       if (!cached) {
         const fragment = request.query.definitions.find(
@@ -154,11 +156,13 @@ export function useFragment<
           }
           return acc;
         }, {});
+
         const newResult = maskFragment<Data>(
           data,
           fragment.selectionSet,
           fragments
         );
+
         if (newResult.fulfilled) {
           cache.set(request.key, newResult.data as any);
           return { data: newResult.data as any, fetching: false };
@@ -178,34 +182,23 @@ export function useFragment<
     [cache, request]
   );
 
-  const deps = [client, request, args.context, args.data] as const;
+  // TODO: either we use request here or args.query and args.data
+  const deps = [client, args.context, args.data, args.query] as const;
 
+  // In essence we could opt to not use state and always get snapshot
   const [state, setState] = React.useState(
-    () =>
-      [
-        computeNextState(
-          initialState,
-          getSnapshot(request, args.data, suspense)
-        ),
-        deps,
-      ] as const
+    () => [getSnapshot(request, args.data, suspense), deps] as const
   );
 
-  let currentResult = state[0];
+  const currentResult = state[0];
   if (hasDepsChanged(state[1], deps)) {
-    setState([
-      (currentResult = computeNextState(
-        state[0],
-        getSnapshot(request, args.data, suspense)
-      )),
-      deps,
-    ]);
+    setState([getSnapshot(request, args.data, suspense), deps]);
   }
 
   return currentResult;
 }
 
-const maskFragment = <Data extends Record<string, any>>(
+const maskFragment = <Data>(
   data: Data,
   selectionSet: SelectionSetNode,
   fragments: Record<string, FragmentDefinitionNode>
@@ -306,7 +299,7 @@ const maskFragment = <Data extends Record<string, any>>(
 
 const isHeuristicFragmentMatch = (
   fragment: InlineFragmentNode | FragmentDefinitionNode,
-  data: Record<string, unknown>,
+  data: any,
   fragments: Record<string, FragmentDefinitionNode>
 ): boolean => {
   if (
