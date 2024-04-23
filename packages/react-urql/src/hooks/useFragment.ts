@@ -326,7 +326,7 @@ const isHeuristicFragmentMatch = (
             x.name.value === 'skip' ||
             x.name.value === 'defer'
         );
-      return Object.hasOwn(data, fieldAlias) && !couldBeExcluded;
+      return data[fieldAlias] !== undefined && !couldBeExcluded;
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
       return isHeuristicFragmentMatch(selection, data, fragments);
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
