@@ -710,7 +710,11 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         for (let i = 0; i < queue.length; i++)
           queued = queued || queue[i].key === operation.key;
 
-        if (!queued && (!dispatched.has(operation.key) || operation.context.requestPolicy === 'network-only')) {
+        if (
+          !queued &&
+          (!dispatched.has(operation.key) ||
+            operation.context.requestPolicy === 'network-only')
+        ) {
           queue.push(operation);
           Promise.resolve().then(dispatchOperation);
         } else {
