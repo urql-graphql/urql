@@ -5,6 +5,7 @@ import type {
   FragmentDefinitionNode,
   InlineFragmentNode,
   SelectionSetNode,
+  DocumentNode,
 } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
 
@@ -21,6 +22,7 @@ import { useRequest } from './useRequest';
 import { getFragmentCacheForClient } from './cache';
 
 import { hasDepsChanged } from './state';
+import { keyDocument } from '@urql/core/utils';
 
 /** Input arguments for the {@link useFragment} hook. */
 export type UseFragmentArgs<Data = any> = {
@@ -122,7 +124,33 @@ export function useFragment<Data>(
   const client = useClient();
   const cache = getFragmentCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  const request = useRequest(args.query, args.data || {});
+  const fragment = React.useMemo(() => {
+    let document: DocumentNode;
+    if (typeof args.query === 'string') {
+      document = keyDocument(args.query);
+    } else {
+      document = args.query;
+    }
+
+    return document.definitions.find(
+      x =>
+        x.kind === Kind.FRAGMENT_DEFINITION &&
+        ((args.name && x.name.value === args.name) || !args.name)
+    ) as FragmentDefinitionNode | undefined;
+  }, [args.query, args.name]);
+
+  if (!fragment) {
+    throw new Error(
+      'Passed document did not contain a fragment definition' + args.name
+        ? ` for ${args.name}.`
+        : '.'
+    );
+  }
+
+  const request = useRequest(
+    args.query,
+    getKeyForEntity(args.data, fragment.typeCondition.name.value)
+  );
 
   const fragments = React.useMemo(() => {
     return request.query.definitions.reduce<
@@ -134,22 +162,6 @@ export function useFragment<Data>(
       return acc;
     }, {});
   }, [request.query]);
-
-  const fragment = React.useMemo(() => {
-    return request.query.definitions.find(
-      x =>
-        x.kind === Kind.FRAGMENT_DEFINITION &&
-        ((args.name && x.name.value === args.name) || !args.name)
-    ) as FragmentDefinitionNode | undefined;
-  }, [request.query, args.name]);
-
-  if (!fragment) {
-    throw new Error(
-      'Passed document did not contain a fragment definition' + args.name
-        ? ` for ${args.name}.`
-        : '.'
-    );
-  }
 
   const getSnapshot = React.useCallback(
     (
@@ -217,6 +229,29 @@ export function useFragment<Data>(
 
   return currentResult;
 }
+
+const getKeyForEntity = (
+  entity: any,
+  typeCondition: string
+): { id: string; __typename: string } | {} => {
+  if (!entity) return {};
+
+  let key = entity.id || entity._id;
+  const typename = entity.__typename;
+
+  if (!key) {
+    const keyable = Object.keys(entity).reduce((acc, key) => {
+      if (typeof entity[key] === 'string' || typeof entity[key] === 'number') {
+        acc[key] = entity[key];
+      }
+
+      return acc;
+    }, {});
+    key = JSON.stringify(keyable);
+  }
+
+  return { id: key, __typename: typename || typeCondition };
+};
 
 const maskFragment = <Data>(
   data: Data,
