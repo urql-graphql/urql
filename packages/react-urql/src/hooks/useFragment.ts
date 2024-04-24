@@ -5,7 +5,6 @@ import type {
   FragmentDefinitionNode,
   InlineFragmentNode,
   SelectionSetNode,
-  DocumentNode,
 } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
 
@@ -16,13 +15,13 @@ import type {
   OperationContext,
   GraphQLRequest,
 } from '@urql/core';
+import { createRequest } from '@urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { getFragmentCacheForClient } from './cache';
 
 import { hasDepsChanged } from './state';
-import { keyDocument } from '@urql/core/utils';
 
 /** Input arguments for the {@link useFragment} hook. */
 export type UseFragmentArgs<Data = any> = {
@@ -125,14 +124,9 @@ export function useFragment<Data>(
   const cache = getFragmentCacheForClient(client);
   const suspense = isSuspense(client, args.context);
   const fragment = React.useMemo(() => {
-    let document: DocumentNode;
-    if (typeof args.query === 'string') {
-      document = keyDocument(args.query);
-    } else {
-      document = args.query;
-    }
+    const request = createRequest(args.query, {});
 
-    return document.definitions.find(
+    return request.query.definitions.find(
       x =>
         x.kind === Kind.FRAGMENT_DEFINITION &&
         ((args.name && x.name.value === args.name) || !args.name)
