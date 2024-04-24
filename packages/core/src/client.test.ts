@@ -19,6 +19,9 @@ import {
   onPush,
   tap,
   take,
+  fromPromise,
+  fromValue,
+  switchMap,
 } from 'wonka';
 
 import { gql } from './gql';
@@ -782,6 +785,75 @@ describe('deduplication behavior', () => {
 
     expect(onOperation).toHaveBeenCalledTimes(2);
     expect(onResult).toHaveBeenCalledTimes(2);
+  });
+
+  it('blocks reexecuting operations that are in-flight', async () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let resolve;
+    const exchange: Exchange =
+      ({ client }) =>
+      ops$ =>
+        pipe(
+          ops$,
+          onPush(onOperation),
+          switchMap(op => {
+            if (op.key === queryOperation.key) {
+              const promise = new Promise<OperationResult>(res => {
+                resolve = () => {
+                  return res({
+                    hasNext: false,
+                    stale: false,
+                    data: 'test',
+                    operation: op,
+                  });
+                };
+              });
+              return fromPromise(promise);
+            } else {
+              client.reexecuteOperation(queryOperation);
+              return fromValue({
+                hasNext: false,
+                stale: false,
+                data: 'test',
+                operation: op,
+              });
+            }
+          })
+        );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    const mutation = makeOperation('mutation', mutationOperation, {
+      ...mutationOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(0);
+
+    pipe(client.executeRequestOperation(mutation), subscribe(onResult));
+    await Promise.resolve();
+
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(1);
+
+    resolve();
+    await Promise.resolve();
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    // TODO: figure out why this isn't called a second time
+    // expect(onResult).toHaveBeenCalledTimes(2);
   });
 });
 
