@@ -707,8 +707,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         Promise.resolve().then(dispatchOperation);
       } else if (active.has(operation.key)) {
         let queued = false;
-        for (let i = 0; i < queue.length; i++)
-          queued = queued || queue[i].key === operation.key;
+        for (let i = 0; i < queue.length; i++) {
+          if (queue[i].key === operation.key) {
+            queue[i] = operation;
+            queued = true;
+          }
+        }
 
         if (
           !queued &&
