@@ -1,5 +1,13 @@
 # @urql/core
 
+## 5.0.2
+
+### Patch Changes
+
+- ⚠️ Fix issue where a reexecute on an in-flight operation would lead to multiple network-requests.
+  For example, this issue presents itself when Graphcache is concurrently updating multiple, inter-dependent queries with shared entities. One query completing while others are still in-flight may lead to duplicate operations being issued
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3573](https://github.com/urql-graphql/urql/pull/3573))
+
 ## 5.0.1
 
 ### Patch Changes
