@@ -25,7 +25,11 @@ import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
 import { Client, createClient } from './client';
-import { queryOperation, subscriptionOperation } from './test-utils';
+import {
+  mutationOperation,
+  queryOperation,
+  subscriptionOperation,
+} from './test-utils';
 
 const url = 'https://hostname.com';
 
@@ -701,8 +705,7 @@ describe('deduplication behavior', () => {
     expect(onOperation).toHaveBeenCalledTimes(2);
   });
 
-  // TODO: I think this test is wrong
-  it.skip('unblocks operations on call to reexecuteOperation', async () => {
+  it('unblocks mutation operations on call to reexecuteOperation', async () => {
     const onOperation = vi.fn();
     const onResult = vi.fn();
 
@@ -725,8 +728,8 @@ describe('deduplication behavior', () => {
       exchanges: [exchange],
     });
 
-    const operation = makeOperation('query', queryOperation, {
-      ...queryOperation.context,
+    const operation = makeOperation('mutation', mutationOperation, {
+      ...mutationOperation.context,
       requestPolicy: 'cache-first',
     });
 
