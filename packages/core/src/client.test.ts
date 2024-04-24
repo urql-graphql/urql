@@ -22,6 +22,7 @@ import {
   fromPromise,
   fromValue,
   switchMap,
+  mergeMap,
 } from 'wonka';
 
 import { gql } from './gql';
@@ -798,19 +799,21 @@ describe('deduplication behavior', () => {
         pipe(
           ops$,
           onPush(onOperation),
-          switchMap(op => {
+          mergeMap(op => {
             if (op.key === queryOperation.key) {
               const promise = new Promise<OperationResult>(res => {
-                resolve = () => {
-                  return res({
+                resolve = res;
+              });
+              return fromPromise(
+                promise.then(() => {
+                  return {
                     hasNext: false,
                     stale: false,
                     data: 'test',
                     operation: op,
-                  });
-                };
-              });
-              return fromPromise(promise);
+                  };
+                })
+              );
             } else {
               client.reexecuteOperation(queryOperation);
               return fromValue({
@@ -851,9 +854,10 @@ describe('deduplication behavior', () => {
 
     resolve();
     await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
     expect(onOperation).toHaveBeenCalledTimes(2);
-    // TODO: figure out why this isn't called a second time
-    // expect(onResult).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(2);
   });
 });
 
