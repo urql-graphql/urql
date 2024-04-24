@@ -3,12 +3,11 @@ import type { Client, OperationResult } from '@urql/core';
 
 export type FragmentPromise = Promise<unknown> & {
   _resolve: () => void;
-  _resolved: boolean;
 };
 
 type CacheEntry = OperationResult | Promise<unknown> | undefined;
 
-type FragmentCacheEntry = Promise<unknown> | undefined;
+type FragmentCacheEntry = FragmentPromise | undefined;
 
 interface Cache<Entry> {
   get(key: number): Entry;

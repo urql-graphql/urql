@@ -15,10 +15,10 @@ import type {
   OperationContext,
   GraphQLRequest,
 } from '@urql/core';
-import { createRequest } from '@urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
+import type { FragmentPromise } from './cache';
 import { getFragmentCacheForClient } from './cache';
 
 import { hasDepsChanged } from './state';
@@ -123,9 +123,10 @@ export function useFragment<Data>(
   const client = useClient();
   const cache = getFragmentCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  const fragment = React.useMemo(() => {
-    const request = createRequest(args.query, {});
 
+  const request = useRequest(args.query, {});
+
+  const fragment = React.useMemo(() => {
     return request.query.definitions.find(
       x =>
         x.kind === Kind.FRAGMENT_DEFINITION &&
@@ -140,11 +141,6 @@ export function useFragment<Data>(
         : '.'
     );
   }
-
-  const request = useRequest(
-    args.query,
-    getKeyForEntity(args.data, fragment.typeCondition.name.value)
-  );
 
   const fragments = React.useMemo(() => {
     return request.query.definitions.reduce<
@@ -165,6 +161,14 @@ export function useFragment<Data>(
     ): UseFragmentState<Data> => {
       if (data === null) {
         return { data: null, fetching: false };
+      } else if (!suspense) {
+        const newResult = maskFragment<Data>(
+          data,
+          fragment.selectionSet,
+          fragments
+        );
+
+        return { data: newResult.data, fetching: !newResult.fulfilled };
       }
 
       const cached = cache.get(request.key);
@@ -177,14 +181,16 @@ export function useFragment<Data>(
 
         if (newResult.fulfilled) {
           return { data: newResult.data, fetching: false };
-        } else if (suspense) {
-          const promise = new Promise(() => {});
+        } else {
+          let _resolve;
+          const promise = new Promise(r => {
+            _resolve = r;
+          }) as FragmentPromise;
+          promise._resolve = _resolve;
           cache.set(request.key, promise);
           throw promise;
-        } else {
-          return { fetching: true, data: newResult.data };
         }
-      } else if (suspense && cached != null && 'then' in cached) {
+      } else {
         const newResult = maskFragment<Data>(
           data,
           fragment.selectionSet,
@@ -194,18 +200,11 @@ export function useFragment<Data>(
         if (!newResult.fulfilled) {
           throw cached;
         } else {
+          cached._resolve();
           cache.dispose(request.key);
           return { data: newResult.data, fetching: false };
         }
       }
-
-      const newResult = maskFragment<Data>(
-        data,
-        fragment.selectionSet,
-        fragments
-      );
-
-      return { fetching: false, data: newResult.data };
     },
     [cache, request]
   );
@@ -223,29 +222,6 @@ export function useFragment<Data>(
 
   return currentResult;
 }
-
-const getKeyForEntity = (
-  entity: any,
-  typeCondition: string
-): { id: string; __typename: string } | {} => {
-  if (!entity) return {};
-
-  let key = entity.id || entity._id;
-  const typename = entity.__typename;
-
-  if (!key) {
-    const keyable = Object.keys(entity).reduce((acc, key) => {
-      if (typeof entity[key] === 'string' || typeof entity[key] === 'number') {
-        acc[key] = entity[key];
-      }
-
-      return acc;
-    }, {});
-    key = JSON.stringify(keyable);
-  }
-
-  return { id: key, __typename: typename || typeCondition };
-};
 
 const maskFragment = <Data>(
   data: Data,
