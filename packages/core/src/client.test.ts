@@ -21,7 +21,6 @@ import {
   take,
   fromPromise,
   fromValue,
-  switchMap,
   mergeMap,
 } from 'wonka';
 
@@ -749,6 +748,7 @@ describe('deduplication behavior', () => {
     expect(onResult).toHaveBeenCalledTimes(1);
   });
 
+  // See https://github.com/urql-graphql/urql/issues/3254
   it('unblocks stale operations', async () => {
     const onOperation = vi.fn();
     const onResult = vi.fn();
@@ -788,6 +788,7 @@ describe('deduplication behavior', () => {
     expect(onResult).toHaveBeenCalledTimes(2);
   });
 
+  // See https://github.com/urql-graphql/urql/issues/3565
   it('blocks reexecuting operations that are in-flight', async () => {
     const onOperation = vi.fn();
     const onResult = vi.fn();
