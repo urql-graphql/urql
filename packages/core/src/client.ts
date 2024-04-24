@@ -643,12 +643,17 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         // Store replay result
         onPush(result => {
           if (result.stale) {
-            // If the current result has queued up an operation of the same
-            // key, then `stale` refers to it
-            for (const operation of queue) {
-              if (operation.key === result.operation.key) {
-                dispatched.delete(operation.key);
-                break;
+            if (!result.hasNext) {
+              // we are dealing with an optimistic mutation or a partial result
+              dispatched.delete(operation.key);
+            } else {
+              // If the current result has queued up an operation of the same
+              // key, then `stale` refers to it
+              for (const operation of queue) {
+                if (operation.key === result.operation.key) {
+                  dispatched.delete(operation.key);
+                  break;
+                }
               }
             }
           } else if (!result.hasNext) {
@@ -697,13 +702,29 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       // operation's exchange results
       if (operation.kind === 'teardown') {
         dispatchOperation(operation);
-      } else if (operation.kind === 'mutation' || active.has(operation.key)) {
-        let queued = false;
-        for (let i = 0; i < queue.length; i++)
-          queued = queued || queue[i].key === operation.key;
-        if (!queued) dispatched.delete(operation.key);
+      } else if (operation.kind === 'mutation') {
         queue.push(operation);
         Promise.resolve().then(dispatchOperation);
+      } else if (active.has(operation.key)) {
+        let queued = false;
+        for (let i = 0; i < queue.length; i++) {
+          if (queue[i].key === operation.key) {
+            queue[i] = operation;
+            queued = true;
+          }
+        }
+
+        if (
+          !queued &&
+          (!dispatched.has(operation.key) ||
+            operation.context.requestPolicy === 'network-only')
+        ) {
+          queue.push(operation);
+          Promise.resolve().then(dispatchOperation);
+        } else {
+          dispatched.delete(operation.key);
+          Promise.resolve().then(dispatchOperation);
+        }
       }
     },
 

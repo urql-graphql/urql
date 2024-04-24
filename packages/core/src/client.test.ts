@@ -19,13 +19,20 @@ import {
   onPush,
   tap,
   take,
+  fromPromise,
+  fromValue,
+  mergeMap,
 } from 'wonka';
 
 import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
 import { Client, createClient } from './client';
-import { queryOperation, subscriptionOperation } from './test-utils';
+import {
+  mutationOperation,
+  queryOperation,
+  subscriptionOperation,
+} from './test-utils';
 
 const url = 'https://hostname.com';
 
@@ -701,7 +708,7 @@ describe('deduplication behavior', () => {
     expect(onOperation).toHaveBeenCalledTimes(2);
   });
 
-  it('unblocks operations on call to reexecuteOperation', async () => {
+  it('unblocks mutation operations on call to reexecuteOperation', async () => {
     const onOperation = vi.fn();
     const onResult = vi.fn();
 
@@ -724,8 +731,8 @@ describe('deduplication behavior', () => {
       exchanges: [exchange],
     });
 
-    const operation = makeOperation('query', queryOperation, {
-      ...queryOperation.context,
+    const operation = makeOperation('mutation', mutationOperation, {
+      ...mutationOperation.context,
       requestPolicy: 'cache-first',
     });
 
@@ -739,6 +746,119 @@ describe('deduplication behavior', () => {
 
     expect(onOperation).toHaveBeenCalledTimes(2);
     expect(onResult).toHaveBeenCalledTimes(1);
+  });
+
+  // See https://github.com/urql-graphql/urql/issues/3254
+  it('unblocks stale operations', async () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let sends = 0;
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        onPush(onOperation),
+        map(op => ({
+          hasNext: false,
+          stale: sends++ ? false : true,
+          data: 'test',
+          operation: op,
+        }))
+      );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(1);
+
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(2);
+  });
+
+  // See https://github.com/urql-graphql/urql/issues/3565
+  it('blocks reexecuting operations that are in-flight', async () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let resolve;
+    const exchange: Exchange =
+      ({ client }) =>
+      ops$ =>
+        pipe(
+          ops$,
+          onPush(onOperation),
+          mergeMap(op => {
+            if (op.key === queryOperation.key) {
+              const promise = new Promise<OperationResult>(res => {
+                resolve = res;
+              });
+              return fromPromise(
+                promise.then(() => {
+                  return {
+                    hasNext: false,
+                    stale: false,
+                    data: 'test',
+                    operation: op,
+                  };
+                })
+              );
+            } else {
+              client.reexecuteOperation(queryOperation);
+              return fromValue({
+                hasNext: false,
+                stale: false,
+                data: 'test',
+                operation: op,
+              });
+            }
+          })
+        );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    const mutation = makeOperation('mutation', mutationOperation, {
+      ...mutationOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(0);
+
+    pipe(client.executeRequestOperation(mutation), subscribe(onResult));
+    await Promise.resolve();
+
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(1);
+
+    resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(2);
   });
 });
 
