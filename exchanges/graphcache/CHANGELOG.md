@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.0.2
+
+### Patch Changes
+
+- Only record dependencies that are changing data, this will reduce the amount of operations we re-invoke due to network-only/cache-and-network queries and mutations
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3564](https://github.com/urql-graphql/urql/pull/3564))
+
 ## 7.0.1
 
 ### Patch Changes
