@@ -1,0 +1,6 @@
+{
+  "name": "@urql/exchange-retry",
+  "version": "1.2.1",
+  "exports": ".",
+  "exclude": ["node_modules", "cypress"]
+}

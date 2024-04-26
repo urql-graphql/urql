@@ -1,0 +1,10 @@
+{
+  "name": "@urql/exchange-graphcache",
+  "version": "7.0.1",
+  "exports": {
+    "0": ".",
+    "./extras": "./src/extras/index.ts",
+    "./default-storage": "./src/default-storage/index.ts"
+  },
+  "exclude": ["node_modules", "cypress"]
+}

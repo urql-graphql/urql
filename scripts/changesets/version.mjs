@@ -8,6 +8,7 @@ import {
   updatePackageManifest,
   listPackages
 } from '../actions/lib/packages.mjs';
+import { updateJsr } from './jsr.mjs'
 
 const versionRe = /^\d+\.\d+\.\d+/i;
 const execaOpts = { stdio: 'inherit' };
@@ -60,3 +61,5 @@ for (const example of examples) {
 
   await updatePackageManifest(example, manifest);
 }
+
+await updateJsr();

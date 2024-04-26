@@ -1,0 +1,6 @@
+{
+  "name": "@urql/preact",
+  "version": "4.0.5",
+  "exports": ".",
+  "exclude": ["node_modules", "cypress"]
+}

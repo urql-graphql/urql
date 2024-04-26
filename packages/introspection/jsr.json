@@ -1,0 +1,6 @@
+{
+  "name": "@urql/introspection",
+  "version": "1.0.3",
+  "exports": ".",
+  "exclude": ["node_modules", "cypress"]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "@urql/exchange-context",
+  "version": "0.2.1",
+  "exports": ".",
+  "exclude": ["node_modules", "cypress"]
+}

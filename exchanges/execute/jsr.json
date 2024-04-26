@@ -1,0 +1,6 @@
+{
+  "name": "@urql/exchange-execute",
+  "version": "2.2.2",
+  "exports": ".",
+  "exclude": ["node_modules", "cypress"]
+}

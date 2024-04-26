@@ -1,0 +1,6 @@
+{
+  "name": "@urql/exchange-persisted",
+  "version": "4.2.0",
+  "exports": ".",
+  "exclude": ["node_modules", "cypress"]
+}
