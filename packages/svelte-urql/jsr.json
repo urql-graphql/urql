@@ -1,6 +1,8 @@
 {
   "name": "@urql/svelte",
   "version": "4.1.1",
-  "exports": ".",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "exclude": ["node_modules", "cypress"]
 }

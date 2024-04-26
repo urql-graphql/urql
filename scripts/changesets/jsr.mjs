@@ -9,18 +9,19 @@ import {
 } from '../actions/lib/packages.mjs';
 
 const getExports = (exports) => {
-  return Object.keys(exports).reduce((acc, item) => {
-    if (item.includes('package.json')) return acc;
-
-    const exp = exports[item];
-    return { ...acc, [item]: exp.source }
-  })
+  const exportNames = Object.keys(exports);
+  const eventualExports = {};
+  for (const exportName of exportNames) {
+    if (exportName.includes('package.json')) continue;
+    const exp = exports[exportName];
+    eventualExports[exportName] = exp.source;
+  }
+  return eventualExports;
 }
 
 export const updateJsr = async () => {
   (await listPackages()).forEach((dir) => {
     const manifest = getPackageManifest(dir);
-
     const jsrManifest = {
       name: manifest.name,
       version: manifest.version,
@@ -31,4 +32,3 @@ export const updateJsr = async () => {
     fs.writeFileSync(path.resolve(dir, 'jsr.json'), JSON.stringify(jsrManifest, undefined, 2));
   });
 }
-

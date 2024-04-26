@@ -1,6 +1,8 @@
 {
   "name": "@urql/exchange-refocus",
   "version": "1.0.2",
-  "exports": ".",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "exclude": ["node_modules", "cypress"]
 }

@@ -1,6 +1,8 @@
 {
   "name": "@urql/exchange-retry",
   "version": "1.2.1",
-  "exports": ".",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "exclude": ["node_modules", "cypress"]
 }

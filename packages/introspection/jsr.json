@@ -1,6 +1,8 @@
 {
   "name": "@urql/introspection",
   "version": "1.0.3",
-  "exports": ".",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "exclude": ["node_modules", "cypress"]
 }

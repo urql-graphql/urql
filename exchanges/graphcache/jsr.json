@@ -1,8 +1,8 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "exports": {
-    "0": ".",
+    ".": "./src/index.ts",
     "./extras": "./src/extras/index.ts",
     "./default-storage": "./src/default-storage/index.ts"
   },

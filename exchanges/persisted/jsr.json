@@ -1,6 +1,8 @@
 {
   "name": "@urql/exchange-persisted",
   "version": "4.2.0",
-  "exports": ".",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "exclude": ["node_modules", "cypress"]
 }
