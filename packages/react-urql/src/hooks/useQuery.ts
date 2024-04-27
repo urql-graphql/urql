@@ -266,6 +266,10 @@ export function useQuery<
           takeWhile(() => (suspense && !resolve) || !result),
           subscribe(_result => {
             result = _result;
+            // TODO: go over the selection-set and replace `undefined` with markers
+            // a marker contains the key of the request and the path to the field
+            // when the subscription in useFragment triggers the cache will be updated
+            // with the marker we are looking for.
             if (resolve) resolve(result);
           })
         );

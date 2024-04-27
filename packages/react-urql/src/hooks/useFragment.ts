@@ -22,6 +22,7 @@ import type { FragmentPromise } from './cache';
 import { getFragmentCacheForClient } from './cache';
 
 import { hasDepsChanged } from './state';
+import { pipe, subscribe } from 'wonka';
 
 /** Input arguments for the {@link useFragment} hook. */
 export type UseFragmentArgs<Data = any> = {
@@ -186,6 +187,20 @@ export function useFragment<Data>(
           const promise = new Promise(r => {
             _resolve = r;
           }) as FragmentPromise;
+          pipe(
+            client.operations$,
+            subscribe(operation => {
+              // Look for the marker
+              const operations = newResult.markers.map(x => x.key);
+              if (
+                operation.kind === 'query' &&
+                operations.includes(operation.key)
+              ) {
+                // Add the new data to the cache merged with props.data
+                // if everything is fulfilled resolve the promise
+              }
+            })
+          );
           promise._resolve = _resolve;
           cache.set(request.key, promise);
           throw promise;
@@ -223,12 +238,22 @@ export function useFragment<Data>(
   return currentResult;
 }
 
+const MARKER = Symbol('urql-fragment-marker');
+const isMarker = (data: any): boolean => {
+  return !!data[MARKER];
+};
+
 const maskFragment = <Data>(
   data: Data,
   selectionSet: SelectionSetNode,
   fragments: Record<string, FragmentDefinitionNode>
-): { data: Data; fulfilled: boolean } => {
+): {
+  data: Data;
+  fulfilled: boolean;
+  markers: Array<{ path: string[]; key: number }>;
+} => {
   const maskedData = {};
+  const markers: Array<{ path: string[]; key: number }> = [];
   let isDataComplete = true;
   selectionSet.selections.forEach(selection => {
     const hasIncludeOrSkip =
@@ -242,7 +267,9 @@ const maskFragment = <Data>(
         ? selection.alias.value
         : selection.name.value;
 
-      if (data[fieldAlias] === undefined) {
+      if (isMarker(data[fieldAlias])) {
+        markers.push(data[fieldAlias]);
+      } else if (data[fieldAlias] === undefined) {
         if (hasIncludeOrSkip) return;
         isDataComplete = false;
       } else if (data[fieldAlias] === null) {
