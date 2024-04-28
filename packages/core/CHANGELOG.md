@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.0.3
+
+### Patch Changes
+
+- Use `documentId` from persisted documents for document keys, when it's available
+  Submitted by [@kitten](https://github.com/kitten) (See [#3575](https://github.com/urql-graphql/urql/pull/3575))
+
 ## 5.0.2
 
 ### Patch Changes
