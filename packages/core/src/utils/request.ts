@@ -12,6 +12,10 @@ import type {
   RequestExtensions,
 } from '../types';
 
+type PersistedDocumentNode = TypedDocumentNode & {
+  documentId?: string;
+};
+
 /** A `DocumentNode` annotated with its hashed key.
  * @internal
  */
@@ -90,11 +94,16 @@ export const stringifyDocument = (
 const hashDocument = (
   node: string | DefinitionNode | DocumentNode
 ): HashValue => {
-  let key = phash(stringifyDocument(node));
-  // Add the operation name to the produced hash
-  if ((node as DocumentNode).definitions) {
-    const operationName = getOperationName(node as DocumentNode);
-    if (operationName) key = phash(`\n# ${operationName}`, key);
+  let key: HashValue;
+  if ((node as PersistedDocumentNode).documentId) {
+    key = phash((node as PersistedDocumentNode).documentId!);
+  } else {
+    key = phash(stringifyDocument(node));
+    // Add the operation name to the produced hash
+    if ((node as DocumentNode).definitions) {
+      const operationName = getOperationName(node as DocumentNode);
+      if (operationName) key = phash(`\n# ${operationName}`, key);
+    }
   }
   return key;
 };

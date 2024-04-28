@@ -81,6 +81,16 @@ describe('createRequest', () => {
       variables: { test: 5 },
     });
   });
+
+  it('should hash persisted documents consistently', () => {
+    const doc = parse('{ testG }');
+    const docPersisted = parse('{ testG }');
+    (docPersisted as any).documentId = 'testG';
+
+    const req = createRequest(doc, undefined);
+    const reqPersisted = createRequest(docPersisted, undefined);
+    expect(req.key).not.toBe(reqPersisted.key);
+  });
 });
 
 describe('stringifyDocument ', () => {
