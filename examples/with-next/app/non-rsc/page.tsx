@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { useQuery, gql } from '@urql/next';
+import { useFragment } from 'urql';
 
 export default function Page() {
   return (
@@ -12,15 +13,26 @@ export default function Page() {
   );
 }
 
+const PokemonQuery = gql`
+  fragment SiteFields on Launch {
+    site {
+      name
+    }
+  }
+`;
+
 const PokemonsQuery = gql`
   query {
-    pokemons(limit: 10) {
-      results {
+    launches(limit: 10) {
+      nodes {
         id
         name
+        ...SiteFields @defer
       }
     }
   }
+
+  ${PokemonQuery}
 `;
 
 function Pokemons() {
@@ -30,36 +42,30 @@ function Pokemons() {
       <h1>This is rendered as part of SSR</h1>
       <ul>
         {result.data
-          ? result.data.pokemons.results.map((x: any) => (
-              <li key={x.id}>{x.name}</li>
+          ? result.data.launches.nodes.map((x: any) => (
+              <li key={x.id}>
+                {x.name}
+                <Suspense>
+                  <Site data={x} />
+                </Suspense>
+              </li>
             ))
           : JSON.stringify(result.error)}
       </ul>
-      <Suspense>
-        <Pokemon name="bulbasaur" />
-      </Suspense>
       <Link href="/">RSC</Link>
     </main>
   );
 }
 
-const PokemonQuery = gql`
-  query ($name: String!) {
-    pokemon(name: $name) {
-      id
-      name
-    }
-  }
-`;
-
-function Pokemon(props: any) {
-  const [result] = useQuery({
+function Site(props: any) {
+  const result = useFragment({
     query: PokemonQuery,
-    variables: { name: props.name },
+    data: props.data,
   });
+  console.log(result)
   return (
     <div>
-      <h1>{result.data && result.data.pokemon.name}</h1>
+      <h1>{result.site && result.site.name}</h1>
     </div>
   );
 }

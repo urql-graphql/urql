@@ -15,7 +15,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
       isClient: typeof window !== 'undefined',
     });
     const client = createClient({
-      url: 'https://graphql-pokeapi.graphcdn.app/',
+      url: 'https://spacex-fuse.vercel.app/api/fuse',
       exchanges: [cacheExchange, ssr, fetchExchange],
       suspense: true,
     });

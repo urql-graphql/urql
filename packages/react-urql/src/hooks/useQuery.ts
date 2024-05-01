@@ -13,7 +13,10 @@ import type {
   RequestPolicy,
   OperationResult,
   Operation,
+  GraphQLRequest,
+  FormattedNode,
 } from '@urql/core';
+import { FragmentDefinitionNode, FragmentSpreadNode, Kind, SelectionSetNode, valueFromASTUntyped, type DirectiveNode, type OperationDefinitionNode, type SelectionNode } from '@0no-co/graphql.web';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
@@ -265,6 +268,9 @@ export function useQuery<
           source,
           takeWhile(() => (suspense && !resolve) || !result),
           subscribe(_result => {
+            if (_result.hasNext) {
+              addMarkers(_result, request);
+            }
             result = _result;
             // TODO: go over the selection-set and replace `undefined` with markers
             // a marker contains the key of the request and the path to the field
@@ -391,3 +397,86 @@ export function useQuery<
 
   return [currentResult, executeQuery];
 }
+
+const addMarkers = (result: Record<string, any>, request: GraphQLRequest) => {
+  const operation = request.query.definitions.find(
+    x => x.kind === 'OperationDefinition' && x.operation === 'query'
+  ) as OperationDefinitionNode;
+  if (operation) {
+    _addMarkers(result, operation.selectionSet, request, []);
+  }
+};
+
+const _addMarkers = (result: Record<string, any>, node: SelectionSetNode, request: GraphQLRequest, path: Array<string>) => {
+  node.selections.forEach(selection => {
+    if (!shouldInclude(selection as any, request.variables)) return;
+
+    if (
+      selection.kind === Kind.FRAGMENT_SPREAD &&
+      isDeferred(selection, request.variables)
+    ) {
+      if (hasData(result, path)) {
+        const fragment = request.query.definitions.find(x => x.kind === Kind.FRAGMENT_DEFINITION && x.name.value === selection.name.value) as FragmentDefinitionNode;
+        if (fragment) {
+          _addMarkers(result, fragment.selectionSet, request, path.concat([selection.name.value]));
+        }
+      } else {
+        // TODO: think a bit more about this as this basically means that we are introducing a breaking change
+        // as result.data.deferred && <Component /> will now become truthy due to the presence of the Promise.
+        // a more scaleable approach with regards to lists, ... would be to rather than keeping track of the path
+        // to traverse the result in parallel to the AST.
+      }
+    } else if (selection.kind === Kind.FIELD && selection.selectionSet) {
+      // traverse deeper
+      _addMarkers(result, selection.selectionSet, request, path.concat([selection.name.value]));
+    }
+  });
+}
+
+const hasData = (result: Record<string, any>, path: Array<string>) => true
+
+/** Resolves @include and @skip directives to determine whether field is included. */
+export const shouldInclude = (
+  node: FormattedNode<SelectionNode>,
+  vars: GraphQLRequest['variables']
+): boolean => {
+  const directives = node._directives || {};
+  if (directives.include || directives.skip) {
+    // Finds any @include or @skip directive that forces the node to be skipped
+    for (const name in directives) {
+      const directive = directives[name];
+      if (
+        directive &&
+        (name === 'include' || name === 'skip') &&
+        directive.arguments &&
+        directive.arguments[0] &&
+        directive.arguments[0].name.value === 'if'
+      ) {
+        // Return whether this directive forces us to skip
+        // `@include(if: false)` or `@skip(if: true)`
+        const value = valueFromASTUntyped(directive.arguments[0].value, vars || {});
+        return name === 'include' ? !!value : !value;
+      }
+    }
+  }
+  return true;
+};
+
+/** Resolves @defer directive to determine whether a fragment is potentially skipped. */
+export const isDeferred = (
+  node: FormattedNode<FragmentSpreadNode>,
+  vars: GraphQLRequest['variables']
+): boolean => {
+  const directives = node._directives || {};
+  if (directives.defer) {
+    for (const argument of directives.defer.arguments || []) {
+      if (argument.name.value === 'if') {
+        // Return whether `@defer(if: )` is enabled
+        return !!valueFromASTUntyped(argument.value, vars || {});
+      }
+    }
+    return true;
+  }
+
+  return false;
+};
