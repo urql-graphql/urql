@@ -55,6 +55,7 @@
     "preact": "^10.13.0"
   },
   "peerDependencies": {
+    "@urql/core": "^5.0.0",
     "preact": ">= 10.0.0"
   },
   "dependencies": {

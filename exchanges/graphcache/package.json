@@ -62,9 +62,12 @@
     "prepare": "node ../../scripts/prepare/index.js",
     "prepublishOnly": "run-s clean build"
   },
+  "peerDependencies": {
+    "@urql/core": "^5.0.0"
+  },
   "dependencies": {
     "@0no-co/graphql.web": "^1.0.5",
-    "@urql/core": ">=5.0.0",
+    "@urql/core": "^5.0.0",
     "wonka": "^6.3.2"
   },
   "devDependencies": {

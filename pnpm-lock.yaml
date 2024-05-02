@@ -182,7 +182,7 @@ importers:
   exchanges/auth:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -195,7 +195,7 @@ importers:
   exchanges/context:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -208,7 +208,7 @@ importers:
   exchanges/execute:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -224,7 +224,7 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(graphql@16.6.0)
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -258,7 +258,7 @@ importers:
   exchanges/persisted:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -271,7 +271,7 @@ importers:
   exchanges/populate:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -284,7 +284,7 @@ importers:
   exchanges/refocus:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -300,7 +300,7 @@ importers:
   exchanges/request-policy:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -313,7 +313,7 @@ importers:
   exchanges/retry:
     dependencies:
       '@urql/core':
-        specifier: '>=5.0.0'
+        specifier: ^5.0.0
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
