@@ -183,7 +183,7 @@ export function subscriptionStore<
       ),
       scan((result: OperationResultState<Result, Variables>, partial) => {
         const data =
-          partial.data !== undefined
+          partial.data != null
             ? typeof handler === 'function'
               ? handler(result.data, partial.data)
               : partial.data

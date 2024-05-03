@@ -282,7 +282,7 @@ export function useSubscription<
               const { current: handler } = handlerRef;
               // If a handler has been passed, it's used to merge new data in
               const data =
-                partial.data !== undefined
+                partial.data != null
                   ? typeof handler === 'function'
                     ? handler(result.data, partial.data)
                     : partial.data

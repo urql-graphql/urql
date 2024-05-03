@@ -266,10 +266,14 @@ export function useSubscription<
       deferDispatch(setState, state => {
         const nextResult = computeNextState(state[1], result);
         if (state[1] === nextResult) return state;
-        if (handlerRef.current && state[1].data !== nextResult.data) {
+        if (
+          handlerRef.current &&
+          nextResult.data != null &&
+          state[1].data !== nextResult.data
+        ) {
           nextResult.data = handlerRef.current(
             state[1].data,
-            nextResult.data!
+            nextResult.data
           ) as any;
         }
 
