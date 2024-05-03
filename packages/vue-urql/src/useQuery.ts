@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { WatchStopHandle, Ref } from 'vue';
-import { shallowRef, ref, watchEffect, reactive, isRef } from 'vue';
+import { shallowRef, ref, watchEffect, reactive } from 'vue';
 
 import type { Subscription, Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
@@ -19,10 +19,8 @@ import type {
 import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
-import { unwrapPossibleProxy, updateShallowRef } from './utils';
-
-type MaybeRef<T> = T | Ref<T>;
-type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
+import type { MaybeRef, MaybeRefObj } from './utils';
+import { unref, updateShallowRef } from './utils';
 
 /** Input arguments for the {@link useQuery} function.
  *
@@ -246,7 +244,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   client: Ref<Client> = useClient(),
   stops: WatchStopHandle[] = []
 ): UseQueryResponse<T, V> {
-  const args = reactive(_args);
+  const args = reactive(_args) as UseQueryArgs<T, V>;
 
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
@@ -255,16 +253,11 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const isPaused: Ref<boolean> = isRef(_args.pause)
-    ? _args.pause
-    : ref(!!_args.pause);
+  const isPaused = ref(!!unref(args.pause));
 
   const input = shallowRef({
-    request: createRequest<T, V>(
-      unwrapPossibleProxy(args.query as any),
-      unwrapPossibleProxy<V>(args.variables as V)
-    ),
-    requestPolicy: unwrapPossibleProxy(args.requestPolicy),
+    request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
+    requestPolicy: unref(args.requestPolicy),
     isPaused: isPaused.value,
   });
 
@@ -274,10 +267,10 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     watchEffect(() => {
       updateShallowRef(input, {
         request: createRequest<T, V>(
-          unwrapPossibleProxy(args.query as any),
-          unwrapPossibleProxy<V>(args.variables as V)
+          unref(args.query),
+          unref(args.variables) as V
         ),
-        requestPolicy: unwrapPossibleProxy(args.requestPolicy),
+        requestPolicy: unref(args.requestPolicy),
         isPaused: isPaused.value,
       });
     }, watchOptions)
@@ -287,10 +280,8 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     watchEffect(() => {
       source.value = !input.value.isPaused
         ? client.value.executeQuery<T, V>(input.value.request, {
-            requestPolicy: unwrapPossibleProxy(
-              args.requestPolicy
-            ) as RequestPolicy,
-            ...unwrapPossibleProxy(args.context),
+            requestPolicy: unref(args.requestPolicy),
+            ...unref(args.context),
           })
         : undefined;
     }, watchOptions)
@@ -308,10 +299,8 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
       const s = (source.value = client.value.executeQuery<T, V>(
         input.value.request,
         {
-          requestPolicy: unwrapPossibleProxy(
-            args.requestPolicy
-          ) as RequestPolicy,
-          ...args.context,
+          requestPolicy: unref(args.requestPolicy),
+          ...unref(args.context),
           ...opts,
         }
       ));

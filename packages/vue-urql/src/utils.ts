@@ -2,11 +2,15 @@ import type { GraphQLRequest, AnyVariables } from '@urql/core';
 import type { Ref, ShallowRef } from 'vue';
 import { isRef } from 'vue';
 
-export function unwrapPossibleProxy<V>(possibleProxy: V | Ref<V>): V {
-  return possibleProxy && isRef(possibleProxy)
-    ? possibleProxy.value
-    : possibleProxy;
-}
+export type MaybeRef<T> = T | (() => T) | Ref<T>;
+export type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
+
+export const unref = <T>(maybeRef: MaybeRef<T>): T =>
+  typeof maybeRef === 'function'
+    ? (maybeRef as () => T)()
+    : maybeRef != null && isRef(maybeRef)
+    ? maybeRef.value
+    : maybeRef;
 
 export interface RequestState<
   Data = any,
