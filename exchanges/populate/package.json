@@ -47,11 +47,12 @@
     "prepublishOnly": "run-s clean build"
   },
   "dependencies": {
-    "@urql/core": ">=5.0.0",
+    "@urql/core": "^5.0.0",
     "wonka": "^6.3.2"
   },
   "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0"
+    "@urql/core": "^5.0.0",
+    "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0"
   },
   "devDependencies": {
     "@urql/core": "workspace:*",

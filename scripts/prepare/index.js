@@ -97,6 +97,28 @@ invariant(
   'package.json:files must include "dist" and "LICENSE"'
 );
 
+if (pkg.dependencies && pkg.dependencies['@urql/core']) {
+  invariant(
+    !!pkg.peerDependencies && !!pkg.peerDependencies['@urql/core'],
+    'package.json:peerDependencies must contain @urql/core.'
+  );
+}
+
+if (pkg.peerDependencies && pkg.peerDependencies['@urql/core']) {
+  invariant(
+    !!pkg.dependencies && !!pkg.dependencies['@urql/core'],
+    'package.json:dependencies must contain @urql/core.'
+  );
+}
+
+for (const key in pkg.peerDependencies || {}) {
+  const dependency = pkg.peerDependencies[key];
+  invariant(
+    key !== 'react' || key !== 'preact' || !dependency.includes('>='),
+    `Peer Dependency "${key}" must not contain ">=" (greater than) range`
+  );
+}
+
 if (hasReact && !hasNext) {
   invariant(
     !pkg.exports,

@@ -55,6 +55,7 @@
     "vue": "^3.2.47"
   },
   "peerDependencies": {
+    "@urql/core": "^5.0.0",
     "vue": "^2.7.0 || ^3.0.0"
   },
   "dependencies": {

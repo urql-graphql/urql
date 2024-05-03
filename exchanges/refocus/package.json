@@ -53,8 +53,11 @@
     "@types/react": "^17.0.4",
     "graphql": "^16.0.0"
   },
+  "peerDependencies": {
+    "@urql/core": "^5.0.0"
+  },
   "dependencies": {
-    "@urql/core": ">=5.0.0",
+    "@urql/core": "^5.0.0",
     "wonka": "^6.3.2"
   },
   "publishConfig": {

@@ -49,6 +49,7 @@
     "prepublishOnly": "run-s clean build"
   },
   "peerDependencies": {
+    "@urql/core": "^5.0.0",
     "svelte": "^3.0.0 || ^4.0.0"
   },
   "dependencies": {
