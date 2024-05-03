@@ -306,9 +306,9 @@ export function callUseSubscription<
             subscribe(result => {
               fetching.value = true;
               data.value =
-                result.data !== undefined
+                result.data != null
                   ? typeof scanHandler.value === 'function'
-                    ? scanHandler.value(data.value as any, result.data!)
+                    ? scanHandler.value(data.value as any, result.data)
                     : result.data
                   : (result.data as any);
               error.value = result.error;
