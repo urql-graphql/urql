@@ -91,7 +91,7 @@ list that constantly changes. [You can find a full code example of this pattern 
 
 This code doesn't take changing variables into account, which will affect the cursors. For an
 example that takes full infinite scrolling into account, [you can find a full code example of an
-extended pattern in our example folder on the topic of infinite pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-infinite--pagination)
+extended pattern in our example folder on the topic of infinite pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-infinite-pagination)
 
 ## Prefetching data
 
