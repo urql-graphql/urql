@@ -4,7 +4,7 @@ import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type { WatchStopHandle, Ref } from 'vue';
-import { ref, shallowRef, watchEffect, reactive, isRef } from 'vue';
+import { ref, shallowRef, watchEffect, reactive } from 'vue';
 
 import type {
   Client,
@@ -18,10 +18,8 @@ import type {
 import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
-import { unwrapPossibleProxy, updateShallowRef } from './utils';
-
-type MaybeRef<T> = Exclude<T, void> | Ref<Exclude<T, void>>;
-type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
+import type { MaybeRef, MaybeRefObj } from './utils';
+import { unref, updateShallowRef } from './utils';
 
 /** Input arguments for the {@link useSubscription} function.
  *
@@ -245,7 +243,7 @@ export function callUseSubscription<
   client: Ref<Client> = useClient(),
   stops: WatchStopHandle[] = []
 ): UseSubscriptionResponse<T, R, V> {
-  const args = reactive(_args);
+  const args = reactive(_args) as UseSubscriptionArgs<T, V>;
 
   const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
@@ -254,17 +252,11 @@ export function callUseSubscription<
   const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);
-
-  const isPaused: Ref<boolean> = isRef(_args.pause)
-    ? _args.pause
-    : ref(!!_args.pause);
+  const scanHandler = ref(handler);
+  const isPaused = ref(!!unref(args.pause));
 
   const input = shallowRef({
-    request: createRequest<T, V>(
-      unwrapPossibleProxy(args.query as any),
-      unwrapPossibleProxy<V>(args.variables as V)
-    ),
+    request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
     isPaused: isPaused.value,
   });
 
@@ -274,8 +266,8 @@ export function callUseSubscription<
     watchEffect(() => {
       updateShallowRef(input, {
         request: createRequest<T, V>(
-          unwrapPossibleProxy(args.query as any),
-          unwrapPossibleProxy<V>(args.variables as V)
+          unref(args.query),
+          unref(args.variables) as V
         ),
         isPaused: isPaused.value,
       });
@@ -286,7 +278,7 @@ export function callUseSubscription<
     watchEffect(() => {
       source.value = !isPaused.value
         ? client.value.executeSubscription<T, V>(input.value.request, {
-            ...(unwrapPossibleProxy(args.context) as Partial<OperationContext>),
+            ...unref(args.context),
           })
         : undefined;
     }, watchOptions)
@@ -338,7 +330,7 @@ export function callUseSubscription<
       source.value = client.value.executeSubscription<T, V>(
         input.value.request,
         {
-          ...unwrapPossibleProxy(args.context),
+          ...unref(args.context),
           ...opts,
         }
       );

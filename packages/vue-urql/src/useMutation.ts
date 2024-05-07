@@ -17,7 +17,8 @@ import type {
 import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
-import { unwrapPossibleProxy } from './utils';
+import type { MaybeRef } from './utils';
+import { unref } from './utils';
 
 /** State of the last mutation executed by {@link useMutation}.
  *
@@ -131,7 +132,7 @@ export function useMutation<T = any, V extends AnyVariables = AnyVariables>(
 }
 
 export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
-  query: TypedDocumentNode<T, V> | DocumentNode | string,
+  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>,
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
@@ -156,7 +157,7 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
 
       return pipe(
         client.value.executeMutation<T, V>(
-          createRequest<T, V>(query, unwrapPossibleProxy(variables)),
+          createRequest<T, V>(unref(query), unref(variables)),
           context || {}
         ),
         onPush(result => {
