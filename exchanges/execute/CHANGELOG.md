@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.0
+
+### Minor Changes
+
+- Mark `@urql/core` as a peer dependency as well as a regular dependency
+  Submitted by [@kitten](https://github.com/kitten) (See [#3579](https://github.com/urql-graphql/urql/pull/3579))
+
 ## 2.2.2
 
 ### Patch Changes

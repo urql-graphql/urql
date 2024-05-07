@@ -1,5 +1,17 @@
 # @urql/svelte
 
+## 4.2.0
+
+### Minor Changes
+
+- Mark `@urql/core` as a peer dependency as well as a regular dependency
+  Submitted by [@kitten](https://github.com/kitten) (See [#3579](https://github.com/urql-graphql/urql/pull/3579))
+
+### Patch Changes
+
+- ⚠️ Fix subscription handlers to not receive `null` values
+  Submitted by [@kitten](https://github.com/kitten) (See [#3581](https://github.com/urql-graphql/urql/pull/3581))
+
 ## 4.1.1
 
 ### Patch Changes

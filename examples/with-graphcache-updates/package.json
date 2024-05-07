@@ -7,12 +7,12 @@
   },
   "dependencies": {
     "@urql/core": "^5.0.3",
-    "@urql/exchange-auth": "^2.1.6",
-    "@urql/exchange-graphcache": "^7.0.2",
+    "@urql/exchange-auth": "^2.2.0",
+    "@urql/exchange-graphcache": "^7.1.0",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "urql": "^4.0.7"
+    "urql": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^3.1.0",
