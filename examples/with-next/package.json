@@ -9,7 +9,7 @@
     "next": "13.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "urql": "^4.0.7"
+    "urql": "^4.1.0"
   },
   "scripts": {
     "dev": "next dev",
