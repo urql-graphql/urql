@@ -511,7 +511,7 @@ This utility is used by the [`cacheExchange`](#cacheexchange) and by
 ### composeExchanges
 
 This utility accepts an array of `Exchange`s and composes them into a single one.
-It chains them in the order that they're given, left to right.
+It chains them in the order that they're given, right to left.
 
 ```js
 function composeExchanges(Exchange[]): Exchange;
