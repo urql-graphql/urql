@@ -41,7 +41,7 @@ const SubscriptionUser: FC<{
 };
 
 beforeAll(() => {
-  vi.spyOn(global.console, 'error').mockImplementation(() => {
+  vi.spyOn(globalThis.console, 'error').mockImplementation(() => {
     // do nothing
   });
 });

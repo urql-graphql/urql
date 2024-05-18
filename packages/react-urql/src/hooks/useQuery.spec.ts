@@ -41,7 +41,7 @@ const mockVariables = {
 describe('useQuery', () => {
   beforeAll(() => {
     // TODO: Fix use of act()
-    vi.spyOn(global.console, 'error').mockImplementation(() => {
+    vi.spyOn(globalThis.console, 'error').mockImplementation(() => {
       // do nothing
     });
   });

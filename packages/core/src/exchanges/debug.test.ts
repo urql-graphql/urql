@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 it('forwards query operations correctly', async () => {
-  vi.spyOn(global.console, 'log').mockImplementation(() => {
+  vi.spyOn(globalThis.console, 'log').mockImplementation(() => {
     /** Do NOthing */
   });
   const { source: ops$, next, complete } = input;

@@ -105,11 +105,11 @@ describe('storage', () => {
 describe('offline', () => {
   beforeAll(() => {
     vi.resetAllMocks();
-    global.navigator = { onLine: true } as any;
+    globalThis.navigator = { onLine: true } as any;
   });
 
   it('should intercept errored mutations', () => {
-    const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
+    const onlineSpy = vi.spyOn(globalThis.navigator, 'onLine', 'get');
 
     const client = createClient({
       url: 'http://0.0.0.0',

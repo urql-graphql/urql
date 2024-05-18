@@ -42,7 +42,7 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.spyOn(global.console, 'error');
+  vi.spyOn(globalThis.console, 'error');
 });
 
 describe('useQuery', () => {

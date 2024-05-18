@@ -47,7 +47,7 @@ const exchangeArgs = {
 const expectedQueryOperationName = 'getUser';
 const expectedSubscribeOperationName = 'subscribeToUser';
 
-const fetchMock = (global as any).fetch as Mock;
+const fetchMock = (globalThis as any).fetch as Mock;
 const mockHttpResponseData = { key: 'value' };
 
 beforeEach(() => {
