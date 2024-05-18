@@ -21,7 +21,7 @@ const client = {
 describe('Subscription', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.spyOn(global.console, 'error').mockImplementation(() => {
+    vi.spyOn(globalThis.console, 'error').mockImplementation(() => {
       // do nothing
     });
   });

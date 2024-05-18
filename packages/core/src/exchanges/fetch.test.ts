@@ -17,14 +17,14 @@ import { queryOperation } from '../test-utils';
 import { OperationResult } from '../types';
 import { fetchExchange } from './fetch';
 
-const fetch = (global as any).fetch as Mock;
+const fetch = (globalThis as any).fetch as Mock;
 const abort = vi.fn();
 
 const abortError = new Error();
 abortError.name = 'AbortError';
 
 beforeAll(() => {
-  (global as any).AbortController = function AbortController() {
+  (globalThis as any).AbortController = function AbortController() {
     this.signal = undefined;
     this.abort = abort;
   };
@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 afterAll(() => {
-  (global as any).AbortController = undefined;
+  (globalThis as any).AbortController = undefined;
 });
 
 const response = JSON.stringify({

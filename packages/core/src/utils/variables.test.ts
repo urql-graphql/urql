@@ -68,14 +68,14 @@ describe('stringifyVariables', () => {
   });
 
   it('stringifies plain objects from foreign JS contexts correctly', () => {
-    const global: typeof globalThis = new Script(
+    const scriptGlobal: typeof globalThis = new Script(
       'exports = globalThis'
     ).runInNewContext({}).exports;
 
-    const plain = new global.Function('return { test: true }')();
+    const plain = new scriptGlobal.Function('return { test: true }')();
     expect(stringifyVariables(plain)).toBe('{"test":true}');
 
-    const data = new global.Function('return new (class Test {})')();
+    const data = new scriptGlobal.Function('return new (class Test {})')();
     expect(stringifyVariables(data)).toMatch(/^{"__key":"\w+"}$/);
   });
 });
