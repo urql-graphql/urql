@@ -34,5 +34,4 @@ npm run start
 This example contains:
 
 - The `urql` bindings and a React app with a client set up in [`src/App.jsx`](src/App.jsx)
-- The `multipartFetchExchange` from `@urql/exchange-multipart-fetch` in [`src/App.jsx`](src/App.jsx)
 - A basic file upload form in [`src/FileUpload.jsx`](src/FileUpload.jsx)
