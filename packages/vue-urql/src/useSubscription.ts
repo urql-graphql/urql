@@ -4,6 +4,7 @@ import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type { WatchStopHandle, Ref } from 'vue';
+import { isRef } from 'vue';
 import { ref, shallowRef, watchEffect, reactive } from 'vue';
 
 import type {
@@ -253,7 +254,9 @@ export function callUseSubscription<
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
   const scanHandler = ref(handler);
-  const isPaused = ref(!!unref(args.pause));
+  const isPaused: Ref<boolean> = isRef(_args.pause)
+    ? _args.pause
+    : ref(!!_args.pause);
 
   const input = shallowRef({
     request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
