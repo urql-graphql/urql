@@ -1,7 +1,7 @@
 export type FileMap = Map<string, File | Blob>;
 
-const seen = new Set();
-const cache = new WeakMap();
+const seen: Set<any> = new Set();
+const cache: WeakMap<any, any> = new WeakMap();
 
 const stringify = (x: any): string => {
   if (x === null || seen.has(x)) {

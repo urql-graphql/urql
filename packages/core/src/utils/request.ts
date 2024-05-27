@@ -23,15 +23,21 @@ const SOURCE_NAME = 'gql';
 const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
 const REPLACE_CHAR_RE = /(?:#[^\n\r]+)?(?:[\r\n]+|$)/g;
 
-const replaceOutsideStrings = (str: string, idx: number) =>
+const replaceOutsideStrings = (str: string, idx: number): string =>
   idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, '\n') : str;
 
 /** Sanitizes a GraphQL document string by replacing comments and redundant newlines in it. */
 const sanitizeDocument = (node: string): string =>
   node.split(GRAPHQL_STRING_RE).map(replaceOutsideStrings).join('').trim();
 
-const prints = new Map<DocumentNode | DefinitionNode, string>();
-const docs = new Map<HashValue, KeyedDocumentNode>();
+const prints: Map<DocumentNode | DefinitionNode, string> = new Map<
+  DocumentNode | DefinitionNode,
+  string
+>();
+const docs: Map<HashValue, KeyedDocumentNode> = new Map<
+  HashValue,
+  KeyedDocumentNode
+>();
 
 /** A cached printing function for GraphQL documents.
  *

@@ -8,7 +8,8 @@
     "postinstall": "node ./scripts/prepare/postinstall.js",
     "pack": "node ./scripts/actions/pack-all.mjs",
     "changeset:version": "node ./scripts/changesets/version.mjs",
-    "changeset:publish": "changeset publish"
+    "changeset:publish": "changeset publish",
+    "jsr": "pnpm --filter @urql/core jsr"
   },
   "eslintConfig": {
     "root": true,
@@ -88,6 +89,7 @@
     "husky-v4": "^4.3.8",
     "invariant": "^2.2.4",
     "jsdom": "^21.1.1",
+    "jsr": "^0.12.4",
     "lint-staged": "^13.2.2",
     "npm-packlist": "^7.0.4",
     "npm-run-all": "^4.1.5",
