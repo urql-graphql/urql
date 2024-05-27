@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { WatchStopHandle, Ref } from 'vue';
+import { isRef } from 'vue';
 import { shallowRef, ref, watchEffect, reactive } from 'vue';
 
 import type { Subscription, Source } from 'wonka';
@@ -253,7 +254,9 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const isPaused = ref(!!unref(args.pause));
+  const isPaused: Ref<boolean> = isRef(_args.pause)
+    ? _args.pause
+    : ref(!!_args.pause);
 
   const input = shallowRef({
     request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
