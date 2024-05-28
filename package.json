@@ -9,7 +9,8 @@
     "pack": "node ./scripts/actions/pack-all.mjs",
     "changeset:version": "node ./scripts/changesets/version.mjs && node ./scripts/changesets/jsr.mjs",
     "changeset:publish": "changeset publish && pnpm jsr",
-    "jsr": "pnpm --filter @urql/core jsr"
+    "jsr": "pnpm --filter @urql/core jsr",
+    "jsr:dryrun": "pnpm --filter @urql/core jsr --dry-run"
   },
   "eslintConfig": {
     "root": true,
