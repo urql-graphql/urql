@@ -7,7 +7,7 @@
     "build": "node ./scripts/actions/build-all.mjs",
     "postinstall": "node ./scripts/prepare/postinstall.js",
     "pack": "node ./scripts/actions/pack-all.mjs",
-    "changeset:version": "node ./scripts/changesets/version.mjs && node ./scripts/changesets/jsr.mjs",
+    "changeset:version": "node ./scripts/changesets/version.mjs",
     "changeset:publish": "changeset publish && pnpm jsr",
     "jsr": "pnpm --filter @urql/core jsr",
     "jsr:dryrun": "pnpm --filter @urql/core jsr --dry-run"

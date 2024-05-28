@@ -5,5 +5,12 @@
     ".": "./src/index.ts",
     "./internal": "./src/internal/index.ts"
   },
-  "exclude": ["node_modules", "cypress"]
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
 }

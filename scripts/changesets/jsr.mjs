@@ -3,12 +3,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import {
-  getPackageManifest,
-  listPackages
-} from '../actions/lib/packages.mjs';
+import { getPackageManifest, listPackages } from '../actions/lib/packages.mjs';
 
-const getExports = (exports) => {
+const getExports = exports => {
   const exportNames = Object.keys(exports);
   const eventualExports = {};
   for (const exportName of exportNames) {
@@ -17,18 +14,30 @@ const getExports = (exports) => {
     eventualExports[exportName] = exp.source;
   }
   return eventualExports;
-}
+};
 
 export const updateJsr = async () => {
-  (await listPackages()).forEach((dir) => {
+  (await listPackages()).forEach(dir => {
     const manifest = getPackageManifest(dir);
     const jsrManifest = {
       name: manifest.name,
       version: manifest.version,
-      exports: manifest.exports ? getExports(manifest.exports) : manifest.source,
-      exclude: ['node_modules', 'cypress']
-    }
+      exports: manifest.exports
+        ? getExports(manifest.exports)
+        : manifest.source,
+      exclude: [
+        'node_modules',
+        'cypress',
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/*.test.*.snap',
+        '**/*.spec.*.snap',
+      ],
+    };
 
-    fs.writeFileSync(path.resolve(dir, 'jsr.json'), JSON.stringify(jsrManifest, undefined, 2));
+    fs.writeFileSync(
+      path.resolve(dir, 'jsr.json'),
+      JSON.stringify(jsrManifest, undefined, 2)
+    );
   });
-}
+};

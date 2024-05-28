@@ -6,5 +6,12 @@
     "./extras": "./src/extras/index.ts",
     "./default-storage": "./src/default-storage/index.ts"
   },
-  "exclude": ["node_modules", "cypress"]
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
 }

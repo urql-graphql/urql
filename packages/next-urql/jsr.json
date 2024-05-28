@@ -5,5 +5,12 @@
     ".": "./src/index.ts",
     "./rsc": "./src/rsc.ts"
   },
-  "exclude": ["node_modules", "cypress"]
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
 }

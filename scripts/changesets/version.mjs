@@ -6,9 +6,9 @@ import { execa } from 'execa';
 import {
   getPackageManifest,
   updatePackageManifest,
-  listPackages
+  listPackages,
 } from '../actions/lib/packages.mjs';
-import { updateJsr } from './jsr.mjs'
+import { updateJsr } from './jsr.mjs';
 
 const versionRe = /^\d+\.\d+\.\d+/i;
 const execaOpts = { stdio: 'inherit' };
