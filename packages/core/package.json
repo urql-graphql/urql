@@ -51,7 +51,8 @@
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.mjs",
     "prepare": "node ../../scripts/prepare/index.js",
-    "prepublishOnly": "run-s clean build"
+    "prepublishOnly": "run-s clean build",
+    "jsr": "jsr publish"
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.0.5",

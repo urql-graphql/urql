@@ -55,6 +55,9 @@ jobs:
       - name: Unit Tests
         run: pnpm run test
 
+      - name: Check for slow types
+        run: pnpm jsr:dryrun
+
   react-e2e:
     name: React E2E
     runs-on: ubuntu-latest

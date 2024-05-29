@@ -1,0 +1,13 @@
+{
+  "name": "urql",
+  "version": "4.0.7",
+  "exports": "src/index.ts",
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
+}

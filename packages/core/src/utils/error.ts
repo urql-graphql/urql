@@ -114,7 +114,7 @@ export class CombinedError extends Error {
     this.response = input.response;
   }
 
-  toString() {
+  toString(): string {
     return this.message;
   }
 }

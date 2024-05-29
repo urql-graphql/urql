@@ -74,7 +74,10 @@ const formatNode = <
   return node as FormattedNode<T>;
 };
 
-const formattedDocs = new Map<number, KeyedDocumentNode>();
+const formattedDocs: Map<number, KeyedDocumentNode> = new Map<
+  number,
+  KeyedDocumentNode
+>();
 
 /** Formats a GraphQL document to add `__typename` fields and process client-side directives.
  *

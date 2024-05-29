@@ -1,0 +1,15 @@
+{
+  "name": "@urql/preact",
+  "version": "4.0.5",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
+}

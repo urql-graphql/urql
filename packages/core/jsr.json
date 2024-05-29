@@ -1,0 +1,16 @@
+{
+  "name": "@urql/core",
+  "version": "5.0.2",
+  "exports": {
+    ".": "./src/index.ts",
+    "./internal": "./src/internal/index.ts"
+  },
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
+}

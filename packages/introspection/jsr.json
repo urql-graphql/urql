@@ -1,0 +1,15 @@
+{
+  "name": "@urql/introspection",
+  "version": "1.0.3",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.test.*.snap",
+    "**/*.spec.*.snap"
+  ]
+}

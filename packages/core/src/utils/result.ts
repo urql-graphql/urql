@@ -51,7 +51,7 @@ export const makeResult = (
   };
 };
 
-const deepMerge = (target: any, source: any) => {
+const deepMerge = (target: any, source: any): any => {
   if (typeof target === 'object' && target != null) {
     if (
       !target.constructor ||
