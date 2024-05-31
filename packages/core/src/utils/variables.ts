@@ -51,7 +51,7 @@ const stringify = (x: any): string => {
   return out;
 };
 
-const extract = (map: FileMap, path: string, x: any) => {
+const extract = (map: FileMap, path: string, x: any): void => {
   if (x == null || typeof x !== 'object' || x.toJSON || seen.has(x)) {
     /*noop*/
   } else if (Array.isArray(x)) {

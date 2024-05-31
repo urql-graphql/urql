@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-auth",
-  "version": "2.1.6",
+  "version": "2.2.0",
   "exports": {
     ".": "./src/index.ts"
   },
