@@ -4,8 +4,7 @@ import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type { WatchStopHandle, Ref } from 'vue';
-import { isRef } from 'vue';
-import { ref, shallowRef, watchEffect, reactive } from 'vue';
+import { computed, isRef, reactive, ref, shallowRef, watchEffect } from 'vue';
 
 import type {
   Client,
@@ -19,6 +18,7 @@ import type {
 import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
+
 import type { MaybeRef, MaybeRefObj } from './utils';
 import { unref, updateShallowRef } from './utils';
 
@@ -254,9 +254,12 @@ export function callUseSubscription<
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
   const scanHandler = ref(handler);
-  const isPaused: Ref<boolean> = isRef(_args.pause)
-    ? _args.pause
-    : ref(!!_args.pause);
+  const isPaused: Ref<boolean> =
+    typeof _args.pause === 'function'
+      ? computed(_args.pause)
+      : isRef(_args.pause)
+      ? _args.pause
+      : ref(!!_args.pause);
 
   const input = shallowRef({
     request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
