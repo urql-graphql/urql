@@ -36,7 +36,7 @@ export type UseSubscriptionArgs<
    * @remarks
    * `pause` may be set to `true` to stop {@link useSubscription} from starting
    * its subscription automatically. This will pause the subscription until
-   * {@link UseSubscriptonState.resume} is called, or, if `pause` is a reactive
+   * {@link UseSubscriptionResponse.resume} is called, or, if `pause` is a reactive
    * ref of a boolean, until this ref changes to `true`.
    */
   pause?: MaybeRef<boolean>;
@@ -143,7 +143,7 @@ export interface UseSubscriptionResponse<
    *
    * @remarks
    * This is the subscription {@link Operation} that is currently active.
-   * When {@link UseQueryState.fetching} is `true`, this is the
+   * When {@link UseSubscriptionResponse.fetching} is `true`, this is the
    * last `Operation` that the current state was for.
    */
   operation: Ref<Operation<T, V> | undefined>;
