@@ -116,15 +116,17 @@ describe('useQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
+    const pause = ref(true);
+
     const _query = useQuery({
       query: `{ test }`,
-      pause: true,
+      pause: () => pause.value,
     });
     const query = reactive(_query);
 
     expect(executeQuery).not.toHaveBeenCalled();
 
-    query.resume();
+    pause.value = false;
     await nextTick();
     expect(query.fetching).toBe(true);
 
