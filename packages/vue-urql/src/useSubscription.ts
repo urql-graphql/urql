@@ -256,7 +256,7 @@ export function callUseSubscription<
   const scanHandler = ref(handler);
   const isPaused: Ref<boolean> = ref(!!unref(args.pause));
   if (isRef(args.pause) || typeof args.pause === 'function') {
-    watch(args.pause, value => (isPaused.value = value));
+    stops.push(watch(args.pause, value => (isPaused.value = value)));
   }
 
   const input = shallowRef({

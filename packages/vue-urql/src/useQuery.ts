@@ -256,7 +256,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
 
   const isPaused: Ref<boolean> = ref(!!unref(args.pause));
   if (isRef(args.pause) || typeof args.pause === 'function') {
-    watch(args.pause, value => (isPaused.value = value));
+    stops.push(watch(args.pause, value => (isPaused.value = value)));
   }
 
   const input = shallowRef({
