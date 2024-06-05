@@ -3852,3 +3852,122 @@ describe('commutativity', () => {
     expect(failingData).not.toMatchObject({ hasNext: true });
   });
 });
+
+describe.only('abstract types', () => {
+  it('works with two responses giving different concrete types for a union', () => {
+    const query = gql`
+      query ($id: ID!) {
+        field(id: $id) {
+          id
+          union {
+            ... on Type1 {
+              id
+              name
+              __typename
+            }
+            ... on Type2 {
+              id
+              title
+              __typename
+            }
+          }
+          __typename
+        }
+      }
+    `;
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+    const operation1 = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: { id: '1' },
+    });
+    const operation2 = client.createRequestOperation('query', {
+      key: 2,
+      query,
+      variables: { id: '2' },
+    });
+    const queryResult1: OperationResult = {
+      ...queryResponse,
+      operation: operation1,
+      data: {
+        __typename: 'Query',
+        field: {
+          id: '1',
+          __typename: 'Todo',
+          union: {
+            id: '1',
+            name: 'test',
+            __typename: 'Type1',
+          },
+        },
+      },
+    };
+
+    const queryResult2: OperationResult = {
+      ...queryResponse,
+      operation: operation2,
+      data: {
+        __typename: 'Query',
+        field: {
+          id: '2',
+          __typename: 'Todo',
+          union: {
+            id: '2',
+            title: 'test',
+            __typename: 'Type2',
+          },
+        },
+      },
+    };
+
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(next);
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) return queryResult1;
+      if (forwardOp.key === 2) return queryResult2;
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(operation1);
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+    expect(result.mock.calls[0][0].data).toEqual({
+      field: {
+        __typename: 'Todo',
+        id: '1',
+        union: {
+          __typename: 'Type1',
+          id: '1',
+          name: 'test',
+        },
+      },
+    });
+
+    next(operation2);
+    expect(response).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(result.mock.calls[1][0].data).toEqual({
+      field: {
+        __typename: 'Todo',
+        id: '2',
+        union: {
+          __typename: 'Type2',
+          id: '2',
+          title: 'test',
+        },
+      },
+    });
+  });
+});

@@ -138,20 +138,23 @@ const isFragmentHeuristicallyMatching = (
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) return true;
 
-  warn(
-    'Heuristic Fragment Matching: A fragment is trying to match against the `' +
-      typename +
-      '` type, ' +
-      'but the type condition is `' +
-      typeCondition +
-      '`. Since GraphQL allows for interfaces `' +
-      typeCondition +
-      '` may be an ' +
-      'interface.\nA schema needs to be defined for this match to be deterministic, ' +
-      'otherwise the fragment will be matched heuristically!',
-    16,
-    logger
-  );
+  const types = getConcreteTypes(typeCondition);
+  if (!types.has(typename)) {
+    warn(
+      'Heuristic Fragment Matching: A fragment is trying to match against the `' +
+        typename +
+        '` type, ' +
+        'but the type condition is `' +
+        typeCondition +
+        '`. Since GraphQL allows for interfaces `' +
+        typeCondition +
+        '` may be an ' +
+        'interface.\nA schema needs to be defined for this match to be deterministic, ' +
+        'otherwise the fragment will be matched heuristically!',
+      16,
+      logger
+    );
+  }
 
   return (
     currentOperation === 'write' ||
@@ -225,12 +228,7 @@ export function makeSelectionIterator(
               !fragment.typeCondition ||
               (ctx.store.schema
                 ? isInterfaceOfType(ctx.store.schema, fragment, typename)
-                : (currentOperation === 'read' &&
-                    isFragmentMatching(
-                      fragment.typeCondition.name.value,
-                      typename
-                    )) ||
-                  isFragmentHeuristicallyMatching(
+                : isFragmentHeuristicallyMatching(
                     fragment,
                     typename,
                     entityKey,
@@ -268,13 +266,6 @@ export function makeSelectionIterator(
     }
   };
 }
-
-const isFragmentMatching = (typeCondition: string, typename: string | void) => {
-  if (!typename) return false;
-  if (typeCondition === typename) return true;
-  const types = getConcreteTypes(typeCondition);
-  return types.size && types.has(typename);
-};
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x == null ? null : (x as Data | NullArray<Data>);
