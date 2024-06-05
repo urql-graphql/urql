@@ -19,10 +19,11 @@ const stringify = (x: any, includeFiles: boolean): string => {
     out += ']';
     return out;
   } else if (
-    (FileConstructor !== NoopConstructor && x instanceof FileConstructor) ||
-    (BlobConstructor !== NoopConstructor && x instanceof BlobConstructor)
+    !includeFiles &&
+    ((FileConstructor !== NoopConstructor && x instanceof FileConstructor) ||
+      (BlobConstructor !== NoopConstructor && x instanceof BlobConstructor))
   ) {
-    return includeFiles ? x.toString() : 'null';
+    return 'null';
   }
 
   const keys = Object.keys(x).sort();
