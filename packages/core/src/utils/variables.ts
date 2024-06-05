@@ -3,18 +3,18 @@ export type FileMap = Map<string, File | Blob>;
 const seen: Set<any> = new Set();
 const cache: WeakMap<any, any> = new WeakMap();
 
-const stringify = (x: any): string => {
+const stringify = (x: any, includeFiles: boolean): string => {
   if (x === null || seen.has(x)) {
     return 'null';
   } else if (typeof x !== 'object') {
     return JSON.stringify(x) || '';
   } else if (x.toJSON) {
-    return stringify(x.toJSON());
+    return stringify(x.toJSON(), includeFiles);
   } else if (Array.isArray(x)) {
     let out = '[';
     for (const value of x) {
       if (out.length > 1) out += ',';
-      out += stringify(value) || 'null';
+      out += stringify(value, includeFiles) || 'null';
     }
     out += ']';
     return out;
@@ -22,7 +22,7 @@ const stringify = (x: any): string => {
     (FileConstructor !== NoopConstructor && x instanceof FileConstructor) ||
     (BlobConstructor !== NoopConstructor && x instanceof BlobConstructor)
   ) {
-    return 'null';
+    return includeFiles ? x.toString() : 'null';
   }
 
   const keys = Object.keys(x).sort();
@@ -33,16 +33,16 @@ const stringify = (x: any): string => {
   ) {
     const key = cache.get(x) || Math.random().toString(36).slice(2);
     cache.set(x, key);
-    return stringify({ __key: key });
+    return stringify({ __key: key }, includeFiles);
   }
 
   seen.add(x);
   let out = '{';
   for (const key of keys) {
-    const value = stringify(x[key]);
+    const value = stringify(x[key], includeFiles);
     if (value) {
       if (out.length > 1) out += ',';
-      out += stringify(key) + ':' + value;
+      out += stringify(key, includeFiles) + ':' + value;
     }
   }
 
@@ -79,9 +79,9 @@ const extract = (map: FileMap, path: string, x: any): void => {
  * replacing their values, which remain stable for the objects’
  * instance.
  */
-export const stringifyVariables = (x: any): string => {
+export const stringifyVariables = (x: any, includeFiles?: boolean): string => {
   seen.clear();
-  return stringify(x);
+  return stringify(x, includeFiles || false);
 };
 
 class NoopConstructor {}

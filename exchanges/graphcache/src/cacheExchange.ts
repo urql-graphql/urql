@@ -162,9 +162,7 @@ export const cacheExchange =
         operation.kind === 'mutation' &&
         operation.context.requestPolicy !== 'network-only'
       ) {
-        const key = (operation.key +
-          (operation.context._instance || 0)) as number;
-        operations.set(key, operation);
+        operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
         initDataState('write', store.data, operation.key, true, false);
         const { dependencies } = _write(
@@ -233,11 +231,7 @@ export const cacheExchange =
         : 'miss';
 
       results.set(operation.key, result.data);
-      const key =
-        operation.kind === 'mutation'
-          ? operation.key + (operation.context._instance || 0)
-          : operation.key;
-      operations.set(key, operation);
+      operations.set(operation.key, operation);
       updateDependencies(operation, result.dependencies);
 
       return {
@@ -255,11 +249,8 @@ export const cacheExchange =
       pendingOperations: Operations
     ): OperationResult => {
       // Retrieve the original operation to get unfiltered variables
-      const key =
-        result.operation.kind === 'mutation'
-          ? result.operation.key + (result.operation.context._instance || 0)
-          : result.operation.key;
-      const operation = operations.get(key) || result.operation;
+      const operation =
+        operations.get(result.operation.key) || result.operation;
       if (operation.kind === 'mutation') {
         // Collect previous dependencies that have been written for optimistic updates
         const dependencies = optimisticKeysToDependencies.get(operation.key);
@@ -410,13 +401,9 @@ export const cacheExchange =
           if (!shouldReexecute) {
             /*noop*/
           } else if (!isBlockedByOptimisticUpdate(res.dependencies)) {
-            const key =
-              res.operation.kind === 'mutation'
-                ? res.operation.key + (res.operation.context._instance || 0)
-                : result.operation.key;
             client.reexecuteOperation(
               toRequestPolicy(
-                operations.get(key) || res.operation,
+                operations.get(res.operation.key) || res.operation,
                 'network-only'
               )
             );
