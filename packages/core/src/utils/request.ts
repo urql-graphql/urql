@@ -169,7 +169,7 @@ export const createRequest = <
 ): GraphQLRequest<Data, Variables> => {
   const variables = _variables || ({} as Variables);
   const query = keyDocument(_query);
-  const printedVars = stringifyVariables(variables);
+  const printedVars = stringifyVariables(variables, true);
   let key = query.__key;
   if (printedVars !== '{}') key = phash(printedVars, key);
   return { key, query, variables, extensions };
