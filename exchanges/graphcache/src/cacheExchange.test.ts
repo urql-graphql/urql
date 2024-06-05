@@ -3853,7 +3853,7 @@ describe('commutativity', () => {
   });
 });
 
-describe.only('abstract types', () => {
+describe('abstract types', () => {
   it('works with two responses giving different concrete types for a union', () => {
     const query = gql`
       query ($id: ID!) {

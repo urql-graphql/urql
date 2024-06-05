@@ -138,32 +138,26 @@ const isFragmentHeuristicallyMatching = (
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) return true;
 
-  const types = getConcreteTypes(typeCondition);
-  if (!types.has(typename)) {
-    warn(
-      'Heuristic Fragment Matching: A fragment is trying to match against the `' +
-        typename +
-        '` type, ' +
-        'but the type condition is `' +
-        typeCondition +
-        '`. Since GraphQL allows for interfaces `' +
-        typeCondition +
-        '` may be an ' +
-        'interface.\nA schema needs to be defined for this match to be deterministic, ' +
-        'otherwise the fragment will be matched heuristically!',
-      16,
-      logger
-    );
-  }
-
-  return (
-    currentOperation === 'write' ||
-    !getSelectionSet(node).some(node => {
-      if (node.kind !== Kind.FIELD) return false;
-      const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
-      return !hasField(entityKey, fieldKey);
-    })
+  warn(
+    'Heuristic Fragment Matching: A fragment is trying to match against the `' +
+      typename +
+      '` type, ' +
+      'but the type condition is `' +
+      typeCondition +
+      '`. Since GraphQL allows for interfaces `' +
+      typeCondition +
+      '` may be an ' +
+      'interface.\nA schema needs to be defined for this match to be deterministic, ' +
+      'otherwise the fragment will be matched heuristically!',
+    16,
+    logger
   );
+
+  return !getSelectionSet(node).some(node => {
+    if (node.kind !== Kind.FIELD) return false;
+    const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
+    return !hasField(entityKey, fieldKey);
+  });
 };
 
 interface SelectionIterator {
@@ -228,7 +222,12 @@ export function makeSelectionIterator(
               !fragment.typeCondition ||
               (ctx.store.schema
                 ? isInterfaceOfType(ctx.store.schema, fragment, typename)
-                : isFragmentHeuristicallyMatching(
+                : (currentOperation === 'read' &&
+                    isFragmentMatching(
+                      fragment.typeCondition.name.value,
+                      typename
+                    )) ||
+                  isFragmentHeuristicallyMatching(
                     fragment,
                     typename,
                     entityKey,
@@ -236,11 +235,12 @@ export function makeSelectionIterator(
                     ctx.store.logger
                   ));
 
-            if (isMatching) {
+            if (isMatching || currentOperation === 'write') {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
               const isFragmentOptional = isOptional(select);
               if (
+                isMatching &&
                 fragment.typeCondition &&
                 typename !== fragment.typeCondition.name.value
               ) {
@@ -266,6 +266,13 @@ export function makeSelectionIterator(
     }
   };
 }
+
+const isFragmentMatching = (typeCondition: string, typename: string | void) => {
+  if (!typename) return false;
+  if (typeCondition === typename) return true;
+  const types = getConcreteTypes(typeCondition);
+  return types.size && types.has(typename);
+};
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x == null ? null : (x as Data | NullArray<Data>);
