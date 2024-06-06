@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.1.1
+
+### Patch Changes
+
+- ⚠️ Fix where we would incorrectly match all fragment concrete types because they belong to the abstract type
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3603](https://github.com/urql-graphql/urql/pull/3603))
+
 ## 7.1.0
 
 ### Minor Changes
