@@ -492,6 +492,9 @@ export const writeType = (typename: string, entityKey: string) => {
 export const getConcreteTypes = (typename: string): Set<string> =>
   currentData!.abstractToConcreteMap.get(typename) || DEFAULT_EMPTY_SET;
 
+export const isSeenConcreteType = (typename: string): boolean =>
+  currentData!.types.has(typename);
+
 export const writeConcreteType = (
   abstractType: string,
   concreteType: string

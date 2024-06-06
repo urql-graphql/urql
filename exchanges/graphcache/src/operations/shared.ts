@@ -23,6 +23,7 @@ import {
   currentOptimistic,
   writeConcreteType,
   getConcreteTypes,
+  isSeenConcreteType,
 } from '../store/data';
 import { keyOfField } from '../store/keys';
 import type { Store } from '../store/store';
@@ -153,14 +154,11 @@ const isFragmentHeuristicallyMatching = (
     logger
   );
 
-  return (
-    currentOperation === 'write' ||
-    !getSelectionSet(node).some(node => {
-      if (node.kind !== Kind.FIELD) return false;
-      const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
-      return !hasField(entityKey, fieldKey);
-    })
-  );
+  return !getSelectionSet(node).some(node => {
+    if (node.kind !== Kind.FIELD) return false;
+    const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
+    return !hasField(entityKey, fieldKey);
+  });
 };
 
 interface SelectionIterator {
@@ -238,11 +236,12 @@ export function makeSelectionIterator(
                     ctx.store.logger
                   ));
 
-            if (isMatching) {
+            if (isMatching || currentOperation === 'write') {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
               const isFragmentOptional = isOptional(select);
               if (
+                isMatching &&
                 fragment.typeCondition &&
                 typename !== fragment.typeCondition.name.value
               ) {
@@ -272,6 +271,10 @@ export function makeSelectionIterator(
 const isFragmentMatching = (typeCondition: string, typename: string | void) => {
   if (!typename) return false;
   if (typeCondition === typename) return true;
+
+  const isProbableAbstractType = !isSeenConcreteType(typeCondition);
+  if (!isProbableAbstractType) return false;
+
   const types = getConcreteTypes(typeCondition);
   return types.size && types.has(typename);
 };
