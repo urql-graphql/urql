@@ -3,7 +3,9 @@ import type { Ref, ShallowRef } from 'vue';
 import { isRef } from 'vue';
 
 export type MaybeRef<T> = T | (() => T) | Ref<T>;
-export type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
+export type MaybeRefObj<T> = T extends {}
+  ? { [K in keyof T]: MaybeRef<T[K]> }
+  : T;
 
 export const unref = <T>(maybeRef: MaybeRef<T>): T =>
   typeof maybeRef === 'function'

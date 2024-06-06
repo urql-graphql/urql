@@ -75,7 +75,7 @@ export type UseQueryArgs<
    * documentation on the `pause` option.
    */
   pause?: MaybeRef<boolean>;
-} & MaybeRefObj<GraphQLRequestParams<Data, Variables>>;
+} & MaybeRefObj<GraphQLRequestParams<Data, MaybeRefObj<Variables>>>;
 
 /** State of the current query, your {@link useQuery} function is executing.
  *
