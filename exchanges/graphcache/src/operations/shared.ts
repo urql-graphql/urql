@@ -23,6 +23,7 @@ import {
   currentOptimistic,
   writeConcreteType,
   getConcreteTypes,
+  isSeenConcreteType,
 } from '../store/data';
 import { keyOfField } from '../store/keys';
 import type { Store } from '../store/store';
@@ -270,6 +271,10 @@ export function makeSelectionIterator(
 const isFragmentMatching = (typeCondition: string, typename: string | void) => {
   if (!typename) return false;
   if (typeCondition === typename) return true;
+
+  const isProbableAbstractType = !isSeenConcreteType(typeCondition);
+  if (!isProbableAbstractType) return false;
+
   const types = getConcreteTypes(typeCondition);
   return types.size && types.has(typename);
 };
