@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { expect, it, describe, vi } from 'vitest';
 import { CreateQueryState, createQuery } from './createQuery';
 import { renderHook, testEffect } from '@solidjs/testing-library';

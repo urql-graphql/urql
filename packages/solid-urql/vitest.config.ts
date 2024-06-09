@@ -1,13 +1,7 @@
-import { defineConfig, mergeConfig } from 'vite';
+import { mergeConfig } from 'vitest/config';
 import solidPlugin from 'vite-plugin-solid';
-import rootConfig from '../../vitest.config';
+import baseConfig from '../../vitest.config';
 
-export default mergeConfig(
-  rootConfig,
-  defineConfig({
-    plugins: [solidPlugin()],
-    test: {
-      globals: true,
-    },
-  })
-);
+export default mergeConfig(baseConfig, {
+  plugins: [solidPlugin({ hot: false })],
+});

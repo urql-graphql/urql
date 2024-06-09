@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { renderHook, testEffect } from '@solidjs/testing-library';
 import {
   OperationResult,
