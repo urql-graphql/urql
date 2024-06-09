@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { testEffect } from '@solidjs/testing-library';
 import { expect, it, describe, vi } from 'vitest';
 import { CreateMutationState, createMutation } from './createMutation';

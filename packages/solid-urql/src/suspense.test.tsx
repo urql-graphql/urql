@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { describe, it, vi } from 'vitest';
 import {
   OperationResult,
