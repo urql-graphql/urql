@@ -61,8 +61,7 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
 
   const request = computed(() => {
     let vars = unref(args.variables);
-
-    // unwrap possible nested reactive variables
+    // unwrap possible nested reactive variables with `readonly()`
     for (const prop in vars) {
       if (Object.hasOwn(vars, prop)) {
         if (isRef(vars[prop])) {
@@ -104,6 +103,8 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
     });
   };
 
+  // it's important to use `watchEffect()` here instead of `watch()`
+  // because it listening for reactive variables inside `execute()` function
   watchEffect(() => {
     source.value = !isPaused.value ? execute() : undefined;
   });
