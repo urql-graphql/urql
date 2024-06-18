@@ -1,7 +1,11 @@
 import type { DocumentNode } from 'graphql';
 import type { AnyVariables, Client, TypedDocumentNode } from '@urql/core';
-import type { WatchStopHandle } from 'vue';
-import { getCurrentInstance, onMounted, onBeforeUnmount } from 'vue';
+import {
+  getCurrentInstance,
+  onMounted,
+  onBeforeUnmount,
+  effectScope,
+} from 'vue';
 
 import { useClient } from './useClient';
 
@@ -129,11 +133,11 @@ export interface ClientHandle {
  */
 export function useClientHandle(): ClientHandle {
   const client = useClient();
-  const stops: WatchStopHandle[] = [];
+
+  const scope = effectScope();
 
   onBeforeUnmount(() => {
-    let stop: WatchStopHandle | void;
-    while ((stop = stops.shift())) stop();
+    scope.stop();
   });
 
   const handle: ClientHandle = {
@@ -142,14 +146,14 @@ export function useClientHandle(): ClientHandle {
     useQuery<T = any, V extends AnyVariables = AnyVariables>(
       args: UseQueryArgs<T, V>
     ): UseQueryResponse<T, V> {
-      return callUseQuery(args, client, stops);
+      return scope.run(() => callUseQuery(args, client))!;
     },
 
     useSubscription<T = any, R = T, V extends AnyVariables = AnyVariables>(
       args: UseSubscriptionArgs<T, V>,
       handler?: SubscriptionHandlerArg<T, R>
     ): UseSubscriptionResponse<T, R, V> {
-      return callUseSubscription(args, handler, client, stops);
+      return scope.run(() => callUseSubscription(args, handler, client))!;
     },
 
     useMutation<T = any, V extends AnyVariables = AnyVariables>(
@@ -171,7 +175,7 @@ export function useClientHandle(): ClientHandle {
             );
           }
 
-          return callUseQuery(args, client, stops);
+          return scope.run(() => callUseQuery(args, client))!;
         },
 
         useSubscription<T = any, R = T, V extends AnyVariables = AnyVariables>(
@@ -184,7 +188,7 @@ export function useClientHandle(): ClientHandle {
             );
           }
 
-          return callUseSubscription(args, handler, client, stops);
+          return scope.run(() => callUseSubscription(args, handler, client))!;
         },
       });
     });
