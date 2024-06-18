@@ -1,5 +1,14 @@
 # @urql/vue
 
+## 1.2.2
+
+### Patch Changes
+
+- ⚠️ Fix reactaive typings for `variables` (See [#3605](https://github.com/urql-graphql/urql/pull/3605))
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [`118d74b2`](https://github.com/urql-graphql/urql/commit/118d74b238007264cacfb91fc12de74370d5766e))
+- Restore the possibility to use a getter for the pause property
+  Submitted by [@arkandias](https://github.com/arkandias) (See [#3598](https://github.com/urql-graphql/urql/pull/3598))
+
 ## 1.2.1
 
 ### Patch Changes
