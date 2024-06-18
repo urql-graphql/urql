@@ -242,7 +242,7 @@ export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
 
 export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   args: UseQueryArgs<T, V>,
-  client: Ref<Client> = useClient(),
+  client: Ref<Client> = useClient()
 ): UseQueryResponse<T, V> {
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
