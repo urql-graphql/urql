@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import type { Ref, WatchStopHandle } from 'vue';
+import type { Ref } from 'vue';
 import { isRef, reactive, ref, shallowRef, watch, watchEffect } from 'vue';
 
 import type { Subscription, Source } from 'wonka';
@@ -242,8 +242,7 @@ export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
 
 export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   _args: UseQueryArgs<T, V>,
-  client: Ref<Client> = useClient(),
-  stops: WatchStopHandle[] = []
+  client: Ref<Client> = useClient()
 ): UseQueryResponse<T, V> {
   const args = reactive(_args) as UseQueryArgs<T, V>;
 
@@ -256,7 +255,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
 
   const isPaused: Ref<boolean> = ref(!!unref(args.pause));
   if (isRef(args.pause) || typeof args.pause === 'function') {
-    stops.push(watch(args.pause, value => (isPaused.value = value)));
+    watch(args.pause, value => (isPaused.value = value));
   }
 
   const input = shallowRef({
@@ -267,29 +266,25 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
-  stops.push(
-    watchEffect(() => {
-      updateShallowRef(input, {
-        request: createRequest<T, V>(
-          unref(args.query),
-          unref(args.variables) as V
-        ),
-        requestPolicy: unref(args.requestPolicy),
-        isPaused: isPaused.value,
-      });
-    }, watchOptions)
-  );
+  watchEffect(() => {
+    updateShallowRef(input, {
+      request: createRequest<T, V>(
+        unref(args.query),
+        unref(args.variables) as V
+      ),
+      requestPolicy: unref(args.requestPolicy),
+      isPaused: isPaused.value,
+    });
+  }, watchOptions);
 
-  stops.push(
-    watchEffect(() => {
-      source.value = !input.value.isPaused
-        ? client.value.executeQuery<T, V>(input.value.request, {
-            requestPolicy: unref(args.requestPolicy),
-            ...unref(args.context),
-          })
-        : undefined;
-    }, watchOptions)
-  );
+  watchEffect(() => {
+    source.value = !input.value.isPaused
+      ? client.value.executeQuery<T, V>(input.value.request, {
+          requestPolicy: unref(args.requestPolicy),
+          ...unref(args.context),
+        })
+      : undefined;
+  }, watchOptions);
 
   const state: UseQueryState<T, V> = {
     data,
@@ -338,41 +333,39 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     },
   };
 
-  stops.push(
-    watchEffect(
-      onInvalidate => {
-        if (source.value) {
-          fetching.value = true;
-          stale.value = false;
+  watchEffect(
+    onInvalidate => {
+      if (source.value) {
+        fetching.value = true;
+        stale.value = false;
 
-          onInvalidate(
-            pipe(
-              source.value,
-              onEnd(() => {
-                fetching.value = false;
-                stale.value = false;
-              }),
-              subscribe(res => {
-                data.value = res.data;
-                stale.value = !!res.stale;
-                fetching.value = false;
-                error.value = res.error;
-                operation.value = res.operation;
-                extensions.value = res.extensions;
-              })
-            ).unsubscribe
-          );
-        } else {
-          fetching.value = false;
-          stale.value = false;
-        }
-      },
-      {
-        // NOTE: This part of the query pipeline is only initialised once and will need
-        // to do so synchronously
-        flush: 'sync',
+        onInvalidate(
+          pipe(
+            source.value,
+            onEnd(() => {
+              fetching.value = false;
+              stale.value = false;
+            }),
+            subscribe(res => {
+              data.value = res.data;
+              stale.value = !!res.stale;
+              fetching.value = false;
+              error.value = res.error;
+              operation.value = res.operation;
+              extensions.value = res.extensions;
+            })
+          ).unsubscribe
+        );
+      } else {
+        fetching.value = false;
+        stale.value = false;
       }
-    )
+    },
+    {
+      // NOTE: This part of the query pipeline is only initialised once and will need
+      // to do so synchronously
+      flush: 'sync',
+    }
   );
 
   const response: UseQueryResponse<T, V> = {

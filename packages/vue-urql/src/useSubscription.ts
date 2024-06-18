@@ -3,7 +3,7 @@
 import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
-import type { Ref, WatchStopHandle } from 'vue';
+import type { Ref } from 'vue';
 import { isRef, reactive, ref, shallowRef, watch, watchEffect } from 'vue';
 
 import type {
@@ -241,8 +241,7 @@ export function callUseSubscription<
 >(
   _args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>,
-  client: Ref<Client> = useClient(),
-  stops: WatchStopHandle[] = []
+  client: Ref<Client> = useClient()
 ): UseSubscriptionResponse<T, R, V> {
   const args = reactive(_args) as UseSubscriptionArgs<T, V>;
 
@@ -256,7 +255,7 @@ export function callUseSubscription<
   const scanHandler = ref(handler);
   const isPaused: Ref<boolean> = ref(!!unref(args.pause));
   if (isRef(args.pause) || typeof args.pause === 'function') {
-    stops.push(watch(args.pause, value => (isPaused.value = value)));
+    watch(args.pause, value => (isPaused.value = value));
   }
 
   const input = shallowRef({
@@ -266,59 +265,53 @@ export function callUseSubscription<
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
-  stops.push(
-    watchEffect(() => {
-      updateShallowRef(input, {
-        request: createRequest<T, V>(
-          unref(args.query),
-          unref(args.variables) as V
-        ),
-        isPaused: isPaused.value,
-      });
-    }, watchOptions)
-  );
+  watchEffect(() => {
+    updateShallowRef(input, {
+      request: createRequest<T, V>(
+        unref(args.query),
+        unref(args.variables) as V
+      ),
+      isPaused: isPaused.value,
+    });
+  }, watchOptions);
 
-  stops.push(
-    watchEffect(() => {
-      source.value = !isPaused.value
-        ? client.value.executeSubscription<T, V>(input.value.request, {
-            ...unref(args.context),
+  watchEffect(() => {
+    source.value = !isPaused.value
+      ? client.value.executeSubscription<T, V>(input.value.request, {
+          ...unref(args.context),
+        })
+      : undefined;
+  }, watchOptions);
+
+  watchEffect(onInvalidate => {
+    if (source.value) {
+      fetching.value = true;
+
+      onInvalidate(
+        pipe(
+          source.value,
+          onEnd(() => {
+            fetching.value = false;
+          }),
+          subscribe(result => {
+            fetching.value = true;
+            data.value =
+              result.data != null
+                ? typeof scanHandler.value === 'function'
+                  ? scanHandler.value(data.value as any, result.data)
+                  : result.data
+                : (result.data as any);
+            error.value = result.error;
+            extensions.value = result.extensions;
+            stale.value = !!result.stale;
+            operation.value = result.operation;
           })
-        : undefined;
-    }, watchOptions)
-  );
-
-  stops.push(
-    watchEffect(onInvalidate => {
-      if (source.value) {
-        fetching.value = true;
-
-        onInvalidate(
-          pipe(
-            source.value,
-            onEnd(() => {
-              fetching.value = false;
-            }),
-            subscribe(result => {
-              fetching.value = true;
-              data.value =
-                result.data != null
-                  ? typeof scanHandler.value === 'function'
-                    ? scanHandler.value(data.value as any, result.data)
-                    : result.data
-                  : (result.data as any);
-              error.value = result.error;
-              extensions.value = result.extensions;
-              stale.value = !!result.stale;
-              operation.value = result.operation;
-            })
-          ).unsubscribe
-        );
-      } else {
-        fetching.value = false;
-      }
-    }, watchOptions)
-  );
+        ).unsubscribe
+      );
+    } else {
+      fetching.value = false;
+    }
+  }, watchOptions);
 
   const state: UseSubscriptionResponse<T, R, V> = {
     data,
