@@ -1,5 +1,12 @@
 # @urql/vue
 
+## 1.3.1
+
+### Patch Changes
+
+- ⚠️ Fix variables losing reactivity
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3614](https://github.com/urql-graphql/urql/pull/3614))
+
 ## 1.3.0
 
 ### Minor Changes
