@@ -108,6 +108,38 @@ describe('useQuery', () => {
     );
   });
 
+  it('reacts to variables changing', async () => {
+    const executeQuery = vi
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(request => {
+        return pipe(
+          fromValue({ operation: request, data: { test: true } }),
+          delay(1)
+        ) as any;
+      });
+
+    const variables = {
+      test: ref(1),
+    };
+    const query$ = useQuery({
+      query: '{ test }',
+      variables,
+    });
+
+    await query$;
+
+    expect(executeQuery).toHaveBeenCalledTimes(1);
+
+    expect(query$.operation.value).toHaveProperty('variables.test', 1);
+
+    variables.test.value = 2;
+
+    await query$;
+
+    expect(executeQuery).toHaveBeenCalledTimes(2);
+    expect(query$.operation.value).toHaveProperty('variables.test', 2);
+  });
+
   it('pauses query when asked to do so', async () => {
     const subject = makeSubject<any>();
     const executeQuery = vi
