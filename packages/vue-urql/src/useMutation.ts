@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref } from 'vue';
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import type { DocumentNode } from 'graphql';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
@@ -138,9 +138,9 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = ref();
-  const operation: Ref<Operation<T, V> | undefined> = ref();
-  const extensions: Ref<Record<string, any> | undefined> = ref();
+  const error: Ref<CombinedError | undefined> = shallowRef();
+  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
+  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
 
   return {
     data,
