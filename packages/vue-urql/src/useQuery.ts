@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref, WatchStopHandle } from 'vue';
-import { reactive } from 'vue';
-import { isRef, ref, shallowRef, watch, watchEffect } from 'vue';
+import { isRef, ref, shallowRef, watch, watchEffect, reactive } from 'vue';
 
 import type { Subscription, Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
