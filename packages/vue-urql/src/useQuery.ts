@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref, WatchStopHandle } from 'vue';
-import { isRef, reactive, ref, shallowRef, watch, watchEffect } from 'vue';
+import { isRef, ref, shallowRef, watch, watchEffect } from 'vue';
 
 import type { Subscription, Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
@@ -241,12 +241,10 @@ export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
 }
 
 export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
-  _args: UseQueryArgs<T, V>,
+  args: UseQueryArgs<T, V>,
   client: Ref<Client> = useClient(),
   stops: WatchStopHandle[] = []
 ): UseQueryResponse<T, V> {
-  const args = reactive(_args) as UseQueryArgs<T, V>;
-
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
