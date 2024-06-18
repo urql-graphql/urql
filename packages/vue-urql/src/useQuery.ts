@@ -250,9 +250,9 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = ref();
-  const operation: Ref<Operation<T, V> | undefined> = ref();
-  const extensions: Ref<Record<string, any> | undefined> = ref();
+  const error: Ref<CombinedError | undefined> = shallowRef();
+  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
+  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
 
   const isPaused: Ref<boolean> = ref(!!unref(args.pause));
   if (isRef(args.pause) || typeof args.pause === 'function') {
