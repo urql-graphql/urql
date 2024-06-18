@@ -1,5 +1,12 @@
 # @urql/vue
 
+## 1.3.2
+
+### Patch Changes
+
+- ⚠️ Fix deep options reactivity for subscriptions
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3616](https://github.com/urql-graphql/urql/pull/3616))
+
 ## 1.3.1
 
 ### Patch Changes
