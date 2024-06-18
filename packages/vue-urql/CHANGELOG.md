@@ -1,5 +1,14 @@
 # @urql/vue
 
+## 1.3.0
+
+### Minor Changes
+
+- Use `shallowRef` to avoid creating deeply reactive objects for heavy objects
+  Submitted by [@negezor](https://github.com/negezor) (See [#3611](https://github.com/urql-graphql/urql/pull/3611))
+- Remove wrapping request `args` in `reactive` to fix memory leak
+  Submitted by [@negezor](https://github.com/negezor) (See [#3612](https://github.com/urql-graphql/urql/pull/3612))
+
 ## 1.2.2
 
 ### Patch Changes
