@@ -1,5 +1,5 @@
 import type { App, Ref } from 'vue';
-import { getCurrentInstance, inject, provide, isRef, ref } from 'vue';
+import { getCurrentInstance, inject, provide, isRef, shallowRef } from 'vue';
 import type { ClientOptions } from '@urql/core';
 import { Client } from '@urql/core';
 
@@ -36,7 +36,7 @@ const clientsPerInstance = new WeakMap<{}, Ref<Client>>();
 export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
   let client: Ref<Client>;
   if (!isRef(opts)) {
-    client = ref(opts instanceof Client ? opts : new Client(opts));
+    client = shallowRef(opts instanceof Client ? opts : new Client(opts));
   } else {
     client = opts;
   }
@@ -78,7 +78,7 @@ export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
 export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
   let client: Ref<Client>;
   if (!isRef(opts)) {
-    client = ref(opts instanceof Client ? opts : new Client(opts));
+    client = shallowRef(opts instanceof Client ? opts : new Client(opts));
   } else {
     client = opts;
   }

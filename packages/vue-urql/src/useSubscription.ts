@@ -4,7 +4,7 @@ import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type { Ref } from 'vue';
-import { isRef, reactive, ref, shallowRef, watch, watchEffect } from 'vue';
+import { isRef, ref, shallowRef, watch, watchEffect } from 'vue';
 
 import type {
   Client,
@@ -239,18 +239,16 @@ export function callUseSubscription<
   R = T,
   V extends AnyVariables = AnyVariables,
 >(
-  _args: UseSubscriptionArgs<T, V>,
+  args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>,
   client: Ref<Client> = useClient()
 ): UseSubscriptionResponse<T, R, V> {
-  const args = reactive(_args) as UseSubscriptionArgs<T, V>;
-
   const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = ref();
-  const operation: Ref<Operation<T, V> | undefined> = ref();
-  const extensions: Ref<Record<string, any> | undefined> = ref();
+  const error: Ref<CombinedError | undefined> = shallowRef();
+  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
+  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
 
   const scanHandler = ref(handler);
   const isPaused: Ref<boolean> = ref(!!unref(args.pause));
