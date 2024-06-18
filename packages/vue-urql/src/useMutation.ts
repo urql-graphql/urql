@@ -63,7 +63,7 @@ export interface UseMutationResponse<T, V extends AnyVariables = AnyVariables> {
    *
    * @param variables - variables using which the mutation will be executed.
    * @param context - optionally, context options that will be merged with
-   * {@link UseMutationArgs.context} and the `Client`’s options.
+   * the `Client`’s options.
    * @returns the {@link OperationResult} of the mutation.
    *
    * @remarks

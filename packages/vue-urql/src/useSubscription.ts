@@ -3,9 +3,8 @@
 import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
-import type { WatchStopHandle, Ref } from 'vue';
-import { isRef } from 'vue';
-import { ref, shallowRef, watchEffect, reactive } from 'vue';
+import type { Ref, WatchStopHandle } from 'vue';
+import { isRef, reactive, ref, shallowRef, watch, watchEffect } from 'vue';
 
 import type {
   Client,
@@ -19,6 +18,7 @@ import type {
 import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
+
 import type { MaybeRef, MaybeRefObj } from './utils';
 import { unref, updateShallowRef } from './utils';
 
@@ -36,7 +36,7 @@ export type UseSubscriptionArgs<
    * @remarks
    * `pause` may be set to `true` to stop {@link useSubscription} from starting
    * its subscription automatically. This will pause the subscription until
-   * {@link UseSubscriptonState.resume} is called, or, if `pause` is a reactive
+   * {@link UseSubscriptionResponse.resume} is called, or, if `pause` is a reactive
    * ref of a boolean, until this ref changes to `true`.
    */
   pause?: MaybeRef<boolean>;
@@ -143,7 +143,7 @@ export interface UseSubscriptionResponse<
    *
    * @remarks
    * This is the subscription {@link Operation} that is currently active.
-   * When {@link UseQueryState.fetching} is `true`, this is the
+   * When {@link UseSubscriptionResponse.fetching} is `true`, this is the
    * last `Operation` that the current state was for.
    */
   operation: Ref<Operation<T, V> | undefined>;
@@ -254,9 +254,10 @@ export function callUseSubscription<
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
   const scanHandler = ref(handler);
-  const isPaused: Ref<boolean> = isRef(_args.pause)
-    ? _args.pause
-    : ref(!!_args.pause);
+  const isPaused: Ref<boolean> = ref(!!unref(args.pause));
+  if (isRef(args.pause) || typeof args.pause === 'function') {
+    stops.push(watch(args.pause, value => (isPaused.value = value)));
+  }
 
   const input = shallowRef({
     request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
