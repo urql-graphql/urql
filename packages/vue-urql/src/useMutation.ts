@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref } from 'vue';
-import { ref, shallowRef } from 'vue';
+import { ref } from 'vue';
 import type { DocumentNode } from 'graphql';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
@@ -18,6 +18,7 @@ import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 import type { MaybeRef } from './utils';
+import { useRequestState } from './utils';
 import { unref } from './utils';
 
 /** State of the last mutation executed by {@link useMutation}.
@@ -136,11 +137,11 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
-  const stale: Ref<boolean> = ref(false);
-  const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = shallowRef();
-  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
-  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
+
+  const { fetching, operation, extensions, stale, error } = useRequestState<
+    T,
+    V
+  >();
 
   return {
     data,
