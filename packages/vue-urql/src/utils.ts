@@ -120,17 +120,22 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
     }
   };
 
-  const execute = (opts?: Partial<OperationContext>) => {
+  const executeRaw = (opts?: Partial<OperationContext>) => {
     return client.value[method]<T, V>(request.value, {
       ...requestOptions.value,
       ...opts,
     });
   };
 
+  const execute = (opts?: Partial<OperationContext>) => {
+    source.value = executeRaw(opts);
+    return source.value;
+  };
+
   // it's important to use `watchEffect()` here instead of `watch()`
   // because it listening for reactive variables inside `execute()` function
   watchEffect(() => {
-    source.value = !isPaused.value ? execute() : undefined;
+    source.value = !isPaused.value ? executeRaw() : undefined;
   });
 
   return {

@@ -262,7 +262,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     pause,
     resume,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      const s = (source.value = execute(opts));
+      const s = execute(opts);
 
       return {
         ...response,

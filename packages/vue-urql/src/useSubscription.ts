@@ -293,7 +293,7 @@ export function callUseSubscription<
     executeSubscription(
       opts?: Partial<OperationContext>
     ): UseSubscriptionResponse<T, R, V> {
-      source.value = execute(opts);
+      execute(opts);
       return state;
     },
   };
