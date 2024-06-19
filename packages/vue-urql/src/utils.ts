@@ -23,10 +23,10 @@ export type MaybeRefObj<T> = T extends {}
   ? { [K in keyof T]: MaybeRef<T[K]> }
   : T;
 
-export type MutationQuery<T = any, V extends AnyVariables = AnyVariables> =
-  | TypedDocumentNode<T, V>
-  | DocumentNode
-  | string;
+export type MutationDocumentNode<
+  T = any,
+  V extends AnyVariables = AnyVariables,
+> = TypedDocumentNode<T, V> | DocumentNode | string;
 
 const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
   typeof maybeRef === 'function'
@@ -42,7 +42,7 @@ export const createRequestWithArgs = <
   args:
     | UseQueryArgs<T, V>
     | UseSubscriptionArgs<T, V>
-    | { query: MaybeRef<MutationQuery>; variables: V }
+    | { query: MaybeRef<MutationDocumentNode>; variables: V }
 ) => {
   let vars = unwrap(args.variables);
   // unwrap possible nested reactive variables with `readonly()`

@@ -14,7 +14,7 @@ import type {
 } from '@urql/core';
 
 import { useClient } from './useClient';
-import type { MaybeRef, MutationQuery } from './utils';
+import type { MaybeRef, MutationDocumentNode } from './utils';
 import { createRequestWithArgs, useRequestState } from './utils';
 
 /** State of the last mutation executed by {@link useMutation}.
@@ -123,13 +123,13 @@ export interface UseMutationResponse<T, V extends AnyVariables = AnyVariables> {
  * ```
  */
 export function useMutation<T = any, V extends AnyVariables = AnyVariables>(
-  query: MutationQuery
+  query: MutationDocumentNode
 ): UseMutationResponse<T, V> {
   return callUseMutation(query);
 }
 
 export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
-  query: MaybeRef<MutationQuery>,
+  query: MaybeRef<MutationDocumentNode>,
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
