@@ -239,7 +239,6 @@ export function callUseSubscription<
   client: Ref<Client> = useClient()
 ): UseSubscriptionResponse<T, R, V> {
   const data: Ref<R | undefined> = ref();
-  const scanHandler = ref(handler);
 
   const { fetching, operation, extensions, stale, error } = useRequestState<
     T,
@@ -269,12 +268,10 @@ export function callUseSubscription<
             stale.value = !!result.stale;
             operation.value = result.operation;
 
-            if (result.data != null && scanHandler) {
-              const handler = isRef(scanHandler)
-                ? scanHandler.value
-                : scanHandler;
-              if (typeof handler === 'function') {
-                data.value = handler(data.value, result.data);
+            if (result.data != null && handler) {
+              const cb = isRef(handler) ? handler.value : handler;
+              if (typeof cb === 'function') {
+                data.value = cb(data.value, result.data);
                 return;
               }
             }

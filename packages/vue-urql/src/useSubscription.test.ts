@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { OperationResult, OperationResultSource } from '@urql/core';
-import { nextTick, reactive, ref } from 'vue';
+import { nextTick, readonly, ref } from 'vue';
 import { vi, expect, it, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => ({
@@ -25,13 +25,11 @@ describe('useSubscription', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const sub = reactive(
-      useSubscription({
-        query: `{ test }`,
-      })
-    );
+    const sub = useSubscription({
+      query: `{ test }`,
+    });
 
-    expect(sub).toMatchObject({
+    expect(readonly(sub)).toMatchObject({
       data: undefined,
       stale: false,
       fetching: true,
@@ -53,12 +51,13 @@ describe('useSubscription', () => {
       expect.any(Object)
     );
 
-    expect(sub.fetching).toBe(true);
+    expect(sub.fetching.value).toBe(true);
 
     subject.next({ data: { test: true } });
-    expect(sub.data).toEqual({ test: true });
+    expect(sub.data.value).toHaveProperty('test', true);
+
     subject.complete();
-    expect(sub.fetching).toBe(false);
+    expect(sub.fetching.value).toBe(false);
   });
 
   it('updates the executed subscription when inputs change', async () => {
@@ -70,12 +69,10 @@ describe('useSubscription', () => {
       );
 
     const variables = ref({});
-    const sub = reactive(
-      useSubscription({
-        query: `{ test }`,
-        variables,
-      })
-    );
+    const sub = useSubscription({
+      query: `{ test }`,
+      variables,
+    });
 
     expect(executeSubscription).toHaveBeenCalledWith(
       {
@@ -87,7 +84,7 @@ describe('useSubscription', () => {
     );
 
     subject.next({ data: { test: true } });
-    expect(sub.data).toEqual({ test: true });
+    expect(sub.data.value).toHaveProperty('test', true);
 
     variables.value = { test: true };
     await nextTick();
@@ -101,9 +98,10 @@ describe('useSubscription', () => {
       expect.any(Object)
     );
 
-    expect(sub.fetching).toBe(true);
-    expect(sub.data).toEqual({ test: true });
+    expect(sub.fetching.value).toBe(true);
+    expect(sub.data.value).toHaveProperty('test', true);
   });
+
   it('supports a custom scanning handler', async () => {
     const subject = makeSubject<any>();
     const executeSubscription = vi
@@ -115,13 +113,12 @@ describe('useSubscription', () => {
     const scanHandler = (currentState: any, nextState: any) => ({
       counter: (currentState ? currentState.counter : 0) + nextState.counter,
     });
-    const sub = reactive(
-      useSubscription(
-        {
-          query: `subscription { counter }`,
-        },
-        scanHandler
-      )
+
+    const sub = useSubscription(
+      {
+        query: `subscription { counter }`,
+      },
+      scanHandler
     );
 
     expect(executeSubscription).toHaveBeenCalledWith(
@@ -134,9 +131,9 @@ describe('useSubscription', () => {
     );
 
     subject.next({ data: { counter: 1 } });
-    expect(sub.data).toEqual({ counter: 1 });
+    expect(sub.data.value).toHaveProperty('counter', 1);
 
     subject.next({ data: { counter: 2 } });
-    expect(sub.data).toEqual({ counter: 3 });
+    expect(sub.data.value).toHaveProperty('counter', 3);
   });
 });
