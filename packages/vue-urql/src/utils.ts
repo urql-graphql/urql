@@ -129,7 +129,6 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
 
   const execute = (opts?: Partial<OperationContext>) => {
     source.value = executeRaw(opts);
-    return source.value;
   };
 
   // it's important to use `watchEffect()` here instead of `watch()`

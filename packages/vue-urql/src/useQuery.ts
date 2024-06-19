@@ -251,42 +251,6 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     'executeQuery'
   );
 
-  const state: UseQueryState<T, V> = {
-    data,
-    stale,
-    error,
-    operation,
-    extensions,
-    fetching,
-    isPaused,
-    pause,
-    resume,
-    executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      const s = execute(opts);
-
-      return {
-        ...response,
-        then(onFulfilled, onRejected) {
-          let sub: Subscription | void;
-          return new Promise<UseQueryState<T, V>>(resolve => {
-            let hasResult = false;
-            sub = pipe(
-              s,
-              subscribe(() => {
-                if (!state.fetching.value && !state.stale.value) {
-                  if (sub) sub.unsubscribe();
-                  hasResult = true;
-                  resolve(state);
-                }
-              })
-            );
-            if (hasResult) sub.unsubscribe();
-          }).then(onFulfilled, onRejected);
-        },
-      };
-    },
-  };
-
   watchEffect(
     onInvalidate => {
       if (source.value) {
@@ -322,29 +286,45 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     }
   );
 
-  const response: UseQueryResponse<T, V> = {
-    ...state,
-    then(onFulfilled, onRejected) {
-      let sub: Subscription | void;
-      const promise = new Promise<UseQueryState<T, V>>(resolve => {
-        if (!source.value) return resolve(state);
-        let hasResult = false;
-        sub = pipe(
-          source.value,
-          subscribe(() => {
-            if (!state.fetching.value && !state.stale.value) {
-              if (sub) sub.unsubscribe();
-              hasResult = true;
-              resolve(state);
-            }
-          })
-        );
-        if (hasResult) sub.unsubscribe();
-      });
+  const then: UseQueryResponse<T, V>['then'] = (onFulfilled, onRejected) => {
+    let sub: Subscription | void;
 
-      return promise.then(onFulfilled, onRejected);
+    const promise = new Promise<UseQueryState<T, V>>(resolve => {
+      if (!source.value) {
+        return resolve(state);
+      }
+      let hasResult = false;
+      sub = pipe(
+        source.value,
+        subscribe(() => {
+          if (!state.fetching.value && !state.stale.value) {
+            if (sub) sub.unsubscribe();
+            hasResult = true;
+            resolve(state);
+          }
+        })
+      );
+      if (hasResult) sub.unsubscribe();
+    });
+
+    return promise.then(onFulfilled, onRejected);
+  };
+
+  const state: UseQueryState<T, V> = {
+    data,
+    stale,
+    error,
+    operation,
+    extensions,
+    fetching,
+    isPaused,
+    pause,
+    resume,
+    executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
+      execute(opts);
+      return { ...state, then };
     },
   };
 
-  return response;
+  return { ...state, then };
 }
