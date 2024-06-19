@@ -64,7 +64,8 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
     // unwrap possible nested reactive variables with `readonly()`
     for (const prop in vars) {
       if (Object.hasOwn(vars, prop)) {
-        if (isRef(vars[prop])) {
+        const value = vars[prop];
+        if (value && (typeof value === 'object' || isRef(value))) {
           vars = readonly(vars);
           break;
         }
