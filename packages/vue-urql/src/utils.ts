@@ -5,6 +5,8 @@ import type {
   Operation,
   OperationContext,
   OperationResult,
+  OperationResultSource,
+  TypedDocumentNode,
 } from '@urql/core';
 import { createRequest } from '@urql/core';
 import type { Ref } from 'vue';
@@ -12,14 +14,19 @@ import { watchEffect } from 'vue';
 import { isReadonly } from 'vue';
 import { computed, readonly, ref, shallowRef } from 'vue';
 import { isRef } from 'vue';
-import type { Source } from 'wonka';
 import type { UseSubscriptionArgs } from './useSubscription';
 import type { UseQueryArgs } from './useQuery';
+import type { DocumentNode } from 'graphql/index';
 
 export type MaybeRef<T> = T | (() => T) | Ref<T>;
 export type MaybeRefObj<T> = T extends {}
   ? { [K in keyof T]: MaybeRef<T[K]> }
   : T;
+
+export type MutationQuery<T = any, V extends AnyVariables = AnyVariables> =
+  | TypedDocumentNode<T, V>
+  | DocumentNode
+  | string;
 
 export const unref = <T>(maybeRef: MaybeRef<T>): T =>
   typeof maybeRef === 'function'
@@ -27,6 +34,29 @@ export const unref = <T>(maybeRef: MaybeRef<T>): T =>
     : maybeRef != null && isRef(maybeRef)
     ? maybeRef.value
     : maybeRef;
+
+export const createRequestWithArgs = <
+  T = any,
+  V extends AnyVariables = AnyVariables,
+>(
+  args:
+    | UseQueryArgs<T, V>
+    | UseSubscriptionArgs<T, V>
+    | { query: MaybeRef<MutationQuery>; variables: V }
+) => {
+  let vars = unref(args.variables);
+  // unwrap possible nested reactive variables with `readonly()`
+  for (const prop in vars) {
+    if (Object.hasOwn(vars, prop)) {
+      const value = vars[prop];
+      if (value && (typeof value === 'object' || isRef(value))) {
+        vars = readonly(vars);
+        break;
+      }
+    }
+  }
+  return createRequest<T, V>(unref(args.query), vars as V);
+};
 
 export const useRequestState = <
   T = any,
@@ -51,7 +81,8 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
   client: Ref<Client>,
   method: keyof Pick<Client, 'executeSubscription' | 'executeQuery'>
 ) {
-  const source: Ref<Source<OperationResult<T, V>> | undefined> = shallowRef();
+  const source: Ref<OperationResultSource<OperationResult<T, V>> | undefined> =
+    shallowRef();
 
   const isPaused: Ref<boolean> = isRef(args.pause)
     ? args.pause
@@ -59,20 +90,7 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
     ? computed(args.pause)
     : ref(!!args.pause);
 
-  const request = computed(() => {
-    let vars = unref(args.variables);
-    // unwrap possible nested reactive variables with `readonly()`
-    for (const prop in vars) {
-      if (Object.hasOwn(vars, prop)) {
-        const value = vars[prop];
-        if (value && (typeof value === 'object' || isRef(value))) {
-          vars = readonly(vars);
-          break;
-        }
-      }
-    }
-    return createRequest<T, V>(unref(args.query), vars as V);
-  });
+  const request = computed(() => createRequestWithArgs(args));
 
   const requestOptions = computed(() => {
     return 'requestPolicy' in args
