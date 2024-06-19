@@ -19,8 +19,7 @@ import type {
 import { useClient } from './useClient';
 
 import type { MaybeRef, MaybeRefObj } from './utils';
-import { useRequestState } from './utils';
-import { useClientState } from './utils';
+import { useRequestState, useClientState } from './utils';
 
 /** Input arguments for the {@link useQuery} function.
  *

@@ -10,13 +10,18 @@ import type {
 } from '@urql/core';
 import { createRequest } from '@urql/core';
 import type { Ref } from 'vue';
-import { watchEffect } from 'vue';
-import { isReadonly } from 'vue';
-import { computed, readonly, ref, shallowRef } from 'vue';
-import { isRef } from 'vue';
+import {
+  watchEffect,
+  isReadonly,
+  computed,
+  readonly,
+  ref,
+  shallowRef,
+  isRef,
+} from 'vue';
 import type { UseSubscriptionArgs } from './useSubscription';
 import type { UseQueryArgs } from './useQuery';
-import type { DocumentNode } from 'graphql/index';
+import type { DocumentNode } from 'graphql';
 
 export type MaybeRef<T> = T | (() => T) | Ref<T>;
 export type MaybeRefObj<T> = T extends {}
