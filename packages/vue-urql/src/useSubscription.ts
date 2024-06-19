@@ -3,7 +3,7 @@
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type { Ref } from 'vue';
-import { ref, watchEffect } from 'vue';
+import { isRef, ref, watchEffect } from 'vue';
 
 import type {
   Client,
@@ -86,7 +86,9 @@ export type UseSubscriptionArgs<
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 /** A {@link SubscriptionHandler} or a reactive ref of one. */
-export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
+export type SubscriptionHandlerArg<T, R> =
+  | Ref<SubscriptionHandler<T, R>>
+  | SubscriptionHandler<T, R>;
 
 /** State of the current query, your {@link useSubscription} function is executing.
  *
@@ -222,7 +224,7 @@ export function useSubscription<
   V extends AnyVariables = AnyVariables,
 >(
   args: UseSubscriptionArgs<T, V>,
-  handler?: MaybeRef<SubscriptionHandler<T, R>>
+  handler?: SubscriptionHandlerArg<T, R>
 ): UseSubscriptionResponse<T, R, V> {
   return callUseSubscription(args, handler);
 }
@@ -233,7 +235,7 @@ export function callUseSubscription<
   V extends AnyVariables = AnyVariables,
 >(
   args: UseSubscriptionArgs<T, V>,
-  handler?: MaybeRef<SubscriptionHandler<T, R>>,
+  handler?: SubscriptionHandlerArg<T, R>,
   client: Ref<Client> = useClient()
 ): UseSubscriptionResponse<T, R, V> {
   const data: Ref<R | undefined> = ref();
@@ -262,16 +264,21 @@ export function callUseSubscription<
           }),
           subscribe(result => {
             fetching.value = true;
-            data.value =
-              result.data != null
-                ? typeof scanHandler.value === 'function'
-                  ? scanHandler.value(data.value as any, result.data)
-                  : result.data
-                : (result.data as any);
             error.value = result.error;
             extensions.value = result.extensions;
             stale.value = !!result.stale;
             operation.value = result.operation;
+
+            if (result.data != null && scanHandler) {
+              const handler = isRef(scanHandler)
+                ? scanHandler.value
+                : scanHandler;
+              if (typeof handler === 'function') {
+                data.value = handler(data.value, result.data);
+                return;
+              }
+            }
+            data.value = result.data as R;
           })
         ).unsubscribe
       );
