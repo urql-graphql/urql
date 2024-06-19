@@ -1,5 +1,5 @@
 import { OperationResult, OperationResultSource } from '@urql/core';
-import { reactive } from 'vue';
+import { readonly } from 'vue';
 import { vi, expect, it, beforeEach, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => {
@@ -30,15 +30,13 @@ describe('useMutation', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const mutation = reactive(
-      useMutation(gql`
-        mutation {
-          test
-        }
-      `)
-    );
+    const mutation = useMutation(gql`
+      mutation {
+        test
+      }
+    `);
 
-    expect(mutation).toMatchObject({
+    expect(readonly(mutation)).toMatchObject({
       data: undefined,
       stale: false,
       fetching: false,
@@ -50,18 +48,18 @@ describe('useMutation', () => {
 
     const promise = mutation.executeMutation({ test: true });
 
-    expect(mutation.fetching).toBe(true);
-    expect(mutation.stale).toBe(false);
-    expect(mutation.error).toBe(undefined);
+    expect(mutation.fetching.value).toBe(true);
+    expect(mutation.stale.value).toBe(false);
+    expect(mutation.error.value).toBe(undefined);
 
     expect(clientMutation).toHaveBeenCalledTimes(1);
 
     subject.next({ data: { test: true }, stale: false });
-    await promise.then(function () {
-      expect(mutation.fetching).toBe(false);
-      expect(mutation.stale).toBe(false);
-      expect(mutation.error).toBe(undefined);
-      expect(mutation.data).toEqual({ test: true });
-    });
+
+    await promise;
+    expect(mutation.fetching.value).toBe(false);
+    expect(mutation.stale.value).toBe(false);
+    expect(mutation.error.value).toBe(undefined);
+    expect(mutation.data.value).toHaveProperty('test', true);
   });
 });

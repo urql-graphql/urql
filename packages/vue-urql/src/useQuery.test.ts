@@ -3,7 +3,7 @@ import {
   OperationResultSource,
   RequestPolicy,
 } from '@urql/core';
-import { computed, nextTick, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, readonly, ref } from 'vue';
 import { vi, expect, it, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => ({
@@ -45,12 +45,11 @@ describe('useQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const _query = useQuery({
+    const query = useQuery({
       query: `{ test }`,
     });
-    const query = reactive(_query);
 
-    expect(query).toMatchObject({
+    expect(readonly(query)).toMatchObject({
       data: undefined,
       stale: false,
       fetching: true,
@@ -76,12 +75,12 @@ describe('useQuery', () => {
       }
     );
 
-    expect(query.fetching).toBe(true);
+    expect(query.fetching.value).toBe(true);
 
     subject.next({ data: { test: true } });
 
-    expect(query.fetching).toBe(false);
-    expect(query.data).toEqual({ test: true });
+    expect(query.fetching.value).toBe(false);
+    expect(query.data.value).toHaveProperty('test', true);
   });
 
   it('runs queries as a promise-like that resolves when used', async () => {
@@ -319,22 +318,21 @@ describe('useQuery', () => {
         () => subject.source as OperationResultSource<OperationResult>
       );
 
-    const _query = useQuery({
+    const query = useQuery({
       query: `{ test }`,
       pause: true,
     });
-    const query = reactive(_query);
 
     expect(executeQuery).not.toHaveBeenCalled();
 
     query.resume();
     await nextTick();
-    expect(query.fetching).toBe(true);
+    expect(query.fetching.value).toBe(true);
 
     subject.next({ data: { test: true } });
 
-    expect(query.fetching).toBe(false);
-    expect(query.data).toEqual({ test: true });
+    expect(query.fetching.value).toBe(false);
+    expect(query.data.value).toHaveProperty('test', true);
   });
 
   it('pauses query with ref variable', async () => {
