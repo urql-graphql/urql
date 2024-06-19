@@ -28,7 +28,7 @@ export type MutationQuery<T = any, V extends AnyVariables = AnyVariables> =
   | DocumentNode
   | string;
 
-export const unref = <T>(maybeRef: MaybeRef<T>): T =>
+const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
   typeof maybeRef === 'function'
     ? (maybeRef as () => T)()
     : maybeRef != null && isRef(maybeRef)
@@ -44,7 +44,7 @@ export const createRequestWithArgs = <
     | UseSubscriptionArgs<T, V>
     | { query: MaybeRef<MutationQuery>; variables: V }
 ) => {
-  let vars = unref(args.variables);
+  let vars = unwrap(args.variables);
   // unwrap possible nested reactive variables with `readonly()`
   for (const prop in vars) {
     if (Object.hasOwn(vars, prop)) {
@@ -55,7 +55,7 @@ export const createRequestWithArgs = <
       }
     }
   }
-  return createRequest<T, V>(unref(args.query), vars as V);
+  return createRequest<T, V>(unwrap(args.query), vars as V);
 };
 
 export const useRequestState = <
@@ -95,11 +95,11 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
   const requestOptions = computed(() => {
     return 'requestPolicy' in args
       ? {
-          requestPolicy: unref(args.requestPolicy),
-          ...unref(args.context),
+          requestPolicy: unwrap(args.requestPolicy),
+          ...unwrap(args.context),
         }
       : {
-          ...unref(args.context),
+          ...unwrap(args.context),
         };
   });
 
