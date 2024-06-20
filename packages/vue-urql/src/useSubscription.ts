@@ -2,7 +2,7 @@
 
 import { pipe, subscribe, onEnd } from 'wonka';
 
-import type { Ref } from 'vue';
+import type { Ref, WatchStopHandle } from 'vue';
 import { isRef, ref, watchEffect } from 'vue';
 
 import type {
@@ -236,7 +236,8 @@ export function callUseSubscription<
 >(
   args: UseSubscriptionArgs<T, V>,
   handler?: SubscriptionHandlerArg<T, R>,
-  client: Ref<Client> = useClient()
+  client: Ref<Client> = useClient(),
+  stops: WatchStopHandle[] = []
 ): UseSubscriptionResponse<T, R, V> {
   const data: Ref<R | undefined> = ref();
 
@@ -245,13 +246,13 @@ export function callUseSubscription<
     V
   >();
 
-  const { isPaused, source, pause, resume, execute } = useClientState(
+  const { isPaused, source, pause, resume, execute, teardown } = useClientState(
     args,
     client,
     'executeSubscription'
   );
 
-  watchEffect(onInvalidate => {
+  const teardownSubscription = watchEffect(onInvalidate => {
     if (source.value) {
       fetching.value = true;
 
@@ -283,6 +284,8 @@ export function callUseSubscription<
       fetching.value = false;
     }
   });
+
+  stops.push(teardown, teardownSubscription);
 
   const state: UseSubscriptionResponse<T, R, V> = {
     data,

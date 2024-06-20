@@ -133,7 +133,7 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
 
   // it's important to use `watchEffect()` here instead of `watch()`
   // because it listening for reactive variables inside `executeRaw()` function
-  watchEffect(() => {
+  const teardown = watchEffect(() => {
     source.value = !isPaused.value ? executeRaw() : undefined;
   });
 
@@ -143,5 +143,6 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
     pause,
     resume,
     execute,
+    teardown,
   };
 }

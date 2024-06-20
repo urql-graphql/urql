@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import type { Ref } from 'vue';
+import type { Ref, WatchStopHandle } from 'vue';
 import { ref, watchEffect } from 'vue';
 
 import type { Subscription } from 'wonka';
@@ -236,7 +236,8 @@ export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
 
 export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   args: UseQueryArgs<T, V>,
-  client: Ref<Client> = useClient()
+  client: Ref<Client> = useClient(),
+  stops: WatchStopHandle[] = []
 ): UseQueryResponse<T, V> {
   const data: Ref<T | undefined> = ref();
 
@@ -245,13 +246,13 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     V
   >();
 
-  const { isPaused, source, pause, resume, execute } = useClientState(
+  const { isPaused, source, pause, resume, execute, teardown } = useClientState(
     args,
     client,
     'executeQuery'
   );
 
-  watchEffect(
+  const teardownQuery = watchEffect(
     onInvalidate => {
       if (source.value) {
         fetching.value = true;
@@ -285,6 +286,8 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
       flush: 'sync',
     }
   );
+
+  stops.push(teardown, teardownQuery);
 
   const then: UseQueryResponse<T, V>['then'] = (onFulfilled, onRejected) => {
     let sub: Subscription | void;
