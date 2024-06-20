@@ -237,7 +237,7 @@ export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
 export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   args: UseQueryArgs<T, V>,
   client: Ref<Client> = useClient(),
-  stops: WatchStopHandle[] = []
+  stops?: WatchStopHandle[]
 ): UseQueryResponse<T, V> {
   const data: Ref<T | undefined> = ref();
 
@@ -287,7 +287,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     }
   );
 
-  stops.push(teardown, teardownQuery);
+  stops && stops.push(teardown, teardownQuery);
 
   const then: UseQueryResponse<T, V>['then'] = (onFulfilled, onRejected) => {
     let sub: Subscription | void;

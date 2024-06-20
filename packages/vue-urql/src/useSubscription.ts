@@ -237,7 +237,7 @@ export function callUseSubscription<
   args: UseSubscriptionArgs<T, V>,
   handler?: SubscriptionHandlerArg<T, R>,
   client: Ref<Client> = useClient(),
-  stops: WatchStopHandle[] = []
+  stops?: WatchStopHandle[]
 ): UseSubscriptionResponse<T, R, V> {
   const data: Ref<R | undefined> = ref();
 
@@ -285,7 +285,7 @@ export function callUseSubscription<
     }
   });
 
-  stops.push(teardown, teardownSubscription);
+  stops && stops.push(teardown, teardownSubscription);
 
   const state: UseSubscriptionResponse<T, R, V> = {
     data,
