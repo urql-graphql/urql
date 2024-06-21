@@ -2,11 +2,11 @@ import type {
   AnyVariables,
   Client,
   CombinedError,
+  DocumentInput,
   Operation,
   OperationContext,
   OperationResult,
   OperationResultSource,
-  TypedDocumentNode,
 } from '@urql/core';
 import { createRequest } from '@urql/core';
 import type { Ref } from 'vue';
@@ -21,17 +21,11 @@ import {
 } from 'vue';
 import type { UseSubscriptionArgs } from './useSubscription';
 import type { UseQueryArgs } from './useQuery';
-import type { DocumentNode } from 'graphql';
 
 export type MaybeRef<T> = T | (() => T) | Ref<T>;
 export type MaybeRefObj<T> = T extends {}
   ? { [K in keyof T]: MaybeRef<T[K]> }
   : T;
-
-export type MutationDocumentNode<
-  T = any,
-  V extends AnyVariables = AnyVariables,
-> = TypedDocumentNode<T, V> | DocumentNode | string;
 
 const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
   typeof maybeRef === 'function'
@@ -47,7 +41,7 @@ export const createRequestWithArgs = <
   args:
     | UseQueryArgs<T, V>
     | UseSubscriptionArgs<T, V>
-    | { query: MaybeRef<MutationDocumentNode>; variables: V }
+    | { query: MaybeRef<DocumentInput<T, V>>; variables: V }
 ) => {
   let vars = unwrap(args.variables);
   // unwrap possible nested reactive variables with `readonly()`
