@@ -236,7 +236,7 @@ export function makeSelectionIterator(
                     ctx.store.logger
                   ));
 
-            if (isMatching || currentOperation === 'write') {
+            if (isMatching || (currentOperation === 'write' && !ctx.store.schema)) {
               if (process.env.NODE_ENV !== 'production')
                 pushDebugNode(typename, fragment);
               const isFragmentOptional = isOptional(select);
