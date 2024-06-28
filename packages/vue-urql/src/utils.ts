@@ -33,14 +33,12 @@ const unwrapDeeply = <T>(input: T): T => {
     return unwrapDeeply(input()) as T;
   }
 
-  if (Array.isArray(input)) {
-    return input.map(item => unwrapDeeply(item)) as T;
-  }
-
   if (input && typeof input === 'object') {
-    const out = {} as T;
+    const isArray = Array.isArray(input);
+    const out = (isArray ? [] : {}) as T;
     for (const prop in input) {
       if (
+        isArray ||
         (Object.hasOwn || Object.prototype.hasOwnProperty.call)(input, prop)
       ) {
         out[prop] = unwrapDeeply(input[prop]);
