@@ -10,15 +10,7 @@ import type {
 } from '@urql/core';
 import { createRequest } from '@urql/core';
 import type { Ref } from 'vue';
-import {
-  watchEffect,
-  isReadonly,
-  computed,
-  readonly,
-  ref,
-  shallowRef,
-  isRef,
-} from 'vue';
+import { watchEffect, isReadonly, computed, ref, shallowRef, isRef } from 'vue';
 import type { UseSubscriptionArgs } from './useSubscription';
 import type { UseQueryArgs } from './useQuery';
 
@@ -34,6 +26,32 @@ const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
     ? maybeRef.value
     : maybeRef;
 
+const unwrapDeeply = <T>(input: T): T => {
+  input = isRef(input) ? (input.value as T) : input;
+
+  if (typeof input === 'function') {
+    return unwrapDeeply(input()) as T;
+  }
+
+  if (Array.isArray(input)) {
+    return input.map(item => unwrapDeeply(item)) as T;
+  }
+
+  if (input && typeof input === 'object') {
+    const out = {} as T;
+    for (const prop in input) {
+      if (
+        (Object.hasOwn || Object.prototype.hasOwnProperty.call)(input, prop)
+      ) {
+        out[prop] = unwrapDeeply(input[prop]);
+      }
+    }
+    return out;
+  }
+
+  return input;
+};
+
 export const createRequestWithArgs = <
   T = any,
   V extends AnyVariables = AnyVariables,
@@ -43,20 +61,10 @@ export const createRequestWithArgs = <
     | UseSubscriptionArgs<T, V>
     | { query: MaybeRef<DocumentInput<T, V>>; variables: V }
 ) => {
-  let vars = unwrap(args.variables);
-  // unwrap possible nested reactive variables with `readonly()`
-  if (vars) {
-    for (const prop in vars) {
-      if ((Object.hasOwn || Object.prototype.hasOwnProperty.call)(vars, prop)) {
-        const value = vars[prop];
-        if (value && (typeof value === 'object' || isRef(value))) {
-          vars = readonly(vars);
-          break;
-        }
-      }
-    }
-  }
-  return createRequest<T, V>(unwrap(args.query), vars as V);
+  return createRequest<T, V>(
+    unwrap(args.query),
+    unwrapDeeply(args.variables) as V
+  );
 };
 
 export const useRequestState = <
