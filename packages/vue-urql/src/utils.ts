@@ -45,12 +45,14 @@ export const createRequestWithArgs = <
 ) => {
   let vars = unwrap(args.variables);
   // unwrap possible nested reactive variables with `readonly()`
-  for (const prop in vars) {
-    if (Object.hasOwn(vars, prop)) {
-      const value = vars[prop];
-      if (value && (typeof value === 'object' || isRef(value))) {
-        vars = readonly(vars);
-        break;
+  if (vars) {
+    for (const prop in vars) {
+      if ((Object.hasOwn || Object.prototype.hasOwnProperty.call)(vars, prop)) {
+        const value = vars[prop];
+        if (value && (typeof value === 'object' || isRef(value))) {
+          vars = readonly(vars);
+          break;
+        }
       }
     }
   }
