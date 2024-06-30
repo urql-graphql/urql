@@ -67,3 +67,4 @@ maintainers and supporters. This page is specifically dedicated to all of you!
 - [`@grafbase/urql-exchange`](https://github.com/grafbase/playground/tree/main/packages/grafbase-urql-exchange): URQL-exchange for handling Server Sent Events (SSE) with Grafbase GraphQL Live Queries.
   to automatically convert scalars.
 - [`urql-rest-exchange`](https://github.com/iamsavani/urql-rest-exchange): A custom exchange for URQL that supports GraphQL queries/mutations via REST endpoints
+- [`urql-exhaustive-additional-typenames-exchange`](https://github.com/route06/urql-exhaustive-additional-typenames-exchange): URQL-exchange that add all list fields of the operation to additionalTypenames to help document caching
