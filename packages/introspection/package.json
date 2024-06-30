@@ -37,7 +37,6 @@
     "dist/"
   ],
   "scripts": {
-    "test": "vitest --config ../../vitest.config.ts",
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -51,7 +50,6 @@
   "peerDependencies": {
     "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0"
   },
-  "dependencies": {},
   "publishConfig": {
     "access": "public",
     "provenance": true

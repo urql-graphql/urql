@@ -18,6 +18,7 @@ export default defineConfig({
     setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,
     exclude: [
+      'packages/solid-urql/**',
       '**/node_modules/**',
       '**/dist/**',
       '**/cypress/**',

@@ -49,15 +49,16 @@
     "prepublishOnly": "run-s clean build"
   },
   "peerDependencies": {
-    "@urql/exchange-graphcache": ">=5.0.0",
     "@react-native-async-storage/async-storage": "^1.15.5",
-    "@react-native-community/netinfo": "^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^11.0.0"
+    "@react-native-community/netinfo": "^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^11.0.0",
+    "@urql/exchange-graphcache": ">=5.0.0"
   },
   "devDependencies": {
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/netinfo": "^11.2.1",
     "@urql/core": "workspace:*",
     "@urql/exchange-graphcache": "workspace:*",
-    "@react-native-async-storage/async-storage": "^1.21.0",
-    "@react-native-community/netinfo": "^11.2.1"
+    "vitest": "^0.30.1"
   },
   "publishConfig": {
     "access": "public",
