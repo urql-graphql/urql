@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.1.2
+
+### Patch Changes
+
+- Disregard write-only operation when fragment-matching with schema awareness
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3621](https://github.com/urql-graphql/urql/pull/3621))
+
 ## 7.1.1
 
 ### Patch Changes

@@ -8,7 +8,7 @@
   "dependencies": {
     "@urql/core": "^5.0.4",
     "@urql/exchange-auth": "^2.2.0",
-    "@urql/exchange-graphcache": "^7.1.1",
+    "@urql/exchange-graphcache": "^7.1.2",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
