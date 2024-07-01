@@ -1,5 +1,4 @@
-import type { DocumentNode } from 'graphql';
-import type { AnyVariables, Client, TypedDocumentNode } from '@urql/core';
+import type { AnyVariables, Client, DocumentInput } from '@urql/core';
 import type { WatchStopHandle } from 'vue';
 import { getCurrentInstance, onMounted, onBeforeUnmount } from 'vue';
 
@@ -75,7 +74,7 @@ export interface ClientHandle {
    * function or when chained in an `async setup()` function.
    */
   useMutation<T = any, V extends AnyVariables = AnyVariables>(
-    query: TypedDocumentNode<T, V> | DocumentNode | string
+    query: DocumentInput<T, V>
   ): UseMutationResponse<T, V>;
 }
 
@@ -153,7 +152,7 @@ export function useClientHandle(): ClientHandle {
     },
 
     useMutation<T = any, V extends AnyVariables = AnyVariables>(
-      query: TypedDocumentNode<T, V> | DocumentNode | string
+      query: DocumentInput<T, V>
     ): UseMutationResponse<T, V> {
       return callUseMutation(query, client);
     },

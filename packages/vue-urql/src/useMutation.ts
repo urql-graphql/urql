@@ -1,24 +1,22 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref } from 'vue';
-import { ref, shallowRef } from 'vue';
-import type { DocumentNode } from 'graphql';
+import { ref } from 'vue';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
 import type {
   Client,
   AnyVariables,
-  TypedDocumentNode,
   CombinedError,
   Operation,
   OperationContext,
   OperationResult,
+  DocumentInput,
 } from '@urql/core';
-import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 import type { MaybeRef } from './utils';
-import { unref } from './utils';
+import { createRequestWithArgs, useRequestState } from './utils';
 
 /** State of the last mutation executed by {@link useMutation}.
  *
@@ -126,21 +124,21 @@ export interface UseMutationResponse<T, V extends AnyVariables = AnyVariables> {
  * ```
  */
 export function useMutation<T = any, V extends AnyVariables = AnyVariables>(
-  query: TypedDocumentNode<T, V> | DocumentNode | string
+  query: DocumentInput<T, V>
 ): UseMutationResponse<T, V> {
   return callUseMutation(query);
 }
 
 export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
-  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>,
+  query: MaybeRef<DocumentInput<T, V>>,
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
-  const stale: Ref<boolean> = ref(false);
-  const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = shallowRef();
-  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
-  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
+
+  const { fetching, operation, extensions, stale, error } = useRequestState<
+    T,
+    V
+  >();
 
   return {
     data,
@@ -157,7 +155,7 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
 
       return pipe(
         client.value.executeMutation<T, V>(
-          createRequest<T, V>(unref(query), unref(variables)),
+          createRequestWithArgs({ query, variables }),
           context || {}
         ),
         onPush(result => {

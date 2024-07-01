@@ -1,27 +1,25 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref, WatchStopHandle } from 'vue';
-import { isRef, ref, shallowRef, watch, watchEffect, reactive } from 'vue';
+import { ref, watchEffect } from 'vue';
 
-import type { Subscription, Source } from 'wonka';
+import type { Subscription } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type {
   Client,
   AnyVariables,
-  OperationResult,
   GraphQLRequestParams,
   CombinedError,
   OperationContext,
   RequestPolicy,
   Operation,
 } from '@urql/core';
-import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 
 import type { MaybeRef, MaybeRefObj } from './utils';
-import { unref, updateShallowRef } from './utils';
+import { useRequestState, useClientState } from './utils';
 
 /** Input arguments for the {@link useQuery} function.
  *
@@ -195,10 +193,6 @@ export type UseQueryResponse<
   V extends AnyVariables = AnyVariables,
 > = UseQueryState<T, V> & PromiseLike<UseQueryState<T, V>>;
 
-const watchOptions = {
-  flush: 'pre' as const,
-};
-
 /** Function to run a GraphQL query and get reactive GraphQL results.
  *
  * @param args - a {@link UseQueryArgs} object, to pass a `query`, `variables`, and options.
@@ -241,55 +235,83 @@ export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
 }
 
 export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
-  _args: UseQueryArgs<T, V>,
+  args: UseQueryArgs<T, V>,
   client: Ref<Client> = useClient(),
-  stops: WatchStopHandle[] = []
+  stops?: WatchStopHandle[]
 ): UseQueryResponse<T, V> {
-  const args = reactive(_args) as UseQueryArgs<T, V>;
-
   const data: Ref<T | undefined> = ref();
-  const stale: Ref<boolean> = ref(false);
-  const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = shallowRef();
-  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
-  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
 
-  const isPaused: Ref<boolean> = ref(!!unref(args.pause));
-  if (isRef(args.pause) || typeof args.pause === 'function') {
-    stops.push(watch(args.pause, value => (isPaused.value = value)));
-  }
+  const { fetching, operation, extensions, stale, error } = useRequestState<
+    T,
+    V
+  >();
 
-  const input = shallowRef({
-    request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
-    requestPolicy: unref(args.requestPolicy),
-    isPaused: isPaused.value,
-  });
-
-  const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
-
-  stops.push(
-    watchEffect(() => {
-      updateShallowRef(input, {
-        request: createRequest<T, V>(
-          unref(args.query),
-          unref(args.variables) as V
-        ),
-        requestPolicy: unref(args.requestPolicy),
-        isPaused: isPaused.value,
-      });
-    }, watchOptions)
+  const { isPaused, source, pause, resume, execute, teardown } = useClientState(
+    args,
+    client,
+    'executeQuery'
   );
 
-  stops.push(
-    watchEffect(() => {
-      source.value = !input.value.isPaused
-        ? client.value.executeQuery<T, V>(input.value.request, {
-            requestPolicy: unref(args.requestPolicy),
-            ...unref(args.context),
-          })
-        : undefined;
-    }, watchOptions)
+  const teardownQuery = watchEffect(
+    onInvalidate => {
+      if (source.value) {
+        fetching.value = true;
+        stale.value = false;
+
+        onInvalidate(
+          pipe(
+            source.value,
+            onEnd(() => {
+              fetching.value = false;
+              stale.value = false;
+            }),
+            subscribe(res => {
+              data.value = res.data;
+              stale.value = !!res.stale;
+              fetching.value = false;
+              error.value = res.error;
+              operation.value = res.operation;
+              extensions.value = res.extensions;
+            })
+          ).unsubscribe
+        );
+      } else {
+        fetching.value = false;
+        stale.value = false;
+      }
+    },
+    {
+      // NOTE: This part of the query pipeline is only initialised once and will need
+      // to do so synchronously
+      flush: 'sync',
+    }
   );
+
+  stops && stops.push(teardown, teardownQuery);
+
+  const then: UseQueryResponse<T, V>['then'] = (onFulfilled, onRejected) => {
+    let sub: Subscription | void;
+
+    const promise = new Promise<UseQueryState<T, V>>(resolve => {
+      if (!source.value) {
+        return resolve(state);
+      }
+      let hasResult = false;
+      sub = pipe(
+        source.value,
+        subscribe(() => {
+          if (!state.fetching.value && !state.stale.value) {
+            if (sub) sub.unsubscribe();
+            hasResult = true;
+            resolve(state);
+          }
+        })
+      );
+      if (hasResult) sub.unsubscribe();
+    });
+
+    return promise.then(onFulfilled, onRejected);
+  };
 
   const state: UseQueryState<T, V> = {
     data,
@@ -299,105 +321,13 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     extensions,
     fetching,
     isPaused,
+    pause,
+    resume,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      const s = (source.value = client.value.executeQuery<T, V>(
-        input.value.request,
-        {
-          requestPolicy: unref(args.requestPolicy),
-          ...unref(args.context),
-          ...opts,
-        }
-      ));
-
-      return {
-        ...response,
-        then(onFulfilled, onRejected) {
-          let sub: Subscription | void;
-          return new Promise<UseQueryState<T, V>>(resolve => {
-            let hasResult = false;
-            sub = pipe(
-              s,
-              subscribe(() => {
-                if (!state.fetching.value && !state.stale.value) {
-                  if (sub) sub.unsubscribe();
-                  hasResult = true;
-                  resolve(state);
-                }
-              })
-            );
-            if (hasResult) sub.unsubscribe();
-          }).then(onFulfilled, onRejected);
-        },
-      };
-    },
-    pause() {
-      isPaused.value = true;
-    },
-    resume() {
-      isPaused.value = false;
+      execute(opts);
+      return { ...state, then };
     },
   };
 
-  stops.push(
-    watchEffect(
-      onInvalidate => {
-        if (source.value) {
-          fetching.value = true;
-          stale.value = false;
-
-          onInvalidate(
-            pipe(
-              source.value,
-              onEnd(() => {
-                fetching.value = false;
-                stale.value = false;
-              }),
-              subscribe(res => {
-                data.value = res.data;
-                stale.value = !!res.stale;
-                fetching.value = false;
-                error.value = res.error;
-                operation.value = res.operation;
-                extensions.value = res.extensions;
-              })
-            ).unsubscribe
-          );
-        } else {
-          fetching.value = false;
-          stale.value = false;
-        }
-      },
-      {
-        // NOTE: This part of the query pipeline is only initialised once and will need
-        // to do so synchronously
-        flush: 'sync',
-      }
-    )
-  );
-
-  const response: UseQueryResponse<T, V> = {
-    ...state,
-    then(onFulfilled, onRejected) {
-      let sub: Subscription | void;
-      const promise = new Promise<UseQueryState<T, V>>(resolve => {
-        if (!source.value) return resolve(state);
-        let hasResult = false;
-        sub = pipe(
-          source.value,
-          subscribe(() => {
-            if (!state.fetching.value && !state.stale.value) {
-              if (sub) sub.unsubscribe();
-              hasResult = true;
-              resolve(state);
-            }
-          })
-        );
-        if (hasResult) sub.unsubscribe();
-      });
-
-      return promise.then(onFulfilled, onRejected);
-    },
-  };
-
-  return response;
+  return { ...state, then };
 }
