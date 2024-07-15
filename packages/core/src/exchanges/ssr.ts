@@ -109,7 +109,6 @@ const serializeResult = (
   includeExtensions: boolean
 ): SerializedResult => {
   const serialized: SerializedResult = {
-    data: JSON.stringify(result.data),
     hasNext: result.hasNext,
   };
 
