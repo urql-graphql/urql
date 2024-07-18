@@ -1,5 +1,12 @@
 # @urql/svelte
 
+## 4.2.1
+
+### Patch Changes
+
+- add support for Svelte 5 in the `peerDependencies`
+  Submitted by [@itssumitrai](https://github.com/itssumitrai) (See [#3634](https://github.com/urql-graphql/urql/pull/3634))
+
 ## 4.2.0
 
 ### Minor Changes
