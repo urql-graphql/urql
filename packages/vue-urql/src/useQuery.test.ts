@@ -120,6 +120,51 @@ describe('useQuery', () => {
     );
   });
 
+  it('runs a query with different variables', async () => {
+    const simpleVariables = {
+      null: null,
+      NaN: NaN,
+      empty: '',
+      bool: false,
+      int: 1,
+      float: 1.1,
+      string: 'string',
+      blob: new Blob(),
+      date: new Date(),
+    };
+
+    const variablesSet = {
+      func: () => 'func',
+      ref: ref('ref'),
+      computed: computed(() => 'computed'),
+      ...simpleVariables,
+    };
+
+    const variablesSetUnwrapped = {
+      func: 'func',
+      ref: 'ref',
+      computed: 'computed',
+      ...simpleVariables,
+    };
+
+    const { query$ } = createQuery({
+      query: ref('{ test }'),
+      variables: {
+        ...variablesSet,
+        nested: variablesSet,
+        array: [variablesSet],
+      },
+    });
+
+    await query$;
+
+    expect(query$.operation.value?.variables).toStrictEqual({
+      ...variablesSetUnwrapped,
+      nested: variablesSetUnwrapped,
+      array: [variablesSetUnwrapped],
+    });
+  });
+
   it('reacts to ref variables changing', async () => {
     const variables = ref({ prop: 1 });
 

@@ -26,6 +26,12 @@ const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
     ? maybeRef.value
     : maybeRef;
 
+const _toString = Object.prototype.toString;
+const isPlainObject = (obj: any): boolean => {
+  return _toString.call(obj) === '[object Object]';
+};
+export const isArray = Array.isArray;
+
 const unwrapDeeply = <T>(input: T): T => {
   input = isRef(input) ? (input.value as T) : input;
 
@@ -34,17 +40,29 @@ const unwrapDeeply = <T>(input: T): T => {
   }
 
   if (input && typeof input === 'object') {
-    const isArray = Array.isArray(input);
-    const out = (isArray ? [] : {}) as T;
-    for (const prop in input) {
-      if (
-        isArray ||
-        (Object.hasOwn || Object.prototype.hasOwnProperty.call)(input, prop)
-      ) {
-        out[prop] = unwrapDeeply(input[prop]);
+    if (isArray(input)) {
+      const length = input.length;
+      const out = new Array(length) as T;
+      let i = 0;
+      for (; i < length; i++) {
+        out[i] = unwrapDeeply(input[i]);
       }
+
+      return out;
+    } else if (isPlainObject(input)) {
+      const keys = Object.keys(input);
+      const length = keys.length;
+      let i = 0;
+      let key: string;
+      const out = {} as T;
+
+      for (; i < length; i++) {
+        key = keys[i];
+        out[key] = unwrapDeeply(input[key]);
+      }
+
+      return out;
     }
-    return out;
   }
 
   return input;
