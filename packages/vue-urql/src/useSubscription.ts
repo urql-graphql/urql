@@ -1,26 +1,23 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import type { Source } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type { Ref, WatchStopHandle } from 'vue';
-import { isRef, ref, shallowRef, watch, watchEffect, reactive } from 'vue';
+import { isRef, ref, watchEffect } from 'vue';
 
 import type {
   Client,
   GraphQLRequestParams,
   AnyVariables,
-  OperationResult,
   CombinedError,
   OperationContext,
   Operation,
 } from '@urql/core';
-import { createRequest } from '@urql/core';
 
 import { useClient } from './useClient';
 
 import type { MaybeRef, MaybeRefObj } from './utils';
-import { unref, updateShallowRef } from './utils';
+import { useRequestState, useClientState } from './utils';
 
 /** Input arguments for the {@link useSubscription} function.
  *
@@ -89,7 +86,9 @@ export type UseSubscriptionArgs<
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 /** A {@link SubscriptionHandler} or a reactive ref of one. */
-export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
+export type SubscriptionHandlerArg<T, R> =
+  | Ref<SubscriptionHandler<T, R>>
+  | SubscriptionHandler<T, R>;
 
 /** State of the current query, your {@link useSubscription} function is executing.
  *
@@ -182,10 +181,6 @@ export interface UseSubscriptionResponse<
   executeSubscription(opts?: Partial<OperationContext>): void;
 }
 
-const watchOptions = {
-  flush: 'pre' as const,
-};
-
 /** Function to run a GraphQL subscription and get reactive GraphQL results.
  *
  * @param args - a {@link UseSubscriptionArgs} object, to pass a `query`, `variables`, and options.
@@ -229,7 +224,7 @@ export function useSubscription<
   V extends AnyVariables = AnyVariables,
 >(
   args: UseSubscriptionArgs<T, V>,
-  handler?: MaybeRef<SubscriptionHandler<T, R>>
+  handler?: SubscriptionHandlerArg<T, R>
 ): UseSubscriptionResponse<T, R, V> {
   return callUseSubscription(args, handler);
 }
@@ -239,86 +234,58 @@ export function callUseSubscription<
   R = T,
   V extends AnyVariables = AnyVariables,
 >(
-  _args: UseSubscriptionArgs<T, V>,
-  handler?: MaybeRef<SubscriptionHandler<T, R>>,
+  args: UseSubscriptionArgs<T, V>,
+  handler?: SubscriptionHandlerArg<T, R>,
   client: Ref<Client> = useClient(),
-  stops: WatchStopHandle[] = []
+  stops?: WatchStopHandle[]
 ): UseSubscriptionResponse<T, R, V> {
-  const args = reactive(_args) as UseSubscriptionArgs<T, V>;
-
   const data: Ref<R | undefined> = ref();
-  const stale: Ref<boolean> = ref(false);
-  const fetching: Ref<boolean> = ref(false);
-  const error: Ref<CombinedError | undefined> = shallowRef();
-  const operation: Ref<Operation<T, V> | undefined> = shallowRef();
-  const extensions: Ref<Record<string, any> | undefined> = shallowRef();
 
-  const scanHandler = ref(handler);
-  const isPaused: Ref<boolean> = ref(!!unref(args.pause));
-  if (isRef(args.pause) || typeof args.pause === 'function') {
-    stops.push(watch(args.pause, value => (isPaused.value = value)));
-  }
+  const { fetching, operation, extensions, stale, error } = useRequestState<
+    T,
+    V
+  >();
 
-  const input = shallowRef({
-    request: createRequest<T, V>(unref(args.query), unref(args.variables) as V),
-    isPaused: isPaused.value,
+  const { isPaused, source, pause, resume, execute, teardown } = useClientState(
+    args,
+    client,
+    'executeSubscription'
+  );
+
+  const teardownSubscription = watchEffect(onInvalidate => {
+    if (source.value) {
+      fetching.value = true;
+
+      onInvalidate(
+        pipe(
+          source.value,
+          onEnd(() => {
+            fetching.value = false;
+          }),
+          subscribe(result => {
+            fetching.value = true;
+            error.value = result.error;
+            extensions.value = result.extensions;
+            stale.value = !!result.stale;
+            operation.value = result.operation;
+
+            if (result.data != null && handler) {
+              const cb = isRef(handler) ? handler.value : handler;
+              if (typeof cb === 'function') {
+                data.value = cb(data.value, result.data);
+                return;
+              }
+            }
+            data.value = result.data as R;
+          })
+        ).unsubscribe
+      );
+    } else {
+      fetching.value = false;
+    }
   });
 
-  const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
-
-  stops.push(
-    watchEffect(() => {
-      updateShallowRef(input, {
-        request: createRequest<T, V>(
-          unref(args.query),
-          unref(args.variables) as V
-        ),
-        isPaused: isPaused.value,
-      });
-    }, watchOptions)
-  );
-
-  stops.push(
-    watchEffect(() => {
-      source.value = !isPaused.value
-        ? client.value.executeSubscription<T, V>(input.value.request, {
-            ...unref(args.context),
-          })
-        : undefined;
-    }, watchOptions)
-  );
-
-  stops.push(
-    watchEffect(onInvalidate => {
-      if (source.value) {
-        fetching.value = true;
-
-        onInvalidate(
-          pipe(
-            source.value,
-            onEnd(() => {
-              fetching.value = false;
-            }),
-            subscribe(result => {
-              fetching.value = true;
-              data.value =
-                result.data != null
-                  ? typeof scanHandler.value === 'function'
-                    ? scanHandler.value(data.value as any, result.data)
-                    : result.data
-                  : (result.data as any);
-              error.value = result.error;
-              extensions.value = result.extensions;
-              stale.value = !!result.stale;
-              operation.value = result.operation;
-            })
-          ).unsubscribe
-        );
-      } else {
-        fetching.value = false;
-      }
-    }, watchOptions)
-  );
+  stops && stops.push(teardown, teardownSubscription);
 
   const state: UseSubscriptionResponse<T, R, V> = {
     data,
@@ -328,24 +295,13 @@ export function callUseSubscription<
     extensions,
     fetching,
     isPaused,
+    pause,
+    resume,
     executeSubscription(
       opts?: Partial<OperationContext>
     ): UseSubscriptionResponse<T, R, V> {
-      source.value = client.value.executeSubscription<T, V>(
-        input.value.request,
-        {
-          ...unref(args.context),
-          ...opts,
-        }
-      );
-
+      execute(opts);
       return state;
-    },
-    pause() {
-      isPaused.value = true;
-    },
-    resume() {
-      isPaused.value = false;
     },
   };
 
