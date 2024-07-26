@@ -1,5 +1,12 @@
 # @urql/vue
 
+## 1.4.0
+
+### Minor Changes
+
+- Refactor composable functions with a focus on avoiding memory leaks and Vue best practices
+  Submitted by [@yurks](https://github.com/yurks) (See [#3619](https://github.com/urql-graphql/urql/pull/3619))
+
 ## 1.3.2
 
 ### Patch Changes
