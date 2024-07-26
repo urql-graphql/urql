@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref } from 'vue';
-import { ref } from 'vue';
+import { shallowRef } from 'vue';
 import { pipe, onPush, filter, toPromise, take } from 'wonka';
 
 import type {
@@ -133,7 +133,7 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
   query: MaybeRef<DocumentInput<T, V>>,
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
-  const data: Ref<T | undefined> = ref();
+  const data: Ref<T | undefined> = shallowRef();
 
   const { fetching, operation, extensions, stale, error } = useRequestState<
     T,
