@@ -27,8 +27,15 @@ const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
     : maybeRef;
 
 const _toString = Object.prototype.toString;
-const isPlainObject = (obj: any): boolean => {
-  return _toString.call(obj) === '[object Object]';
+const isPlainObject = (value: any): boolean => {
+  if (typeof value !== 'object' || value === null) return false;
+
+  if (_toString.call(value) !== '[object Object]') return false;
+
+  return (
+    value.constructor &&
+    Object.getPrototypeOf(value).constructor === Object.prototype.constructor
+  );
 };
 export const isArray = Array.isArray;
 
