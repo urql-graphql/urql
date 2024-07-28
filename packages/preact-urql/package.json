@@ -40,7 +40,7 @@
     "dist/"
   ],
   "scripts": {
-    "test": "vitest --config ../../vitest.config.ts",
+    "test": "vitest",
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -49,10 +49,11 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@urql/core": "workspace:*",
     "@testing-library/preact": "^2.0.0",
+    "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
-    "preact": "^10.13.0"
+    "preact": "^10.13.0",
+    "vitest": "^0.30.1"
   },
   "peerDependencies": {
     "@urql/core": "^5.0.0",
