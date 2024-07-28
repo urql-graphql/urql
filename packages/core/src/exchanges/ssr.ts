@@ -113,10 +113,6 @@ const serializeResult = (
     hasNext: result.hasNext,
   };
 
-  if (result.data !== undefined) {
-    serialized.data = JSON.stringify(result.data);
-  }
-
   if (includeExtensions && result.extensions !== undefined) {
     serialized.extensions = JSON.stringify(result.extensions);
   }
