@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.0.5
+
+### Patch Changes
+
+- Removes double serialization of `data` in `ssrExchange`
+  Submitted by [@negezor](https://github.com/negezor) (See [#3632](https://github.com/urql-graphql/urql/pull/3632))
+
 ## 5.0.4
 
 ### Patch Changes
