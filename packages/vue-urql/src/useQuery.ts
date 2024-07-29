@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref, WatchStopHandle } from 'vue';
-import { ref, watchEffect } from 'vue';
+import { shallowRef, watchEffect } from 'vue';
 
 import type { Subscription } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
@@ -239,7 +239,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   client: Ref<Client> = useClient(),
   stops?: WatchStopHandle[]
 ): UseQueryResponse<T, V> {
-  const data: Ref<T | undefined> = ref();
+  const data: Ref<T | undefined> = shallowRef();
 
   const { fetching, operation, extensions, stale, error } = useRequestState<
     T,
