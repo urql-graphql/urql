@@ -60,6 +60,16 @@ describe('CombinedError', () => {
     expect(err.graphQLErrors).toEqual(graphQLErrors);
   });
 
+  it('accepts empty string errors for graphQLError', () => {
+    const graphQLErrors = [new Error('')];
+
+    const err = new CombinedError({ graphQLErrors });
+
+    expect(err.message).toBe('[GraphQL] ');
+
+    expect(err.graphQLErrors).toEqual(graphQLErrors);
+  });
+
   it('accepts a response that is attached to the resulting error', () => {
     const response = {};
     const err = new CombinedError({
