@@ -107,6 +107,8 @@ export const mergeResultPatch = (
   }
 
   const withData = { data: prevResult.data };
+  let hasNext =
+    nextResult.hasNext != null ? nextResult.hasNext : prevResult.hasNext;
   if (incremental) {
     for (const patch of incremental) {
       if (Array.isArray(patch.errors)) {
@@ -155,6 +157,9 @@ export const mergeResultPatch = (
       (nextResult.errors as any[]) ||
       (nextResult.payload && nextResult.payload.errors) ||
       errors;
+    if (hasNext && errors.length && !nextResult.data) {
+      hasNext = false;
+    }
   }
 
   return {
@@ -164,8 +169,7 @@ export const mergeResultPatch = (
       ? new CombinedError({ graphQLErrors: errors, response })
       : undefined,
     extensions: hasExtensions ? extensions : undefined,
-    hasNext:
-      nextResult.hasNext != null ? nextResult.hasNext : prevResult.hasNext,
+    hasNext,
     stale: false,
   };
 };
