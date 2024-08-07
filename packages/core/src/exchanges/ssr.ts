@@ -168,6 +168,7 @@ const deserializeResult = (
 });
 
 const revalidated = new Set<number>();
+const data: Record<string, SerializedResult | null> = {};
 
 /** Creates a server-side rendering `Exchange` that either captures responses on the server-side or replays them on the client-side.
  *
@@ -188,7 +189,6 @@ const revalidated = new Set<number>();
 export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
   const staleWhileRevalidate = !!params.staleWhileRevalidate;
   const includeExtensions = !!params.includeExtensions;
-  const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
