@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.0.6
+
+### Patch Changes
+
+- Allow empty error messages when re-hydrating GraphQL errors
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3650](https://github.com/urql-graphql/urql/pull/3650))
+
 ## 5.0.5
 
 ### Patch Changes

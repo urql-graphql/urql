@@ -1,5 +1,12 @@
 # @urql/vue
 
+## 1.4.1
+
+### Patch Changes
+
+- Use `shallowRef` for data variable to avoid extra overhead for heavy objects
+  Submitted by [@yurks](https://github.com/yurks) (See [#3641](https://github.com/urql-graphql/urql/pull/3641))
+
 ## 1.4.0
 
 ### Minor Changes
