@@ -109,7 +109,6 @@ async function* parseEventStream(
       } catch (error) {
         if (!payload) throw error;
       }
-      if (payload && payload.hasNext === false) break;
     }
   }
   if (payload && payload.hasNext !== false) {
@@ -140,7 +139,6 @@ async function* parseMultipartMixed(
     } catch (error) {
       if (!payload) throw error;
     }
-    if (payload && payload.hasNext === false) break;
   }
   if (payload && payload.hasNext !== false) {
     yield { hasNext: false };
@@ -204,6 +202,7 @@ async function* fetchOperation(
         : makeResult(operation, payload, response);
       networkMode = false;
       yield result;
+      if (result.hasNext === false) break;
       networkMode = true;
     }
 
