@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 it('forwards query operations correctly', async () => {
-  vi.spyOn(globalThis.console, 'log').mockImplementation(() => {
+  vi.spyOn(globalThis.console, 'debug').mockImplementation(() => {
     /** Do NOthing */
   });
   const { source: ops$, next, complete } = input;
@@ -39,9 +39,9 @@ it('forwards query operations correctly', async () => {
   next(queryOperation);
   complete();
   // eslint-disable-next-line no-console
-  expect(console.log).toBeCalled();
+  expect(console.debug).toBeCalled();
   // eslint-disable-next-line no-console
-  expect(console.log).toBeCalledTimes(2);
+  expect(console.debug).toBeCalledTimes(2);
 });
 
 describe('production', () => {
