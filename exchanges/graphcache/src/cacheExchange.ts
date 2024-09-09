@@ -136,8 +136,9 @@ export const cacheExchange =
         // Upon completion, all dependent operations become reexecuting operations, preventing
         // them from reexecuting prior operations again, causing infinite loops
         const _reexecutingOperations = reexecutingOperations;
+        reexecutingOperations = dependentOperations;
         if (operation.kind === 'query') {
-          (reexecutingOperations = dependentOperations).add(operation.key);
+          reexecutingOperations.add(operation.key);
         }
         (dependentOperations = _reexecutingOperations).clear();
       }

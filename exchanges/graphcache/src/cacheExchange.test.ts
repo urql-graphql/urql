@@ -913,6 +913,148 @@ describe('data dependencies', () => {
     expect(reexecuteOperation).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0]).toHaveProperty('data.author', null);
   });
+
+  it('mutation does not change number of reexecute request after a query', () => {
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+
+    const reexec = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(nextOp);
+
+    const mutation = gql`
+      mutation {
+        updateNode {
+          __typename
+          id
+        }
+      }
+    `;
+
+    const normalQuery = gql`
+      {
+        __typename
+        item {
+          __typename
+          id
+        }
+      }
+    `;
+
+    const extendedQuery = gql`
+      {
+        __typename
+        item {
+          __typename
+          extended: id
+          extra @_optional
+        }
+      }
+    `;
+
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 0,
+      query: mutation,
+      variables: undefined,
+    });
+
+    const normalOp = client.createRequestOperation(
+      'query',
+      {
+        key: 1,
+        query: normalQuery,
+        variables: undefined,
+      },
+      {
+        requestPolicy: 'cache-and-network',
+      }
+    );
+
+    const extendedOp = client.createRequestOperation(
+      'query',
+      {
+        key: 2,
+        query: extendedQuery,
+        variables: undefined,
+      },
+      {
+        requestPolicy: 'cache-only',
+      }
+    );
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 0) {
+        return {
+          operation: mutationOp,
+          data: {
+            __typename: 'Mutation',
+            updateNode: {
+              __typename: 'Node',
+              id: 'id',
+            },
+          },
+          stale: false,
+          hasNext: false,
+        };
+      } else if (forwardOp.key === 1) {
+        return {
+          operation: normalOp,
+          data: {
+            __typename: 'Query',
+            item: {
+              __typename: 'Node',
+              id: 'id',
+            },
+          },
+          stale: false,
+          hasNext: false,
+        };
+      } else if (forwardOp.key === 2) {
+        return {
+          operation: extendedOp,
+          data: {
+            __typename: 'Query',
+            item: {
+              __typename: 'Node',
+              extended: 'id',
+              extra: 'extra',
+            },
+          },
+          stale: false,
+          hasNext: false,
+        };
+      }
+
+      return undefined as any;
+    });
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      pipe(ops$, map(response), share);
+
+    pipe(cacheExchange()({ forward, client, dispatchDebug })(ops$), publish);
+
+    nextOp(normalOp);
+    expect(reexec).toHaveBeenCalledTimes(0);
+
+    nextOp(extendedOp);
+    expect(reexec).toHaveBeenCalledTimes(0);
+
+    // re-execute first operation
+    reexec.mockClear();
+    nextOp(normalOp);
+    expect(reexec).toHaveBeenCalledTimes(4);
+
+    nextOp(mutationOp);
+
+    // re-execute first operation after mutation
+    reexec.mockClear();
+    nextOp(normalOp);
+    expect(reexec).toHaveBeenCalledTimes(4);
+  });
 });
 
 describe('directives', () => {
