@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.1.3
+
+### Patch Changes
+
+- ⚠️ fix bug that mutation would cause dependent operations and reexecuting operations to become the same set
+  Submitted by [@xuanduc987](https://github.com/xuanduc987) (See [#3665](https://github.com/urql-graphql/urql/pull/3665))
+
 ## 7.1.2
 
 ### Patch Changes
