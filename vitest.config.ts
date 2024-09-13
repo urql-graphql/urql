@@ -2,21 +2,11 @@ import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      'preact/hooks':
-        __dirname +
-        '/packages/preact-urql/node_modules/preact/hooks/dist/hooks.js',
-      preact:
-        __dirname + '/packages/preact-urql/node_modules/preact/dist/preact.js',
-    },
-  },
   test: {
     globals: true,
-    setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,
+    setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
     exclude: [
-      'packages/solid-urql/**',
       '**/node_modules/**',
       '**/dist/**',
       '**/cypress/**',

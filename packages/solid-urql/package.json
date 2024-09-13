@@ -54,7 +54,7 @@
     "graphql": "^16.0.0",
     "jsdom": "^22.1.0",
     "solid-js": "^1.8.22",
-    "vite-plugin-solid": "^2.7.0"
+    "vite-plugin-solid": "2.8.2"
   },
   "peerDependencies": {
     "@urql/core": "^5.0.0",

@@ -560,8 +560,8 @@ importers:
         specifier: ^1.8.22
         version: 1.8.22
       vite-plugin-solid:
-        specifier: ^2.7.0
-        version: 2.10.2(solid-js@1.8.22)(vite@5.4.4(@types/node@22.5.4)(terser@5.32.0))
+        specifier: 2.8.2
+        version: 2.8.2(solid-js@1.8.22)(vite@5.4.4(@types/node@22.5.4)(terser@5.32.0))
 
   packages/storage-rn:
     devDependencies:
@@ -9351,15 +9351,11 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-solid@2.10.2:
-    resolution: {integrity: sha512-AOEtwMe2baBSXMXdo+BUwECC8IFHcKS6WQV/1NEd+Q7vHPap5fmIhLcAzr+DUJ04/KHx/1UBU0l1/GWP+rMAPQ==}
+  vite-plugin-solid@2.8.2:
+    resolution: {integrity: sha512-HcvMs6DTxBaO4kE3psnirPQBCUUdYeQkCNKuB2TpEkJsxb6BGP6/7qkbbCSMxn25PyNdjvzVi1WXi0ou8KPgHw==}
     peerDependencies:
-      '@testing-library/jest-dom': ^5.16.6 || ^5.17.0 || ^6.*
       solid-js: ^1.7.2
       vite: ^3.0.0 || ^4.0.0 || ^5.0.0
-    peerDependenciesMeta:
-      '@testing-library/jest-dom':
-        optional: true
 
   vite@5.4.4:
     resolution: {integrity: sha512-RHFCkULitycHVTtelJ6jQLd+KSAAzOgEYorV32R2q++M6COBjKJR6BxqClwp5sf0XaBDjVMuJ9wnNfyAJwjMkA==}
@@ -20765,9 +20761,10 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-solid@2.10.2(solid-js@1.8.22)(vite@5.4.4(@types/node@22.5.4)(terser@5.32.0)):
+  vite-plugin-solid@2.8.2(solid-js@1.8.22)(vite@5.4.4(@types/node@22.5.4)(terser@5.32.0)):
     dependencies:
       '@babel/core': 7.25.2
+      '@babel/preset-typescript': 7.24.7(@babel/core@7.25.2)
       '@types/babel__core': 7.20.5
       babel-preset-solid: 1.8.17(@babel/core@7.25.2)
       merge-anything: 5.1.7
