@@ -1,7 +1,7 @@
 export * from '@urql/core';
 
 export { type UseClient } from './context';
-export { useClient } from './context';
+export { useClient, Provider } from './context';
 
 export {
   type CreateMutationState,
