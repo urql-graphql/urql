@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   test: {
-    globals: false,
+    globals: true,
     setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,
     exclude: [
