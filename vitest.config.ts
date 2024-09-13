@@ -1,6 +1,5 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   resolve: {
@@ -12,7 +11,6 @@ export default defineConfig({
         __dirname + '/packages/preact-urql/node_modules/preact/dist/preact.js',
     },
   },
-  plugins: [tsconfigPaths()],
   test: {
     globals: false,
     setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
