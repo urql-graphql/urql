@@ -14,8 +14,8 @@ export default defineConfig({
   },
   plugins: [tsconfigPaths()],
   test: {
-    globals: false,
-    setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
+    globals: true,
+    setupFiles: [resolve(__dirname, 'scripts/vitest/setup.mjs')],
     clearMocks: true,
     exclude: [
       'packages/solid-urql/**',
