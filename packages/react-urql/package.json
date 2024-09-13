@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@cypress/react": "^7.0.2",
-    "@cypress/vite-dev-server": "^5.0.4",
+    "@cypress/vite-dev-server": "^5.2.0",
     "@testing-library/react": "^11.1.1",
     "@testing-library/react-hooks": "^5.1.2",
     "@types/react": "^17.0.4",
@@ -55,8 +55,7 @@
     "react-is": "^17.0.1",
     "react-ssr-prepass": "^1.1.2",
     "react-test-renderer": "^17.0.1",
-    "vite": "^3.2.4",
-    "vitest": "^0.30.1"
+    "vite": "^5.4.4"
   },
   "peerDependencies": {
     "@urql/core": "^5.0.0",
