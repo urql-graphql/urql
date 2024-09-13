@@ -1,7 +1,7 @@
 {
-  "name": "@urql/exchange-persisted",
-  "version": "4.3.0",
-  "description": "An exchange that allows for persisted queries support when fetching queries",
+  "name": "@urql/solid",
+  "version": "0.0.0",
+  "description": "A highly customizable and versatile GraphQL client for Solid",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/urql-graphql/urql/issues",
@@ -10,23 +10,25 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/urql-graphql/urql.git",
-    "directory": "exchanges/persisted"
+    "directory": "packages/solid-urql"
   },
   "keywords": [
-    "urql",
+    "graphql client",
+    "state management",
+    "cache",
     "graphql",
-    "persisted queries",
-    "exchanges"
+    "exchanges",
+    "solid"
   ],
-  "main": "dist/urql-exchange-persisted",
-  "module": "dist/urql-exchange-persisted.mjs",
-  "types": "dist/urql-exchange-persisted.d.ts",
+  "main": "dist/urql-solid",
+  "module": "dist/urql-solid.mjs",
+  "types": "dist/urql-solid.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/urql-exchange-persisted.d.ts",
-      "import": "./dist/urql-exchange-persisted.mjs",
-      "require": "./dist/urql-exchange-persisted.js",
+      "types": "./dist/urql-solid.d.ts",
+      "import": "./dist/urql-solid.mjs",
+      "require": "./dist/urql-solid.js",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"
@@ -39,24 +41,29 @@
   ],
   "scripts": {
     "test": "vitest",
-    "clean": "rimraf dist extras",
+    "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.mjs",
     "prepare": "node ../../scripts/prepare/index.js",
     "prepublishOnly": "run-s clean build"
   },
-  "peerDependencies": {
-    "@urql/core": "^5.0.0"
-  },
-  "dependencies": {
-    "@urql/core": "^5.0.0",
-    "wonka": "^6.3.2"
-  },
   "devDependencies": {
+    "@solidjs/testing-library": "^0.8.2",
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
+    "jsdom": "^22.1.0",
+    "vite-plugin-solid": "^2.7.0",
+    "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^0.30.1"
+  },
+  "peerDependencies": {
+    "@urql/core": "^5.0.0",
+    "solid-js": "^1.7.7"
+  },
+  "dependencies": {
+    "@urql/core": "^4.0.0",
+    "wonka": "^6.3.2"
   },
   "publishConfig": {
     "access": "public",

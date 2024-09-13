@@ -45,7 +45,7 @@
     "internal/"
   ],
   "scripts": {
-    "test": "vitest --config ../../vitest.config.ts",
+    "test": "vitest",
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -61,5 +61,8 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "devDependencies": {
+    "vitest": "^0.30.1"
   }
 }

@@ -54,7 +54,7 @@
     "default-storage/"
   ],
   "scripts": {
-    "test": "vitest --config ../../vitest.config.ts",
+    "test": "vitest",
     "clean": "rimraf dist extras",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -79,7 +79,8 @@
     "graphql": "^16.6.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "urql": "workspace:*"
+    "urql": "workspace:*",
+    "vitest": "^0.30.1"
   },
   "publishConfig": {
     "access": "public",

@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "test": "vitest",
+    "test": "test -z $CI && vitest || pnpm -r --parallel run test run",
     "check": "tsc",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "node ./scripts/actions/build-all.mjs",
