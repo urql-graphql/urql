@@ -321,11 +321,7 @@ export const createQuery = <
     ): any {
       if (isSuspense() && prop === 'data') {
         const resource = dataResource();
-        if (resource !== undefined) {
-          return resource.data;
-        }
-
-        return undefined;
+        if (resource === undefined) return undefined;
       }
 
       return Reflect.get(target, prop);
