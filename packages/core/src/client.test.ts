@@ -181,7 +181,7 @@ describe('promisified methods', () => {
 });
 
 describe('synchronous methods', () => {
-  it('readQuery', () => {
+  it('readQuery', async () => {
     const result = client.readQuery(
       gql`
         {
@@ -193,9 +193,8 @@ describe('synchronous methods', () => {
       { example: 1234 }
     );
 
-    expect(receivedOps.length).toBe(2);
+    expect(receivedOps.length).toBe(1);
     expect(receivedOps[0].kind).toBe('query');
-    expect(receivedOps[1].kind).toBe('teardown');
     expect(result).toEqual({
       operation: {
         ...query,
@@ -204,6 +203,9 @@ describe('synchronous methods', () => {
         kind: 'query',
       },
     });
+
+    await Promise.resolve();
+    expect(receivedOps[1].kind).toBe('teardown');
   });
 });
 

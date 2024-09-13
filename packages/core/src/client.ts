@@ -586,9 +586,11 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     }
   }
 
-  function flushOperations() {
+  function flushOperations(operation?: Operation | void) {
     if (!isOperationBatchActive) {
-      Promise.resolve().then(dispatchOperation);
+      Promise.resolve(operation).then(dispatchOperation);
+    } else if (operation) {
+      queue.unshift(operation);
     }
   }
 
@@ -677,10 +679,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           for (let i = queue.length - 1; i >= 0; i--)
             if (queue[i].key === operation.key) queue.splice(i, 1);
           // Dispatch a teardown signal for the stopped operation
-          queue.unshift(
+          flushOperations(
             makeOperation('teardown', operation, operation.context)
           );
-          flushOperations();
         })
       );
     } else {
