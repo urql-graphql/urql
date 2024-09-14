@@ -12,6 +12,9 @@
     "jsr": "pnpm --filter @urql/core jsr",
     "jsr:dryrun": "pnpm --filter @urql/core jsr --dry-run"
   },
+  "engines": {
+    "pnpm": "^9.0.0"
+  },
   "eslintConfig": {
     "root": true,
     "extends": [
