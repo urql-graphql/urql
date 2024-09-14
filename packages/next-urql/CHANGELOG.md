@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+### Patch Changes
+
+- export SSRContext from provider
+  Submitted by [@ccummings](https://github.com/ccummings) (See [#3659](https://github.com/urql-graphql/urql/pull/3659))
+
 ## 1.1.1
 
 ### Patch Changes
