@@ -1,9 +1,8 @@
 {
-  "name": "@urql/next",
-  "version": "1.1.2",
+  "name": "@urql/solid",
+  "version": "0.1.0",
   "exports": {
-    ".": "./src/index.ts",
-    "./rsc": "./src/rsc.ts"
+    ".": "./src/index.ts"
   },
   "exclude": [
     "node_modules",
