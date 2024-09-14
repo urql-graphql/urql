@@ -4,15 +4,19 @@ import * as fs from 'fs/promises';
 import { relative, join, dirname, basename } from 'path';
 
 import { makePlugins, makeBasePlugins, makeOutputPlugins } from './plugins.mjs';
-import cleanup from './cleanup-plugin.mjs'
+import cleanup from './cleanup-plugin.mjs';
 import * as settings from './settings.mjs';
 
 const plugins = makePlugins();
 
-const chunkFileNames = (extension) => {
+const chunkFileNames = extension => {
   let hasDynamicChunk = false;
-  return (chunkInfo) => {
-    if (chunkInfo.isDynamicEntry || chunkInfo.isEntry || chunkInfo.isImplicitEntry) {
+  return chunkInfo => {
+    if (
+      chunkInfo.isDynamicEntry ||
+      chunkInfo.isEntry ||
+      chunkInfo.isImplicitEntry
+    ) {
       return `[name]${extension}`;
     } else if (!hasDynamicChunk) {
       hasDynamicChunk = true;
@@ -29,27 +33,34 @@ const input = settings.sources.reduce((acc, source) => {
     const rel = relative(source.dir, process.cwd());
     plugins.push({
       async writeBundle() {
-        const packageJson = JSON.stringify({
-          name: source.name,
-          private: true,
-          version: '0.0.0',
-          main: join(rel, dirname(source.main), basename(source.main, '.js')),
-          module: join(rel, source.module),
-          types: join(rel, source.types),
-          source: join(rel, source.source),
-          exports: {
-            '.': {
-              types: join(rel, source.types),
-              import: join(rel, source.module),
-              require: join(rel, source.main),
-              source: join(rel, source.source),
+        const packageJson = JSON.stringify(
+          {
+            name: source.name,
+            private: true,
+            version: '0.0.0',
+            main: join(rel, dirname(source.main), basename(source.main, '.js')),
+            module: join(rel, source.module),
+            types: join(rel, source.types),
+            source: join(rel, source.source),
+            exports: {
+              '.': {
+                types: join(rel, source.types),
+                import: join(rel, source.module),
+                require: join(rel, source.main),
+                source: join(rel, source.source),
+              },
+              './package.json': './package.json',
             },
-            './package.json': './package.json'
           },
-        }, null, 2).trim();
+          null,
+          2
+        ).trim();
 
         await fs.mkdir(source.dir, { recursive: true });
-        await fs.writeFile(join(source.dir, 'package.json'), packageJson + '\n');
+        await fs.writeFile(
+          join(source.dir, 'package.json'),
+          packageJson + '\n'
+        );
       },
     });
   }
@@ -63,9 +74,12 @@ const output = ({ format, isProduction }) => {
   if (format !== 'cjs' && format !== 'esm')
     throw new Error('Invalid option `format` at output({ ... })');
 
-  let extension = format === 'esm'
-    ? (settings.hasReact && !settings.hasNext ? '.es.js' : '.mjs')
-    : '.js';
+  let extension =
+    format === 'esm'
+      ? settings.hasReact && !settings.hasNext
+        ? '.es.js'
+        : '.mjs'
+      : '.js';
   if (isProduction) {
     extension = '.min' + extension;
   }
@@ -76,7 +90,7 @@ const output = ({ format, isProduction }) => {
     dir: './dist',
     exports: 'named',
     sourcemap: true,
-    banner: chunk => chunk.name === 'urql-next' ? '"use client"' : undefined,
+    banner: chunk => (chunk.name === 'urql-next' ? '"use client"' : undefined),
     sourcemapExcludeSources: false,
     hoistTransitiveImports: false,
     indent: false,
@@ -116,7 +130,7 @@ const commonConfig = {
   treeshake: {
     unknownGlobalSideEffects: false,
     tryCatchDeoptimization: false,
-    moduleSideEffects: false
+    moduleSideEffects: false,
   },
 };
 
@@ -148,5 +162,5 @@ export default [
       dir: './dist',
       plugins: [cleanup()],
     },
-  }
+  },
 ];

@@ -8,7 +8,7 @@ import { uploadArtifact } from './lib/github.mjs';
   try {
     const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request';
     const packages = await listPackages();
-    const packs = packages.map(async (cwd) => {
+    const packs = packages.map(async cwd => {
       await preparePackage(cwd);
       await packPackage(cwd);
       if (isPR) {

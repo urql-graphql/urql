@@ -48,7 +48,7 @@ Any GraphQL request can be abstracted into its query documents and its variables
 import { gql } from '@urql/core';
 
 const query = gql`
-  query($name: String!) {
+  query ($name: String!) {
     helloWorld(name: $name)
   }
 `;

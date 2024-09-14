@@ -3,9 +3,8 @@
 import { vi, expect, it, beforeEach, describe, Mock, afterEach } from 'vitest';
 
 vi.mock('../context', async () => {
-  const { delay, fromValue, pipe } = await vi.importActual<
-    typeof import('wonka')
-  >('wonka');
+  const { delay, fromValue, pipe } =
+    await vi.importActual<typeof import('wonka')>('wonka');
 
   const mock = {
     executeMutation: vi.fn(() =>

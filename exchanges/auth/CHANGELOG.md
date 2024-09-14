@@ -89,9 +89,7 @@
         });
       },
       didAuthError(error) {
-        return error.graphQLErrors.some(
-          e => e.extensions?.code === 'FORBIDDEN'
-        );
+        return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
       },
       async refreshAuth() {
         const result = await utils.mutate(REFRESH, { token });

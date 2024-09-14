@@ -11,7 +11,7 @@
 
 <script>
 import { provideClient, cacheExchange, fetchExchange } from '@urql/vue';
-import PokemonList from './PokemonList.vue'
+import PokemonList from './PokemonList.vue';
 
 export default {
   name: 'App',
@@ -22,7 +22,7 @@ export default {
     });
   },
   components: {
-    PokemonList
-  }
-}
+    PokemonList,
+  },
+};
 </script>

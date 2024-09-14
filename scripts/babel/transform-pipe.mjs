@@ -18,9 +18,9 @@ const pipePlugin = ({ types: t }) => ({
           const pipeSpecifier = specifiers[pipeSpecifierIndex];
           state.pipeName = pipeSpecifier.local.name;
           if (specifiers.length > 1) {
-          path.node.specifiers.splice(pipeSpecifierIndex, 1);
+            path.node.specifiers.splice(pipeSpecifierIndex, 1);
           } else {
-          	path.remove();
+            path.remove();
           }
         }
       }
@@ -37,8 +37,8 @@ const pipePlugin = ({ types: t }) => ({
           path.replaceWith(pipeExpression(t, args));
         }
       }
-    }
-  }
+    },
+  },
 });
 
 export default pipePlugin;

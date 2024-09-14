@@ -594,8 +594,8 @@ const readSelection = (
   return isQuery && ctx.partial && !hasFields
     ? undefined
     : hasChanged
-    ? output
-    : input;
+      ? output
+      : input;
 };
 
 const resolveResolverResult = (

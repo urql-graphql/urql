@@ -37,5 +37,5 @@ export default {
     };
   },
   name: 'PokemonList',
-}
+};
 </script>

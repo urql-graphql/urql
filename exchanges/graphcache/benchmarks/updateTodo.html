@@ -1,38 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Update Todo</title>
     <script>
-        window.process = { env: { NODE_ENV: "development" } };
+      window.process = { env: { NODE_ENV: 'development' } };
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="root"></div>
     <script type="module">
-        import urqlClient from './urqlClient.js';
-        import * as bench from '/bench.js';
-        import { makeEntries } from "./makeEntries.js";
-        import { makeTodo } from "./entities.js";
-        import { getAllTodos, addTodos, updateTodo } from "./benchmarks.js";
+      import urqlClient from './urqlClient.js';
+      import * as bench from '/bench.js';
+      import { makeEntries } from './makeEntries.js';
+      import { makeTodo } from './entities.js';
+      import { getAllTodos, addTodos, updateTodo } from './benchmarks.js';
 
-        // create todos to be added/written
-        const hundredTodos = makeEntries(100, makeTodo);
+      // create todos to be added/written
+      const hundredTodos = makeEntries(100, makeTodo);
 
-        const benchmark = async () => {
-            await addTodos(hundredTodos);
-            // measure how long update of last Todo entity takes on faux server-side (executeExchange) & cache
-            bench.start();
-            await updateTodo({id: "99", complete: true});
-            bench.stop();
-        };
+      const benchmark = async () => {
+        await addTodos(hundredTodos);
+        // measure how long update of last Todo entity takes on faux server-side (executeExchange) & cache
+        bench.start();
+        await updateTodo({ id: '99', complete: true });
+        bench.stop();
+      };
 
-        benchmark();
-        
+      benchmark();
     </script>
-</body>
-
+  </body>
 </html>

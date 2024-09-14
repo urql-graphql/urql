@@ -1,37 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>10000 Writes Complex</title>
     <script>
-        window.process = { env: { NODE_ENV: "development" } };
+      window.process = { env: { NODE_ENV: 'development' } };
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="root"></div>
     <script type="module">
-        import urqlClient from './urqlClient.js';
-        import * as bench from '/bench.js';
-        import { makeEntries } from "./makeEntries.js";
-        import { makeAuthor } from "./entities.js";
-        import { getAllAuthors, addAuthors } from "./benchmarks.js";
+      import urqlClient from './urqlClient.js';
+      import * as bench from '/bench.js';
+      import { makeEntries } from './makeEntries.js';
+      import { makeAuthor } from './entities.js';
+      import { getAllAuthors, addAuthors } from './benchmarks.js';
 
-        // create authors to be added/written
-        const hundredAuthors = makeEntries(10000, makeAuthor);
+      // create authors to be added/written
+      const hundredAuthors = makeEntries(10000, makeAuthor);
 
-        const benchmark = async () => {
-            // measure how long write takes
-            bench.start();
-            await addAuthors(hundredAuthors);
-            bench.stop();
-        };
+      const benchmark = async () => {
+        // measure how long write takes
+        bench.start();
+        await addAuthors(hundredAuthors);
+        bench.stop();
+      };
 
-        benchmark();
-
+      benchmark();
     </script>
-</body>
-
+  </body>
 </html>

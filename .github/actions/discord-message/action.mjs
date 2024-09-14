@@ -6,11 +6,14 @@ const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
 const octokit = github.getOctokit(GITHUB_TOKEN);
 
-const formatBody = (input) => {
+const formatBody = input => {
   const titleRe = /(?:^|\n)#+[^\n]+/g;
   const updatedDepsRe = /\n-\s*Updated dependencies[\s\S]+\n(\n\s+-[\s\S]+)*/gi;
   const markdownLinkRe = /\[([^\]]+)\]\(([^\)]+)\)/g;
-  const creditRe = new RegExp(`Submitted by (?:undefined|${markdownLinkRe.source})`, 'ig');
+  const creditRe = new RegExp(
+    `Submitted by (?:undefined|${markdownLinkRe.source})`,
+    'ig'
+  );
   const repeatedNewlineRe = /(?:\n[ ]*)*(\n[ ]*)/g;
   return input
     .replace(titleRe, '')
@@ -20,7 +23,7 @@ const formatBody = (input) => {
       return `Submitted by [${text}](${url})`;
     })
     .replace(markdownLinkRe, (_match, text, url) => `[${text}](<${url}>)`)
-    .replace(repeatedNewlineRe, (_match, text) => text ? ` ${text}` : '\n')
+    .replace(repeatedNewlineRe, (_match, text) => (text ? ` ${text}` : '\n'))
     .trim();
 };
 
@@ -51,12 +54,12 @@ async function main() {
   }
 
   // Get releases
-  const releasePromises = packages.map((entry) => {
+  const releasePromises = packages.map(entry => {
     return getReleaseBody(entry.name, entry.version);
   });
 
   const content = (await Promise.allSettled(releasePromises))
-    .map((x) => x.status === 'fulfilled' && x.value)
+    .map(x => x.status === 'fulfilled' && x.value)
     .filter(Boolean)
     .join('\n\n');
 
@@ -70,7 +73,10 @@ async function main() {
   });
 
   if (!response.ok) {
-    console.error('Something went wrong while sending the discord webhook.', response.status);
+    console.error(
+      'Something went wrong while sending the discord webhook.',
+      response.status
+    );
     console.error(await response.text());
   }
 }

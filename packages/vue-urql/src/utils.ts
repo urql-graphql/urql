@@ -23,8 +23,8 @@ const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
   typeof maybeRef === 'function'
     ? (maybeRef as () => T)()
     : maybeRef != null && isRef(maybeRef)
-    ? maybeRef.value
-    : maybeRef;
+      ? maybeRef.value
+      : maybeRef;
 
 const isPlainObject = (value: any): boolean => {
   if (typeof value !== 'object' || value === null) return false;
@@ -115,8 +115,8 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
   const isPaused: Ref<boolean> = isRef(args.pause)
     ? args.pause
     : typeof args.pause === 'function'
-    ? computed(args.pause)
-    : ref(!!args.pause);
+      ? computed(args.pause)
+      : ref(!!args.pause);
 
   const request = computed(() => createRequestWithArgs(args));
 

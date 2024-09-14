@@ -4,17 +4,17 @@ import glob from 'glob';
 
 import { workspaceRoot, workspaces, require } from './constants.mjs';
 
-const getPackageManifest = (cwd) =>
-  require(path.resolve(cwd, 'package.json'));
+const getPackageManifest = cwd => require(path.resolve(cwd, 'package.json'));
 
 const updatePackageManifest = async (cwd, manifest) => {
-  const sortDependencies = (dependencies) => {
-    if (dependencies == null)
-      return undefined;
-    return Object.keys(dependencies).sort().reduce((acc, key) => {
-      acc[key] = dependencies[key];
-      return acc;
-    }, {});
+  const sortDependencies = dependencies => {
+    if (dependencies == null) return undefined;
+    return Object.keys(dependencies)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = dependencies[key];
+        return acc;
+      }, {});
   };
 
   try {
@@ -23,7 +23,7 @@ const updatePackageManifest = async (cwd, manifest) => {
       manifest.devDependencies = sortDependencies(manifest.devDependencies);
       await fs.writeFile(
         path.resolve(cwd, 'package.json'),
-        JSON.stringify(manifest, null, 2) + '\n',
+        JSON.stringify(manifest, null, 2) + '\n'
       );
     }
   } catch (_error) {
@@ -31,12 +31,10 @@ const updatePackageManifest = async (cwd, manifest) => {
   }
 };
 
-const getPackageArtifact = (cwd) => {
+const getPackageArtifact = cwd => {
   const pkg = getPackageManifest(cwd);
   const name =
-    pkg.name[0] === "@"
-      ?  pkg.name.slice(1).replace(/\//g, '-')
-      : pkg.name;
+    pkg.name[0] === '@' ? pkg.name.slice(1).replace(/\//g, '-') : pkg.name;
   return `${name}-v${pkg.version}.tgz`;
 };
 

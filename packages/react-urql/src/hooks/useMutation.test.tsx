@@ -2,9 +2,8 @@ import { vi, expect, it, beforeEach, describe, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', async () => {
-  const { delay, fromValue, pipe } = await vi.importActual<
-    typeof import('wonka')
-  >('wonka');
+  const { delay, fromValue, pipe } =
+    await vi.importActual<typeof import('wonka')>('wonka');
 
   const mock = {
     executeMutation: vi.fn(() =>

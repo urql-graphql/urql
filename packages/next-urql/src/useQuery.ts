@@ -198,7 +198,9 @@ export type UseQueryResponse<
 export function useQuery<
   Data = any,
   Variables extends AnyVariables = AnyVariables,
->(args: UseQueryArgs<Variables, Data>): UseQueryResponse<Data, Variables> {
+>(
+  args: UseQueryArgs<Variables, Data>
+): UseQueryResponse<Data, Variables | undefined> {
   const request = createRequest(
     args.query,
     (args.variables || {}) as AnyVariables

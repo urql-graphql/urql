@@ -103,7 +103,7 @@ const app = createApp(Root);
 
 app.use(urql, {
   url: 'http://localhost:3000/graphql',
-  exchanges: [cacheExchange, fetchExchange]
+  exchanges: [cacheExchange, fetchExchange],
 });
 
 app.mount('#app');
@@ -587,7 +587,7 @@ import { gql, useMutation } from '@urql/vue';
 export default {
   setup() {
     const { executeMutation: updateTodo } = useMutation(gql`
-      mutation($id: ID!, $title: String!) {
+      mutation ($id: ID!, $title: String!) {
         updateTodo(id: $id, title: $title) {
           id
           title
@@ -623,7 +623,7 @@ import { gql, useMutation } from '@urql/vue';
 export default {
   setup() {
     const updateTodoResult = useMutation(gql`
-      mutation($id: ID!, $title: String!) {
+      mutation ($id: ID!, $title: String!) {
         updateTodo(id: $id, title: $title) {
           id
           title
@@ -664,7 +664,7 @@ import { gql, useMutation } from '@urql/vue';
 export default {
   setup() {
     const updateTodoResult = useMutation(gql`
-      mutation($id: ID!, $title: String!) {
+      mutation ($id: ID!, $title: String!) {
         updateTodo(id: $id, title: $title) {
           id
           title
