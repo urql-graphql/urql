@@ -84,6 +84,7 @@ const minifyIntrospectionType = (
       };
 
     case 'INPUT_OBJECT': {
+      // @ts-ignore TODO: add isOneOf support here
       return {
         kind: 'INPUT_OBJECT',
         name: type.name,

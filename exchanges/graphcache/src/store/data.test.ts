@@ -149,7 +149,7 @@ describe('inspectFields', () => {
           "arguments": {
             "id": "1",
           },
-          "fieldKey": "todo({\\"id\\":\\"1\\"})",
+          "fieldKey": "todo({"id":"1"})",
           "fieldName": "todo",
         },
         {
@@ -166,7 +166,7 @@ describe('inspectFields', () => {
           "arguments": {
             "id": "1",
           },
-          "fieldKey": "hasTodo({\\"id\\":\\"1\\"})",
+          "fieldKey": "hasTodo({"id":"1"})",
           "fieldName": "hasTodo",
         },
       ]
