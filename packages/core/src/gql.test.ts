@@ -1,10 +1,10 @@
 import { parse, print } from '@0no-co/graphql.web';
-import { vi, expect, it, beforeEach, SpyInstance } from 'vitest';
+import { vi, expect, it, beforeEach, MockInstance  } from 'vitest';
 
 import { gql } from './gql';
 import { keyDocument } from './utils';
 
-let warn: SpyInstance;
+let warn: MockInstance;
 
 beforeEach(() => {
   warn = vi.spyOn(console, 'warn');
