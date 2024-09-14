@@ -7,13 +7,14 @@ import {
   createRequest,
 } from '@urql/core';
 import {
+  batch,
   createComputed,
   createMemo,
   createResource,
   createSignal,
   onCleanup,
 } from 'solid-js';
-import { createStore, produce } from 'solid-js/store';
+import { createStore, produce, reconcile } from 'solid-js/store';
 import { useClient } from './context';
 import { type MaybeAccessor, asAccessor } from './utils';
 import type { Source, Subscription } from 'wonka';
@@ -258,16 +259,18 @@ export const createQuery = <
           );
         }),
         subscribe(res => {
-          setResult(
-            produce(draft => {
-              draft.data = res.data;
-              draft.stale = !!res.stale;
-              draft.fetching = false;
-              draft.error = res.error;
-              draft.operation = res.operation;
-              draft.extensions = res.extensions;
-            })
-          );
+          batch(() => {
+            setResult('data', reconcile(res.data));
+            setResult(
+              produce(draft => {
+                draft.stale = !!res.stale;
+                draft.fetching = false;
+                draft.error = res.error;
+                draft.operation = res.operation;
+                draft.extensions = res.extensions;
+              })
+            );
+          });
         })
       ).unsubscribe
     );

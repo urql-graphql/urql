@@ -1,4 +1,4 @@
-import { createStore } from 'solid-js/store';
+import { createStore, reconcile } from 'solid-js/store';
 import {
   type AnyVariables,
   type DocumentInput,
@@ -10,6 +10,7 @@ import {
 } from '@urql/core';
 import { useClient } from './context';
 import { pipe, onPush, filter, take, toPromise } from 'wonka';
+import { batch } from 'solid-js';
 
 export type CreateMutationState<
   Data = any,
@@ -158,13 +159,15 @@ export const createMutation = <
     return pipe(
       client.executeMutation(request, context),
       onPush(result => {
-        setState({
-          fetching: false,
-          stale: result.stale,
-          data: result.data,
-          error: result.error,
-          extensions: result.extensions,
-          operation: result.operation,
+        batch(() => {
+          setState('data', reconcile(result.data));
+          setState({
+            fetching: false,
+            stale: result.stale,
+            error: result.error,
+            extensions: result.extensions,
+            operation: result.operation,
+          });
         });
       }),
       filter(result => !result.hasNext),
