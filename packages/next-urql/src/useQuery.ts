@@ -209,5 +209,6 @@ export function useQuery<
 
   useUrqlValue(request.key);
 
+  // @ts-ignore Sorry what?
   return [result, execute];
 }

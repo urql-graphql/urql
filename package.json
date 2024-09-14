@@ -109,6 +109,7 @@
     "terser": "^5.17.1",
     "typescript": "^5.4.4",
     "vite": "^5.4.4",
+    "vite-tsconfig-paths": "^4.0.0",
     "vitest": "^2.1.0"
   },
   "dependencies": {
