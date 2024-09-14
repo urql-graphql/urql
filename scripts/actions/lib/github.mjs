@@ -7,7 +7,7 @@ const client = () => {
   return _client || (_client = create());
 };
 
-export const uploadArtifact = async (cwd) => {
+export const uploadArtifact = async cwd => {
   const manifest = getPackageManifest(cwd);
   const artifact = getPackageArtifact(cwd);
   console.log('> Uploading', manifest.name);
