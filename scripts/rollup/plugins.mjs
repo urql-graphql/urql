@@ -9,7 +9,7 @@ import visualizer from 'rollup-plugin-visualizer';
 import terser from '@rollup/plugin-terser';
 import cjsCheck from 'rollup-plugin-cjs-check';
 
-import cleanup from './cleanup-plugin.mjs'
+import cleanup from './cleanup-plugin.mjs';
 import babelPluginTransformPipe from '../babel/transform-pipe.mjs';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning.mjs';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target.mjs';
@@ -22,7 +22,7 @@ export const makeBasePlugins = () => [
     extensions: ['.js', '.ts', '.tsx'],
     mainFields: ['module', 'jsnext', 'main'],
     preferBuiltins: false,
-    browser: true
+    browser: true,
   }),
   commonjs({
     ignoreGlobal: true,
@@ -44,36 +44,51 @@ export const makePlugins = () => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
-      settings.hasReact && ['@babel/plugin-transform-react-jsx', {
-        pragma: 'React.createElement',
-        pragmaFrag: 'React.Fragment',
-        useBuiltIns: true
-      }],
-      !settings.hasReact && settings.hasPreact && ['@babel/plugin-transform-react-jsx', {
-        pragma: 'h',
-        useBuiltIns: true
-      }],
-    ].filter(Boolean)
+      settings.hasReact && [
+        '@babel/plugin-transform-react-jsx',
+        {
+          pragma: 'React.createElement',
+          pragmaFrag: 'React.Fragment',
+          useBuiltIns: true,
+        },
+      ],
+      !settings.hasReact &&
+        settings.hasPreact && [
+          '@babel/plugin-transform-react-jsx',
+          {
+            pragma: 'h',
+            useBuiltIns: true,
+          },
+        ],
+    ].filter(Boolean),
   }),
 ];
 
 export const makeOutputPlugins = ({ isProduction, extension }) => {
   if (typeof isProduction !== 'boolean')
-    throw new Error('Missing option `isProduction` on makeOutputPlugins({ ... })');
+    throw new Error(
+      'Missing option `isProduction` on makeOutputPlugins({ ... })'
+    );
   if (extension !== '.mjs' && extension !== '.js')
     throw new Error('Missing option `extension` on makeOutputPlugins({ ... })');
 
   return [
-    isProduction && replace({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    }),
+    isProduction &&
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
     cjsCheck({ extension }),
     cleanup(),
-    isProduction ? terserMinified : (extension !== '.js' ? terserPretty : null),
-    isProduction && settings.isAnalyze && visualizer({
-      filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
-      sourcemap: true,
-    }),
+    isProduction ? terserMinified : extension !== '.js' ? terserPretty : null,
+    isProduction &&
+      settings.isAnalyze &&
+      visualizer({
+        filename: path.resolve(
+          settings.cwd,
+          'node_modules/.cache/analyze.html'
+        ),
+        sourcemap: true,
+      }),
   ].filter(Boolean);
 };
 
@@ -93,7 +108,7 @@ const terserPretty = terser({
     sequences: false,
     loops: false,
     conditionals: false,
-    join_vars: false
+    join_vars: false,
   },
   mangle: {
     module: true,
@@ -103,8 +118,8 @@ const terserPretty = terser({
     comments: false,
     beautify: true,
     braces: true,
-    indent_level: 2
-  }
+    indent_level: 2,
+  },
 });
 
 const terserMinified = terser({
@@ -115,12 +130,12 @@ const terserMinified = terser({
   compress: {
     keep_infinity: true,
     pure_getters: true,
-    passes: 10
+    passes: 10,
   },
   mangle: {
     module: true,
   },
   output: {
-    comments: false
-  }
+    comments: false,
+  },
 });

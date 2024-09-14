@@ -1,10 +1,8 @@
 import { execa } from 'execa';
 
-const run = execa(
-  'pnpm',
-  ['run', process.env.INPUT_COMMAND],
-  { cwd: process.cwd(), }
-);
+const run = execa('pnpm', ['run', process.env.INPUT_COMMAND], {
+  cwd: process.cwd(),
+});
 
 run.stdout.pipe(process.stdout);
 run.stderr.pipe(process.stderr);

@@ -61,21 +61,23 @@ export type TypedDocumentNode<
 export type FormattedNode<Node> = Node extends readonly (infer Child)[]
   ? readonly FormattedNode<Child>[]
   : Node extends ValueNode | TypeNode
-  ? Node
-  : Node extends { kind: Kind }
-  ? {
-      [K in Exclude<keyof Node, 'directives' | 'loc'>]: FormattedNode<Node[K]>;
-    } extends infer Node
-    ? Node extends {
-        kind: Kind.FIELD | Kind.INLINE_FRAGMENT | Kind.FRAGMENT_SPREAD;
-      }
-      ? Node & {
-          _generated?: boolean;
-          _directives?: Record<string, DirectiveNode> | undefined;
-        }
-      : Node
-    : Node
-  : Node;
+    ? Node
+    : Node extends { kind: Kind }
+      ? {
+          [K in Exclude<keyof Node, 'directives' | 'loc'>]: FormattedNode<
+            Node[K]
+          >;
+        } extends infer Node
+        ? Node extends {
+            kind: Kind.FIELD | Kind.INLINE_FRAGMENT | Kind.FRAGMENT_SPREAD;
+          }
+          ? Node & {
+              _generated?: boolean;
+              _directives?: Record<string, DirectiveNode> | undefined;
+            }
+          : Node
+        : Node
+      : Node;
 
 /** Any GraphQL `DocumentNode` or query string input.
  *
@@ -384,20 +386,20 @@ export type GraphQLRequestParams<
           variables?: Variables;
         }
       : Variables extends {
-          [P in keyof Variables]: Exclude<Variables[P], null | void>;
-        }
-      ? Variables extends {
-          [P in keyof Variables]: never;
-        }
-        ? {
-            variables?: Variables;
+            [P in keyof Variables]: Exclude<Variables[P], null | void>;
           }
+        ? Variables extends {
+            [P in keyof Variables]: never;
+          }
+          ? {
+              variables?: Variables;
+            }
+          : {
+              variables: Variables;
+            }
         : {
-            variables: Variables;
-          }
-      : {
-          variables?: Variables;
-        }))
+            variables?: Variables;
+          }))
   | {
       query: DocumentInput<Data, Variables>;
       variables: Variables;

@@ -61,9 +61,7 @@ const Header = () => (
       <BlockLink href="https://formidable.com/">
         <FormidableLogo />
       </BlockLink>
-      <ProjectWording to="/">
-        urql
-      </ProjectWording>
+      <ProjectWording to="/">urql</ProjectWording>
     </Wrapper>
   </Fixed>
 );

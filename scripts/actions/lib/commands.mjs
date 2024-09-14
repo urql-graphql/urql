@@ -13,42 +13,35 @@ import { getPackageManifest, getPackageArtifact } from './packages.mjs';
 
 const pipeline = promisify(stream.pipeline);
 
-const buildPackage = async (cwd) => {
+const buildPackage = async cwd => {
   const manifest = getPackageManifest(cwd);
   console.log('> Building', manifest.name);
 
   try {
-    await execa(
-      'run-s',
-      ['build'],
-      {
-        preferLocal: true,
-        localDir: workspaceRoot,
-        cwd,
-      }
-    );
+    await execa('run-s', ['build'], {
+      preferLocal: true,
+      localDir: workspaceRoot,
+      cwd,
+    });
   } catch (error) {
     console.error('> Build failed', manifest.name);
     throw error;
   }
 };
 
-const preparePackage = async (cwd) => {
+const preparePackage = async cwd => {
   const manifest = getPackageManifest(cwd);
   console.log('> Preparing', manifest.name);
 
   try {
-    await execaNode(
-      require.resolve('../../prepare/index.js'),
-      { cwd },
-    );
+    await execaNode(require.resolve('../../prepare/index.js'), { cwd });
   } catch (error) {
     console.error('> Preparing failed', manifest.name);
     throw error;
   }
 };
 
-const packPackage = async (cwd) => {
+const packPackage = async cwd => {
   const manifest = getPackageManifest(cwd);
   const artifact = getPackageArtifact(cwd);
   console.log('> Packing', manifest.name);
@@ -65,7 +58,7 @@ const packPackage = async (cwd) => {
           portable: true,
           gzip: true,
         },
-        (await packlist(tree)).map((f) => `./${f}`)
+        (await packlist(tree)).map(f => `./${f}`)
       ),
       fs.createWriteStream(path.resolve(cwd, artifact))
     );

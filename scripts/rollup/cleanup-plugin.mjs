@@ -6,7 +6,7 @@ function cleanup() {
   const dtsFilter = createFilter(/\.d\.ts(\.map)?$/, null, { resolve: false });
 
   return {
-    name: "cleanup",
+    name: 'cleanup',
 
     renderChunk(input, chunk) {
       if (dtsFilter(chunk.fileName)) {

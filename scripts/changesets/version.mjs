@@ -27,8 +27,10 @@ const packages = (await listPackages()).reduce((map, dir) => {
   return map;
 }, {});
 
-const examples = (await glob('./examples/*/')).filter(x => !/node_modules$/.test(x));
-console.log(`Scope: updating ${examples.length} examples`)
+const examples = (await glob('./examples/*/')).filter(
+  x => !/node_modules$/.test(x)
+);
+console.log(`Scope: updating ${examples.length} examples`);
 for (const example of examples) {
   let hadMatch = false;
 
@@ -55,8 +57,8 @@ for (const example of examples) {
     !(manifest.devDependencies || {})['@urql/core'] &&
     !(manifest.dependencies || {})['@urql/core']
   ) {
-    (manifest.dependencies || manifest.devDependencies || {})['@urql/core']
-      = packages['@urql/core'];
+    (manifest.dependencies || manifest.devDependencies || {})['@urql/core'] =
+      packages['@urql/core'];
   }
 
   await updatePackageManifest(example, manifest);
