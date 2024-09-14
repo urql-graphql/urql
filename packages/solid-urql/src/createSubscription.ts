@@ -9,8 +9,14 @@ import {
   createRequest,
 } from '@urql/core';
 import { useClient } from './context';
-import { createStore, produce } from 'solid-js/store';
-import { createComputed, createSignal, onCleanup } from 'solid-js';
+import { createStore, produce, reconcile } from 'solid-js/store';
+import {
+  batch,
+  createComputed,
+  createSignal,
+  onCleanup,
+  untrack,
+} from 'solid-js';
 import { type Source, onEnd, pipe, subscribe } from 'wonka';
 
 /** Triggers {@link createSubscription} to re-execute a GraphQL subscription operation.
@@ -266,21 +272,27 @@ export const createSubscription = <
           );
         }),
         subscribe(res => {
-          setState(
-            produce(draft => {
-              draft.data =
-                res.data !== undefined
-                  ? typeof handler === 'function'
-                    ? handler(draft.data, res.data)
-                    : res.data
-                  : (draft.data as any);
-              draft.stale = !!res.stale;
-              draft.fetching = true;
-              draft.error = res.error;
-              draft.operation = res.operation;
-              draft.extensions = res.extensions;
-            })
-          );
+          batch(() => {
+            if (res.data !== undefined) {
+              const newData =
+                typeof handler === 'function'
+                  ? handler(
+                      untrack(() => state.data),
+                      res.data
+                    )
+                  : (res.data as Result);
+              setState('data', reconcile(newData));
+            }
+            setState(
+              produce(draft => {
+                draft.stale = !!res.stale;
+                draft.fetching = true;
+                draft.error = res.error;
+                draft.operation = res.operation;
+                draft.extensions = res.extensions;
+              })
+            );
+          });
         })
       ).unsubscribe
     );
