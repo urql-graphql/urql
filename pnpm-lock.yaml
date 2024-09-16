@@ -321,6 +321,22 @@ importers:
         specifier: ^16.6.0
         version: 16.6.0
 
+  exchanges/throw-on-error:
+    dependencies:
+      '@urql/core':
+        specifier: ^5.0.0
+        version: 5.0.6(graphql@16.6.0)
+      graphql-toe:
+        specifier: 0.1.2
+        version: 0.1.2
+      wonka:
+        specifier: ^6.3.2
+        version: 6.3.2
+    devDependencies:
+      graphql:
+        specifier: ^16.6.0
+        version: 16.6.0
+
   packages/core:
     dependencies:
       '@0no-co/graphql.web':
@@ -5366,6 +5382,9 @@ packages:
 
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
+
+  graphql-toe@0.1.2:
+    resolution: {integrity: sha512-XK04wXEHbLY33YHoPAnLMIafRKSOn7FTWzTCob23GC6o8DnO4ibkA8Aje+Udee8QdXx46TV6m6LQM9iU8C9vwQ==}
 
   graphql@16.6.0:
     resolution: {integrity: sha512-KPIBPDlW7NxrbT/eh4qPXz5FiFdL5UbaA0XUNz2Rp3Z3hqBSkbj0GVjwFDztsWVauZUWsbKHgMg++sk8UX0bkw==}
@@ -17176,6 +17195,8 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   graphemer@1.4.0: {}
+
+  graphql-toe@0.1.2: {}
 
   graphql@16.6.0: {}
 

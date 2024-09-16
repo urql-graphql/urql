@@ -1,0 +1,66 @@
+{
+  "name": "@urql/exchange-throw-on-error",
+  "version": "0.0.0",
+  "description": "An exchange for throw-on-error support in urql",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
+  "license": "MIT",
+  "author": "urql GraphQL Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urql-graphql/urql.git",
+    "directory": "exchanges/throw-on-error"
+  },
+  "keywords": [
+    "urql",
+    "graphql client",
+    "graphql",
+    "exchanges",
+    "throw on error"
+  ],
+  "main": "dist/urql-exchange-throw-on-error",
+  "module": "dist/urql-exchange-throw-on-error.mjs",
+  "types": "dist/urql-exchange-throw-on-error.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/urql-exchange-throw-on-error.d.ts",
+      "import": "./dist/urql-exchange-throw-on-error.mjs",
+      "require": "./dist/urql-exchange-throw-on-error.js",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "vitest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.mjs",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "devDependencies": {
+    "@urql/core": "workspace:*",
+    "graphql": "^16.0.0"
+  },
+  "peerDependencies": {
+    "@urql/core": "^5.0.0"
+  },
+  "dependencies": {
+    "@urql/core": "^5.0.0",
+    "graphql-toe": "0.1.2",
+    "wonka": "^6.3.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
