@@ -25,7 +25,7 @@ const Document = ({ Html, Head, Body, children }) => (
         rel="icon"
         type="image/png"
         sizes="32x32"
-        href="./favicon/favicon-32.png"
+        href="/favicon/favicon-32.png"
       />
       <link rel="manifest" href="./site.webmanifest" />
       <meta name="msapplication-TileColor" content="#ff4081" />
