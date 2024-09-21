@@ -271,7 +271,7 @@ describe('on query -> mutation', () => {
             __typename
             id
             text
-            createdAt(timezone: \\"GMT+1\\")
+            createdAt(timezone: "GMT+1")
           }
         }"
       `);

@@ -58,7 +58,7 @@
     "@react-native-community/netinfo": "^11.2.1",
     "@urql/core": "workspace:*",
     "@urql/exchange-graphcache": "workspace:*",
-    "vitest": "^0.30.1"
+    "vitest": "^2.1.1"
   },
   "publishConfig": {
     "access": "public",

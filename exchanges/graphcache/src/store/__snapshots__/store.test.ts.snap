@@ -2,17 +2,17 @@
 
 exports[`Store with storage > should be able to persist embedded data 1`] = `
 {
-  "Query%2eappointment({\\"id\\":\\"1\\"}).__typename": "\\"Appointment\\"",
-  "Query%2eappointment({\\"id\\":\\"1\\"}).info": "\\"urql meeting\\"",
-  "Query.appointment({\\"id\\":\\"1\\"})": ":\\"Query.appointment({\\\\\\"id\\\\\\":\\\\\\"1\\\\\\"})\\"",
+  "Query%2eappointment({"id":"1"}).__typename": ""Appointment"",
+  "Query%2eappointment({"id":"1"}).info": ""urql meeting"",
+  "Query.appointment({"id":"1"})": ":"Query.appointment({\\"id\\":\\"1\\"})"",
 }
 `;
 
 exports[`Store with storage > should be able to store and rehydrate data 1`] = `
 {
-  "Appointment:1.__typename": "\\"Appointment\\"",
-  "Appointment:1.id": "\\"1\\"",
-  "Appointment:1.info": "\\"urql meeting\\"",
-  "Query.appointment({\\"id\\":\\"1\\"})": ":\\"Appointment:1\\"",
+  "Appointment:1.__typename": ""Appointment"",
+  "Appointment:1.id": ""1"",
+  "Appointment:1.info": ""urql meeting"",
+  "Query.appointment({"id":"1"})": ":"Appointment:1"",
 }
 `;

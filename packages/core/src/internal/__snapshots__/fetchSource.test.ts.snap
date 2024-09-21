@@ -758,23 +758,7 @@ exports[`on success > uses the mock fetch if given 1`] = `
         "results": [
           {
             "type": "return",
-            "value": {
-              "headers": {
-                "get": [Function],
-              },
-              "status": 200,
-              "text": [MockFunction spy] {
-                "calls": [
-                  [],
-                ],
-                "results": [
-                  {
-                    "type": "return",
-                    "value": "{\\"status\\":200,\\"data\\":{\\"data\\":{\\"user\\":1200}}}",
-                  },
-                ],
-              },
-            },
+            "value": Promise {},
           },
         ],
       },
