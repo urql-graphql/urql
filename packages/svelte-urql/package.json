@@ -59,8 +59,7 @@
   "devDependencies": {
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
-    "svelte": "^3.20.0",
-    "vitest": "^2.1.1"
+    "svelte": "^3.20.0"
   },
   "publishConfig": {
     "access": "public",

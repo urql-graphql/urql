@@ -61,8 +61,5 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
-  },
-  "devDependencies": {
-    "vitest": "^2.1.1"
   }
 }
