@@ -80,6 +80,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "urql": "workspace:*",
+    "vite": "^3.2.4",
     "vitest": "^2.1.1"
   },
   "publishConfig": {

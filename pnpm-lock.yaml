@@ -265,6 +265,9 @@ importers:
       urql:
         specifier: workspace:*
         version: link:../../packages/react-urql
+      vite:
+        specifier: ^3.2.4
+        version: 3.2.5(@types/node@22.5.5)(terser@5.32.0)
       vitest:
         specifier: ^2.1.1
         version: 2.1.1(@types/node@22.5.5)(jsdom@25.0.0)(terser@5.32.0)
@@ -23107,7 +23110,7 @@ snapshots:
   vitest@2.1.1(@types/node@22.5.5)(jsdom@25.0.0)(terser@5.32.0):
     dependencies:
       '@vitest/expect': 2.1.1
-      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(vite@5.4.7(@types/node@22.5.5)(terser@5.32.0))
+      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(vite@5.4.7(@types/node@18.19.50)(terser@5.32.0))
       '@vitest/pretty-format': 2.1.1
       '@vitest/runner': 2.1.1
       '@vitest/snapshot': 2.1.1
