@@ -9,7 +9,7 @@ vi.mock('../context', async () => {
   const mock = {
     executeQuery: vi.fn(() =>
       pipe(
-        interval(200),
+        interval(150),
         map((i: number) => ({ data: i, error: i + 1 }))
       )
     ),
