@@ -41,22 +41,20 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@cypress/react": "^7.0.2",
+    "@cypress/react": "^8.0.2",
     "@cypress/vite-dev-server": "^5.0.4",
     "@testing-library/react": "^11.1.1",
     "@testing-library/react-hooks": "^5.1.2",
     "@types/react": "^17.0.4",
     "@types/react-test-renderer": "^17.0.1",
     "@urql/core": "workspace:*",
-    "cypress": "^12.8.1",
+    "cypress": "^13.14.0",
     "graphql": "^16.6.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
     "react-ssr-prepass": "^1.1.2",
-    "react-test-renderer": "^17.0.1",
-    "vite": "^3.2.4",
-    "vitest": "^0.30.1"
+    "react-test-renderer": "^17.0.1"
   },
   "peerDependencies": {
     "@urql/core": "^5.0.0",

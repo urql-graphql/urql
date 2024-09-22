@@ -57,8 +57,7 @@
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/netinfo": "^11.2.1",
     "@urql/core": "workspace:*",
-    "@urql/exchange-graphcache": "workspace:*",
-    "vitest": "^0.30.1"
+    "@urql/exchange-graphcache": "workspace:*"
   },
   "publishConfig": {
     "access": "public",

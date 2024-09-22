@@ -177,7 +177,7 @@ describe('stringifyDocument ', () => {
       .toMatchInlineSnapshot(`
         "{
           field(arg: 
-        \\"test #1\\")
+        "test #1")
         }"
       `);
   });
@@ -197,10 +197,10 @@ describe('stringifyDocument ', () => {
       .toMatchInlineSnapshot(`
         "{
           field(arg: 
-        \\"\\"\\"
+        """
           hello
           #hello
-          \\"\\"\\")
+          """)
         }"
       `);
   });

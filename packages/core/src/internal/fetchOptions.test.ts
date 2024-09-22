@@ -135,7 +135,7 @@ describe('makeFetchOptions', () => {
     const body = makeFetchBody(queryOperation);
     expect(makeFetchOptions(queryOperation, body)).toMatchInlineSnapshot(`
       {
-        "body": "{\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}",
+        "body": "{"operationName":"getUser","query":"query getUser($name: String) {\\n  user(name: $name) {\\n    id\\n    firstName\\n    lastName\\n  }\\n}","variables":{"name":"Clara"}}",
         "headers": {
           "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
           "content-type": "application/json",
@@ -158,7 +158,7 @@ describe('makeFetchOptions', () => {
 
     expect(makeFetchOptions(operation, body)).toMatchInlineSnapshot(`
       {
-        "body": "{\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}",
+        "body": "{"operationName":"getUser","query":"query getUser($name: String) {\\n  user(name: $name) {\\n    id\\n    firstName\\n    lastName\\n  }\\n}","variables":{"name":"Clara"}}",
         "headers": {
           "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
           "content-type": "application/json",
@@ -180,7 +180,7 @@ describe('makeFetchOptions', () => {
 
     expect(makeFetchOptions(operation, body)).toMatchInlineSnapshot(`
       {
-        "body": "{\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}",
+        "body": "{"operationName":"getUser","query":"query getUser($name: String) {\\n  user(name: $name) {\\n    id\\n    firstName\\n    lastName\\n  }\\n}","variables":{"name":"Clara"}}",
         "headers": {
           "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
           "content-type": "application/json",
@@ -239,9 +239,7 @@ describe('makeFetchOptions', () => {
       },
     });
 
-    expect(form.get('map')).toMatchInlineSnapshot(
-      '"{\\"0\\":[\\"variables.file\\"]}"'
-    );
+    expect(form.get('map')).toMatchInlineSnapshot(`"{"0":["variables.file"]}"`);
     expect(form.get('0')).toBeInstanceOf(Blob);
   });
 });

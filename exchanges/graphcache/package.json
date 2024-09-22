@@ -71,16 +71,15 @@
     "wonka": "^6.3.2"
   },
   "devDependencies": {
-    "@cypress/react": "^7.0.2",
+    "@cypress/react": "^8.0.2",
     "@urql/core": "workspace:*",
     "@urql/exchange-execute": "workspace:*",
     "@urql/introspection": "workspace:*",
-    "cypress": "^12.8.1",
+    "cypress": "^13.14.0",
     "graphql": "^16.6.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "urql": "workspace:*",
-    "vitest": "^0.30.1"
+    "urql": "workspace:*"
   },
   "publishConfig": {
     "access": "public",
