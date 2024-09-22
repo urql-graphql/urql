@@ -44,7 +44,7 @@
     "@cypress/react": "^8.0.2",
     "@cypress/vite-dev-server": "^5.2.0",
     "@testing-library/react": "^16.0.1",
-    "@types/react": "^17.0.4",
+    "@types/react": "^18.3.8",
     "@types/react-test-renderer": "^17.0.1",
     "@urql/core": "workspace:*",
     "cypress": "^13.14.0",

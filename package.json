@@ -43,7 +43,6 @@
       }
     },
     "overrides": {
-      "@types/react": "^17.0.39",
       "graphql": "^16.6.0",
       "styled-components": "^5.2.3",
       "wonka": "^6.3.2"

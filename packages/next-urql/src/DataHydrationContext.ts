@@ -44,7 +44,9 @@ export const DataHydrationContextProvider = ({
 
 export function useDataHydrationContext(): DataHydrationValue | undefined {
   const dataHydrationContext = React.useContext(DataHydrationContext);
-  const insertHtml = React.useContext(ServerInsertedHTMLContext);
+  const insertHtml = React.useContext(ServerInsertedHTMLContext as any) as (
+    cb: () => any
+  ) => any;
 
   if (typeof window !== 'undefined') return;
 

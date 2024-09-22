@@ -12,7 +12,6 @@ if (typeof document !== 'undefined') {
 
 const GoogleAnalytics = ({ children, ...rest }) => {
   const basename = `/${useBasepath() || ''}`;
-  // Test
   if (typeof document !== 'undefined') {
     // fragment doesn't like it when you try to give it attributes
     return (
