@@ -49,8 +49,7 @@
   },
   "devDependencies": {
     "@urql/core": "workspace:*",
-    "graphql": "^16.0.0",
-    "vitest": "^2.1.1"
+    "graphql": "^16.0.0"
   },
   "peerDependencies": {
     "@urql/core": "^5.0.0"
