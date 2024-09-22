@@ -20,6 +20,7 @@ framework bindings, you'll likely want to import from your framework bindings pa
 
 ## Client
 
+test
 The `Client` manages all operations and ongoing requests to the exchange pipeline.
 It accepts several options on creation.
 
