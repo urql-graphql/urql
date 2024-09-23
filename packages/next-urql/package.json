@@ -49,8 +49,8 @@
   "devDependencies": {
     "@urql/core": "workspace:*",
     "urql": "workspace:*",
-    "@types/react": "^18.2.6",
-    "@types/react-dom": "^18.2.4",
+    "@types/react": "^18.3.8",
+    "@types/react-dom": "^18.3.0",
     "graphql": "^16.0.0",
     "next": "^13.0.0",
     "react": "^18.0.0",

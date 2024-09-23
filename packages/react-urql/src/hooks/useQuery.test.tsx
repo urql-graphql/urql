@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { vi, expect, it, beforeEach, describe, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011

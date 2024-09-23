@@ -42,19 +42,18 @@
   },
   "devDependencies": {
     "@cypress/react": "^8.0.2",
-    "@cypress/vite-dev-server": "^5.0.4",
-    "@testing-library/react": "^11.1.1",
-    "@testing-library/react-hooks": "^5.1.2",
-    "@types/react": "^17.0.4",
+    "@cypress/vite-dev-server": "^5.2.0",
+    "@testing-library/react": "^16.0.1",
+    "@types/react": "^18.3.8",
     "@types/react-test-renderer": "^17.0.1",
     "@urql/core": "workspace:*",
     "cypress": "^13.14.0",
     "graphql": "^16.6.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-is": "^17.0.1",
-    "react-ssr-prepass": "^1.1.2",
-    "react-test-renderer": "^17.0.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-is": "^18.3.1",
+    "react-ssr-prepass": "^1.5.0",
+    "react-test-renderer": "^18.3.1"
   },
   "peerDependencies": {
     "@urql/core": "^5.0.0",
