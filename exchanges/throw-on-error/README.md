@@ -1,6 +1,6 @@
 # @urql/exchange-throw-on-error (Exchange factory)
 
-`@urql/exchange-throw-on-error` is an exchange for the [`urql`](../../README.md) GraphQL client that makes field access to data throw an error if the field was errored.
+`@urql/exchange-throw-on-error` is an exchange for the [`urql`](../../README.md) GraphQL client that makes field access to data throw an error if the field errored.
 
 It is built on top of the [`graphql-toe`](https://github.com/graphile/graphql-toe) package.
 
