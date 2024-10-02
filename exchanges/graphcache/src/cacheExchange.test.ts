@@ -1552,40 +1552,69 @@ describe('directives', () => {
     });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const query = gql`
-      {
+    const initialQuery = gql`
+      query {
         latestTodo {
           id
-          text
-          completed @_required
         }
       }
     `;
 
-    const operation = client.createRequestOperation('query', {
+    const query = gql`
+      {
+        latestTodo {
+          id
+          author @_required {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const initialQueryOperation = client.createRequestOperation('query', {
       key: 1,
+      query: initialQuery,
+      variables: undefined,
+    });
+
+    const queryOperation = client.createRequestOperation('query', {
+      key: 2,
       query,
       variables: undefined,
     });
 
-    const queryResult: OperationResult = {
+    const initialQueryResult: OperationResult = {
       ...queryResponse,
-      operation,
+      operation: initialQueryOperation,
       data: {
         __typename: 'Query',
-        latestTodo: [
-          {
-            id: '1',
-            text: 'learn urql',
-            completed: null,
-            __typename: 'Todo',
-          },
-        ],
+        latestTodo: {
+          __typename: 'Todo',
+          id: '1',
+        },
+      },
+    };
+
+    const queryResult: OperationResult = {
+      ...queryResponse,
+      operation: queryOperation,
+      data: {
+        __typename: 'Query',
+        latestTodo: {
+          __typename: 'Todo',
+          id: '1',
+          author: null,
+        },
       },
     };
 
     const response = vi.fn((forwardOp: Operation): OperationResult => {
-      if (forwardOp.key === 1) return queryResult;
+      if (forwardOp.key === 1) {
+        return initialQueryResult;
+      } else if (forwardOp.key === 2) {
+        return queryResult;
+      }
       return undefined as any;
     });
 
@@ -1603,9 +1632,17 @@ describe('directives', () => {
       publish
     );
 
-    next(operation);
+    next(initialQueryOperation);
+    vi.runAllTimers();
+    next(queryOperation);
+    vi.runAllTimers();
 
-    expect(result.mock.calls[0][0].data).toEqual(null);
+    expect(result.mock.calls[0][0].data).toEqual({
+      latestTodo: {
+        id: '1',
+      },
+    });
+    expect(result.mock.calls[1][0].data).toEqual(null);
   });
 });
 
