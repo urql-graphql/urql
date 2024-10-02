@@ -1605,8 +1605,6 @@ describe('directives', () => {
 
     next(operation);
 
-    console.log(result.mock.calls[0][0])
-
     expect(result.mock.calls[0][0].data).toEqual(null);
   });
 });
