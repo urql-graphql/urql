@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.2.0
+
+### Minor Changes
+
+- Allow @\_required directive to be used in combination with configured schemas
+  Submitted by [@AndrewIngram](https://github.com/AndrewIngram) (See [#3685](https://github.com/urql-graphql/urql/pull/3685))
+
 ## 7.1.3
 
 ### Patch Changes
