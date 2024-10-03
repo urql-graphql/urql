@@ -534,7 +534,8 @@ const readSelection = (
       (directives.optional ||
         (optionalRef && !directives.required) ||
         !!getFieldError(ctx) ||
-        (store.schema &&
+        (!directives.required &&
+          store.schema &&
           isFieldNullable(store.schema, typename, fieldName, ctx.store.logger)))
     ) {
       // The field is uncached or has errored, so it'll be set to null and skipped

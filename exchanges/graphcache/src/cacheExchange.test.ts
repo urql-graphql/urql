@@ -1544,6 +1544,106 @@ describe('directives', () => {
     expect(reexecuteOperation).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0].data).toEqual(null);
   });
+
+  it('does not return missing fields when nullable fields from a defined schema are marked as required in the query', () => {
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const initialQuery = gql`
+      query {
+        latestTodo {
+          id
+        }
+      }
+    `;
+
+    const query = gql`
+      {
+        latestTodo {
+          id
+          author @_required {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const initialQueryOperation = client.createRequestOperation('query', {
+      key: 1,
+      query: initialQuery,
+      variables: undefined,
+    });
+
+    const queryOperation = client.createRequestOperation('query', {
+      key: 2,
+      query,
+      variables: undefined,
+    });
+
+    const initialQueryResult: OperationResult = {
+      ...queryResponse,
+      operation: initialQueryOperation,
+      data: {
+        __typename: 'Query',
+        latestTodo: {
+          __typename: 'Todo',
+          id: '1',
+        },
+      },
+    };
+
+    const queryResult: OperationResult = {
+      ...queryResponse,
+      operation: queryOperation,
+      data: {
+        __typename: 'Query',
+        latestTodo: {
+          __typename: 'Todo',
+          id: '1',
+          author: null,
+        },
+      },
+    };
+
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return initialQueryResult;
+      } else if (forwardOp.key === 2) {
+        return queryResult;
+      }
+      return undefined as any;
+    });
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    pipe(
+      cacheExchange({
+        schema: minifyIntrospectionQuery(
+          // eslint-disable-next-line
+          require('./test-utils/simple_schema.json')
+        ),
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(initialQueryOperation);
+    vi.runAllTimers();
+    next(queryOperation);
+    vi.runAllTimers();
+
+    expect(result.mock.calls[0][0].data).toEqual({
+      latestTodo: {
+        id: '1',
+      },
+    });
+    expect(result.mock.calls[1][0].data).toEqual(null);
+  });
 });
 
 describe('optimistic updates', () => {
