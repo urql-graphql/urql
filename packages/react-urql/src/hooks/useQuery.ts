@@ -263,7 +263,12 @@ export function useQuery<
 
         const subscription = pipe(
           source,
-          takeWhile(() => (suspense && !resolve) || !result),
+          takeWhile(
+            () =>
+              (suspense && !resolve) ||
+              !result ||
+              ('hasNext' in result && result.hasNext)
+          ),
           subscribe(_result => {
             result = _result;
             if (resolve) resolve(result);
