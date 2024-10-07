@@ -1,5 +1,12 @@
 # urql
 
+## 4.2.0
+
+### Minor Changes
+
+- Support use of defer with suspense
+  Submitted by [@AndrewIngram](https://github.com/AndrewIngram) (See [#3687](https://github.com/urql-graphql/urql/pull/3687))
+
 ## 4.1.0
 
 ### Minor Changes
