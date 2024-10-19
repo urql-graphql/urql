@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.0.7
+
+### Patch Changes
+
+- Remove `for-of` syntax from `@urql/core` helpers for JSC memory reduction
+  Submitted by [@kitten](https://github.com/kitten) (See [#3690](https://github.com/urql-graphql/urql/pull/3690))
+
 ## 5.0.6
 
 ### Patch Changes
