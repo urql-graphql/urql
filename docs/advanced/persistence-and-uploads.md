@@ -126,6 +126,9 @@ In a browser, the `File` object may often be retrieved via a
 [file input](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications),
 for example.
 
+> **Note:** If you are using your own version of `File` and `Blob` ensure you are properly extending the
+> so it can be properly identified as a file.
+
 The `@urql/core@4` package supports File Uploads natively, so we won't have to do any installation
 or setup work. When `urql` sees a `File` or a `Blob` anywhere in your `variables`, it switches to
 a `multipart/form-data` request, converts the request to a `FormData` object, according to the
