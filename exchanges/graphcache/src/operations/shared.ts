@@ -192,24 +192,27 @@ export function makeSelectionIterator(
   selectionSet: FormattedNode<SelectionSet>,
   ctx: Context
 ): SelectionIterator {
-  let child: SelectionIterator | void;
-  let index = 0;
+  interface stackState {
+    selectionSet: FormattedNode<SelectionSet>;
+    index: number;
+    defer: boolean;
+    optional: boolean | undefined;
+  }
+
+  const stack: stackState[] = [
+    {
+      selectionSet,
+      index: 0,
+      defer: _defer,
+      optional: _optional,
+    },
+  ];
 
   return function next() {
-    let node: FormattedNode<FieldNode> | undefined;
-    while (child || index < selectionSet.length) {
-      node = undefined;
-      deferRef = _defer;
-      optionalRef = _optional;
-      if (child) {
-        if ((node = child())) {
-          return node;
-        } else {
-          child = undefined;
-          if (process.env.NODE_ENV !== 'production') popDebugNode();
-        }
-      } else {
-        const select = selectionSet[index++];
+    while (stack.length > 0) {
+      let state = stack[stack.length - 1];
+      while (state.index < state.selectionSet.length) {
+        const select = state.selectionSet[state.index++];
         if (!shouldInclude(select, ctx.variables)) {
           /*noop*/
         } else if (select.kind !== Kind.FIELD) {
@@ -235,7 +238,6 @@ export function makeSelectionIterator(
                     ctx.variables,
                     ctx.store.logger
                   ));
-
             if (
               isMatching ||
               (currentOperation === 'write' && !ctx.store.schema)
@@ -251,23 +253,29 @@ export function makeSelectionIterator(
                 writeConcreteType(fragment.typeCondition.name.value, typename!);
               }
 
-              child = makeSelectionIterator(
-                typename,
-                entityKey,
-                _defer || isDeferred(select, ctx.variables),
-                isFragmentOptional !== undefined
-                  ? isFragmentOptional
-                  : _optional,
-                getSelectionSet(fragment),
-                ctx
+              stack.push(
+                (state = {
+                  selectionSet: getSelectionSet(fragment),
+                  index: 0,
+                  defer: state.defer || isDeferred(select, ctx.variables),
+                  optional:
+                    isFragmentOptional !== undefined
+                      ? isFragmentOptional
+                      : state.optional,
+                })
               );
             }
           }
         } else if (currentOperation === 'write' || !select._generated) {
+          deferRef = state.defer;
+          optionalRef = state.optional;
           return select;
         }
       }
+      stack.pop();
+      if (process.env.NODE_ENV !== 'production') popDebugNode();
     }
+    return undefined;
   };
 }
 
