@@ -37,7 +37,7 @@ import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
 import type { Context } from './shared';
 import {
-  makeSelectionIterator,
+  SelectionIterator,
   ensureData,
   makeContext,
   updateContext,
@@ -142,7 +142,7 @@ const readRoot = (
     return input;
   }
 
-  const iterate = makeSelectionIterator(
+  const selection = new SelectionIterator(
     entityKey,
     entityKey,
     false,
@@ -154,7 +154,7 @@ const readRoot = (
   let node: FormattedNode<FieldNode> | void;
   let hasChanged = InMemoryData.currentForeignData;
   const output = InMemoryData.makeData(input);
-  while ((node = iterate())) {
+  while ((node = selection.next())) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = input[fieldAlias];
     // Add the current alias to the walked path before processing the field's value
@@ -387,7 +387,7 @@ const readSelection = (
     return;
   }
 
-  const iterate = makeSelectionIterator(
+  const selection = new SelectionIterator(
     typename,
     entityKey,
     false,
@@ -402,7 +402,7 @@ const readSelection = (
   let node: FormattedNode<FieldNode> | void;
   const hasPartials = ctx.partial;
   const output = InMemoryData.makeData(input);
-  while ((node = iterate()) !== undefined) {
+  while ((node = selection.next()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
