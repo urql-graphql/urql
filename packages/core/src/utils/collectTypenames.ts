@@ -5,7 +5,9 @@ interface EntityLike {
 
 const collectTypes = (obj: EntityLike | EntityLike[], types: Set<string>) => {
   if (Array.isArray(obj)) {
-    for (const item of obj) collectTypes(item, types);
+    for (let i = 0, l = obj.length; i < l; i++) {
+      collectTypes(obj[i], types);
+    }
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
       if (key === '__typename' && typeof obj[key] === 'string') {
