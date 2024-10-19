@@ -53,13 +53,18 @@ export const makeResult = (
 
 const deepMerge = (target: any, source: any): any => {
   if (typeof target === 'object' && target != null) {
+    if (Array.isArray(target)) {
+      target = [...target];
+      for (let i = 0, l = source.length; i < l; i++)
+        target[i] = deepMerge(target[i], source[i]);
+    }
     if (
       !target.constructor ||
       target.constructor === Object ||
       Array.isArray(target)
     ) {
-      target = Array.isArray(target) ? [...target] : { ...target };
-      for (const key of Object.keys(source))
+      target = { ...target };
+      for (const key in source)
         target[key] = deepMerge(target[key], source[key]);
       return target;
     }
@@ -108,7 +113,8 @@ export const mergeResultPatch = (
 
   const withData = { data: prevResult.data };
   if (incremental) {
-    for (const patch of incremental) {
+    for (let i = 0, l = incremental.length; i < l; i++) {
+      const patch = incremental[i];
       if (Array.isArray(patch.errors)) {
         errors.push(...(patch.errors as any));
       }
