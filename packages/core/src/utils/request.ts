@@ -180,7 +180,8 @@ export const createRequest = <
  * @returns the operation's name contained within the document, or `undefined`
  */
 export const getOperationName = (query: DocumentNode): string | undefined => {
-  for (const node of query.definitions) {
+  for (let i = 0, l = query.definitions.length; i < l; i++) {
+    const node = query.definitions[i];
     if (node.kind === Kind.OPERATION_DEFINITION) {
       return node.name ? node.name.value : undefined;
     }
@@ -192,7 +193,8 @@ export const getOperationName = (query: DocumentNode): string | undefined => {
  * @returns the operation's type contained within the document, or `undefined`
  */
 export const getOperationType = (query: DocumentNode): string | undefined => {
-  for (const node of query.definitions) {
+  for (let i = 0, l = query.definitions.length; i < l; i++) {
+    const node = query.definitions[i];
     if (node.kind === Kind.OPERATION_DEFINITION) {
       return node.operation;
     }
