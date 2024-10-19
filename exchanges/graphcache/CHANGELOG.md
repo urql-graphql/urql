@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.2.1
+
+### Patch Changes
+
+- Update selection iterator implementation for JSC memory reduction
+  Submitted by [@kitten](https://github.com/kitten) (See [#3693](https://github.com/urql-graphql/urql/pull/3693))
+
 ## 7.2.0
 
 ### Minor Changes
