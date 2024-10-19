@@ -12,9 +12,9 @@ const stringify = (x: any, includeFiles: boolean): string => {
     return stringify(x.toJSON(), includeFiles);
   } else if (Array.isArray(x)) {
     let out = '[';
-    for (const value of x) {
+    for (let i = 0, l = x.length; i < l; i++) {
       if (out.length > 1) out += ',';
-      out += stringify(value, includeFiles) || 'null';
+      out += stringify(x[i], includeFiles) || 'null';
     }
     out += ']';
     return out;
@@ -39,11 +39,11 @@ const stringify = (x: any, includeFiles: boolean): string => {
 
   seen.add(x);
   let out = '{';
-  for (const key of keys) {
-    const value = stringify(x[key], includeFiles);
+  for (let i = 0, l = keys.length; i < l; i++) {
+    const value = stringify(x[keys[i]], includeFiles);
     if (value) {
       if (out.length > 1) out += ',';
-      out += stringify(key, includeFiles) + ':' + value;
+      out += stringify(keys[i], includeFiles) + ':' + value;
     }
   }
 
@@ -62,7 +62,7 @@ const extract = (map: FileMap, path: string, x: any): void => {
     map.set(path, x as File | Blob);
   } else {
     seen.add(x);
-    for (const key of Object.keys(x)) extract(map, `${path}.${key}`, x[key]);
+    for (const key in x) extract(map, `${path}.${key}`, x[key]);
   }
 };
 
