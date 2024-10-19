@@ -79,7 +79,7 @@ function gql(parts: string | TemplateStringsArray /* arguments */) {
 
   source.unshift(keyDocument(body));
   for (let i = 0; i < source.length; i++) {
-    for (let j = 0; j < source[i].definitions; j++) {
+    for (let j = 0; j < source[i].definitions.length; j++) {
       const definition = source[i].definitions[j];
       if (definition.kind === Kind.FRAGMENT_DEFINITION) {
         const name = definition.name.value;
