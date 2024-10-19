@@ -7,7 +7,7 @@ import {
 } from '@urql/core';
 import { FieldNode } from '@0no-co/graphql.web';
 
-import { makeSelectionIterator, deferRef } from './shared';
+import { SelectionIterator, deferRef } from './shared';
 import { SelectionSet } from '../ast';
 
 const selectionOfDocument = (
@@ -21,7 +21,7 @@ const selectionOfDocument = (
 
 const ctx = {} as any;
 
-describe('makeSelectionIterator', () => {
+describe('SelectionIterator', () => {
   it('emits all fields', () => {
     const selection = selectionOfDocument(gql`
       {
@@ -30,7 +30,7 @@ describe('makeSelectionIterator', () => {
         c
       }
     `);
-    const iterate = makeSelectionIterator(
+    const iterate = new SelectionIterator(
       'Query',
       'Query',
       false,
@@ -41,7 +41,7 @@ describe('makeSelectionIterator', () => {
     const result: FieldNode[] = [];
 
     let node: FieldNode | void;
-    while ((node = iterate())) result.push(node);
+    while ((node = iterate.next())) result.push(node);
 
     expect(result).toMatchInlineSnapshot(`
       [
@@ -90,7 +90,7 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator(
+    const iterate = new SelectionIterator(
       'Query',
       'Query',
       false,
@@ -101,7 +101,7 @@ describe('makeSelectionIterator', () => {
     const result: FieldNode[] = [];
 
     let node: FieldNode | void;
-    while ((node = iterate())) result.push(node);
+    while ((node = iterate.next())) result.push(node);
 
     expect(result).toMatchInlineSnapshot('[]');
   });
@@ -121,7 +121,7 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator(
+    const iterate = new SelectionIterator(
       'Query',
       'Query',
       false,
@@ -132,7 +132,7 @@ describe('makeSelectionIterator', () => {
     const result: FieldNode[] = [];
 
     let node: FieldNode | void;
-    while ((node = iterate())) result.push(node);
+    while ((node = iterate.next())) result.push(node);
 
     expect(result).toMatchInlineSnapshot(`
       [
@@ -207,7 +207,7 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator(
+    const iterate = new SelectionIterator(
       'Query',
       'Query',
       false,
@@ -217,7 +217,7 @@ describe('makeSelectionIterator', () => {
     );
 
     const deferred: boolean[] = [];
-    while (iterate()) deferred.push(deferRef);
+    while (iterate.next()) deferred.push(deferRef);
     expect(deferred).toEqual([
       false, // a
       true, // b
@@ -243,7 +243,7 @@ describe('makeSelectionIterator', () => {
       }
     `);
 
-    const iterate = makeSelectionIterator(
+    const iterate = new SelectionIterator(
       'Query',
       'Query',
       true,
@@ -253,7 +253,7 @@ describe('makeSelectionIterator', () => {
     );
 
     const deferred: boolean[] = [];
-    while (iterate()) deferred.push(deferRef);
+    while (iterate.next()) deferred.push(deferRef);
     expect(deferred).toEqual([true, true, true]);
   });
 });

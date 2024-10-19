@@ -1,7 +1,6 @@
 import type { CombinedError, ErrorLike, FormattedNode } from '@urql/core';
 
 import type {
-  FieldNode,
   InlineFragmentNode,
   FragmentDefinitionNode,
 } from '@0no-co/graphql.web';
@@ -161,114 +160,133 @@ const isFragmentHeuristicallyMatching = (
   });
 };
 
-interface SelectionIterator {
-  (): FormattedNode<FieldNode> | undefined;
-}
+export class SelectionIterator {
+  typename: undefined | string;
+  entityKey: string;
+  ctx: Context;
+  stack: {
+    selectionSet: FormattedNode<SelectionSet>;
+    index: number;
+    defer: boolean;
+    optional: boolean | undefined;
+  }[];
 
-// NOTE: Outside of this file, we expect `_defer` to always be reset to `false`
-export function makeSelectionIterator(
-  typename: undefined | string,
-  entityKey: string,
-  _defer: false,
-  _optional: undefined,
-  selectionSet: FormattedNode<SelectionSet>,
-  ctx: Context
-): SelectionIterator;
-// NOTE: Inside this file we expect the state to be recursively passed on
-export function makeSelectionIterator(
-  typename: undefined | string,
-  entityKey: string,
-  _defer: boolean,
-  _optional: undefined | boolean,
-  selectionSet: FormattedNode<SelectionSet>,
-  ctx: Context
-): SelectionIterator;
+  // NOTE: Outside of this file, we expect `_defer` to always be reset to `false`
+  constructor(
+    typename: undefined | string,
+    entityKey: string,
+    _defer: false,
+    _optional: undefined,
+    selectionSet: FormattedNode<SelectionSet>,
+    ctx: Context
+  );
+  // NOTE: Inside this file we expect the state to be recursively passed on
+  constructor(
+    typename: undefined | string,
+    entityKey: string,
+    _defer: boolean,
+    _optional: undefined | boolean,
+    selectionSet: FormattedNode<SelectionSet>,
+    ctx: Context
+  );
 
-export function makeSelectionIterator(
-  typename: undefined | string,
-  entityKey: string,
-  _defer: boolean,
-  _optional: boolean | undefined,
-  selectionSet: FormattedNode<SelectionSet>,
-  ctx: Context
-): SelectionIterator {
-  let child: SelectionIterator | void;
-  let index = 0;
+  constructor(
+    typename: undefined | string,
+    entityKey: string,
+    _defer: boolean,
+    _optional: boolean | undefined,
+    selectionSet: FormattedNode<SelectionSet>,
+    ctx: Context
+  ) {
+    this.typename = typename;
+    this.entityKey = entityKey;
+    this.ctx = ctx;
+    this.stack = [
+      {
+        selectionSet,
+        index: 0,
+        defer: _defer,
+        optional: _optional,
+      },
+    ];
+  }
 
-  return function next() {
-    let node: FormattedNode<FieldNode> | undefined;
-    while (child || index < selectionSet.length) {
-      node = undefined;
-      deferRef = _defer;
-      optionalRef = _optional;
-      if (child) {
-        if ((node = child())) {
-          return node;
-        } else {
-          child = undefined;
-          if (process.env.NODE_ENV !== 'production') popDebugNode();
-        }
-      } else {
-        const select = selectionSet[index++];
-        if (!shouldInclude(select, ctx.variables)) {
+  next() {
+    while (this.stack.length > 0) {
+      let state = this.stack[this.stack.length - 1];
+      while (state.index < state.selectionSet.length) {
+        const select = state.selectionSet[state.index++];
+        if (!shouldInclude(select, this.ctx.variables)) {
           /*noop*/
         } else if (select.kind !== Kind.FIELD) {
           // A fragment is either referred to by FragmentSpread or inline
           const fragment =
             select.kind !== Kind.INLINE_FRAGMENT
-              ? ctx.fragments[getName(select)]
+              ? this.ctx.fragments[getName(select)]
               : select;
           if (fragment) {
             const isMatching =
               !fragment.typeCondition ||
-              (ctx.store.schema
-                ? isInterfaceOfType(ctx.store.schema, fragment, typename)
+              (this.ctx.store.schema
+                ? isInterfaceOfType(
+                    this.ctx.store.schema,
+                    fragment,
+                    this.typename
+                  )
                 : (currentOperation === 'read' &&
                     isFragmentMatching(
                       fragment.typeCondition.name.value,
-                      typename
+                      this.typename
                     )) ||
                   isFragmentHeuristicallyMatching(
                     fragment,
-                    typename,
-                    entityKey,
-                    ctx.variables,
-                    ctx.store.logger
+                    this.typename,
+                    this.entityKey,
+                    this.ctx.variables,
+                    this.ctx.store.logger
                   ));
-
             if (
               isMatching ||
-              (currentOperation === 'write' && !ctx.store.schema)
+              (currentOperation === 'write' && !this.ctx.store.schema)
             ) {
               if (process.env.NODE_ENV !== 'production')
-                pushDebugNode(typename, fragment);
+                pushDebugNode(this.typename, fragment);
               const isFragmentOptional = isOptional(select);
               if (
                 isMatching &&
                 fragment.typeCondition &&
-                typename !== fragment.typeCondition.name.value
+                this.typename !== fragment.typeCondition.name.value
               ) {
-                writeConcreteType(fragment.typeCondition.name.value, typename!);
+                writeConcreteType(
+                  fragment.typeCondition.name.value,
+                  this.typename!
+                );
               }
 
-              child = makeSelectionIterator(
-                typename,
-                entityKey,
-                _defer || isDeferred(select, ctx.variables),
-                isFragmentOptional !== undefined
-                  ? isFragmentOptional
-                  : _optional,
-                getSelectionSet(fragment),
-                ctx
+              this.stack.push(
+                (state = {
+                  selectionSet: getSelectionSet(fragment),
+                  index: 0,
+                  defer: state.defer || isDeferred(select, this.ctx.variables),
+                  optional:
+                    isFragmentOptional !== undefined
+                      ? isFragmentOptional
+                      : state.optional,
+                })
               );
             }
           }
         } else if (currentOperation === 'write' || !select._generated) {
+          deferRef = state.defer;
+          optionalRef = state.optional;
           return select;
         }
       }
+      this.stack.pop();
+      if (process.env.NODE_ENV !== 'production') popDebugNode();
     }
-  };
+    return undefined;
+  }
 }
 
 const isFragmentMatching = (typeCondition: string, typename: string | void) => {

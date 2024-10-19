@@ -39,7 +39,7 @@ import * as InMemoryData from '../store/data';
 
 import type { Context } from './shared';
 import {
-  makeSelectionIterator,
+  SelectionIterator,
   ensureData,
   makeContext,
   updateContext,
@@ -237,7 +237,7 @@ const writeSelection = (
   }
 
   const updates = ctx.store.updates[typename];
-  const iterate = makeSelectionIterator(
+  const selection = new SelectionIterator(
     typename,
     entityKey || typename,
     false,
@@ -247,7 +247,7 @@ const writeSelection = (
   );
 
   let node: FormattedNode<FieldNode> | void;
-  while ((node = iterate())) {
+  while ((node = selection.next())) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldKey = keyOfField(fieldName, fieldArgs);
