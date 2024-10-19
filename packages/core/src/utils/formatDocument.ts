@@ -16,8 +16,8 @@ const formatNode = <
 ): FormattedNode<T> => {
   if ('definitions' in node) {
     const definitions: FormattedNode<DefinitionNode>[] = [];
-    for (const definition of node.definitions) {
-      const newDefinition = formatNode(definition);
+    for (let i = 0, l = node.definitions.length; i < l; i++) {
+      const newDefinition = formatNode(node.definitions[i]);
       definitions.push(newDefinition);
     }
 
@@ -27,7 +27,8 @@ const formatNode = <
   if ('directives' in node && node.directives && node.directives.length) {
     const directives: DirectiveNode[] = [];
     const _directives = {};
-    for (const directive of node.directives) {
+    for (let i = 0, l = node.directives.length; i < l; i++) {
+      const directive = node.directives[i];
       let name = directive.name.value;
       if (name[0] !== '_') {
         directives.push(directive);
@@ -43,7 +44,8 @@ const formatNode = <
     const selections: FormattedNode<SelectionNode>[] = [];
     let hasTypename = node.kind === Kind.OPERATION_DEFINITION;
     if (node.selectionSet) {
-      for (const selection of node.selectionSet.selections || []) {
+      for (let i = 0, l = node.selectionSet.selections.length; i < l; i++) {
+        const selection = node.selectionSet.selections[i];
         hasTypename =
           hasTypename ||
           (selection.kind === Kind.FIELD &&
