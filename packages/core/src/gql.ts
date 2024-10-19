@@ -78,8 +78,9 @@ function gql(parts: string | TemplateStringsArray /* arguments */) {
   }
 
   source.unshift(keyDocument(body));
-  for (const document of source) {
-    for (const definition of document.definitions) {
+  for (let i = 0; i < source.length; i++) {
+    for (let j = 0; j < source[i].definitions.length; j++) {
+      const definition = source[i].definitions[j];
       if (definition.kind === Kind.FRAGMENT_DEFINITION) {
         const name = definition.name.value;
         const value = stringifyDocument(definition);

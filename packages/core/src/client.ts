@@ -649,7 +649,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             } else {
               // If the current result has queued up an operation of the same
               // key, then `stale` refers to it
-              for (const operation of queue) {
+              for (let i = 0; i < queue.length; i++) {
+                const operation = queue[i];
                 if (operation.key === result.operation.key) {
                   dispatched.delete(operation.key);
                   break;

@@ -8,9 +8,9 @@ const generateErrorMessage = (
   let error = '';
   if (networkErr) return `[Network] ${networkErr.message}`;
   if (graphQlErrs) {
-    for (const err of graphQlErrs) {
+    for (let i = 0, l = graphQlErrs.length; i < l; i++) {
       if (error) error += '\n';
-      error += `[GraphQL] ${err.message}`;
+      error += `[GraphQL] ${graphQlErrs[i].message}`;
     }
   }
   return error;
