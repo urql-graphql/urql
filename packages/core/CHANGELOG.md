@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.0.8
+
+### Patch Changes
+
+- ⚠️ Fix `deepMerge` regression on array values
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3696](https://github.com/urql-graphql/urql/pull/3696))
+
 ## 5.0.7
 
 ### Patch Changes

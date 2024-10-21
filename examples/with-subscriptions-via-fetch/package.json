@@ -8,7 +8,7 @@
     "start": "run-p client server"
   },
   "dependencies": {
-    "@urql/core": "^5.0.7",
+    "@urql/core": "^5.0.8",
     "@urql/exchange-graphcache": "^7.2.1",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
