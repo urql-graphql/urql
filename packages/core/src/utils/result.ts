@@ -57,12 +57,10 @@ const deepMerge = (target: any, source: any): any => {
       target = [...target];
       for (let i = 0, l = source.length; i < l; i++)
         target[i] = deepMerge(target[i], source[i]);
+
+      return target;
     }
-    if (
-      !target.constructor ||
-      target.constructor === Object ||
-      Array.isArray(target)
-    ) {
+    if (!target.constructor || target.constructor === Object) {
       target = { ...target };
       for (const key in source)
         target[key] = deepMerge(target[key], source[key]);
