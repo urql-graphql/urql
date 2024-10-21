@@ -6,7 +6,7 @@
     "start": "vite"
   },
   "dependencies": {
-    "@urql/core": "^5.0.7",
+    "@urql/core": "^5.0.8",
     "@urql/exchange-retry": "^1.3.0",
     "graphql": "^16.6.0",
     "react": "^18.2.0",
