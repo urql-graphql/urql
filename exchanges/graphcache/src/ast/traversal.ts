@@ -81,11 +81,11 @@ export const isDeferred = (
   vars: Variables
 ): boolean => {
   const { defer } = getDirectives(node);
-  if (defer) {
-    for (const argument of defer.arguments || []) {
-      if (getName(argument) === 'if') {
+  if (defer && defer.arguments) {
+    for (let i = 0; defer.arguments && i < defer.arguments.length; i++) {
+      if (getName(defer.arguments[i]) === 'if') {
         // Return whether `@defer(if: )` is enabled
-        return !!valueFromASTUntyped(argument.value, vars);
+        return !!valueFromASTUntyped(defer.arguments[i].value, vars);
       }
     }
     return true;
