@@ -2,22 +2,11 @@ import type {
   Exchange,
   Operation,
   OperationResult,
-  RequestPolicy,
   CacheOutcome,
 } from '@urql/core';
 import { formatDocument, makeOperation } from '@urql/core';
 
-import type { Source } from 'wonka';
-import {
-  filter,
-  map,
-  merge,
-  pipe,
-  share,
-  fromArray,
-  mergeMap,
-  empty,
-} from 'wonka';
+import { filter, map, merge, pipe, share } from 'wonka';
 
 import { _query } from './operations/query';
 import { _write } from './operations/write';
@@ -45,8 +34,6 @@ interface OperationResultWithMeta extends Partial<OperationResult> {
 type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
 type ResultMap = Map<number, Data | null>;
-type OptimisticDependencies = Map<number, Dependencies>;
-type DependentOperations = Map<string, Operations>;
 
 /** Exchange factory that creates a normalized cache exchange.
  *
@@ -78,71 +65,10 @@ export const cacheExchange =
       });
     }
 
-    const optimisticKeysToDependencies: OptimisticDependencies = new Map();
-    const mutationResultBuffer: OperationResult[] = [];
     const operations: OperationMap = new Map();
     const results: ResultMap = new Map();
-    const blockedDependencies: Dependencies = new Set();
-    const requestedRefetch: Operations = new Set();
-    const deps: DependentOperations = new Map();
 
-    let reexecutingOperations: Operations = new Set();
-    let dependentOperations: Operations = new Set();
-
-    const isBlockedByOptimisticUpdate = (
-      dependencies: Dependencies
-    ): boolean => {
-      for (const dep of dependencies.values())
-        if (blockedDependencies.has(dep)) return true;
-      return false;
-    };
-
-    const collectPendingOperations = (
-      pendingOperations: Operations,
-      dependencies: undefined | Dependencies
-    ) => {
-      if (dependencies) {
-        // Collect operations that will be updated due to cache changes
-        for (const dep of dependencies.values()) {
-          const keys = deps.get(dep);
-          if (keys) for (const key of keys.values()) pendingOperations.add(key);
-        }
-      }
-    };
-
-    const executePendingOperations = (
-      operation: Operation,
-      pendingOperations: Operations,
-      isOptimistic: boolean
-    ) => {
-      // Reexecute collected operations and delete them from the mapping
-      for (const key of pendingOperations.values()) {
-        if (key !== operation.key) {
-          const op = operations.get(key);
-          if (op) {
-            // Collect all dependent operations if the reexecuting operation is a query
-            if (operation.kind === 'query') dependentOperations.add(key);
-            let policy: RequestPolicy = 'cache-first';
-            if (requestedRefetch.has(key)) {
-              requestedRefetch.delete(key);
-              policy = 'cache-and-network';
-            }
-            client.reexecuteOperation(toRequestPolicy(op, policy));
-          }
-        }
-      }
-
-      if (!isOptimistic) {
-        // Upon completion, all dependent operations become reexecuting operations, preventing
-        // them from reexecuting prior operations again, causing infinite loops
-        const _reexecutingOperations = reexecutingOperations;
-        reexecutingOperations = dependentOperations;
-        if (operation.kind === 'query') {
-          reexecutingOperations.add(operation.key);
-        }
-        (dependentOperations = _reexecutingOperations).clear();
-      }
-    };
+    const reexecutingOperations: Operations = new Set();
 
     // This registers queries with the data layer to ensure commutativity
     const prepareForwardedOperation = (operation: Operation) => {
@@ -174,14 +100,6 @@ export const cacheExchange =
         );
         clearDataState();
         if (dependencies.size) {
-          // Update blocked optimistic dependencies
-          for (const dep of dependencies.values()) blockedDependencies.add(dep);
-          // Store optimistic dependencies for update
-          optimisticKeysToDependencies.set(operation.key, dependencies);
-          // Update related queries
-          const pendingOperations: Operations = new Set();
-          collectPendingOperations(pendingOperations, dependencies);
-          executePendingOperations(operation, pendingOperations, true);
           // Mark operation as optimistic
           optimistic = true;
         }
@@ -201,15 +119,6 @@ export const cacheExchange =
         },
         { ...operation.context, optimistic }
       );
-    };
-
-    // This updates the known dependencies for the passed operation
-    const updateDependencies = (op: Operation, dependencies: Dependencies) => {
-      for (const dep of dependencies.values()) {
-        let depOps = deps.get(dep);
-        if (!depOps) deps.set(dep, (depOps = new Set()));
-        depOps.add(op.key);
-      }
     };
 
     // Retrieves a query result from cache and adds an `isComplete` hint
@@ -233,7 +142,6 @@ export const cacheExchange =
 
       results.set(operation.key, result.data);
       operations.set(operation.key, operation);
-      updateDependencies(operation, result.dependencies);
 
       return {
         outcome: cacheOutcome,
@@ -246,36 +154,22 @@ export const cacheExchange =
 
     // Take any OperationResult and update the cache with it
     const updateCacheWithResult = (
-      result: OperationResult,
-      pendingOperations: Operations
+      result: OperationResult
     ): OperationResult => {
       // Retrieve the original operation to get unfiltered variables
       const operation =
         operations.get(result.operation.key) || result.operation;
-      if (operation.kind === 'mutation') {
-        // Collect previous dependencies that have been written for optimistic updates
-        const dependencies = optimisticKeysToDependencies.get(operation.key);
-        collectPendingOperations(pendingOperations, dependencies);
-        optimisticKeysToDependencies.delete(operation.key);
-      }
 
       if (operation.kind === 'subscription' || result.hasNext)
         reserveLayer(store.data, operation.key, true);
 
-      let queryDependencies: undefined | Dependencies;
       let data: Data | null = result.data;
       if (data) {
         // Write the result to cache and collect all dependencies that need to be
         // updated
         initDataState('write', store.data, operation.key, false, false);
-        const writeDependencies = _write(
-          store,
-          operation,
-          data,
-          result.error
-        ).dependencies;
+        _write(store, operation, data, result.error).dependencies;
         clearDataState();
-        collectPendingOperations(pendingOperations, writeDependencies);
         const prevData =
           operation.kind === 'query' ? results.get(operation.key) : null;
         initDataState(
@@ -294,18 +188,10 @@ export const cacheExchange =
         clearDataState();
         data = queryResult.data;
         if (operation.kind === 'query') {
-          // Collect the query's dependencies for future pending operation updates
-          queryDependencies = queryResult.dependencies;
-          collectPendingOperations(pendingOperations, queryDependencies);
           results.set(operation.key, data);
         }
       } else {
         noopDataState(store.data, operation.key);
-      }
-
-      // Update this operation's dependencies if it's a query
-      if (queryDependencies) {
-        updateDependencies(result.operation, queryDependencies);
       }
 
       return {
@@ -345,7 +231,6 @@ export const cacheExchange =
           res =>
             res.outcome === 'miss' &&
             res.operation.context.requestPolicy !== 'cache-only' &&
-            !isBlockedByOptimisticUpdate(res.dependencies) &&
             !reexecutingOperations.has(res.operation.key)
         ),
         map(res => {
@@ -401,15 +286,13 @@ export const cacheExchange =
 
           if (!shouldReexecute) {
             /*noop*/
-          } else if (!isBlockedByOptimisticUpdate(res.dependencies)) {
+          } else {
             client.reexecuteOperation(
               toRequestPolicy(
                 operations.get(res.operation.key) || res.operation,
                 'network-only'
               )
             );
-          } else if (requestPolicy === 'cache-and-network') {
-            requestedRefetch.add(res.operation.key);
           }
 
           dispatchDebug({
@@ -433,61 +316,6 @@ export const cacheExchange =
         forward
       );
 
-      // Results that can immediately be resolved
-      const nonOptimisticResults$ = pipe(
-        result$,
-        filter(
-          result => !optimisticKeysToDependencies.has(result.operation.key)
-        ),
-        map(result => {
-          const pendingOperations: Operations = new Set();
-          // Update the cache with the incoming API result
-          const cacheResult = updateCacheWithResult(result, pendingOperations);
-          // Execute all dependent queries
-          executePendingOperations(result.operation, pendingOperations, false);
-          return cacheResult;
-        })
-      );
-
-      // Prevent mutations that were previously optimistic from being flushed
-      // immediately and instead clear them out slowly
-      const optimisticMutationCompletion$ = pipe(
-        result$,
-        filter(result =>
-          optimisticKeysToDependencies.has(result.operation.key)
-        ),
-        mergeMap((result: OperationResult): Source<OperationResult> => {
-          const length = mutationResultBuffer.push(result);
-          if (length < optimisticKeysToDependencies.size) {
-            return empty;
-          }
-
-          for (let i = 0; i < mutationResultBuffer.length; i++) {
-            reserveLayer(store.data, mutationResultBuffer[i].operation.key);
-          }
-
-          blockedDependencies.clear();
-
-          const results: OperationResult[] = [];
-          const pendingOperations: Operations = new Set();
-
-          let bufferedResult: OperationResult | void;
-          while ((bufferedResult = mutationResultBuffer.shift()))
-            results.push(
-              updateCacheWithResult(bufferedResult, pendingOperations)
-            );
-
-          // Execute all dependent queries as a single batch
-          executePendingOperations(result.operation, pendingOperations, false);
-
-          return fromArray(results);
-        })
-      );
-
-      return merge([
-        nonOptimisticResults$,
-        optimisticMutationCompletion$,
-        cacheResult$,
-      ]);
+      return merge([pipe(result$, map(updateCacheWithResult)), cacheResult$]);
     };
   };
