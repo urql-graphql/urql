@@ -47,6 +47,8 @@ export interface UseMutationState<
   error?: CombinedError;
   /** The {@link OperationResult.extensions} for the executed mutation. */
   extensions?: Record<string, any>;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: boolean;
   /** The {@link Operation} that the current state is for.
    *
    * @remarks
@@ -167,6 +169,7 @@ export function useMutation<
               error: result.error,
               extensions: result.extensions,
               operation: result.operation,
+              hasNext: result.hasNext,
             });
           }
         }),

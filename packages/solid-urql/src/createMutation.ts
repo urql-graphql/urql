@@ -44,6 +44,8 @@ export type CreateMutationState<
    * last `Operation` that the current state was for.
    */
   operation?: Operation<Data, Variables>;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: boolean;
 };
 
 /** Triggers {@link createMutation} to execute its GraphQL mutation operation.
@@ -140,6 +142,7 @@ export const createMutation = <
   const initialResult: CreateMutationState<Data, Variables> = {
     operation: undefined,
     fetching: false,
+    hasNext: false,
     stale: false,
     data: undefined,
     error: undefined,
@@ -167,6 +170,7 @@ export const createMutation = <
             error: result.error,
             extensions: result.extensions,
             operation: result.operation,
+            hasNext: result.hasNext,
           });
         });
       }),

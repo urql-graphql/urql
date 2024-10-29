@@ -45,6 +45,8 @@ export interface UseMutationState<
   data?: Data;
   /** The {@link OperationResult.error} for the executed mutation. */
   error?: CombinedError;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: boolean;
   /** The {@link OperationResult.extensions} for the executed mutation. */
   extensions?: Record<string, any>;
   /** The {@link Operation} that the current state is for.
@@ -164,6 +166,7 @@ export function useMutation<
               fetching: false,
               stale: result.stale,
               data: result.data,
+              hasNext: result.hasNext,
               error: result.error,
               extensions: result.extensions,
               operation: result.operation,

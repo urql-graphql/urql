@@ -90,12 +90,14 @@ export const useRequestState = <
   T = any,
   V extends AnyVariables = AnyVariables,
 >() => {
+  const hasNext: Ref<boolean> = ref(false);
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
   const error: Ref<CombinedError | undefined> = shallowRef();
   const operation: Ref<Operation<T, V> | undefined> = shallowRef();
   const extensions: Ref<Record<string, any> | undefined> = shallowRef();
   return {
+    hasNext,
     stale,
     fetching,
     error,

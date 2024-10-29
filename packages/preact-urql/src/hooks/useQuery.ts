@@ -137,6 +137,8 @@ export interface UseQueryState<
    * last `Operation` that the current state was for.
    */
   operation?: Operation<Data, Variables>;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: boolean;
 }
 
 /** Triggers {@link useQuery} to execute a new GraphQL query operation.
@@ -303,16 +305,18 @@ export function useQuery<
       return pipe(
         query$$,
         switchMap(query$ => {
-          if (!query$) return fromValue({ fetching: false, stale: false });
+          if (!query$)
+            return fromValue({ fetching: false, stale: false, hasNext: false });
 
           return concat([
             // Initially set fetching to true
             fromValue({ fetching: true, stale: false }),
             pipe(
               query$,
-              map(({ stale, data, error, extensions, operation }) => ({
+              map(({ stale, data, error, extensions, operation, hasNext }) => ({
                 fetching: false,
                 stale: !!stale,
+                hasNext,
                 data,
                 error,
                 operation,
@@ -320,7 +324,7 @@ export function useQuery<
               }))
             ),
             // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false, stale: false }),
+            fromValue({ fetching: false, stale: false, hasNext: false }),
           ]);
         }),
         // The individual partial results are merged into each previous result

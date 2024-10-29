@@ -156,19 +156,29 @@ export function queryStore<
             fromStore(operation$),
             switchMap(operation => {
               return concat<Partial<OperationResultState<Data, Variables>>>([
-                fromValue({ fetching: true, stale: false }),
+                fromValue({ fetching: true, stale: false, hasNext: false }),
                 pipe(
                   args.client.executeRequestOperation(operation),
-                  map(({ stale, data, error, extensions, operation }) => ({
-                    fetching: false,
-                    stale: !!stale,
-                    data,
-                    error,
-                    operation,
-                    extensions,
-                  }))
+                  map(
+                    ({
+                      stale,
+                      data,
+                      error,
+                      extensions,
+                      operation,
+                      hasNext,
+                    }) => ({
+                      fetching: false,
+                      stale: !!stale,
+                      data,
+                      error,
+                      operation,
+                      extensions,
+                      hasNext,
+                    })
+                  )
                 ),
-                fromValue({ fetching: false }),
+                fromValue({ fetching: false, hasNext: false }),
               ]);
             })
           );

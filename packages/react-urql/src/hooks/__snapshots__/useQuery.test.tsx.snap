@@ -6,6 +6,7 @@ exports[`on initial useEffect > initialises default state 1`] = `
   "error": undefined,
   "extensions": undefined,
   "fetching": true,
+  "hasNext": false,
   "operation": undefined,
   "stale": false,
 }
