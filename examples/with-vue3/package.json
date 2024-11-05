@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@urql/core": "^5.0.8",
-    "@urql/vue": "^1.4.1",
+    "@urql/vue": "^1.4.2",
     "graphql": "^16.6.0",
     "vue": "^3.2.47"
   },

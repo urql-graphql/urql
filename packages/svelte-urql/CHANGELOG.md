@@ -1,5 +1,12 @@
 # @urql/svelte
 
+## 4.2.2
+
+### Patch Changes
+
+- Add type for `hasNext` to the query and mutation results
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3703](https://github.com/urql-graphql/urql/pull/3703))
+
 ## 4.2.1
 
 ### Patch Changes
