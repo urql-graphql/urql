@@ -1,6 +1,6 @@
 {
   "name": "@urql/preact",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "exports": {
     ".": "./src/index.ts"
   },
