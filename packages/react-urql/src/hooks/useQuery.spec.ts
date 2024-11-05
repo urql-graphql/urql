@@ -62,6 +62,7 @@ describe('useQuery', () => {
     expect(state).toEqual({
       fetching: true,
       stale: false,
+      hasNext: false,
       extensions: undefined,
       error: undefined,
       data: undefined,
@@ -126,6 +127,7 @@ describe('useQuery', () => {
       fetching: false,
       stale: false,
       extensions: undefined,
+      hasNext: false,
       error: 1,
       data: 0,
     });

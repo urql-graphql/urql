@@ -107,13 +107,14 @@ export function mutationStore<
   const subscription = pipe(
     pipe(
       args.client.executeRequestOperation(operation),
-      map(({ stale, data, error, extensions, operation }) => ({
+      map(({ stale, data, error, extensions, operation, hasNext }) => ({
         fetching: false,
         stale,
         data,
         error,
         operation,
         extensions,
+        hasNext,
       }))
     ),
     scan(

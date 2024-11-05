@@ -57,6 +57,8 @@ export interface UseMutationResponse<T, V extends AnyVariables = AnyVariables> {
    * last `Operation` that the current state was for.
    */
   operation: Ref<Operation<T, V> | undefined>;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: Ref<boolean>;
   /** Triggers {@link useMutation} to execute its GraphQL mutation operation.
    *
    * @param variables - variables using which the mutation will be executed.
@@ -135,10 +137,8 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = shallowRef();
 
-  const { fetching, operation, extensions, stale, error } = useRequestState<
-    T,
-    V
-  >();
+  const { fetching, operation, extensions, stale, error, hasNext } =
+    useRequestState<T, V>();
 
   return {
     data,
@@ -147,6 +147,7 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
     error,
     operation,
     extensions,
+    hasNext,
     executeMutation(
       variables: V,
       context?: Partial<OperationContext>
@@ -165,6 +166,7 @@ export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
           error.value = result.error;
           operation.value = result.operation;
           extensions.value = result.extensions;
+          hasNext.value = result.hasNext;
         }),
         filter(result => !result.hasNext),
         take(1),

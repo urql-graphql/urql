@@ -3,6 +3,7 @@ import * as React from 'react';
 export const initialState = {
   fetching: false,
   stale: false,
+  hasNext: false,
   error: undefined,
   data: undefined,
   extensions: undefined,
@@ -38,6 +39,7 @@ const isShallowDifferent = <T extends Record<string, any>>(a: T, b: T) => {
 interface Stateish {
   data?: any;
   error?: any;
+  hasNext: boolean;
   fetching: boolean;
   stale: boolean;
 }

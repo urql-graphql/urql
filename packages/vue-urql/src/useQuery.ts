@@ -138,6 +138,8 @@ export interface UseQueryState<T = any, V extends AnyVariables = AnyVariables> {
    * documentation on the `pause` option.
    */
   isPaused: Ref<boolean>;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: Ref<boolean>;
   /** Resumes {@link useQuery} if it’s currently paused.
    *
    * @remarks
@@ -241,10 +243,8 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
 ): UseQueryResponse<T, V> {
   const data: Ref<T | undefined> = shallowRef();
 
-  const { fetching, operation, extensions, stale, error } = useRequestState<
-    T,
-    V
-  >();
+  const { fetching, operation, extensions, stale, error, hasNext } =
+    useRequestState<T, V>();
 
   const { isPaused, source, pause, resume, execute, teardown } = useClientState(
     args,
@@ -264,6 +264,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
             onEnd(() => {
               fetching.value = false;
               stale.value = false;
+              hasNext.value = false;
             }),
             subscribe(res => {
               data.value = res.data;
@@ -272,12 +273,14 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
               error.value = res.error;
               operation.value = res.operation;
               extensions.value = res.extensions;
+              hasNext.value = res.hasNext;
             })
           ).unsubscribe
         );
       } else {
         fetching.value = false;
         stale.value = false;
+        hasNext.value = false;
       }
     },
     {
@@ -321,6 +324,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     extensions,
     fetching,
     isPaused,
+    hasNext,
     pause,
     resume,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {

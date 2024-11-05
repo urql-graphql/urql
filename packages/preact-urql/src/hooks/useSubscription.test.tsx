@@ -106,6 +106,7 @@ describe('useSubscription', () => {
       );
       expect(state).toEqual({
         ...data,
+        hasNext: false,
         extensions: undefined,
         fetching: true,
         stale: false,

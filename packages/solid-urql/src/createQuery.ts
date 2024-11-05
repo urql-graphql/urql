@@ -234,6 +234,7 @@ export const createQuery = <
         produce(draft => {
           draft.fetching = false;
           draft.stale = false;
+          draft.hasNext = false;
         })
       );
 
@@ -244,6 +245,7 @@ export const createQuery = <
       produce(draft => {
         draft.fetching = true;
         draft.stale = false;
+        draft.hasNext = false;
       })
     );
 
@@ -255,6 +257,7 @@ export const createQuery = <
             produce(draft => {
               draft.fetching = false;
               draft.stale = false;
+              draft.hasNext = false;
             })
           );
         }),
@@ -268,6 +271,7 @@ export const createQuery = <
                 draft.error = res.error;
                 draft.operation = res.operation;
                 draft.extensions = res.extensions;
+                draft.hasNext = res.hasNext;
               })
             );
           });
