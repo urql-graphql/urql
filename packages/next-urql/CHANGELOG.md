@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+### Patch Changes
+
+- Add type for hasNext to the query-state in urql-next
+  Submitted by [@isy](https://github.com/isy) (See [#3707](https://github.com/urql-graphql/urql/pull/3707))
+
 ## 1.1.2
 
 ### Patch Changes
