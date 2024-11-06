@@ -110,6 +110,8 @@ export interface UseQueryState<
   data?: Data;
   /** The {@link OperationResult.error} for the executed query. */
   error?: CombinedError;
+  /** The {@link OperationResult.hasNext} for the executed query. */
+  hasNext: boolean;
   /** The {@link OperationResult.extensions} for the executed query. */
   extensions?: Record<string, any>;
   /** The {@link Operation} that the current state is for.
