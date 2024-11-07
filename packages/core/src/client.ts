@@ -586,6 +586,14 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     }
   }
 
+  function flushOperations(operation?: Operation | void) {
+    if (!isOperationBatchActive) {
+      Promise.resolve(operation).then(dispatchOperation);
+    } else if (operation) {
+      queue.unshift(operation);
+    }
+  }
+
   /** Defines how result streams are created */
   const makeResultSource = (operation: Operation) => {
     let result$ = pipe(
@@ -668,13 +676,11 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           dispatched.delete(operation.key);
           replays.delete(operation.key);
           active.delete(operation.key);
-          // Interrupt active queue
-          isOperationBatchActive = false;
           // Delete all queued up operations of the same key on end
           for (let i = queue.length - 1; i >= 0; i--)
             if (queue[i].key === operation.key) queue.splice(i, 1);
           // Dispatch a teardown signal for the stopped operation
-          nextOperation(
+          flushOperations(
             makeOperation('teardown', operation, operation.context)
           );
         })
@@ -705,7 +711,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         dispatchOperation(operation);
       } else if (operation.kind === 'mutation') {
         queue.push(operation);
-        Promise.resolve().then(dispatchOperation);
+        flushOperations();
       } else if (active.has(operation.key)) {
         let queued = false;
         for (let i = 0; i < queue.length; i++) {
@@ -721,10 +727,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             operation.context.requestPolicy === 'network-only')
         ) {
           queue.push(operation);
-          Promise.resolve().then(dispatchOperation);
+          flushOperations();
         } else {
           dispatched.delete(operation.key);
-          Promise.resolve().then(dispatchOperation);
+          flushOperations();
         }
       }
     },
