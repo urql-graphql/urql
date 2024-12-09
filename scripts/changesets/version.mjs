@@ -14,7 +14,7 @@ const versionRe = /^\d+\.\d+\.\d+/i;
 const execaOpts = { stdio: 'inherit' };
 
 await execa('changeset', ['version'], execaOpts);
-await execa('pnpm', ['install', '--lockfile-only'], execaOpts);
+// await execa('pnpm', ['install', '--lockfile-only'], execaOpts);
 
 const packages = (await listPackages()).reduce((map, dir) => {
   const manifest = getPackageManifest(dir);
