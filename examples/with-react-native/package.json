@@ -8,7 +8,7 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "@urql/core": "^5.0.8",
+    "@urql/core": "^5.1.0",
     "graphql": "^16.6.0",
     "react": "18.2.0",
     "react-native": "0.71.4",

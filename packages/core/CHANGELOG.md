@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.1.0
+
+### Minor Changes
+
+- Remove `addMetadata` transform where we'd strip out metadata for production environments, this particularly affects `OperationResult.context.metadata.cacheOutcome`
+  Submitted by [@alpavlove](https://github.com/alpavlove) (See [#3714](https://github.com/urql-graphql/urql/pull/3714))
+
 ## 5.0.8
 
 ### Patch Changes
