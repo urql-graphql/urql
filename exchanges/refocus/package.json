@@ -57,7 +57,7 @@
     "@urql/core": "^5.0.0"
   },
   "dependencies": {
-    "@urql/core": "^5.0.0",
+    "@urql/core": "workspace:^5.1.0",
     "wonka": "^6.3.2"
   },
   "publishConfig": {
