@@ -2,4 +2,4 @@
 '@urql/core': minor
 ---
 
-Fixes an issue where `addMetadata` calls were stripped in production mode, ensuring consistent metadata availability (e.g., `cacheOutcome`) in both development and production environments
+Remove `addMetadata` transform where we'd strip out metadata for production environments, this particularly affects `OperationResult.context.metadata.cacheOutcome`
