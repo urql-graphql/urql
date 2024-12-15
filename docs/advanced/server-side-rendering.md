@@ -123,7 +123,7 @@ const handleRequest = async (req, res) => {
   // ...
   const ssr = ssrExchange({ isClient: false });
 
-  const client new Client({
+  const client = new Client({
     url: 'https://??',
     suspense: true, // This activates urql's Suspense mode on the server-side
     exchanges: [cacheExchange, ssr, fetchExchange]
