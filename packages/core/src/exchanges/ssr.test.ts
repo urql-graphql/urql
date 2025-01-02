@@ -5,7 +5,7 @@ import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
 import { ExchangeIO, Operation, OperationResult } from '../types';
 import { CombinedError, formatDocument } from '../utils';
-import { ssrExchange } from './ssr';
+import { SSRDataStorage, ssrExchange } from './ssr';
 
 let forward: ExchangeIO;
 let exchangeInput;
@@ -44,6 +44,31 @@ it('caches query results correctly', () => {
   expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
 
   expect(data).toEqual({
+    [queryOperation.key]: {
+      data: serializedQueryResponse.data,
+      error: undefined,
+      hasNext: false,
+    },
+  });
+});
+
+it('caches query results correctly when storage is provided', () => {
+  output.mockReturnValueOnce(queryResponse);
+
+  const storage: SSRDataStorage = {};
+  const ssr = ssrExchange({ storage });
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+
+  const data = ssr.extractData();
+  expect(storage).toEqual(data);
+
+  expect(Object.keys(storage)).toEqual(['' + queryOperation.key]);
+
+  expect(storage).toEqual({
     [queryOperation.key]: {
       data: serializedQueryResponse.data,
       error: undefined,

@@ -36,6 +36,10 @@ export interface SSRData {
   [key: string]: SerializedResult;
 }
 
+export interface SSRDataStorage {
+  [key: string]: SerializedResult | null;
+}
+
 /** Options for the `ssrExchange` allowing it to either operate on the server- or client-side. */
 export interface SSRExchangeParams {
   /** Indicates to the {@link SSRExchange} whether it's currently in server-side or client-side mode.
@@ -74,6 +78,11 @@ export interface SSRExchangeParams {
    * not serialize this data by default, unless this flag is set.
    */
   includeExtensions?: boolean;
+
+  /**
+   * If provided, this will be used as underlying storage for the serialized results.
+   */
+  storage?: SSRDataStorage;
 }
 
 /** An `SSRExchange` either in server-side mode, serializing results, or client-side mode, deserializing and replaying results..
@@ -188,7 +197,8 @@ const revalidated = new Set<number>();
 export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
   const staleWhileRevalidate = !!params.staleWhileRevalidate;
   const includeExtensions = !!params.includeExtensions;
-  const data: Record<string, SerializedResult | null> = {};
+  const data: SSRDataStorage =
+    params.storage !== undefined ? params.storage : {};
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
