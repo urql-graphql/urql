@@ -111,13 +111,7 @@ Next, we'll modify our server-side code and add `react-ssr-prepass` in front of 
 import { renderToString } from 'react-dom/server';
 import prepass from 'react-ssr-prepass';
 
-import {
-  Client,
-  cacheExchange,
-  fetchExchange,
-  ssrExchange,
-  Provider,
-} from 'urql';
+import { Client, cacheExchange, fetchExchange, ssrExchange, Provider } from 'urql';
 
 const handleRequest = async (req, res) => {
   // ...
@@ -126,7 +120,7 @@ const handleRequest = async (req, res) => {
   const client = new Client({
     url: 'https://??',
     suspense: true, // This activates urql's Suspense mode on the server-side
-    exchanges: [cacheExchange, ssr, fetchExchange]
+    exchanges: [cacheExchange, ssr, fetchExchange],
   });
 
   const element = (
@@ -576,6 +570,51 @@ is an uncommon scenario, and we consider it "unsafe" so evaluate this carefully 
 
 When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetUrqlClient`
 property, when invoked this will create a new top-level client and reset all prior operations.
+
+## TanStack Router / TanStack Start
+
+If you're using SSR with [TanStack Router](https://tanstack.com/router) or [TanStack Start](https://tanstack.com/start) you can use the `@urql/tanstack-react-router` package.
+
+To set up `@urql/tanstack-react-router`, first we'll install `@urql/tanstack-react-router` and `urql`:
+
+```sh
+pnpm add @urql/tanstack-react-router urql graphql
+# or
+npm install --save @urql/tanstack-react-router urql graphql
+```
+
+Then instantiate a client with a SSR Exchange and make sure the `UrqlProvider` is rendered around the routes:
+
+```tsx
+// router.tsx
+import { createRouter } from '@tanstack/react-router';
+
+import {
+  UrqlProvider,
+  ssrExchange,
+  cacheExchange,
+  fetchExchange,
+  createClient,
+} from '@urql/tanstack-react-router';
+
+const ssr = ssrExchange();
+const client = createClient({
+  url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+  exchanges: [cacheExchange, ssr, fetchExchange],
+  suspense: true,
+});
+
+const router = createRouter({
+  routeTree,
+  Wrap: ({ children }) => (
+    <UrqlProvider ssr={ssr} client={client}>
+      {children}
+    </UrqlProvider>
+  ),
+});
+```
+
+Then in your React components use the `useQuery` from `@urql/tanstack-react-router`.
 
 ## Vue Suspense
 
