@@ -63,7 +63,13 @@
     "prepublishOnly": "run-s clean build"
   },
   "peerDependencies": {
-    "@urql/core": "^5.0.0"
+    "@urql/core": "^5.0.0",
+    "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0"
+  },
+  "peerDependenciesMeta": {
+    "graphql": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.0.5",
