@@ -147,8 +147,9 @@ export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
 
 /** Creates a `GraphQLRequest` from the passed parameters.
  *
- * @param q - A string of a document or a {@link DocumentNode}
+ * @param query - A string of a document or a {@link DocumentNode}
  * @param variables - A variables object for the defined GraphQL operation.
+ * @param extensions - An objet containing metadata that a GraphQL API may accept for spec extensions.
  * @returns A {@link GraphQLRequest}
  *
  * @remarks
@@ -163,16 +164,16 @@ export const createRequest = <
   Data = any,
   Variables extends AnyVariables = AnyVariables,
 >(
-  _query: DocumentInput<Data, Variables>,
-  _variables: Variables,
+  query: DocumentInput<Data, Variables>,
+  variables: Variables,
   extensions?: RequestExtensions | undefined
 ): GraphQLRequest<Data, Variables> => {
-  const variables = _variables || ({} as Variables);
-  const query = keyDocument(_query);
-  const printedVars = stringifyVariables(variables, true);
-  let key = query.__key;
+  const _variables = variables || ({} as Variables);
+  const _query = keyDocument(query);
+  const printedVars = stringifyVariables(_variables, true);
+  let key = _query.__key;
   if (printedVars !== '{}') key = phash(printedVars, key);
-  return { key, query, variables, extensions };
+  return { key, query: _query, variables: _variables, extensions };
 };
 
 /** Returns the name of the `DocumentNode`'s operation, if any.
