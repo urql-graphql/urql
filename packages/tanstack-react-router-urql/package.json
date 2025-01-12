@@ -1,12 +1,12 @@
 {
   "name": "@urql/tanstack-react-router",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Convenience wrappers for using urql with SSR in @tanstack/react-router and @tanstack/start",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/urql-graphql/urql/issues",
   "license": "MIT",
-  "author": "Manuel Schiller",
+  "author": "urql GraphQL Contributors",
   "repository": {
     "type": "git",
     "url": "https://github.com/urql-graphql/urql.git",
@@ -41,7 +41,7 @@
     "react-dom": "^18.0.0"
   },
   "peerDependencies": {
-    "@tanstack/react-router": ">=1.94.1",
+    "@tanstack/react-router": ">=1.43.2",
     "react": ">=18.0.0",
     "urql": "^4.0.0"
   },

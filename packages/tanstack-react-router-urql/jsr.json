@@ -1,15 +1,8 @@
 {
   "name": "@urql/tanstack-react-router",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "exports": {
     ".": "./src/index.ts"
   },
-  "exclude": [
-    "node_modules",
-    "cypress",
-    "**/*.test.*",
-    "**/*.spec.*",
-    "**/*.test.*.snap",
-    "**/*.spec.*.snap"
-  ]
+  "exclude": ["node_modules"]
 }

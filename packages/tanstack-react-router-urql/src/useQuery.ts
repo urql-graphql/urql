@@ -7,7 +7,7 @@ import type {
   RequestPolicy,
 } from 'urql';
 import { createRequest, useQuery as orig_useQuery } from 'urql';
-import { useGetStreamedUrqlValue, useStreamUrqlValue } from './useUrqlValue';
+import { useStreamedValue, useStreamValue } from './useUrqlValue';
 
 /** Input arguments for the {@link useQuery} hook.
  *
@@ -206,11 +206,11 @@ export function useQuery<
     args.query,
     (args.variables || {}) as AnyVariables
   );
-  useGetStreamedUrqlValue(request.key);
+  useStreamedValue(request.key);
 
   const [result, execute] = orig_useQuery(args);
 
-  useStreamUrqlValue(request.key);
+  useStreamValue(request.key);
 
   return [result, execute];
 }

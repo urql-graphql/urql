@@ -18,7 +18,7 @@ function useSsrExchange() {
   return ssrExchange;
 }
 
-export function useStreamUrqlValue(operationKey: number): void {
+export function useStreamValue(operationKey: number): void {
   const ssrExchange = useSsrExchange();
   const router = useRouter();
   if (typeof window === 'undefined') {
@@ -29,7 +29,7 @@ export function useStreamUrqlValue(operationKey: number): void {
   }
 }
 
-export function useGetStreamedUrqlValue(operationKey: number): void {
+export function useStreamedValue(operationKey: number): void {
   const ssrExchange = useSsrExchange();
   const router = useRouter();
 
