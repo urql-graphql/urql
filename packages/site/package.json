@@ -56,5 +56,8 @@
     "resolve-from": "^3.0.0",
     "surge": "^0.21.3",
     "webpack": ">=4.4.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
