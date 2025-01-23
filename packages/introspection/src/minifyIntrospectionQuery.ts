@@ -87,6 +87,7 @@ const minifyIntrospectionType = (
       return {
         kind: 'INPUT_OBJECT',
         name: type.name,
+        isOneOf: type.isOneOf,
         inputFields: type.inputFields.map(
           field =>
             ({
