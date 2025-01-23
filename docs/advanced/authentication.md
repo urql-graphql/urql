@@ -207,7 +207,7 @@ authExchange(async utils => {
   return {
     // ...
     didAuthError(error, _operation) {
-      return error.response.status === 401;
+      return error.response?.status === 401;
     },
   };
 });
