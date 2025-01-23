@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 7.2.2
+
+### Patch Changes
+
+- Remove addMetadata transform where we'd strip out metadata for production environments, this particularly affects OperationResult.context.metadata.cacheOutcome
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3744](https://github.com/urql-graphql/urql/pull/3744))
+
 ## 7.2.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @urql/introspection
 
+## 1.2.0
+
+### Minor Changes
+
+- Add oneOf support
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3743](https://github.com/urql-graphql/urql/pull/3743))
+
 ## 1.1.0
 
 ### Minor Changes
