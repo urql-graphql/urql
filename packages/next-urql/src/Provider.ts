@@ -18,6 +18,7 @@ export const SSRContext = React.createContext<SSRExchange | undefined>(
  *
  * @example
  * ```tsx
+ * import { useMemo } from 'react';
  * import {
  *  UrqlProvider,
  *  ssrExchange,
@@ -26,19 +27,23 @@ export const SSRContext = React.createContext<SSRExchange | undefined>(
  *  createClient,
  * } from '@urql/next';
  *
- * const ssr = ssrExchange();
- * const client = createClient({
- *   url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
- *   exchanges: [cacheExchange, ssr, fetchExchange],
- *   suspense: true,
- * });
- *
  * export default function Layout({ children }: React.PropsWithChildren) {
- *   return (
- *     <UrqlProvider client={client} ssr={ssr}>
+ *  const [client, ssr] = useMemo(() => {
+ *    const ssr = ssrExchange();
+ *      const client = createClient({
+ *      url: 'https://trygql.formidable.dev/graphql/web-collections',
+ *      exchanges: [cacheExchange, ssr, fetchExchange],
+ *      suspense: true,
+ *    });
+ *
+ *    return [client, ssr];
+ *  }, []);
+ *
+ *  return (
+ *    <UrqlProvider client={client} ssr={ssr}>
  *      {children}
- *     </UrqlProvider>
- *   );
+ *    </UrqlProvider>
+ *  );
  * }
  *
  * ```
