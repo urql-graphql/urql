@@ -1,0 +1,8 @@
+{
+  "name": "@urql/tanstack-react-router",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "exclude": ["node_modules"]
+}
