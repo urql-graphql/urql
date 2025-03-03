@@ -92,7 +92,7 @@ const output = ({ format, isProduction }) => {
     exports: 'named',
     sourcemap: true,
     banner: chunk => (chunk.name === 'urql-next' ? '"use client"' : undefined),
-    sourcemapExcludeSources: false,
+    sourcemapExcludeSources: isCI,
     hoistTransitiveImports: false,
     indent: false,
     freeze: false,
