@@ -1,6 +1,6 @@
 {
   "name": "@urql/core",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "exports": {
     ".": "./src/index.ts",
     "./internal": "./src/internal/index.ts"

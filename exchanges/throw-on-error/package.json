@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-throw-on-error",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An exchange for throw-on-error support in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -55,7 +55,7 @@
     "@urql/core": "^5.0.0"
   },
   "dependencies": {
-    "@urql/core": "workspace:^5.1.0",
+    "@urql/core": "workspace:^5.1.1",
     "graphql-toe": "0.1.2",
     "wonka": "^6.3.2"
   },

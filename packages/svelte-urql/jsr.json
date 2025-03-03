@@ -1,6 +1,6 @@
 {
   "name": "@urql/svelte",
-  "version": "4.2.2",
+  "version": "4.2.3",
   "exports": {
     ".": "./src/index.ts"
   },
