@@ -18,7 +18,7 @@ import type {
 
 import { useClient } from './useClient';
 
-import type { MaybeRef, MaybeRefObj } from './utils';
+import type { MaybeRefOrGetter, MaybeRefOrGetterObj } from './utils';
 import { useRequestState, useClientState } from './utils';
 
 /** Input arguments for the {@link useQuery} function.
@@ -42,7 +42,7 @@ export type UseQueryArgs<
    *
    * @see {@link OperationContext.requestPolicy} for where this value is set.
    */
-  requestPolicy?: MaybeRef<RequestPolicy>;
+  requestPolicy?: MaybeRefOrGetter<RequestPolicy>;
   /** Updates the {@link OperationContext} for the executed GraphQL query operation.
    *
    * @remarks
@@ -60,7 +60,7 @@ export type UseQueryArgs<
    * });
    * ```
    */
-  context?: MaybeRef<Partial<OperationContext>>;
+  context?: MaybeRefOrGetter<Partial<OperationContext>>;
   /** Prevents {@link useQuery} from automatically executing GraphQL query operations.
    *
    * @remarks
@@ -72,8 +72,8 @@ export type UseQueryArgs<
    * @see {@link https://urql.dev/goto/docs/basics/vue#pausing-usequery} for
    * documentation on the `pause` option.
    */
-  pause?: MaybeRef<boolean>;
-} & MaybeRefObj<GraphQLRequestParams<Data, MaybeRefObj<Variables>>>;
+  pause?: MaybeRefOrGetter<boolean>;
+} & MaybeRefOrGetterObj<GraphQLRequestParams<Data, Variables>>;
 
 /** State of the current query, your {@link useQuery} function is executing.
  *
@@ -246,11 +246,10 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   const { fetching, operation, extensions, stale, error, hasNext } =
     useRequestState<T, V>();
 
-  const { isPaused, source, pause, resume, execute, teardown } = useClientState(
-    args,
-    client,
-    'executeQuery'
-  );
+  const { isPaused, source, pause, resume, execute, teardown } = useClientState<
+    T,
+    V
+  >(args, client, 'executeQuery');
 
   const teardownQuery = watchEffect(
     onInvalidate => {
