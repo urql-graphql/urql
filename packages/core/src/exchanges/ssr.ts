@@ -36,6 +36,9 @@ export interface SSRData {
   [key: string]: SerializedResult;
 }
 
+export type Serializer = (data: any) => string
+export type Deserializer = (serialized: string) => any
+
 /** Options for the `ssrExchange` allowing it to either operate on the server- or client-side. */
 export interface SSRExchangeParams {
   /** Indicates to the {@link SSRExchange} whether it's currently in server-side or client-side mode.
@@ -74,6 +77,10 @@ export interface SSRExchangeParams {
    * not serialize this data by default, unless this flag is set.
    */
   includeExtensions?: boolean;
+
+  serialize?: Serializer;
+
+  deserialize?: Deserializer;
 }
 
 /** An `SSRExchange` either in server-side mode, serializing results, or client-side mode, deserializing and replaying results..
@@ -106,18 +113,19 @@ export interface SSRExchange extends Exchange {
 /** Serialize an OperationResult to plain JSON */
 const serializeResult = (
   result: OperationResult,
-  includeExtensions: boolean
+  includeExtensions: boolean,
+  serializer: Serializer,
 ): SerializedResult => {
   const serialized: SerializedResult = {
     hasNext: result.hasNext,
   };
 
   if (result.data !== undefined) {
-    serialized.data = JSON.stringify(result.data);
+    serialized.data = serializer(result.data);
   }
 
   if (includeExtensions && result.extensions !== undefined) {
-    serialized.extensions = JSON.stringify(result.extensions);
+    serialized.extensions = serializer(result.extensions);
   }
 
   if (result.error) {
@@ -147,13 +155,14 @@ const serializeResult = (
 const deserializeResult = (
   operation: Operation,
   result: SerializedResult,
-  includeExtensions: boolean
+  includeExtensions: boolean,
+  deserializer: Deserializer,
 ): OperationResult => ({
   operation,
-  data: result.data ? JSON.parse(result.data) : undefined,
+  data: result.data ? deserializer(result.data) : undefined,
   extensions:
     includeExtensions && result.extensions
-      ? JSON.parse(result.extensions)
+      ? deserializer(result.extensions)
       : undefined,
   error: result.error
     ? new CombinedError({
@@ -189,6 +198,8 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
   const staleWhileRevalidate = !!params.staleWhileRevalidate;
   const includeExtensions = !!params.includeExtensions;
   const data: Record<string, SerializedResult | null> = {};
+  const serializer: Serializer = params.serialize ?? JSON.stringify
+  const deserializer: Deserializer = params.deserialize ?? JSON.parse
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
@@ -245,7 +256,8 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
           const cachedResult = deserializeResult(
             op,
             serialized,
-            includeExtensions
+            includeExtensions,
+            deserializer
           );
 
           if (staleWhileRevalidate && !revalidated.has(op.key)) {
@@ -271,7 +283,7 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
           tap((result: OperationResult) => {
             const { operation } = result;
             if (operation.kind !== 'mutation') {
-              const serialized = serializeResult(result, includeExtensions);
+              const serialized = serializeResult(result, includeExtensions, serializer);
               data[operation.key] = serialized;
             }
           })
