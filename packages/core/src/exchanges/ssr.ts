@@ -36,8 +36,8 @@ export interface SSRData {
   [key: string]: SerializedResult;
 }
 
-export type Serializer = (data: any) => string
-export type Deserializer = (serialized: string) => any
+export type Serializer = (data: any) => string;
+export type Deserializer = (serialized: string) => any;
 
 /** Options for the `ssrExchange` allowing it to either operate on the server- or client-side. */
 export interface SSRExchangeParams {
@@ -114,7 +114,7 @@ export interface SSRExchange extends Exchange {
 const serializeResult = (
   result: OperationResult,
   includeExtensions: boolean,
-  serializer: Serializer,
+  serializer: Serializer
 ): SerializedResult => {
   const serialized: SerializedResult = {
     hasNext: result.hasNext,
@@ -156,7 +156,7 @@ const deserializeResult = (
   operation: Operation,
   result: SerializedResult,
   includeExtensions: boolean,
-  deserializer: Deserializer,
+  deserializer: Deserializer
 ): OperationResult => ({
   operation,
   data: result.data ? deserializer(result.data) : undefined,
@@ -198,8 +198,8 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
   const staleWhileRevalidate = !!params.staleWhileRevalidate;
   const includeExtensions = !!params.includeExtensions;
   const data: Record<string, SerializedResult | null> = {};
-  const serializer: Serializer = params.serialize ?? JSON.stringify
-  const deserializer: Deserializer = params.deserialize ?? JSON.parse
+  const serializer: Serializer = params.serialize ? params.serialize : JSON.stringify;
+  const deserializer: Deserializer = params.deserialize ? params.deserialize : JSON.parse;
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
@@ -283,8 +283,11 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
           tap((result: OperationResult) => {
             const { operation } = result;
             if (operation.kind !== 'mutation') {
-              const serialized = serializeResult(result, includeExtensions, serializer);
-              data[operation.key] = serialized;
+              data[operation.key] = serializeResult(
+                result,
+                includeExtensions,
+                serializer
+              );
             }
           })
         );
