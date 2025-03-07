@@ -198,8 +198,12 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
   const staleWhileRevalidate = !!params.staleWhileRevalidate;
   const includeExtensions = !!params.includeExtensions;
   const data: Record<string, SerializedResult | null> = {};
-  const serializer: Serializer = params.serialize ? params.serialize : JSON.stringify;
-  const deserializer: Deserializer = params.deserialize ? params.deserialize : JSON.parse;
+  const serializer: Serializer = params.serialize
+    ? params.serialize
+    : JSON.stringify;
+  const deserializer: Deserializer = params.deserialize
+    ? params.deserialize
+    : JSON.parse;
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
