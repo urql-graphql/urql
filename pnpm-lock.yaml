@@ -327,8 +327,8 @@ importers:
         specifier: workspace:^5.1.1
         version: link:../../packages/core
       graphql-toe:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: ^1.0.0-rc.0
+        version: 1.0.0-rc.0
       wonka:
         specifier: ^6.3.2
         version: 6.3.2
@@ -5069,8 +5069,8 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  graphql-toe@0.1.2:
-    resolution: {integrity: sha512-XK04wXEHbLY33YHoPAnLMIafRKSOn7FTWzTCob23GC6o8DnO4ibkA8Aje+Udee8QdXx46TV6m6LQM9iU8C9vwQ==}
+  graphql-toe@1.0.0-rc.0:
+    resolution: {integrity: sha512-/reEXGT1QCrQkweajQvbK298u/duyEHGftzKlFO0K3kD050USxD55bQw0QctjhCzKEZJIvdkoCxoUfijHv4izg==}
 
   graphql@16.9.0:
     resolution: {integrity: sha512-GGTKBX4SD7Wdb8mqeDLni2oaRGYQWjWHGKPQ24ZMnUtKfcsVoiv4uX8+LJr1K6U5VW2Lu1BwJnj7uiori0YtRw==}
@@ -7628,7 +7628,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   q@1.5.1:
@@ -7636,7 +7635,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qs@6.10.4:
@@ -15811,7 +15809,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql-toe@0.1.2: {}
+  graphql-toe@1.0.0-rc.0: {}
 
   graphql@16.9.0: {}
 

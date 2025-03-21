@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "@urql/core": "workspace:^5.1.1",
-    "graphql-toe": "0.1.2",
+    "graphql-toe": "^1.0.0-rc.0",
     "wonka": "^6.3.2"
   },
   "publishConfig": {
