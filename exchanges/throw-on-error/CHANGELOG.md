@@ -1,5 +1,12 @@
 # @urql/exchange-throw-on-error
 
+## 0.1.2
+
+### Patch Changes
+
+- Update `graphql-toe` and add more detail to README
+  Submitted by [@benjie](https://github.com/benjie) (See [#3765](https://github.com/urql-graphql/urql/pull/3765))
+
 ## 0.1.1
 
 ### Patch Changes

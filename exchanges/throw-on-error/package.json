@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-throw-on-error",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An exchange for throw-on-error support in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
