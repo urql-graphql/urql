@@ -58,7 +58,7 @@ type ChunkData = Buffer | Uint8Array;
 const toString = (input: Buffer | ArrayBuffer): string =>
   input.constructor.name === 'Buffer'
     ? (input as Buffer).toString()
-    : decoder!.decode(input as ArrayBuffer);
+    : decoder!.decode(input as ArrayBuffer, { stream: true });
 
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
