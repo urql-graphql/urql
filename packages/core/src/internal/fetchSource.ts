@@ -52,10 +52,11 @@ const eventStreamRe = /data: ?([^\n]+)/;
 
 type ChunkData = Buffer | Uint8Array;
 
-async function* streamBody(response: Response): AsyncIterableIterator<ChunkData> {
+async function* streamBody(
+  response: Response
+): AsyncIterableIterator<ChunkData> {
   if (response.body![Symbol.asyncIterator]) {
-    for await (const chunk of response.body! as any)
-      yield chunk as ChunkData;
+    for await (const chunk of response.body! as any) yield chunk as ChunkData;
   } else {
     const reader = response.body!.getReader();
     let result: ReadableStreamReadResult<ChunkData>;
@@ -77,9 +78,10 @@ async function* streamToBoundedChunks(
   for await (const chunk of chunks) {
     // NOTE: We're avoiding referencing the `Buffer` global here to prevent
     // auto-polyfilling in Webpack
-    buffer += chunk.constructor.name === 'Buffer'
-      ? (chunk as Buffer).toString()
-      : decoder!.decode(chunk as ArrayBuffer, { stream: true });
+    buffer +=
+      chunk.constructor.name === 'Buffer'
+        ? (chunk as Buffer).toString()
+        : decoder!.decode(chunk as ArrayBuffer, { stream: true });
     while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
       yield buffer.slice(0, boundaryIndex);
       buffer = buffer.slice(boundaryIndex + boundary.length);
@@ -97,7 +99,10 @@ async function* parseEventStream(
   response: Response
 ): AsyncIterableIterator<ExecutionResult> {
   let payload: any;
-  for await (const chunk of streamToBoundedChunks(streamBody(response), '\n\n')) {
+  for await (const chunk of streamToBoundedChunks(
+    streamBody(response),
+    '\n\n'
+  )) {
     const match = chunk.match(eventStreamRe);
     if (match) {
       const chunk = match[1];
@@ -122,7 +127,10 @@ async function* parseMultipartMixed(
   const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
   let isPreamble = true;
   let payload: any;
-  for await (let chunk of streamToBoundedChunks(streamBody(response), '\r\n' + boundary)) {
+  for await (let chunk of streamToBoundedChunks(
+    streamBody(response),
+    '\r\n' + boundary
+  )) {
     if (isPreamble) {
       isPreamble = false;
       const preambleIndex = chunk.indexOf(boundary);
