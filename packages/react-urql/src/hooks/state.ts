@@ -67,7 +67,8 @@ export const hasDepsChanged = <T extends { length: number }>(a: T, b: T) => {
 
 const ReactSharedInternals =
   (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED ||
-  (React as any).__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+  (React as any)
+    .__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
 
 export function deferDispatch<Dispatch extends React.Dispatch<any>>(
   setState: Dispatch,
@@ -76,7 +77,9 @@ export function deferDispatch<Dispatch extends React.Dispatch<any>>(
   if (!!ReactSharedInternals && process.env.NODE_ENV !== 'production') {
     const currentOwner = ReactSharedInternals.ReactCurrentOwner
       ? ReactSharedInternals.ReactCurrentOwner.current
-      : (ReactSharedInternals.A && ReactSharedInternals.A.getOwner && ReactSharedInternals.A.getOwner());
+      : ReactSharedInternals.A &&
+        ReactSharedInternals.A.getOwner &&
+        ReactSharedInternals.A.getOwner();
     if (currentOwner) {
       Promise.resolve(value).then(setState);
     } else {
