@@ -26,7 +26,7 @@
  * The implementation in this file needs to make certain accommodations for:
  * - The Web Fetch API
  * - Non-browser or polyfill Fetch APIs
- * - Node.js-like Fetch implementations (see `toString` below)
+ * - Node.js-like Fetch implementations
  *
  * GraphQL over SSE has a reference implementation, which supports non-HTTP/2
  * modes and is a faithful implementation of the spec.
@@ -47,42 +47,39 @@ import { fromAsyncIterable, onEnd, filter, pipe } from 'wonka';
 import type { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
-const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
 const eventStreamRe = /data: ?([^\n]+)/;
 
 type ChunkData = Buffer | Uint8Array;
 
-// NOTE: We're avoiding referencing the `Buffer` global here to prevent
-// auto-polyfilling in Webpack
-const toString = (input: Buffer | ArrayBuffer): string =>
-  input.constructor.name === 'Buffer'
-    ? (input as Buffer).toString()
-    : decoder!.decode(input as ArrayBuffer, { stream: true });
-
-async function* streamBody(response: Response): AsyncIterableIterator<string> {
+async function* streamBody(response: Response): AsyncIterableIterator<ChunkData> {
   if (response.body![Symbol.asyncIterator]) {
     for await (const chunk of response.body! as any)
-      yield toString(chunk as ChunkData);
+      yield chunk as ChunkData;
   } else {
     const reader = response.body!.getReader();
     let result: ReadableStreamReadResult<ChunkData>;
     try {
-      while (!(result = await reader.read()).done) yield toString(result.value);
+      while (!(result = await reader.read()).done) yield result.value;
     } finally {
       reader.cancel();
     }
   }
 }
 
-async function* split(
-  chunks: AsyncIterableIterator<string>,
+async function* streamToBoundedChunks(
+  chunks: AsyncIterableIterator<ChunkData>,
   boundary: string
 ): AsyncIterableIterator<string> {
+  const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
   let buffer = '';
   let boundaryIndex: number;
   for await (const chunk of chunks) {
-    buffer += chunk;
+    // NOTE: We're avoiding referencing the `Buffer` global here to prevent
+    // auto-polyfilling in Webpack
+    buffer += chunk.constructor.name === 'Buffer'
+      ? (chunk as Buffer).toString()
+      : decoder!.decode(chunk as ArrayBuffer, { stream: true });
     while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
       yield buffer.slice(0, boundaryIndex);
       buffer = buffer.slice(boundaryIndex + boundary.length);
@@ -100,7 +97,7 @@ async function* parseEventStream(
   response: Response
 ): AsyncIterableIterator<ExecutionResult> {
   let payload: any;
-  for await (const chunk of split(streamBody(response), '\n\n')) {
+  for await (const chunk of streamToBoundedChunks(streamBody(response), '\n\n')) {
     const match = chunk.match(eventStreamRe);
     if (match) {
       const chunk = match[1];
@@ -125,7 +122,7 @@ async function* parseMultipartMixed(
   const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
   let isPreamble = true;
   let payload: any;
-  for await (let chunk of split(streamBody(response), '\r\n' + boundary)) {
+  for await (let chunk of streamToBoundedChunks(streamBody(response), '\r\n' + boundary)) {
     if (isPreamble) {
       isPreamble = false;
       const preambleIndex = chunk.indexOf(boundary);
