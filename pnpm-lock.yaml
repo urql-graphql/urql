@@ -220,7 +220,7 @@ importers:
     dependencies:
       '@0no-co/graphql.web':
         specifier: ^1.0.13
-        version: 1.0.13(graphql@16.6.0)
+        version: 1.0.13(graphql@16.9.0)
       '@urql/core':
         specifier: workspace:^5.1.1
         version: link:../../packages/core
