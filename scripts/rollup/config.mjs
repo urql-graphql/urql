@@ -8,6 +8,7 @@ import cleanup from './cleanup-plugin.mjs';
 import * as settings from './settings.mjs';
 
 const plugins = makePlugins();
+const isCI = !!process.env.CI;
 
 const chunkFileNames = extension => {
   let hasDynamicChunk = false;
@@ -91,7 +92,7 @@ const output = ({ format, isProduction }) => {
     exports: 'named',
     sourcemap: true,
     banner: chunk => (chunk.name === 'urql-next' ? '"use client"' : undefined),
-    sourcemapExcludeSources: false,
+    sourcemapExcludeSources: isCI,
     hoistTransitiveImports: false,
     indent: false,
     freeze: false,
@@ -141,8 +142,8 @@ export default [
     output: [
       output({ format: 'cjs', isProduction: false }),
       output({ format: 'esm', isProduction: false }),
-      output({ format: 'cjs', isProduction: true }),
-      output({ format: 'esm', isProduction: true }),
+      !isCI && output({ format: 'cjs', isProduction: true }),
+      !isCI && output({ format: 'esm', isProduction: true }),
     ].filter(Boolean),
   },
   {

@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-request-policy",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "An exchange for operation request-policy upgrading in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -55,7 +55,7 @@
     "@urql/core": "^5.0.0"
   },
   "dependencies": {
-    "@urql/core": "workspace:^5.1.0",
+    "@urql/core": "workspace:^5.1.1",
     "wonka": "^6.3.2"
   },
   "publishConfig": {

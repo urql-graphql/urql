@@ -7,7 +7,7 @@ order: 5
 
 When we use a GraphQL API there are two kinds of errors we may encounter: Network Errors and GraphQL
 Errors from the API. Since it's common to encounter either of them, there's a
-[`CombinedError`](../api/core.md#combinederror-class) class that can hold and abstract either.
+[`CombinedError`](../api/core.md#combinederror) class that can hold and abstract either.
 
 We may encounter a `CombinedError` when using `urql` wherever an `error` may be returned, typically
 in results from the API. The `CombinedError` can have one of two properties that describe what went

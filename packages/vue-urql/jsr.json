@@ -1,6 +1,6 @@
 {
   "name": "@urql/vue",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "exports": {
     ".": "./src/index.ts"
   },

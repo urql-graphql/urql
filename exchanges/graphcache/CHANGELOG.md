@@ -1,5 +1,21 @@
 # @urql/exchange-graphcache
 
+## 7.2.3
+
+### Patch Changes
+
+- Omit minified files and sourcemaps' `sourcesContent` in published packages
+  Submitted by [@kitten](https://github.com/kitten) (See [#3755](https://github.com/urql-graphql/urql/pull/3755))
+- Updated dependencies (See [#3755](https://github.com/urql-graphql/urql/pull/3755))
+  - @urql/core@5.1.1
+
+## 7.2.2
+
+### Patch Changes
+
+- Remove addMetadata transform where we'd strip out metadata for production environments, this particularly affects OperationResult.context.metadata.cacheOutcome
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3744](https://github.com/urql-graphql/urql/pull/3744))
+
 ## 7.2.1
 
 ### Patch Changes
