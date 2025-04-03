@@ -3,6 +3,7 @@ import type { CombinedError, ErrorLike, FormattedNode } from '@urql/core';
 import type {
   InlineFragmentNode,
   FragmentDefinitionNode,
+  FieldNode,
 } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
 
@@ -211,7 +212,7 @@ export class SelectionIterator {
     ];
   }
 
-  next() {
+  next(): FormattedNode<FieldNode> | undefined {
     while (this.stack.length > 0) {
       let state = this.stack[this.stack.length - 1];
       while (state.index < state.selectionSet.length) {
