@@ -21,8 +21,8 @@ importers:
         version: 3.3.2
     devDependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.8
-        version: 1.0.8(graphql@16.9.0)
+        specifier: ^1.0.13
+        version: 1.0.13(graphql@16.9.0)
       '@actions/artifact':
         specifier: ^2.0.0
         version: 2.1.9(encoding@0.1.13)
@@ -219,8 +219,8 @@ importers:
   exchanges/graphcache:
     dependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.5
-        version: 1.0.8(graphql@16.9.0)
+        specifier: ^1.0.13
+        version: 1.0.13(graphql@16.9.0)
       '@urql/core':
         specifier: workspace:^5.1.1
         version: link:../../packages/core
@@ -340,8 +340,8 @@ importers:
   packages/core:
     dependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.5
-        version: 1.0.8(graphql@16.9.0)
+        specifier: ^1.0.13
+        version: 1.0.13(graphql@16.9.0)
       wonka:
         specifier: ^6.3.2
         version: 6.3.2
@@ -624,8 +624,8 @@ importers:
 
 packages:
 
-  '@0no-co/graphql.web@1.0.8':
-    resolution: {integrity: sha512-8BG6woLtDMvXB9Ajb/uE+Zr/U7y4qJ3upXi0JQHZmsKUJa7HjF/gFvmL2f3/mSmfZoQGRr9VoY97LCX2uaFMzA==}
+  '@0no-co/graphql.web@1.0.13':
+    resolution: {integrity: sha512-jqYxOevheVTU1S36ZdzAkJIdvRp2m3OYIG5SEoKDw5NI8eVwkoI0D/Q3DYNGmXCxkA6CQuoa7zvMiDPTLqUNuw==}
     peerDependencies:
       graphql: ^16.6.0
     peerDependenciesMeta:
@@ -9885,7 +9885,7 @@ packages:
 
 snapshots:
 
-  '@0no-co/graphql.web@1.0.8(graphql@16.9.0)':
+  '@0no-co/graphql.web@1.0.13(graphql@16.9.0)':
     optionalDependencies:
       graphql: 16.9.0
 
