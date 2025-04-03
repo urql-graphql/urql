@@ -342,9 +342,6 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.0.13
         version: 1.0.13(graphql@16.9.0)
-      graphql:
-        specifier: ^16.6.0
-        version: 16.9.0
       wonka:
         specifier: ^6.3.2
         version: 6.3.2
