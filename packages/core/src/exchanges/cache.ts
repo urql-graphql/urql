@@ -72,7 +72,7 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
           ...(cachedResult
             ? {
                 type: 'cacheHit',
-                message: 'The result was successfully retried from the cache',
+                message: 'The result was successfully retrieved from the cache',
               }
             : {
                 type: 'cacheMiss',
