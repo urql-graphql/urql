@@ -108,7 +108,7 @@ interface RetryState {
  * });
  * ```
  */
-export const retryExchange = (options: RetryExchangeOptions): Exchange => {
+export const retryExchange = (options: RetryExchangeOptions = {}): Exchange => {
   const { retryIf, retryWith } = options;
   const MIN_DELAY = options.initialDelayMs || 1000;
   const MAX_DELAY = options.maxDelayMs || 15_000;
