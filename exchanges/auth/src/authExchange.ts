@@ -46,6 +46,28 @@ export interface AuthUtilities {
     context?: Partial<OperationContext>
   ): Promise<OperationResult<Data>>;
 
+  /** Sends a query to your GraphQL API, bypassing earlier exchanges and authentication.
+   *
+   * @param query - a GraphQL document containing the query operation that will be executed.
+   * @param variables - the variables used to execute the operation.
+   * @param context - {@link OperationContext} options that'll be used in future exchanges.
+   * @returns A `Promise` of an {@link OperationResult} for the GraphQL query.
+   *
+   * @remarks
+   * The `query()` utility method is useful when your authentication requires you to make a GraphQL query
+   * request to update your authentication tokens. In these cases, you likely wish to bypass prior exchanges and
+   * the authentication in the `authExchange` itself.
+   *
+   * This method bypasses the usual query flow of the `Client` and instead issues the query as directly
+   * as possible. This also means that it doesn’t carry your `Client`'s default {@link OperationContext}
+   * options, so you may have to pass them again, if needed.
+   */
+  query<Data = any, Variables extends AnyVariables = AnyVariables>(
+    query: DocumentInput<Data, Variables>,
+    variables: Variables,
+    context?: Partial<OperationContext>
+  ): Promise<OperationResult<Data>>;
+
   /** Adds additional HTTP headers to an `Operation`.
    *
    * @param operation - An {@link Operation} to add headers to.
@@ -236,6 +258,35 @@ export function authExchange(
               ): Promise<OperationResult<Data>> {
                 const baseOperation = client.createRequestOperation(
                   'mutation',
+                  createRequest(query, variables),
+                  context
+                );
+                return pipe(
+                  result$,
+                  onStart(() => {
+                    const operation = addAuthToOperation(baseOperation);
+                    bypassQueue.add(
+                      operation.context._instance as OperationInstance
+                    );
+                    retries.next(operation);
+                  }),
+                  filter(
+                    result =>
+                      result.operation.key === baseOperation.key &&
+                      baseOperation.context._instance ===
+                        result.operation.context._instance
+                  ),
+                  take(1),
+                  toPromise
+                );
+              },
+              query<Data = any, Variables extends AnyVariables = AnyVariables>(
+                query: DocumentInput<Data, Variables>,
+                variables: Variables,
+                context?: Partial<OperationContext>
+              ): Promise<OperationResult<Data>> {
+                const baseOperation = client.createRequestOperation(
+                  'query',
                   createRequest(query, variables),
                   context
                 );
