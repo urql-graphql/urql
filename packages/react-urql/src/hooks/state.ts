@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type { Dispatch } from 'react';
 
 export const initialState = {
   fetching: false,
@@ -65,27 +65,31 @@ export const hasDepsChanged = <T extends { length: number }>(a: T, b: T) => {
   return false;
 };
 
-const ReactSharedInternals =
-  (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED ||
-  (React as any)
-    .__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+let isDispatching = false;
 
-export function deferDispatch<Dispatch extends React.Dispatch<any>>(
-  setState: Dispatch,
-  value: Dispatch extends React.Dispatch<infer State> ? State : void
-) {
-  if (!!ReactSharedInternals && process.env.NODE_ENV !== 'production') {
-    const currentOwner = ReactSharedInternals.ReactCurrentOwner
-      ? ReactSharedInternals.ReactCurrentOwner.current
-      : ReactSharedInternals.A &&
-        ReactSharedInternals.A.getOwner &&
-        ReactSharedInternals.A.getOwner();
-    if (currentOwner) {
-      Promise.resolve(value).then(setState);
-    } else {
-      setState(value);
+function deferDispatch<F extends Dispatch<any>>(
+  setState: F,
+  value: F extends Dispatch<infer State> ? State : void
+): void;
+
+function deferDispatch<F extends Dispatch<any>>(
+  setState: F
+): ReturnType<F>;
+
+function deferDispatch<F extends Dispatch<any>>(
+  setState: F,
+  value?: F extends Dispatch<infer State> ? State : void
+): any {
+  if (!isDispatching || value === undefined) {
+    try {
+      isDispatching = true;
+      return setState(value);
+    } finally {
+      isDispatching = false;
     }
   } else {
-    setState(value);
+    Promise.resolve(value).then(setState);
   }
 }
+
+export { deferDispatch };
