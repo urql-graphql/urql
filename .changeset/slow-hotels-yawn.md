@@ -2,4 +2,4 @@
 "@urql/exchange-retry": patch
 ---
 
-minor(exchanges/retry): make options argument optional
+Mark options argument as optional (`retryExchange()`)
