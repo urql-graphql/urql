@@ -266,7 +266,15 @@ export function makeFetchSource(
 ): Source<OperationResult> {
   let abortController: AbortController | void;
   if (typeof AbortController !== 'undefined') {
-    fetchOptions.signal = (abortController = new AbortController()).signal;
+    abortController = new AbortController();
+    if (fetchOptions.signal) {
+      fetchOptions.signal = AbortSignal.any([
+        fetchOptions.signal,
+        abortController.signal,
+      ]);
+    } else {
+      fetchOptions.signal = abortController.signal;
+    }
   }
   return pipe(
     fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
