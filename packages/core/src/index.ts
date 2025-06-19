@@ -14,4 +14,5 @@ export {
   mergeResultPatch,
   formatDocument,
   makeOperation,
+  getOperationName,
 } from './utils';
