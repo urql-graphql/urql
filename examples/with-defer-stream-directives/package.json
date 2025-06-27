@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@graphql-yoga/plugin-defer-stream": "^1.7.1",
-    "@urql/core": "^5.1.1",
-    "@urql/exchange-graphcache": "^7.2.3",
+    "@urql/core": "^5.1.2",
+    "@urql/exchange-graphcache": "^7.2.4",
     "graphql": "17.0.0-alpha.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
