@@ -180,7 +180,7 @@ importers:
   exchanges/auth:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -193,7 +193,7 @@ importers:
   exchanges/context:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -206,7 +206,7 @@ importers:
   exchanges/execute:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -222,7 +222,7 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13(graphql@16.9.0)
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -256,7 +256,7 @@ importers:
   exchanges/persisted:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -269,7 +269,7 @@ importers:
   exchanges/populate:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -282,7 +282,7 @@ importers:
   exchanges/refocus:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -298,7 +298,7 @@ importers:
   exchanges/request-policy:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -311,7 +311,7 @@ importers:
   exchanges/retry:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       wonka:
         specifier: ^6.3.2
@@ -324,7 +324,7 @@ importers:
   exchanges/throw-on-error:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../../packages/core
       graphql-toe:
         specifier: ^1.0.0-rc.0
@@ -382,7 +382,7 @@ importers:
   packages/preact-urql:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../core
       wonka:
         specifier: ^6.3.2
@@ -401,7 +401,7 @@ importers:
   packages/react-urql:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../core
       wonka:
         specifier: ^6.3.2
@@ -550,7 +550,7 @@ importers:
   packages/solid-urql:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../core
       solid-js:
         specifier: ^1.7.7
@@ -590,7 +590,7 @@ importers:
   packages/svelte-urql:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../core
       wonka:
         specifier: ^6.3.2
@@ -606,7 +606,7 @@ importers:
   packages/vue-urql:
     dependencies:
       '@urql/core':
-        specifier: workspace:^5.1.1
+        specifier: workspace:^5.1.2
         version: link:../core
       wonka:
         specifier: ^6.3.2
@@ -6726,6 +6726,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -7628,6 +7629,7 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   q@1.5.1:
@@ -7635,6 +7637,7 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qs@6.10.4:

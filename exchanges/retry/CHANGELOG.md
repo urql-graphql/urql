@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.2
+
+### Patch Changes
+
+- Mark options argument as optional (`retryExchange()`)
+  Submitted by [@jtomaszewski](https://github.com/jtomaszewski) (See [#3775](https://github.com/urql-graphql/urql/pull/3775))
+- Updated dependencies (See [#3773](https://github.com/urql-graphql/urql/pull/3773), [#3767](https://github.com/urql-graphql/urql/pull/3767), [#3730](https://github.com/urql-graphql/urql/pull/3730), and [#3770](https://github.com/urql-graphql/urql/pull/3770))
+  - @urql/core@5.1.2
+
 ## 1.3.1
 
 ### Patch Changes

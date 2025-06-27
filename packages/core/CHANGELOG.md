@@ -1,5 +1,18 @@
 # @urql/core
 
+## 5.1.2
+
+### Patch Changes
+
+- Correct typo in cacheHit debug message of the `debugExchange`
+  Submitted by [@jorrit](https://github.com/jorrit) (See [#3773](https://github.com/urql-graphql/urql/pull/3773))
+- ⚠️ Fix `fetchSource` not text-decoding response chunks as streams, which could cause UTF-8 decoding to break
+  Submitted by [@i110](https://github.com/i110) (See [#3767](https://github.com/urql-graphql/urql/pull/3767))
+- ⚠️ Fix compatibility with Typescript >5.5 (See: https://github.com/0no-co/graphql.web/pull/49)
+  Submitted by [@andreisergiu98](https://github.com/andreisergiu98) (See [#3730](https://github.com/urql-graphql/urql/pull/3730))
+- Change debug log verbosity to `console.debug` rather than `console.log`
+  Submitted by [@kitten](https://github.com/kitten) (See [#3770](https://github.com/urql-graphql/urql/pull/3770))
+
 ## 5.1.1
 
 ### Patch Changes

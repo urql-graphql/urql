@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 7.2.4
+
+### Patch Changes
+
+- ⚠️ Fix compatibility with Typescript >5.5 (See: https://github.com/0no-co/graphql.web/pull/49)
+  Submitted by [@andreisergiu98](https://github.com/andreisergiu98) (See [#3730](https://github.com/urql-graphql/urql/pull/3730))
+- Updated dependencies (See [#3773](https://github.com/urql-graphql/urql/pull/3773), [#3767](https://github.com/urql-graphql/urql/pull/3767), [#3730](https://github.com/urql-graphql/urql/pull/3730), and [#3770](https://github.com/urql-graphql/urql/pull/3770))
+  - @urql/core@5.1.2
+
 ## 7.2.3
 
 ### Patch Changes
