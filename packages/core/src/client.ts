@@ -79,7 +79,9 @@ export interface ClientOptions {
    *
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/fetch} for a description of this object.
    */
-  fetchOptions?: RequestInit | (() => RequestInit);
+  fetchOptions?:
+    | Omit<RequestInit, 'signal'>
+    | (() => Omit<RequestInit, 'signal'>);
   /** A `fetch` function polyfill used by fetch exchanges to make API calls.
    *
    * @remarks
