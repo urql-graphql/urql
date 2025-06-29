@@ -265,14 +265,30 @@ export function makeFetchSource(
   fetchOptions: RequestInit
 ): Source<OperationResult> {
   let abortController: AbortController | void;
+  const userAbortSignal = fetchOptions.signal;
+  let abortAbortController: (() => void) | undefined;
   if (typeof AbortController !== 'undefined') {
-    fetchOptions.signal = (abortController = new AbortController()).signal;
+    abortController = new AbortController();
+    if (userAbortSignal) {
+      abortAbortController = () => {
+        abortController!.abort();
+      };
+      userAbortSignal.addEventListener('abort', abortAbortController, {
+        once: true,
+      });
+    }
+    fetchOptions.signal = abortController.signal;
   }
   return pipe(
     fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
     filter((result): result is OperationResult => !!result),
     onEnd(() => {
-      if (abortController) abortController.abort();
+      if (abortController) {
+        abortController.abort();
+        if (userAbortSignal && abortAbortController) {
+          userAbortSignal.removeEventListener('abort', abortAbortController);
+        }
+      }
     })
   );
 }
