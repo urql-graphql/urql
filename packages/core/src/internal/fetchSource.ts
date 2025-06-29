@@ -268,13 +268,18 @@ export function makeFetchSource(
   if (typeof AbortController !== 'undefined') {
     abortController = new AbortController();
     if (fetchOptions.signal) {
-      fetchOptions.signal = AbortSignal.any([
-        fetchOptions.signal,
-        abortController.signal,
-      ]);
-    } else {
-      fetchOptions.signal = abortController.signal;
+      fetchOptions.signal.addEventListener(
+        'abort',
+        () => {
+          abortController!.abort();
+        },
+        {
+          once: true,
+        }
+      );
+      // TODO: remove the above event listener once the fetch has completed (successfully or otherwise)
     }
+    fetchOptions.signal = abortController.signal;
   }
   return pipe(
     fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
