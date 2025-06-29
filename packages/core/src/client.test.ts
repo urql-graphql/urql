@@ -148,7 +148,7 @@ describe('promisified methods', () => {
       fetchOptions: undefined,
       fetch: undefined,
       suspense: false,
-      preferGetMethod: undefined,
+      preferGetMethod: 'within-url-limit',
     });
     expect(queryResult).toHaveProperty('then');
   });
@@ -174,7 +174,7 @@ describe('promisified methods', () => {
       fetchOptions: undefined,
       fetch: undefined,
       suspense: false,
-      preferGetMethod: undefined,
+      preferGetMethod: 'within-url-limit',
     });
     expect(mutationResult).toHaveProperty('then');
   });
