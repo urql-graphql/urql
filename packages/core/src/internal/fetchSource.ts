@@ -265,19 +265,18 @@ export function makeFetchSource(
   fetchOptions: RequestInit
 ): Source<OperationResult> {
   let abortController: AbortController | void;
+  let userAbortSignal: AbortSignal | null | undefined;
+  let abortAbortController: (() => void) | undefined;
   if (typeof AbortController !== 'undefined') {
     abortController = new AbortController();
-    if (fetchOptions.signal) {
-      fetchOptions.signal.addEventListener(
-        'abort',
-        () => {
-          abortController!.abort();
-        },
-        {
-          once: true,
-        }
-      );
-      // TODO: remove the above event listener once the fetch has completed (successfully or otherwise)
+    userAbortSignal = fetchOptions.signal;
+    if (userAbortSignal) {
+      abortAbortController = () => {
+        abortController!.abort();
+      };
+      userAbortSignal.addEventListener('abort', abortAbortController, {
+        once: true,
+      });
     }
     fetchOptions.signal = abortController.signal;
   }
@@ -285,7 +284,12 @@ export function makeFetchSource(
     fromAsyncIterable(fetchOperation(operation, url, fetchOptions)),
     filter((result): result is OperationResult => !!result),
     onEnd(() => {
-      if (abortController) abortController.abort();
+      if (abortController) {
+        abortController.abort();
+        if (userAbortSignal && abortAbortController) {
+          userAbortSignal.removeEventListener('abort', abortAbortController);
+        }
+      }
     })
   );
 }
