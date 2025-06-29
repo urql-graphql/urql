@@ -1,5 +1,12 @@
 # @urql/core
 
+## 5.2.0
+
+### Minor Changes
+
+- export the getOperationName utility function
+  Submitted by [@giacomocerquone](https://github.com/giacomocerquone) (See [#3785](https://github.com/urql-graphql/urql/pull/3785))
+
 ## 5.1.2
 
 ### Patch Changes
