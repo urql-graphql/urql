@@ -265,11 +265,10 @@ export function makeFetchSource(
   fetchOptions: RequestInit
 ): Source<OperationResult> {
   let abortController: AbortController | void;
-  let userAbortSignal: AbortSignal | null | undefined;
+  const userAbortSignal = fetchOptions.signal;
   let abortAbortController: (() => void) | undefined;
   if (typeof AbortController !== 'undefined') {
     abortController = new AbortController();
-    userAbortSignal = fetchOptions.signal;
     if (userAbortSignal) {
       abortAbortController = () => {
         abortController!.abort();
