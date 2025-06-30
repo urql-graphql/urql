@@ -1,0 +1,52 @@
+{
+  "name": "@urql/tanstack-react-router",
+  "version": "0.0.0",
+  "description": "Convenience wrappers for using urql with SSR in @tanstack/react-router and @tanstack/start",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
+  "license": "MIT",
+  "author": "urql GraphQL Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urql-graphql/urql.git",
+    "directory": "packages/tanstack-react-router-urql"
+  },
+  "main": "dist/urql-tanstack-react-router.js",
+  "module": "dist/urql-tanstack-react-router.es.js",
+  "types": "dist/urql-tanstack-react-router.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.mjs",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "devDependencies": {
+    "@urql/core": "workspace:*",
+    "urql": "workspace:*",
+    "@types/react": "^18.3.8",
+    "@types/react-dom": "^18.3.0",
+    "graphql": "^16.0.0",
+    "@tanstack/react-router": "^1.94.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "peerDependencies": {
+    "@tanstack/react-router": ">=1.43.2",
+    "react": ">=18.0.0",
+    "urql": "^4.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
