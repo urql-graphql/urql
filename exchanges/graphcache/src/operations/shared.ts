@@ -234,18 +234,24 @@ export class SelectionIterator {
                     fragment,
                     this.typename
                   )
-                : (currentOperation === 'read' &&
-                    isFragmentMatching(
+                : this.ctx.store.possibleTypeMap
+                  ? isSuperType(
+                      this.ctx.store.possibleTypeMap,
                       fragment.typeCondition.name.value,
                       this.typename
-                    )) ||
-                  isFragmentHeuristicallyMatching(
-                    fragment,
-                    this.typename,
-                    this.entityKey,
-                    this.ctx.variables,
-                    this.ctx.store.logger
-                  ));
+                    )
+                  : (currentOperation === 'read' &&
+                      isFragmentMatching(
+                        fragment.typeCondition.name.value,
+                        this.typename
+                      )) ||
+                    isFragmentHeuristicallyMatching(
+                      fragment,
+                      this.typename,
+                      this.entityKey,
+                      this.ctx.variables,
+                      this.ctx.store.logger
+                    ));
             if (
               isMatching ||
               (currentOperation === 'write' && !this.ctx.store.schema)
@@ -289,6 +295,19 @@ export class SelectionIterator {
     return undefined;
   }
 }
+
+const isSuperType = (
+  possibleTypeMap: Map<string, Set<string>>,
+  typeCondition: string,
+  typename: string | void
+) => {
+  if (!typename) return false;
+  if (typeCondition === typename) return true;
+
+  const concreteTypes = possibleTypeMap.get(typeCondition);
+
+  return concreteTypes && concreteTypes.has(typename);
+};
 
 const isFragmentMatching = (typeCondition: string, typename: string | void) => {
   if (!typename) return false;
