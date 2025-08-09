@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 8.1.0
+
+### Minor Changes
+
+- Add possibleTypes config for deterministic fragment matching
+  Submitted by [@xuanduc987](https://github.com/xuanduc987) (See [#3805](https://github.com/urql-graphql/urql/pull/3805))
+
 ## 8.0.0
 
 ### Patch Changes
