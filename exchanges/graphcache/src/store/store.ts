@@ -57,6 +57,7 @@ export class Store<
   keys: KeyingConfig;
   globalIDs: Set<string> | boolean;
   schema?: SchemaIntrospector;
+  possibleTypeMap?: Map<string, Set<string>>;
 
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField | void };
@@ -84,6 +85,14 @@ export class Store<
       subscriptionName = schema.subscription || subscriptionName;
       // Only add schema introspector if it has types info
       if (schema.types) this.schema = schema;
+    }
+
+    if (!this.schema && opts.possibleTypes) {
+      this.possibleTypeMap = new Map();
+      for (const entry of Object.entries(opts.possibleTypes)) {
+        const [abstractType, concreteTypes] = entry;
+        this.possibleTypeMap.set(abstractType, new Set(concreteTypes));
+      }
     }
 
     this.updates = opts.updates || {};

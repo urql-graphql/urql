@@ -618,6 +618,16 @@ export type CacheExchangeOpts = {
    * type names may be passed instead.
    */
   globalIDs?: string[] | boolean;
+  /** Configures abstract to concrete types mapping for GraphQL types.
+   *
+   * @remarks
+   * This will disable heuristic fragment matching, allowing Graphcache to match
+   * fragment deterministically.
+   *
+   * When both `possibleTypes` and `schema` is set, `possibleTypes` value will be
+   * ignored.
+   */
+  possibleTypes?: PossibleTypesConfig;
   /** Configures Graphcache with Schema Introspection data.
    *
    * @remarks
@@ -930,6 +940,10 @@ export type OptimisticMutationConfig = {
  */
 export type KeyingConfig = {
   [typename: string]: KeyGenerator;
+};
+
+export type PossibleTypesConfig = {
+  [abstractType: string]: string[];
 };
 
 /** Serialized normalized caching data. */
