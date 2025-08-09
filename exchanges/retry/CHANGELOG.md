@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies (See [#3789](https://github.com/urql-graphql/urql/pull/3789) and [#3807](https://github.com/urql-graphql/urql/pull/3807))
+  - @urql/core@6.0.0
+
 ## 1.3.2
 
 ### Patch Changes

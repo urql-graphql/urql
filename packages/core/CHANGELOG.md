@@ -1,5 +1,20 @@
 # @urql/core
 
+## 6.0.0
+
+### Major Changes
+
+- By default leverage GET for queries where the query-string + variables comes down to less than 2048 characters.
+  When upgrading it's important to see whether your server supports `GET`, if it doesn't ideally adding support for it
+  or alternatively setting `preferGetMethod` in the `createClient` method as well as `preferGetForPersistedQueries` for
+  the persisted exchange to `false`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3789](https://github.com/urql-graphql/urql/pull/3789))
+
+### Minor Changes
+
+- Fix type definition for `GraphQLRequestParams` to make `variables` field optional if and only if **all** fields are optional or nullish
+  Submitted by [@arkandias](https://github.com/arkandias) (See [#3807](https://github.com/urql-graphql/urql/pull/3807))
+
 ## 5.2.0
 
 ### Minor Changes
