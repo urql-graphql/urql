@@ -44,7 +44,7 @@ export interface PersistedExchangeOptions {
    * GET requests are frequently used to make GraphQL requests more
    * cacheable on CDNs.
    *
-   * @defaultValue `undefined` - disabled
+   * @defaultValue `within-url-limit` - Use GET requests for persisted queries within the URL limit.
    */
   preferGetForPersistedQueries?: OperationContext['preferGetMethod'];
   /** Enforces non-automatic persisted queries by ignoring APQ errors.
@@ -137,7 +137,8 @@ export const persistedExchange =
   ({ forward }) => {
     if (!options) options = {};
 
-    const preferGetForPersistedQueries = options.preferGetForPersistedQueries;
+    const preferGetForPersistedQueries =
+      options.preferGetForPersistedQueries || 'within-url-limit';
     const enforcePersistedQueries = !!options.enforcePersistedQueries;
     const hashFn = options.generateHash || hash;
     const enableForMutation = !!options.enableForMutation;
