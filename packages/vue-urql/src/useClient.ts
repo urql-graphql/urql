@@ -1,11 +1,12 @@
-import type { App, Ref } from 'vue';
-import { getCurrentInstance, inject, provide, isRef, shallowRef } from 'vue';
+import { type App, getCurrentScope, type Ref } from 'vue';
+import { inject, provide, isRef, shallowRef } from 'vue';
 import type { ClientOptions } from '@urql/core';
 import { Client } from '@urql/core';
 
-const clientsPerInstance = new WeakMap<{}, Ref<Client>>();
+// WeakMap to store client instances as fallback when client is provided and used in the same component
+const clientsPerScope = new WeakMap<{}, Ref<Client>>();
 
-/** Provides a {@link Client} to a component’s children.
+/** Provides a {@link Client} to a component and it’s children.
  *
  * @param opts - {@link ClientOptions}, a {@link Client}, or a reactive ref object of a `Client`.
  *
@@ -19,18 +20,16 @@ const clientsPerInstance = new WeakMap<{}, Ref<Client>>();
  *
  * @example
  * ```ts
- * import { provideClient } from '@urql/vue';
- * // All of `@urql/core` is also re-exported by `@urql/vue`:
- * import { Client, cacheExchange, fetchExchange } from '@urql/core';
+ * <script setup>
+ *   import { provideClient } from '@urql/vue';
+ *   // All of `@urql/core` is also re-exported by `@urql/vue`:
+ *   import { Client, cacheExchange, fetchExchange } from '@urql/core';
  *
- * export default {
- *   setup() {
- *     provideClient(new Client({
- *       url: 'https://API',
- *       exchanges: [cacheExchange, fetchExchange],
- *     }));
- *   },
- * };
+ *   provideClient(new Client({
+ *     url: 'https://API',
+ *     exchanges: [cacheExchange, fetchExchange],
+ *   }));
+ * </script>
  * ```
  */
 export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
@@ -41,9 +40,9 @@ export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
     client = opts;
   }
 
-  const instance = getCurrentInstance();
-  if (instance) {
-    clientsPerInstance.set(instance, client);
+  const scope = getCurrentScope();
+  if (scope) {
+    clientsPerScope.set(scope, client);
   }
 
   provide('$urql', client);
@@ -88,26 +87,26 @@ export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
 /** Returns a provided reactive ref object of a {@link Client}.
  *
  * @remarks
- * `useClient` may be called in Vue `setup` functions to retrieve a
- * reactive rev object of a {@link Client} that’s previously been
+ * `useClient` may be called in a reactive context to retrieve a
+ * reactive ref object of a {@link Client} that’s previously been
  * provided with {@link provideClient} in the current or a parent’s
  * `setup` function.
  *
  * @throws
- * In development, if `useClient` is called outside of a Vue `setup`
- * function or no {@link Client} was provided, an error will be thrown.
+ * In development, if `useClient` is called outside of a reactive context
+ * or no {@link Client} was provided, an error will be thrown.
  */
 export function useClient(): Ref<Client> {
-  const instance = getCurrentInstance();
-  if (process.env.NODE_ENV !== 'production' && !instance) {
+  const scope = getCurrentScope();
+  if (process.env.NODE_ENV !== 'production' && !scope) {
     throw new Error(
-      'use* functions may only be called during the `setup()` or other lifecycle hooks.'
+      'use* function must be called within a reactive context (component setup, composable, or effect scope).'
     );
   }
 
   let client = inject('$urql') as Ref<Client> | undefined;
-  if (!client && instance) {
-    client = clientsPerInstance.get(instance);
+  if (!client) {
+    client = clientsPerScope.get(scope!);
   }
 
   if (process.env.NODE_ENV !== 'production' && !client) {
