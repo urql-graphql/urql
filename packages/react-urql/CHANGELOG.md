@@ -1,5 +1,12 @@
 # urql
 
+## 5.0.0
+
+### Patch Changes
+
+- Updated dependencies (See [#3789](https://github.com/urql-graphql/urql/pull/3789) and [#3807](https://github.com/urql-graphql/urql/pull/3807))
+  - @urql/core@6.0.0
+
 ## 4.2.2
 
 ### Patch Changes

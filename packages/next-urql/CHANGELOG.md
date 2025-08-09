@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - urql@5.0.0
+
 ## 1.1.5
 
 ### Patch Changes

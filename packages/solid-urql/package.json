@@ -1,6 +1,6 @@
 {
   "name": "@urql/solid",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "A highly customizable and versatile GraphQL client for Solid",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -56,11 +56,11 @@
     "vite-plugin-solid": "^2.7.0"
   },
   "peerDependencies": {
-    "@urql/core": "^5.0.0",
+    "@urql/core": "^6.0.0",
     "solid-js": "^1.7.7"
   },
   "dependencies": {
-    "@urql/core": "workspace:^5.2.0",
+    "@urql/core": "workspace:^6.0.0",
     "wonka": "^6.3.2"
   },
   "publishConfig": {

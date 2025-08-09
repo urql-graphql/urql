@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-persisted",
-  "version": "4.3.1",
+  "version": "5.0.0",
   "exports": {
     ".": "./src/index.ts"
   },
