@@ -386,19 +386,19 @@ export type GraphQLRequestParams<
           variables?: Variables;
         }
       : Variables extends {
-            [P in keyof Variables]: Exclude<Variables[P], null | void>;
+            [P in keyof Variables]: undefined extends Variables[P]
+              ? unknown
+              : null extends Variables[P]
+                ? unknown
+                : void extends Variables[P]
+                  ? unknown
+                  : never;
           }
-        ? Variables extends {
-            [P in keyof Variables]: never;
-          }
-          ? {
-              variables?: Variables;
-            }
-          : {
-              variables: Variables;
-            }
-        : {
+        ? {
             variables?: Variables;
+          }
+        : {
+            variables: Variables;
           }))
   | {
       query: DocumentInput<Data, Variables>;
