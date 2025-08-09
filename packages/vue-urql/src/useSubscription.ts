@@ -16,7 +16,7 @@ import type {
 
 import { useClient } from './useClient';
 
-import type { MaybeRef, MaybeRefObj } from './utils';
+import type { MaybeRefOrGetter, MaybeRefOrGetterObj } from './utils';
 import { useRequestState, useClientState } from './utils';
 
 /** Input arguments for the {@link useSubscription} function.
@@ -36,7 +36,7 @@ export type UseSubscriptionArgs<
    * {@link UseSubscriptionResponse.resume} is called, or, if `pause` is a reactive
    * ref of a boolean, until this ref changes to `true`.
    */
-  pause?: MaybeRef<boolean>;
+  pause?: MaybeRefOrGetter<boolean>;
   /** Updates the {@link OperationContext} for the executed GraphQL subscription operation.
    *
    * @remarks
@@ -54,8 +54,8 @@ export type UseSubscriptionArgs<
    * });
    * ```
    */
-  context?: MaybeRef<Partial<OperationContext>>;
-} & MaybeRefObj<GraphQLRequestParams<Data, MaybeRefObj<Variables>>>;
+  context?: MaybeRefOrGetter<Partial<OperationContext>>;
+} & MaybeRefOrGetterObj<GraphQLRequestParams<Data, Variables>>;
 
 /** Combines previous data with an incoming subscription result’s data.
  *
@@ -246,11 +246,10 @@ export function callUseSubscription<
     V
   >();
 
-  const { isPaused, source, pause, resume, execute, teardown } = useClientState(
-    args,
-    client,
-    'executeSubscription'
-  );
+  const { isPaused, source, pause, resume, execute, teardown } = useClientState<
+    T,
+    V
+  >(args, client, 'executeSubscription');
 
   const teardownSubscription = watchEffect(onInvalidate => {
     if (source.value) {

@@ -3,73 +3,29 @@ import type {
   Client,
   CombinedError,
   DocumentInput,
+  GraphQLRequest,
   Operation,
   OperationContext,
   OperationResult,
   OperationResultSource,
 } from '@urql/core';
 import { createRequest } from '@urql/core';
-import type { Ref } from 'vue';
+import { type Ref, unref } from 'vue';
 import { watchEffect, isReadonly, computed, ref, shallowRef, isRef } from 'vue';
 import type { UseSubscriptionArgs } from './useSubscription';
 import type { UseQueryArgs } from './useQuery';
 
-export type MaybeRef<T> = T | (() => T) | Ref<T>;
-export type MaybeRefObj<T> = T extends {}
-  ? { [K in keyof T]: MaybeRef<T[K]> }
-  : T;
+export type MaybeRefOrGetter<T> = T | (() => T) | Ref<T>;
+export type MaybeRefOrGetterObj<T extends {}> =
+  T extends Record<string, never>
+    ? T
+    : { [K in keyof T]: MaybeRefOrGetter<T[K]> };
 
-const unwrap = <T>(maybeRef: MaybeRef<T>): T =>
-  typeof maybeRef === 'function'
-    ? (maybeRef as () => T)()
-    : maybeRef != null && isRef(maybeRef)
-      ? maybeRef.value
-      : maybeRef;
+const isFunction = <T>(val: MaybeRefOrGetter<T>): val is () => T =>
+  typeof val === 'function';
 
-const isPlainObject = (value: any): boolean => {
-  if (typeof value !== 'object' || value === null) return false;
-  return (
-    value.constructor &&
-    Object.getPrototypeOf(value).constructor === Object.prototype.constructor
-  );
-};
-export const isArray = Array.isArray;
-
-const unwrapDeeply = <T>(input: T): T => {
-  input = isRef(input) ? (input.value as T) : input;
-
-  if (typeof input === 'function') {
-    return unwrapDeeply(input()) as T;
-  }
-
-  if (input && typeof input === 'object') {
-    if (isArray(input)) {
-      const length = input.length;
-      const out = new Array(length) as T;
-      let i = 0;
-      for (; i < length; i++) {
-        out[i] = unwrapDeeply(input[i]);
-      }
-
-      return out;
-    } else if (isPlainObject(input)) {
-      const keys = Object.keys(input);
-      const length = keys.length;
-      let i = 0;
-      let key: string;
-      const out = {} as T;
-
-      for (; i < length; i++) {
-        key = keys[i];
-        out[key] = unwrapDeeply(input[key]);
-      }
-
-      return out;
-    }
-  }
-
-  return input;
-};
+const toValue = <T>(source: MaybeRefOrGetter<T>): T =>
+  isFunction(source) ? source() : unref(source);
 
 export const createRequestWithArgs = <
   T = any,
@@ -78,11 +34,12 @@ export const createRequestWithArgs = <
   args:
     | UseQueryArgs<T, V>
     | UseSubscriptionArgs<T, V>
-    | { query: MaybeRef<DocumentInput<T, V>>; variables: V }
-) => {
+    | { query: MaybeRefOrGetter<DocumentInput<T, V>>; variables: V }
+): GraphQLRequest<T, V> => {
+  const _args = toValue(args);
   return createRequest<T, V>(
-    unwrap(args.query),
-    unwrapDeeply(args.variables) as V
+    toValue(_args.query),
+    toValue(_args.variables as MaybeRefOrGetter<V>)
   );
 };
 
@@ -120,16 +77,16 @@ export function useClientState<T = any, V extends AnyVariables = AnyVariables>(
       ? computed(args.pause)
       : ref(!!args.pause);
 
-  const request = computed(() => createRequestWithArgs(args));
+  const request = computed(() => createRequestWithArgs<T, V>(args));
 
   const requestOptions = computed(() => {
     return 'requestPolicy' in args
       ? {
-          requestPolicy: unwrap(args.requestPolicy),
-          ...unwrap(args.context),
+          requestPolicy: toValue(args.requestPolicy),
+          ...toValue(args.context),
         }
       : {
-          ...unwrap(args.context),
+          ...toValue(args.context),
         };
   });
 
