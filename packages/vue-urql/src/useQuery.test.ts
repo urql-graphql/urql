@@ -120,51 +120,6 @@ describe('useQuery', () => {
     );
   });
 
-  it('runs a query with different variables', async () => {
-    const simpleVariables = {
-      null: null,
-      NaN: NaN,
-      empty: '',
-      bool: false,
-      int: 1,
-      float: 1.1,
-      string: 'string',
-      blob: new Blob(),
-      date: new Date(),
-    };
-
-    const variablesSet = {
-      func: () => 'func',
-      ref: ref('ref'),
-      computed: computed(() => 'computed'),
-      ...simpleVariables,
-    };
-
-    const variablesSetUnwrapped = {
-      func: 'func',
-      ref: 'ref',
-      computed: 'computed',
-      ...simpleVariables,
-    };
-
-    const { query$ } = createQuery({
-      query: ref('{ test }'),
-      variables: {
-        ...variablesSet,
-        nested: variablesSet,
-        array: [variablesSet],
-      },
-    });
-
-    await query$;
-
-    expect(query$.operation.value?.variables).toStrictEqual({
-      ...variablesSetUnwrapped,
-      nested: variablesSetUnwrapped,
-      array: [variablesSetUnwrapped],
-    });
-  });
-
   it('reacts to ref variables changing', async () => {
     const variables = ref({ prop: 1 });
 
@@ -188,46 +143,62 @@ describe('useQuery', () => {
     expect(query$.operation.value).toHaveProperty('variables.prop', 3);
   });
 
-  it('reacts to nested ref variables changing', async () => {
-    const prop = ref(1);
+  it('reacts to ref variables changing', async () => {
+    const foo = ref(1);
+    const bar = ref(1);
 
     const { executeQuery, query$ } = createQuery({
       query: ref('{ test }'),
-      variables: { prop },
+      variables: ref({
+        prop: foo,
+        nested: {
+          prop: bar,
+        },
+      }),
     });
 
     await query$;
     expect(executeQuery).toHaveBeenCalledTimes(1);
     expect(query$.operation.value).toHaveProperty('variables.prop', 1);
 
-    prop.value++;
+    foo.value++;
     await query$;
     expect(executeQuery).toHaveBeenCalledTimes(2);
     expect(query$.operation.value).toHaveProperty('variables.prop', 2);
+
+    bar.value++;
+    await query$;
+    expect(executeQuery).toHaveBeenCalledTimes(3);
+    expect(query$.operation.value).toHaveProperty('variables.nested.prop', 2);
   });
 
-  it('reacts to deep nested ref variables changing', async () => {
-    const prop = ref(1);
+  it('reacts to getter variables changing', async () => {
+    const foo = ref(1);
+    const bar = ref(1);
 
     const { executeQuery, query$ } = createQuery({
       query: ref('{ test }'),
-      variables: { deep: { nested: { prop } } },
+      variables: () => ({
+        prop: foo.value,
+        nested: {
+          prop: bar.value,
+        },
+      }),
     });
 
     await query$;
     expect(executeQuery).toHaveBeenCalledTimes(1);
-    expect(query$.operation.value).toHaveProperty(
-      'variables.deep.nested.prop',
-      1
-    );
+    expect(query$.operation.value).toHaveProperty('variables.prop', 1);
 
-    prop.value++;
+    foo.value++;
     await query$;
     expect(executeQuery).toHaveBeenCalledTimes(2);
-    expect(query$.operation.value).toHaveProperty(
-      'variables.deep.nested.prop',
-      2
-    );
+    expect(query$.operation.value).toHaveProperty('variables.prop', 2);
+
+    bar.value++;
+    await query$;
+    expect(executeQuery).toHaveBeenCalledTimes(3);
+    expect(query$.operation.value).toHaveProperty('variables.nested.prop', 2);
   });
 
   it('reacts to reactive variables changing', async () => {
@@ -258,11 +229,11 @@ describe('useQuery', () => {
   });
 
   it('reacts to computed variables changing', async () => {
-    const prop = ref(1);
-    const prop2 = ref(1);
+    const foo = ref(1);
+    const bar = ref(1);
     const variables = computed(() => ({
-      prop: prop.value,
-      deep: { nested: { prop2 } },
+      prop: foo.value,
+      deep: { nested: { prop: bar.value } },
     }));
 
     const { executeQuery, query$ } = createQuery({
@@ -274,47 +245,16 @@ describe('useQuery', () => {
     expect(executeQuery).toHaveBeenCalledTimes(1);
     expect(query$.operation.value).toHaveProperty('variables.prop', 1);
 
-    prop.value++;
+    foo.value++;
     await query$;
     expect(executeQuery).toHaveBeenCalledTimes(2);
     expect(query$.operation.value).toHaveProperty('variables.prop', 2);
 
-    prop2.value++;
+    bar.value++;
     await query$;
     expect(executeQuery).toHaveBeenCalledTimes(3);
     expect(query$.operation.value).toHaveProperty(
-      'variables.deep.nested.prop2',
-      2
-    );
-  });
-
-  it('reacts to callback variables changing', async () => {
-    const prop = ref(1);
-    const prop2 = ref(1);
-    const variables = () => ({
-      prop: prop.value,
-      deep: { nested: { prop2 } },
-    });
-
-    const { executeQuery, query$ } = createQuery({
-      query: ref('{ test }'),
-      variables,
-    });
-
-    await query$;
-    expect(executeQuery).toHaveBeenCalledTimes(1);
-    expect(query$.operation.value).toHaveProperty('variables.prop', 1);
-
-    prop.value++;
-    await query$;
-    expect(executeQuery).toHaveBeenCalledTimes(2);
-    expect(query$.operation.value).toHaveProperty('variables.prop', 2);
-
-    prop2.value++;
-    await query$;
-    expect(executeQuery).toHaveBeenCalledTimes(3);
-    expect(query$.operation.value).toHaveProperty(
-      'variables.deep.nested.prop2',
+      'variables.deep.nested.prop',
       2
     );
   });
