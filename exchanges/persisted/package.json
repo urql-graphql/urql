@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-persisted",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "An exchange that allows for persisted queries support when fetching queries",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -50,7 +50,7 @@
     "@urql/core": "^6.0.0"
   },
   "dependencies": {
-    "@urql/core": "workspace:^6.0.0",
+    "@urql/core": "workspace:^6.0.1",
     "wonka": "^6.3.2"
   },
   "devDependencies": {
