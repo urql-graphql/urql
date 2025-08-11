@@ -1,5 +1,14 @@
 # @urql/exchange-persisted-fetch
 
+## 5.0.1
+
+### Patch Changes
+
+- Use nullish coalescing for `preferGetMethod` and `preferGetForPersistedQueries` so that `false` is kept if set
+  Submitted by [@dargmuesli](https://github.com/dargmuesli) (See [#3812](https://github.com/urql-graphql/urql/pull/3812))
+- Updated dependencies (See [#3812](https://github.com/urql-graphql/urql/pull/3812))
+  - @urql/core@6.0.1
+
 ## 5.0.0
 
 ### Major Changes

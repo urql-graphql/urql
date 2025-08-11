@@ -55,7 +55,7 @@
     "@urql/core": "^6.0.0"
   },
   "dependencies": {
-    "@urql/core": "workspace:^6.0.0",
+    "@urql/core": "workspace:^6.0.1",
     "graphql-toe": "^1.0.0-rc.0",
     "wonka": "^6.3.2"
   },
