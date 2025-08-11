@@ -138,7 +138,9 @@ export const persistedExchange =
     if (!options) options = {};
 
     const preferGetForPersistedQueries =
-      options.preferGetForPersistedQueries || 'within-url-limit';
+      options.preferGetForPersistedQueries != null
+        ? options.preferGetForPersistedQueries
+        : 'within-url-limit';
     const enforcePersistedQueries = !!options.enforcePersistedQueries;
     const hashFn = options.generateHash || hash;
     const enableForMutation = !!options.enableForMutation;
@@ -170,10 +172,7 @@ export const persistedExchange =
             sha256Hash,
           },
         };
-        if (
-          persistedOperation.kind === 'query' &&
-          preferGetForPersistedQueries
-        ) {
+        if (persistedOperation.kind === 'query') {
           persistedOperation.context.preferGetMethod =
             preferGetForPersistedQueries;
         }

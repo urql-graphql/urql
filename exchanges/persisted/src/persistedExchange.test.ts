@@ -174,7 +174,7 @@ it('skips operation when generateHash returns a nullish value', async () => {
   expect(operations[0]).not.toHaveProperty('extensions.persistedQuery');
 });
 
-it.each([true, 'force', 'within-url-limit'] as const)(
+it.each([true, false, 'force', 'within-url-limit'] as const)(
   'sets `context.preferGetMethod` to %s when `options.preferGetForPersistedQueries` is %s',
   async preferGetMethodValue => {
     const { exchangeArgs } = makeExchangeArgs();
