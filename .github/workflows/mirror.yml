@@ -1,0 +1,26 @@
+# Mirrors to https://tangled.sh/@kitten.sh (knot.kitten.sh)
+name: Mirror (Git Backup)
+on:
+  push:
+    branches:
+      - main
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Mirror
+        env:
+          MIRROR_SSH_KEY: ${{ secrets.MIRROR_SSH_KEY }}
+          GIT_SSH_COMMAND: 'ssh -o StrictHostKeyChecking=yes'
+        run: |
+          mkdir -p ~/.ssh
+          echo "$MIRROR_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H knot.kitten.sh >> ~/.ssh/known_hosts
+          git remote add mirror "git@knot.kitten.sh:kitten.sh/${GITHUB_REPOSITORY#*/}"
+          git push --mirror mirror
