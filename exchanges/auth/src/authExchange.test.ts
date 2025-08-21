@@ -193,7 +193,7 @@ it('adds the same token to subsequent operations', async () => {
     toPromise
   );
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   next(queryOperation);
 
@@ -249,7 +249,7 @@ it('triggers authentication when an operation did error', async () => {
     publish
   );
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   result.mockReturnValueOnce({
     ...queryResponse,
@@ -264,7 +264,7 @@ it('triggers authentication when an operation did error', async () => {
   expect(result).toHaveBeenCalledTimes(1);
   expect(didAuthError).toHaveBeenCalledTimes(1);
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   expect(result).toHaveBeenCalledTimes(2);
   expect(operations.length).toBe(2);
@@ -307,13 +307,13 @@ it('triggers authentication when an operation will error', async () => {
     publish
   );
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(0);
   expect(willAuthError).toHaveBeenCalledTimes(1);
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   expect(result).toHaveBeenCalledTimes(1);
   expect(operations.length).toBe(1);
@@ -369,7 +369,7 @@ it('calls willAuthError on queued operations', async () => {
   expect(initialAuthResolve).toBeDefined();
   initialAuthResolve!();
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   expect(willAuthError).toHaveBeenCalledTimes(2);
   expect(result).toHaveBeenCalledTimes(2);
@@ -411,7 +411,7 @@ it('does not infinitely retry authentication when an operation did error', async
     publish
   );
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   result.mockImplementation(x => ({
     ...queryResponse,
@@ -429,7 +429,7 @@ it('does not infinitely retry authentication when an operation did error', async
   expect(result).toHaveBeenCalledTimes(1);
   expect(didAuthError).toHaveBeenCalledTimes(1);
 
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
 
   expect(result).toHaveBeenCalledTimes(2);
   expect(operations.length).toBe(2);
@@ -489,7 +489,7 @@ it('passes on errors during initialization', async () => {
   expect(output).toHaveBeenCalledTimes(0);
 
   next(queryOperation);
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
   expect(result).toHaveBeenCalledTimes(0);
   expect(output).toHaveBeenCalledTimes(1);
   expect(init).toHaveBeenCalledTimes(1);
@@ -498,7 +498,7 @@ it('passes on errors during initialization', async () => {
   );
 
   next(queryOperation);
-  await new Promise(resolve => setTimeout(resolve));
+  await new Promise(resolve => setTimeout(resolve, 1));
   expect(result).toHaveBeenCalledTimes(0);
   expect(output).toHaveBeenCalledTimes(2);
   expect(init).toHaveBeenCalledTimes(2);

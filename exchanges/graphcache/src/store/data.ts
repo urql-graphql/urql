@@ -209,7 +209,7 @@ export const clearDataState = () => {
         persistData();
         clearDataState();
         data.defer = false;
-      });
+      }, 1);
     }
   }
 };
