@@ -408,20 +408,20 @@ importers:
         version: 6.3.2
     devDependencies:
       '@cypress/react':
-        specifier: ^8.0.2
-        version: 8.0.2(@types/react@18.3.8)(cypress@13.14.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^9.0.0
+        version: 9.0.1(@types/react-dom@18.3.0)(@types/react@19.1.11)(cypress@13.14.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@cypress/vite-dev-server':
         specifier: ^5.2.0
         version: 5.2.0
       '@testing-library/react':
-        specifier: ^16.0.1
-        version: 16.0.1(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@18.3.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^16.3.0
+        version: 16.3.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@19.1.11)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@types/react':
-        specifier: ^18.3.8
-        version: 18.3.8
+        specifier: ^19.0.0
+        version: 19.1.11
       '@types/react-test-renderer':
-        specifier: ^17.0.1
-        version: 17.0.1
+        specifier: ^18.0.0
+        version: 18.3.1
       cypress:
         specifier: ^13.14.0
         version: 13.14.2
@@ -429,20 +429,20 @@ importers:
         specifier: ^16.6.0
         version: 16.9.0
       react:
-        specifier: ^18.3.1
-        version: 18.3.1
+        specifier: ^19.0.0
+        version: 19.1.1
       react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
+        specifier: ^19.0.0
+        version: 19.1.1(react@19.1.1)
       react-is:
-        specifier: ^18.3.1
-        version: 18.3.1
+        specifier: ^19.0.0
+        version: 19.1.1
       react-ssr-prepass:
-        specifier: ^1.5.0
-        version: 1.5.0(react@18.3.1)
+        specifier: ^1.6.0
+        version: 1.6.0(react@19.1.1)
       react-test-renderer:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
+        specifier: ^19.0.0
+        version: 19.1.1(react@19.1.1)
 
   packages/site:
     dependencies:
@@ -576,10 +576,10 @@ importers:
     devDependencies:
       '@react-native-async-storage/async-storage':
         specifier: ^1.21.0
-        version: 1.21.0(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
+        version: 1.21.0(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2))
       '@react-native-community/netinfo':
         specifier: ^11.2.1
-        version: 11.2.1(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
+        version: 11.2.1(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2))
       '@urql/core':
         specifier: workspace:*
         version: link:../core
@@ -1461,6 +1461,18 @@ packages:
       '@types/react':
         optional: true
 
+  '@cypress/react@9.0.1':
+    resolution: {integrity: sha512-qu6ziP2smdlfy3Yvrhm6PadxEtkc/cl6YhZu3h6KCtz+0s54joqxp6uGYOglpwyMBp3qjtSil1JVlFX0hUi5LQ==}
+    peerDependencies:
+      '@types/react': ^18 || ^19
+      '@types/react-dom': ^18 || ^19
+      cypress: '*'
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@cypress/request@2.88.12':
     resolution: {integrity: sha512-tOn+0mDZxASFM+cuAP9szGUGPI1HwWVSvdzm7V4cCsPdFTx6qMj29CwaQmRAMIEhORIUBFBsYROYJcveK4uOjA==}
     engines: {node: '>= 6'}
@@ -2313,15 +2325,15 @@ packages:
     peerDependencies:
       preact: '>=10 || ^10.0.0-alpha.0 || ^10.0.0-beta.0'
 
-  '@testing-library/react@16.0.1':
-    resolution: {integrity: sha512-dSmwJVtJXmku+iocRhWOUFbrERC76TX2Mnf0ATODz8brzAZrMBbzLwQixlBSanZxR6LddK3eiwpSFZgDET1URg==}
+  '@testing-library/react@16.3.0':
+    resolution: {integrity: sha512-kFSyxiEDwv1WLl2fgsq6pPBbw5aWKrsY2/noi1Id0TK0UParSF62oFQFGHXIyaG4pp2tEub/Zlel+fjjZILDsw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@testing-library/dom': ^10.0.0
-      '@types/react': ^18.0.0
-      '@types/react-dom': ^18.0.0
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      '@types/react': ^18.0.0 || ^19.0.0
+      '@types/react-dom': ^18.0.0 || ^19.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -2418,14 +2430,17 @@ packages:
   '@types/react-dom@18.3.0':
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
-  '@types/react-test-renderer@17.0.1':
-    resolution: {integrity: sha512-3Fi2O6Zzq/f3QR9dRnlnHso9bMl7weKCviFmfF6B4LS1Uat6Hkm15k0ZAQuDz+UBq6B3+g+NM6IT2nr5QgPzCw==}
+  '@types/react-test-renderer@18.3.1':
+    resolution: {integrity: sha512-vAhnk0tG2eGa37lkU9+s5SoroCsRI08xnsWFiAXOuPH2jqzMbcXvKExXViPi1P5fIklDeCvXqyrdmipFaSkZrA==}
 
   '@types/react@17.0.52':
     resolution: {integrity: sha512-vwk8QqVODi0VaZZpDXQCmEmiOuyjEFPY7Ttaw5vjM112LOq37yz1CDJGrRJwA1fYEq4Iitd5rnjd1yWAc/bT+A==}
 
   '@types/react@18.3.8':
     resolution: {integrity: sha512-syBUrW3/XpnW4WJ41Pft+I+aPoDVbrBVQGEnbD7NijDGlVC+8gV/XKRY+7vMDlfPpbwYt0l1vd/Sj8bJGMbs9Q==}
+
+  '@types/react@19.1.11':
+    resolution: {integrity: sha512-lr3jdBw/BGj49Eps7EvqlUaoeA0xpj3pc0RoJkHpYaCHkVK7i28dKyImLQb3JVlqs3aYSXf7qYuWOW/fgZnTXQ==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -7734,6 +7749,11 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
+  react-dom@19.1.1:
+    resolution: {integrity: sha512-Dlq/5LAZgF0Gaz6yiqZCf6VCcZs1ghAJyrsu84Q/GT0gV+mCxbfmKNoGRKBYMJ8IEdGPqu49YWXD02GCknEDkw==}
+    peerDependencies:
+      react: ^19.1.1
+
   react-fast-compare@2.0.4:
     resolution: {integrity: sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==}
 
@@ -7781,6 +7801,9 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
+  react-is@19.1.1:
+    resolution: {integrity: sha512-tr41fA15Vn8p4X9ntI+yCyeGSf1TlYaY5vlTZfQmeLBrFo3psOPX6HhTDnFNL9uj3EhP0KAQ80cugCl4b4BERA==}
+
   react-lifecycles-compat@3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
 
@@ -7821,20 +7844,15 @@ packages:
       react: ^15.5.4 || ^16.0.0 || ^17.0.0
       react-dom: ^15.5.4 || ^16.0.0 || ^17.0.0
 
-  react-shallow-renderer@16.15.0:
-    resolution: {integrity: sha512-oScf2FqQ9LFVQgA73vr86xl2NaOIX73rh+YFqcOp68CWj56tSfgtGKrEbyhCj0rSijyG9M1CYprTh39fBi5hzA==}
-    peerDependencies:
-      react: ^16.0.0 || ^17.0.0 || ^18.0.0
-
   react-side-effect@1.2.0:
     resolution: {integrity: sha512-v1ht1aHg5k/thv56DRcjw+WtojuuDHFUgGfc+bFHOWsF4ZK6C2V57DO0Or0GPsg6+LSTE0M6Ry/gfzhzSwbc5w==}
     peerDependencies:
       react: ^0.13.0 || ^0.14.0 || ^15.0.0 || ^16.0.0
 
-  react-ssr-prepass@1.5.0:
-    resolution: {integrity: sha512-yFNHrlVEReVYKsLI5lF05tZoHveA5pGzjFbFJY/3pOqqjGOmMmqx83N4hIjN2n6E1AOa+eQEUxs3CgRnPmT0RQ==}
+  react-ssr-prepass@1.6.0:
+    resolution: {integrity: sha512-M10nxc95Sfm00fXm+tLkC1MWG5NLWEBgWoGrPSnAqEFM4BUaoy97JvVw+m3iL74ZHzj86M33rPiFi738hEFLWg==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   react-static-plugin-md-pages@0.3.3:
     resolution: {integrity: sha512-2vJO2g62zKf5avSsT/5IEbDPhAoWjP4tH+nyMLKta1G4AixlqPYagS7aCpDXRpzgs9ot8LN/aewrd5Vi1oWqew==}
@@ -7859,10 +7877,10 @@ packages:
     peerDependencies:
       react-hot-loader: ^4.12.11
 
-  react-test-renderer@18.3.1:
-    resolution: {integrity: sha512-KkAgygexHUkQqtvvx/otwxtuFu5cVjfzTCtjXLH9boS19/Nbtg84zS7wIQn39G8IlrhThBpQsMKkq5ZHZIYFXA==}
+  react-test-renderer@19.1.1:
+    resolution: {integrity: sha512-aGRXI+zcBTtg0diHofc7+Vy97nomBs9WHHFY1Csl3iV0x6xucjNYZZAkiVKGiNYUv23ecOex5jE67t8ZzqYObA==}
     peerDependencies:
-      react: ^18.3.1
+      react: ^19.1.1
 
   react-universal-component@4.5.0:
     resolution: {integrity: sha512-dBUC6afvSAQhDcE4oh1eTmfU29W0O2eZhcGXnfGUTulXkU8ejuWqlJWXXrSMx5iV1H6LNgj2NJMj3BtBMfBNhA==}
@@ -7879,6 +7897,10 @@ packages:
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
+    engines: {node: '>=0.10.0'}
+
+  react@19.1.1:
+    resolution: {integrity: sha512-w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==}
     engines: {node: '>=0.10.0'}
 
   read-cmd-shim@4.0.0:
@@ -8227,6 +8249,9 @@ packages:
 
   scheduler@0.24.0-canary-efb381bbf-20230505:
     resolution: {integrity: sha512-ABvovCDe/k9IluqSh4/ISoq8tIJnW8euVAWYt5j/bg6dRnqwQwiGO1F/V4AyK96NGF/FB04FhOUDuWj8IKfABA==}
+
+  scheduler@0.26.0:
+    resolution: {integrity: sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==}
 
   schema-utils@1.0.0:
     resolution: {integrity: sha512-i27Mic4KovM/lnGsy8whRCHhc7VicJajAjTrYg11K9zfZXnYIt4k5F+kZkwjnrhKzLic/HLU4j11mjsz2G/75g==}
@@ -11174,13 +11199,14 @@ snapshots:
     optionalDependencies:
       '@types/react': 17.0.52
 
-  '@cypress/react@8.0.2(@types/react@18.3.8)(cypress@13.14.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@cypress/react@9.0.1(@types/react-dom@18.3.0)(@types/react@19.1.11)(cypress@13.14.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
+      '@types/react-dom': 18.3.0
       cypress: 13.14.2
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
     optionalDependencies:
-      '@types/react': 18.3.8
+      '@types/react': 19.1.11
 
   '@cypress/request@2.88.12':
     dependencies:
@@ -11844,10 +11870,10 @@ snapshots:
       react-dom: 16.14.0(react@16.14.0)
       react-lifecycles-compat: 3.0.4
 
-  '@react-native-async-storage/async-storage@1.21.0(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))':
+  '@react-native-async-storage/async-storage@1.21.0(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2))':
     dependencies:
       merge-options: 3.0.4
-      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2)
+      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2)
 
   '@react-native-community/cli-clean@14.1.0':
     dependencies:
@@ -11973,9 +11999,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@react-native-community/netinfo@11.2.1(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))':
+  '@react-native-community/netinfo@11.2.1(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2))':
     dependencies:
-      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2)
+      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2)
 
   '@react-native/assets-registry@0.75.3': {}
 
@@ -12110,12 +12136,12 @@ snapshots:
 
   '@react-native/normalize-colors@0.75.3': {}
 
-  '@react-native/virtualized-lists@0.75.3(@types/react@18.3.8)(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))(react@18.3.1)':
+  '@react-native/virtualized-lists@0.75.3(@types/react@18.3.8)(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2))(react@19.1.1)':
     dependencies:
       invariant: 2.2.4
       nullthrows: 1.1.1
-      react: 18.3.1
-      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2)
+      react: 19.1.1
+      react-native: 0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2)
     optionalDependencies:
       '@types/react': 18.3.8
 
@@ -12311,14 +12337,14 @@ snapshots:
       '@testing-library/dom': 7.30.4
       preact: 10.13.1
 
-  '@testing-library/react@16.0.1(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@18.3.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.3.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@19.1.11)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@babel/runtime': 7.25.6
       '@testing-library/dom': 10.1.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
     optionalDependencies:
-      '@types/react': 18.3.8
+      '@types/react': 19.1.11
       '@types/react-dom': 18.3.0
 
   '@tootallnate/once@2.0.0': {}
@@ -12417,7 +12443,7 @@ snapshots:
     dependencies:
       '@types/react': 18.3.8
 
-  '@types/react-test-renderer@17.0.1':
+  '@types/react-test-renderer@18.3.1':
     dependencies:
       '@types/react': 18.3.8
 
@@ -12430,6 +12456,10 @@ snapshots:
   '@types/react@18.3.8':
     dependencies:
       '@types/prop-types': 15.7.3
+      csstype: 3.1.3
+
+  '@types/react@19.1.11':
+    dependencies:
       csstype: 3.1.3
 
   '@types/resolve@1.20.2': {}
@@ -18833,6 +18863,11 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
+  react-dom@19.1.1(react@19.1.1):
+    dependencies:
+      react: 19.1.1
+      scheduler: 0.26.0
+
   react-fast-compare@2.0.4: {}
 
   react-from-dom@0.3.1(react@17.0.2):
@@ -18881,9 +18916,11 @@ snapshots:
 
   react-is@18.3.1: {}
 
+  react-is@19.1.1: {}
+
   react-lifecycles-compat@3.0.4: {}
 
-  react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2):
+  react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2):
     dependencies:
       '@jest/create-cache-key-function': 29.7.0
       '@react-native-community/cli': 14.1.0(typescript@5.6.2)
@@ -18895,7 +18932,7 @@ snapshots:
       '@react-native/gradle-plugin': 0.75.3
       '@react-native/js-polyfills': 0.75.3
       '@react-native/normalize-colors': 0.75.3
-      '@react-native/virtualized-lists': 0.75.3(@types/react@18.3.8)(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))(react@18.3.1)
+      '@react-native/virtualized-lists': 0.75.3(@types/react@18.3.8)(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.13.15(@babel/core@7.25.2))(@types/react@18.3.8)(encoding@0.1.13)(react@19.1.1)(typescript@5.6.2))(react@19.1.1)
       abort-controller: 3.0.0
       anser: 1.4.10
       ansi-regex: 5.0.1
@@ -18915,7 +18952,7 @@ snapshots:
       nullthrows: 1.1.1
       pretty-format: 26.6.2
       promise: 8.3.0
-      react: 18.3.1
+      react: 19.1.1
       react-devtools-core: 5.3.1
       react-refresh: 0.14.2
       regenerator-runtime: 0.13.11
@@ -18975,20 +19012,14 @@ snapshots:
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
 
-  react-shallow-renderer@16.15.0(react@18.3.1):
-    dependencies:
-      object-assign: 4.1.1
-      react: 18.3.1
-      react-is: 18.3.1
-
   react-side-effect@1.2.0(react@16.14.0):
     dependencies:
       react: 16.14.0
       shallowequal: 1.1.0
 
-  react-ssr-prepass@1.5.0(react@18.3.1):
+  react-ssr-prepass@1.6.0(react@19.1.1):
     dependencies:
-      react: 18.3.1
+      react: 19.1.1
 
   react-static-plugin-md-pages@0.3.3(react-static@7.3.0(react-hot-loader@4.13.0(@types/react@17.0.52)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)))(react@17.0.2):
     dependencies:
@@ -19105,12 +19136,11 @@ snapshots:
       - webpack-cli
       - webpack-command
 
-  react-test-renderer@18.3.1(react@18.3.1):
+  react-test-renderer@19.1.1(react@19.1.1):
     dependencies:
-      react: 18.3.1
-      react-is: 18.3.1
-      react-shallow-renderer: 16.15.0(react@18.3.1)
-      scheduler: 0.23.2
+      react: 19.1.1
+      react-is: 19.1.1
+      scheduler: 0.26.0
 
   react-universal-component@4.5.0(react@16.14.0):
     dependencies:
@@ -19132,6 +19162,8 @@ snapshots:
   react@18.3.1:
     dependencies:
       loose-envify: 1.4.0
+
+  react@19.1.1: {}
 
   read-cmd-shim@4.0.0: {}
 
@@ -19603,6 +19635,8 @@ snapshots:
   scheduler@0.24.0-canary-efb381bbf-20230505:
     dependencies:
       loose-envify: 1.4.0
+
+  scheduler@0.26.0: {}
 
   schema-utils@1.0.0:
     dependencies:

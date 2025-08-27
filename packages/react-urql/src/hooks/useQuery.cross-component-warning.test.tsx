@@ -2,23 +2,25 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { vi } from 'vitest';
+import { describe, it, beforeEach } from 'vitest';
+import { Client, cacheExchange, Operation, Exchange } from '@urql/core';
+import { delay, map, pipe } from 'wonka';
 
+import { Provider } from '../context';
 import { useQuery } from './useQuery';
 
-// Mock the client so we can exercise useQuery without a real Client instance
-vi.mock('../context', async () => {
-  const { fromValue } = await vi.importActual<typeof import('wonka')>('wonka');
-
-  const mock = {
-    // Emit a synchronous result so the parent can quickly flip from loading to not loading
-    executeQuery: vi.fn(() => fromValue({ data: { activeFeatureFlags: [] } })),
-  } as const;
-
-  return {
-    useClient: () => mock,
-  };
-});
+const mockExchange: Exchange = () => ops$ => {
+  return pipe(
+    ops$,
+    delay(100),
+    map((operation: Operation) => ({
+      operation,
+      data: { activeFeatureFlags: [] },
+      stale: false,
+      hasNext: false,
+    }))
+  );
+};
 
 function useFeature() {
   const [result] = useQuery({
@@ -45,12 +47,26 @@ function Repro() {
   return <ReproComponent />;
 }
 
-describe('useQuery cross-component update warning', () => {
-  it('does not warn when the same query is used in parent and child', () => {
-    // Our global test setup throws when console.error is called.
-    // If React emits "Cannot update a component ... while rendering a different component ...",
-    // this render will throw and the test will fail, capturing the regression.
-    render(<Repro />);
+describe('component update warning', () => {
+  let client: Client;
+
+  beforeEach(() => {
+    client = new Client({
+      url: 'https://example.com/graphql',
+      exchanges: [cacheExchange, mockExchange],
+    });
+  });
+
+  it('does not warn when the same query is used in parent and child', async () => {
+    const { findByText, debug } = render(
+      <Provider value={client}>
+        <Repro />
+      </Provider>
+    );
+
+    // Wait for the component to finish loading and render the child
+    await findByText('Check console');
+
+    debug();
   });
 });
-
