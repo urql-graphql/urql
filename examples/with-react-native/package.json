@@ -12,7 +12,7 @@
     "graphql": "^16.6.0",
     "react": "18.2.0",
     "react-native": "0.71.4",
-    "urql": "^5.0.0"
+    "urql": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

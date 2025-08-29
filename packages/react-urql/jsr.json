@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "exports": "src/index.ts",
   "exclude": [
     "node_modules",
