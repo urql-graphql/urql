@@ -308,7 +308,10 @@ export function useQuery<
     () =>
       [
         source,
-        computeNextState(initialState, getSnapshot(source, suspense)),
+        computeNextState(
+          initialState,
+          deferDispatch(() => getSnapshot(source, suspense))
+        ),
         deps,
       ] as const
   );
@@ -319,7 +322,7 @@ export function useQuery<
       source,
       (currentResult = computeNextState(
         state[1],
-        getSnapshot(source, suspense)
+        deferDispatch(() => getSnapshot(source, suspense))
       )),
       deps,
     ]);
