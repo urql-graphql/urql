@@ -1,5 +1,12 @@
 # urql
 
+## 5.0.1
+
+### Patch Changes
+
+- Upgrade false-positive circumvention for internal React warning to support React 19
+  Submitted by [@kitten](https://github.com/kitten) (See [#3769](https://github.com/urql-graphql/urql/pull/3769))
+
 ## 5.0.0
 
 ### Patch Changes
