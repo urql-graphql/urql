@@ -42,6 +42,39 @@ const defaultPageInfo: PageInfo = {
 
 const ensureKey = (x: any): string | null => (typeof x === 'string' ? x : null);
 
+const extractPaginationArgs = (args: Variables) => {
+  const result = {
+    first: undefined as number | undefined,
+    last: undefined as number | undefined,
+    after: null as string | null,
+    before: null as string | null,
+  };
+
+  // Check for nested args in common patterns
+  const nestedPatterns = ['paging', 'pagination', 'page'];
+  for (const pattern of nestedPatterns) {
+    const nested = args[pattern];
+    if (nested && typeof nested === 'object') {
+      if ('first' in nested && typeof nested.first === 'number')
+        result.first = nested.first;
+      if ('last' in nested && typeof nested.last === 'number')
+        result.last = nested.last;
+      if ('after' in nested && typeof nested.after === 'string')
+        result.after = nested.after;
+      if ('before' in nested && typeof nested.before === 'string')
+        result.before = nested.before;
+    }
+  }
+
+  // Check for direct args
+  if (typeof args.first === 'number') result.first = args.first;
+  if (typeof args.last === 'number') result.last = args.last;
+  if (typeof args.after === 'string') result.after = args.after;
+  if (typeof args.before === 'string') result.before = args.before;
+
+  return result;
+};
+
 const concatEdges = (
   cache: Cache,
   leftEdges: NullArray<string>,
@@ -89,24 +122,65 @@ const concatNodes = (
   return newNodes;
 };
 
-const compareArgs = (
+const isPaginationArg = (key: string, value: any): boolean => {
+  // Direct pagination args
+  if (
+    key === 'first' ||
+    key === 'last' ||
+    key === 'after' ||
+    key === 'before'
+  ) {
+    return true;
+  }
+
+  // Nested pagination args - check common patterns
+  const nestedPatterns = ['paging', 'pagination', 'page'];
+  if (
+    nestedPatterns.includes(key) &&
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value)
+  ) {
+    const nested = value as Variables;
+    return (
+      nested.first !== undefined ||
+      nested.last !== undefined ||
+      nested.after !== undefined ||
+      nested.before !== undefined
+    );
+  }
+
+  return false;
+};
+
+const areNonPaginationArgsEqual = (
   fieldArgs: Variables,
   connectionArgs: Variables
 ): boolean => {
+  // Create versions of args without pagination args for comparison
+  const filteredFieldArgs: Variables = {};
+  const filteredConnectionArgs: Variables = {};
+
+  for (const key in fieldArgs) {
+    if (!isPaginationArg(key, fieldArgs[key])) {
+      filteredFieldArgs[key] = fieldArgs[key];
+    }
+  }
+
   for (const key in connectionArgs) {
-    if (
-      key === 'first' ||
-      key === 'last' ||
-      key === 'after' ||
-      key === 'before'
-    ) {
-      continue;
-    } else if (!(key in fieldArgs)) {
+    if (!isPaginationArg(key, connectionArgs[key])) {
+      filteredConnectionArgs[key] = connectionArgs[key];
+    }
+  }
+
+  // Compare non-pagination args
+  for (const key in filteredConnectionArgs) {
+    if (!(key in filteredFieldArgs)) {
       return false;
     }
 
-    const argA = fieldArgs[key];
-    const argB = connectionArgs[key];
+    const argA = filteredFieldArgs[key];
+    const argB = filteredConnectionArgs[key];
 
     if (
       typeof argA !== typeof argB || typeof argA !== 'object'
@@ -117,17 +191,8 @@ const compareArgs = (
     }
   }
 
-  for (const key in fieldArgs) {
-    if (
-      key === 'first' ||
-      key === 'last' ||
-      key === 'after' ||
-      key === 'before'
-    ) {
-      continue;
-    }
-
-    if (!(key in connectionArgs)) return false;
+  for (const key in filteredFieldArgs) {
+    if (!(key in filteredConnectionArgs)) return false;
   }
 
   return true;
@@ -235,7 +300,7 @@ export const relayPagination = (
 
     for (let i = 0; i < size; i++) {
       const { fieldKey, arguments: args } = fieldInfos[i];
-      if (args === null || !compareArgs(fieldArgs, args)) {
+      if (args === null || !areNonPaginationArgsEqual(fieldArgs, args)) {
         continue;
       }
 
@@ -247,15 +312,17 @@ export const relayPagination = (
         continue;
       }
 
+      const paginationArgs = extractPaginationArgs(args);
+
       if (
         mergeMode === 'inwards' &&
-        typeof args.last === 'number' &&
-        typeof args.first === 'number'
+        typeof paginationArgs.last === 'number' &&
+        typeof paginationArgs.first === 'number'
       ) {
-        const firstEdges = page.edges.slice(0, args.first + 1);
-        const lastEdges = page.edges.slice(-args.last);
-        const firstNodes = page.nodes.slice(0, args.first + 1);
-        const lastNodes = page.nodes.slice(-args.last);
+        const firstEdges = page.edges.slice(0, paginationArgs.first + 1);
+        const lastEdges = page.edges.slice(-paginationArgs.last);
+        const firstNodes = page.nodes.slice(0, paginationArgs.first + 1);
+        const lastNodes = page.nodes.slice(-paginationArgs.last);
 
         startEdges = concatEdges(cache, startEdges, firstEdges);
         endEdges = concatEdges(cache, lastEdges, endEdges);
@@ -263,17 +330,17 @@ export const relayPagination = (
         endNodes = concatNodes(lastNodes, endNodes);
 
         pageInfo = page.pageInfo;
-      } else if (args.after) {
+      } else if (paginationArgs.after) {
         startEdges = concatEdges(cache, startEdges, page.edges);
         startNodes = concatNodes(startNodes, page.nodes);
         pageInfo.endCursor = page.pageInfo.endCursor;
         pageInfo.hasNextPage = page.pageInfo.hasNextPage;
-      } else if (args.before) {
+      } else if (paginationArgs.before) {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
         pageInfo.startCursor = page.pageInfo.startCursor;
         pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
-      } else if (typeof args.last === 'number') {
+      } else if (typeof paginationArgs.last === 'number') {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
         pageInfo = page.pageInfo;
