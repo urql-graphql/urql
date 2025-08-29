@@ -72,9 +72,7 @@ function deferDispatch<F extends Dispatch<any>>(
   value: F extends Dispatch<infer State> ? State : void
 ): void;
 
-function deferDispatch<F extends Dispatch<any>>(
-  setState: F
-): ReturnType<F>;
+function deferDispatch<F extends Dispatch<any>>(setState: F): ReturnType<F>;
 
 function deferDispatch<F extends Dispatch<any>>(
   setState: F,
