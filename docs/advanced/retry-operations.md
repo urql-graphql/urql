@@ -113,3 +113,25 @@ const options = {
   },
 };
 ```
+
+## Dealing with Idempotency
+
+To avoid retries for non-idempotent requests, the `operation` parameter may also be useful to determine if a request should be retried or not. For example if you only want to retry `query` operations, you can check that [the `operation.kind` field](https://commerce.nearform.com/open-source/urql/docs/api/core/#operationtype) has the value `query`. For more precise control, you can use the [other GraphQL request inputs](https://commerce.nearform.com/open-source/urql/docs/api/core/#graphqlrequest).
+
+```js
+import { Client, cacheExchange, fetchExchange } from 'urql';
+import { retryExchange } from '@urql/exchange-retry';
+
+const client = new Client({
+  url: 'http://localhost:1234/graphql',
+  exchanges: [
+    cacheExchange,
+    retryExchange({
+      retryIf: (error, operation) => {
+        return !!(error && error.networkError) && operation.kind === 'query';
+      },
+    }),
+    fetchExchange,
+  ],
+});
+```
