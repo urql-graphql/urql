@@ -657,6 +657,18 @@ export type CacheExchangeOpts = {
    * @see {@link https://urql.dev/goto/docs/graphcache/offline} for the full Offline Support docs.
    */
   storage?: StorageAdapter;
+  /**
+   * Configures the default root type names, which are assumed to be `Query`,
+   * `Mutation`, and `Subscription`.
+   *
+   * When both `rootFields` and `schema` is set, `rootFields` value will be
+   * ignored.
+   */
+  rootFields?: {
+    query?: string;
+    mutation?: string;
+    subscription?: string;
+  };
 };
 
 /** Cache Resolver, which may resolve or replace data during cache reads.
