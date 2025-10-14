@@ -157,8 +157,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
               } else {
                 const request = store.get(key);
                 request.onsuccess = () => {
-                  if (key === timestamp)
-                    Object.assign(batch, request.result);
+                  if (key === timestamp) Object.assign(batch, request.result);
                 };
               }
 
