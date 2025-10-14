@@ -30,9 +30,7 @@ export const refocusExchange = (minimumTime = 0): Exchange => {
 
       window.addEventListener('visibilitychange', () => {
         const state =
-          typeof document !== 'object'
-            ? 'visible'
-            : document.visibilityState;
+          typeof document !== 'object' ? 'visible' : document.visibilityState;
         if (state === 'visible') {
           if (Date.now() - lastHidden < minimumTime) return;
           watchedOperations.forEach(op => {
