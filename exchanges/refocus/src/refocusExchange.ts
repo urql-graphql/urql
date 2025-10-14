@@ -4,7 +4,7 @@ import type { Exchange, Operation } from '@urql/core';
 /** Exchange factory that reexecutes operations after a user returns to the tab.
  *
  * @param minimumTime - The minimum time in milliseconds to wait before another refocus can trigger.
- * 
+ *
  * @returns a new refocus {@link Exchange}.
  *
  * @remarks
@@ -29,7 +29,10 @@ export const refocusExchange = (minimumTime = 0): Exchange => {
       let lastHidden = 0;
 
       window.addEventListener('visibilitychange', () => {
-        const state = typeof document !== 'object' ? 'visible' : document.visibilityState;
+        const state =
+          typeof document !== 'object'
+            ? 'visible'
+            : document.visibilityState;
         if (state === 'visible') {
           if (Date.now() - lastHidden < minimumTime) return;
           watchedOperations.forEach(op => {
