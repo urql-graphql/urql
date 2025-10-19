@@ -139,6 +139,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
     },
 
     readData(): Promise<SerializedEntries> {
+      const data: SerializedEntries = {};
       return database$
         .then(database => {
           const transaction = database.transaction(
@@ -157,7 +158,9 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
               } else {
                 const request = store.get(key);
                 request.onsuccess = () => {
-                  if (key === timestamp) Object.assign(batch, request.result);
+                  const result = request.result;
+                  if (key === timestamp) Object.assign(batch, result);
+                  Object.assign(data, result);
                 };
               }
 
@@ -168,7 +171,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
           return getTransactionPromise(transaction);
         })
         .then(
-          () => batch,
+          () => data,
           () => batch
         );
     },
