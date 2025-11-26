@@ -78,49 +78,6 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
     req.result.createObjectStore(METADATA_STORE_NAME);
   };
 
-  const serializeEntry = (entry: string): string => entry.replace(/:/g, '%3a');
-
-  const deserializeEntry = (entry: string): string =>
-    entry.replace(/%3a/g, ':');
-
-  const serializeBatch = (): string => {
-    let data = '';
-    for (const key in batch) {
-      const value = batch[key];
-      data += serializeEntry(key);
-      data += ':';
-      if (value) data += serializeEntry(value);
-      data += ':';
-    }
-
-    return data;
-  };
-
-  const deserializeBatch = (input: string) => {
-    const data = {};
-    let char = '';
-    let key = '';
-    let entry = '';
-    let mode = 0;
-    let index = 0;
-    while (index < input.length) {
-      entry = '';
-      while ((char = input[index++]) !== ':' && char) {
-        entry += char;
-      }
-
-      if (mode) {
-        data[key] = deserializeEntry(entry) || undefined;
-        mode = 0;
-      } else {
-        key = deserializeEntry(entry);
-        mode = 1;
-      }
-    }
-
-    return data;
-  };
-
   return {
     clear() {
       return database$.then(database => {
@@ -175,14 +132,14 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
             database
               .transaction(ENTRIES_STORE_NAME, 'readwrite')
               .objectStore(ENTRIES_STORE_NAME)
-              .put(serializeBatch(), timestamp)
+              .put(batch, timestamp)
           );
         })
         .then(toUndefined, toUndefined);
     },
 
     readData(): Promise<SerializedEntries> {
-      const chunks: string[] = [];
+      const data: SerializedEntries = {};
       return database$
         .then(database => {
           const transaction = database.transaction(
@@ -200,13 +157,10 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
                 store.delete(key);
               } else {
                 const request = store.get(key);
-                const index = chunks.length;
-                chunks.push('');
                 request.onsuccess = () => {
-                  const result = '' + request.result;
-                  if (key === timestamp)
-                    Object.assign(batch, deserializeBatch(result));
-                  chunks[index] = result;
+                  const result = request.result;
+                  if (key === timestamp) Object.assign(batch, result);
+                  Object.assign(data, result);
                 };
               }
 
@@ -217,7 +171,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
           return getTransactionPromise(transaction);
         })
         .then(
-          () => deserializeBatch(chunks.join('')),
+          () => data,
           () => batch
         );
     },
