@@ -22,6 +22,9 @@ import { refocusExchange } from '@urql/exchange-refocus';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
-  exchanges: [refocusExchange(), cacheExchange, fetchExchange],
+  exchanges: [refocusExchange({
+    // The minimum time in milliseconds to wait before another refocus can trigger. Default value is 0.
+    minimumTime: 2000
+  }), cacheExchange, fetchExchange],
 });
 ```

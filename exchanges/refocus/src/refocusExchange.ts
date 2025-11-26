@@ -1,9 +1,16 @@
 import { pipe, tap } from 'wonka';
 import type { Exchange, Operation } from '@urql/core';
 
+export interface RefocusOptions {
+  /** The minimum time in milliseconds to wait before another refocus can trigger.
+   * @defaultValue `0`
+   */
+  minimumTime?: number;
+}
+
 /** Exchange factory that reexecutes operations after a user returns to the tab.
  *
- * @param minimumTime - The minimum time in milliseconds to wait before another refocus can trigger.
+ * @param opts - A {@link RefocusOptions} configuration object.
  *
  * @returns a new refocus {@link Exchange}.
  *
@@ -16,7 +23,9 @@ import type { Exchange, Operation } from '@urql/core';
  * The `cache-and-network` policy will refetch data in the background, but will
  * only refetch queries that are currently active.
  */
-export const refocusExchange = (minimumTime = 0): Exchange => {
+export const refocusExchange = (opts: RefocusOptions = {}): Exchange => {
+  const { minimumTime = 0 } = opts;
+
   return ({ client, forward }) =>
     ops$ => {
       if (typeof window === 'undefined') {
