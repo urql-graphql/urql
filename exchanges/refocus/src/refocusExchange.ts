@@ -1,7 +1,16 @@
 import { pipe, tap } from 'wonka';
 import type { Exchange, Operation } from '@urql/core';
 
+export interface RefocusOptions {
+  /** The minimum time in milliseconds to wait before another refocus can trigger.
+   * @defaultValue `0`
+   */
+  minimumTime?: number;
+}
+
 /** Exchange factory that reexecutes operations after a user returns to the tab.
+ *
+ * @param opts - A {@link RefocusOptions} configuration object.
  *
  * @returns a new refocus {@link Exchange}.
  *
@@ -14,7 +23,9 @@ import type { Exchange, Operation } from '@urql/core';
  * The `cache-and-network` policy will refetch data in the background, but will
  * only refetch queries that are currently active.
  */
-export const refocusExchange = (): Exchange => {
+export const refocusExchange = (opts: RefocusOptions = {}): Exchange => {
+  const { minimumTime = 0 } = opts;
+
   return ({ client, forward }) =>
     ops$ => {
       if (typeof window === 'undefined') {
@@ -24,11 +35,13 @@ export const refocusExchange = (): Exchange => {
       const watchedOperations = new Map<number, Operation>();
       const observedOperations = new Map<number, number>();
 
+      let lastHidden = 0;
+
       window.addEventListener('visibilitychange', () => {
-        if (
-          typeof document !== 'object' ||
-          document.visibilityState === 'visible'
-        ) {
+        const state =
+          typeof document !== 'object' ? 'visible' : document.visibilityState;
+        if (state === 'visible') {
+          if (Date.now() - lastHidden < minimumTime) return;
           watchedOperations.forEach(op => {
             client.reexecuteOperation(
               client.createRequestOperation('query', op, {
@@ -37,6 +50,8 @@ export const refocusExchange = (): Exchange => {
               })
             );
           });
+        } else {
+          lastHidden = Date.now();
         }
       });
 
