@@ -59,8 +59,8 @@
     "vite-plugin-solid": "^2.7.0"
   },
   "peerDependencies": {
-    "@solidjs/router": ">=0.15.0",
-    "@solidjs/start": ">=1.0.0",
+    "@solidjs/router": ">=0.15.4",
+    "@solidjs/start": ">=1.2.1",
     "@urql/core": "^6.0.0",
     "@urql/solid": "^1.0.0",
     "solid-js": "^1.7.7"

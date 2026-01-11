@@ -553,7 +553,7 @@ importers:
         specifier: ^6.2.1
         version: 6.3.2(solid-js@1.8.17)
       '@solidjs/router':
-        specifier: '>=0.15.0'
+        specifier: '>=0.15.4'
         version: 0.15.4(solid-js@1.8.17)
       '@urql/core':
         specifier: workspace:^6.0.1

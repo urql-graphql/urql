@@ -6,7 +6,6 @@ export { type UseClient } from './context';
 export { useClient, Provider } from './context';
 
 // Query exports
-export { type CreateQueryArgs, type CreateQueryResult } from './createQuery';
 export { createQuery } from './createQuery';
 
 // Mutation exports

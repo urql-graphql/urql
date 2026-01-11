@@ -61,9 +61,9 @@ export default function App() {
 ```tsx
 // src/routes/todos.tsx
 import { createQuery } from '@urql/solid-start';
+import { createAsync, query } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { For, Show, Suspense } from 'solid-js';
-import { type RouteDefinition } from '@solidjs/router';
 
 const TodosQuery = gql`
   query {
@@ -75,16 +75,9 @@ const TodosQuery = gql`
   }
 `;
 
-// Preload the query before the route renders (recommended)
-export const route = {
-  preload: () => {
-    const todos = createQuery({ query: TodosQuery });
-    return todos(); // Start fetching
-  },
-} satisfies RouteDefinition;
-
 export default function TodosPage() {
-  const todos = createQuery({ query: TodosQuery });
+  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const todos = createAsync(() => queryTodos());
 
   return (
     <div>
@@ -194,34 +187,51 @@ export function LiveMessages() {
 
 ## API Reference
 
-### `createQuery(args)`
+### `createQuery(queryDocument, key, queryFn, options?)`
 
 Creates a GraphQL query using SolidStart's `query` and `createAsync` primitives.
 
-**Args:**
-```ts
-{
-  query: DocumentInput;           // GraphQL query document
-  variables?: MaybeAccessor<Variables>;  // Static or reactive variables
-  requestPolicy?: MaybeAccessor<RequestPolicy>;  // Cache policy
-  context?: MaybeAccessor<Partial<OperationContext>>;  // Additional context
-  pause?: MaybeAccessor<boolean>;  // Pause execution
-  key?: string;  // Custom cache key for SolidStart's router
-}
+**Parameters:**
+- `queryDocument: DocumentInput` - GraphQL query document
+- `key: string` - Cache key for SolidStart's router
+- `queryFn: typeof query` - The `query` function from `@solidjs/router`
+- `options?: object` - Optional configuration
+  - `variables?: Variables` - Query variables
+  - `requestPolicy?: RequestPolicy` - Cache policy
+  - `context?: Partial<OperationContext>` - Additional context
+
+**Returns:** A query function that can be used with `createAsync`
+
+**Basic Example:**
+```tsx
+import { createAsync, query } from '@solidjs/router';
+import { createQuery } from '@urql/solid-start';
+
+const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+const todos = createAsync(() => queryTodos());
 ```
 
-**Returns:** `Accessor<OperationResult | undefined>`
-
-**Example with reactive variables:**
+**Example with variables:**
 ```tsx
-import { createSignal } from 'solid-js';
+import { createAsync, query } from '@solidjs/router';
+import { createQuery } from '@urql/solid-start';
 
-const [userId, setUserId] = createSignal(1);
-
-const user = createQuery({
-  query: UserQuery,
-  variables: () => ({ id: userId() }), // Re-runs when userId changes!
+const queryUser = createQuery(UserQuery, 'user-details', query, {
+  variables: { id: 1 },
 });
+const user = createAsync(() => queryUser());
+```
+
+**Example with custom client:**
+```tsx
+import { createAsync, query } from '@solidjs/router';
+import { createQuery } from '@urql/solid-start';
+import { createClient } from '@urql/core';
+
+const customClient = createClient({ url: 'https://api.example.com/graphql' });
+
+const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+const todos = createAsync(() => queryTodos(customClient));
 ```
 
 ### `createMutation(mutation, key?)`
@@ -318,98 +328,57 @@ const todos = createQuery({
 });
 ```
 
-## Reactive Variables
+## Dynamic Queries
 
-All `MaybeAccessor` parameters accept either static values or Solid signals/accessors:
+For dynamic queries that change based on reactive values, you can create the query function inside a reactive context:
 
 ```tsx
 import { createSignal } from 'solid-js';
+import { createAsync, query } from '@solidjs/router';
+import { createQuery } from '@urql/solid-start';
 
-const [searchTerm, setSearchTerm] = createSignal('');
+const [userId, setUserId] = createSignal(1);
 
-// Query automatically re-executes when searchTerm changes
-const results = createQuery({
-  query: SearchQuery,
-  variables: () => ({ term: searchTerm() }),
-});
-```
-
-## Pausing Queries
-
-Control when queries execute:
-
-```tsx
-const [isPaused, setIsPaused] = createSignal(true);
-
-const data = createQuery({
-  query: MyQuery,
-  pause: isPaused, // Query only runs when false
-});
-
-// Start the query
-setIsPaused(false);
-```
-
-## Custom Cache Keys
-
-By default, queries and mutations use auto-generated cache keys. You can provide custom keys for better control:
-
-```tsx
-// Custom query key
-const todos = createQuery({
-  query: TodosQuery,
-  key: 'my-todos', // Custom key instead of auto-generated
-});
-
-// Custom mutation key
-const [state, addTodo] = createMutation(AddTodoMutation, 'add-todo');
-```
-
-Custom keys are useful when:
-- You want predictable cache keys for debugging
-- You need to coordinate caching with other SolidStart features
-- You're implementing custom revalidation logic
-
-## Route Preloading
-
-Use SolidStart's `preload` to start fetching data before a route renders:
-
-```tsx
-import { type RouteDefinition } from '@solidjs/router';
-
-const UserQuery = gql`
-  query GetUser($id: ID!) {
-    user(id: $id) { id name email }
-  }
-`;
-
-// Preload with route parameters
-export const route = {
-  preload: ({ params }) => {
-    const user = createQuery({
-      query: UserQuery,
-      variables: { id: params.id },
-    });
-    return user(); // Triggers the fetch
-  },
-} satisfies RouteDefinition;
-
-export default function UserPage(props: { params: { id: string } }) {
-  // This will use the preloaded data
-  const user = createQuery({
-    query: UserQuery,
-    variables: { id: props.params.id },
+export default function UserPage() {
+  // Create the query function
+  const queryUser = createQuery(UserQuery, 'user-details', query, {
+    variables: { id: userId() },
   });
-
-  return <div>{user()?.data?.user.name}</div>;
+  
+  // Wrap with createAsync to get reactive data
+  const user = createAsync(() => queryUser());
+  
+  return (
+    <div>
+      <button onClick={() => setUserId(userId() + 1)}>
+        Next User
+      </button>
+      <Show when={user()?.data}>
+        <h1>{user()!.data.user.name}</h1>
+      </Show>
+    </div>
+  );
 }
 ```
 
-**Benefits of preloading:**
-- ✅ Data starts fetching before the component renders
-- ✅ Reduces time to first meaningful paint
-- ✅ Works with SolidStart's router for parallel data fetching
-- ✅ Automatic deduplication - same query won't fetch twice
+Note: For fully reactive variables that trigger re-fetches, you may need to create the query function inside a `createEffect` or recreate it when dependencies change.
+
+## Cache Keys
+
+Cache keys are required for both queries and mutations to enable SolidStart's caching and revalidation features:
+
+```tsx
+// Query with cache key
+const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+
+// Mutation with cache key
+const [state, addTodo] = createMutation(AddTodoMutation, 'add-todo');
+```
+
+Choose descriptive cache keys that:
+- Are unique within your application
+- Describe the data being cached (e.g., 'user-profile', 'todos-list')
+- Make debugging easier by being human-readable
 
 ## Advanced: Custom Exchanges
 
@@ -484,14 +453,13 @@ const todos = createQuery({ query: TodosQuery });
 
 `@urql/solid-start` integrates URQL with SolidStart's primitives:
 
-- **`createQuery`** uses `query()` + `createAsync()` for automatic SSR and caching
+- **`createQuery`** wraps SolidStart's `query()` function to execute URQL queries with automatic SSR and caching. You pass the `query` function from `@solidjs/router` as a parameter, which ensures proper router context.
 - **`createMutation`** uses `action()` + `useAction()` + `useSubmission()` for form integration with fine-grained reactive stores
 - **`createSubscription`** re-exported from `@urql/solid` (works identically on client/server)
-- **Reactive variables** leverage Solid's fine-grained reactivity via `@solid-primitives/utils`
 
 This means you get:
 - ✅ Automatic server-side rendering
-- ✅ Request deduplication
+- ✅ Request deduplication via SolidStart's query caching
 - ✅ Streaming responses
 - ✅ Progressive enhancement
 - ✅ Full fine-grained reactivity

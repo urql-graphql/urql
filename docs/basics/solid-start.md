@@ -100,7 +100,8 @@ For the following examples, we'll imagine that we're querying data from a GraphQ
 
 ```jsx
 // src/routes/todos.tsx
-import { Suspense, For } from 'solid-js';
+import { Suspense, For, Show } from 'solid-js';
+import { createAsync, query } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid-start';
 
@@ -114,41 +115,39 @@ const TodosQuery = gql`
 `;
 
 export default function Todos() {
-  const result = createQuery({
-    query: TodosQuery,
-  });
+  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const result = createAsync(() => queryTodos());
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <ul>
-        <For each={result().data.todos}>
-          {(todo) => <li>{todo.title}</li>}
-        </For>
-      </ul>
+      <Show when={result()?.data}>
+        <ul>
+          <For each={result()!.data.todos}>
+            {(todo) => <li>{todo.title}</li>}
+          </For>
+        </ul>
+      </Show>
     </Suspense>
   );
 }
 ```
 
-The `createQuery` primitive integrates with SolidStart's data fetching system. It returns a resource that can be used with `Suspense` and other Solid control flow components. The query automatically executes on both the server (during SSR) and the client.
+The `createQuery` primitive integrates with SolidStart's data fetching system:
+1. It wraps SolidStart's `query()` function to execute URQL queries with proper router context
+2. You pass the `query` function from `@solidjs/router` as the third parameter
+3. The second parameter is a cache key (string) for SolidStart's router
+4. The returned function is wrapped with `createAsync()` to get the reactive result
 
-You can optionally provide a custom `key` parameter to control how queries are cached by SolidStart's router:
-
-```jsx
-const result = createQuery({
-  query: TodosQuery,
-  key: 'my-todos-query', // Custom cache key
-});
-```
+The query automatically executes on both the server (during SSR) and the client, with SolidStart handling serialization and hydration.
 
 ### Variables
 
-Typically we'll also need to pass variables to our queries. The `variables` option can be static or reactive:
+Typically we'll also need to pass variables to our queries. Pass variables as an option in the fourth parameter:
 
 ```jsx
 // src/routes/todos/[page].tsx
-import { Suspense, For } from 'solid-js';
-import { useParams } from '@solidjs/router';
+import { Suspense, For, Show } from 'solid-js';
+import { useParams, createAsync, query } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid-start';
 
@@ -164,122 +163,40 @@ const TodosListQuery = gql`
 export default function TodosPage() {
   const params = useParams();
   
-  const result = createQuery({
-    query: TodosListQuery,
-    variables: () => ({
+  const queryTodos = createQuery(TodosListQuery, 'todos-paginated', query, {
+    variables: {
       from: parseInt(params.page) * 10,
       limit: 10,
-    }),
+    },
   });
+  
+  const result = createAsync(() => queryTodos());
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <ul>
-        <For each={result().data.todos}>
-          {(todo) => <li>{todo.title}</li>}
-        </For>
-      </ul>
-    </Suspense>
-  );
-}
-```
-
-When the variables change, the query will automatically re-execute.
-
-### Pausing queries
-
-The `createQuery` primitive accepts a `pause` option to conditionally execute queries:
-
-```jsx
-export default function TodosPage() {
-  const params = useParams();
-  const page = () => parseInt(params.page);
-  
-  const result = createQuery({
-    query: TodosListQuery,
-    variables: () => ({
-      from: page() * 10,
-      limit: 10,
-    }),
-    pause: () => isNaN(page()),
-  });
-
-  return (
-    <Show when={!isNaN(page())} fallback={<p>Invalid page number</p>}>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Show when={result()?.data}>
         <ul>
-          <For each={result().data.todos}>
+          <For each={result()!.data.todos}>
             {(todo) => <li>{todo.title}</li>}
           </For>
         </ul>
-      </Suspense>
-    </Show>
-  );
-}
-```
-
-### Preloading data
-
-SolidStart supports route-level data preloading using the `preload` function. This allows you to start fetching data before the route component renders:
-
-```jsx
-// src/routes/todos/[id].tsx
-import { Suspense } from 'solid-js';
-import { useParams } from '@solidjs/router';
-import type { RouteDefinition } from '@solidjs/router';
-import { gql } from '@urql/core';
-import { createQuery } from '@urql/solid-start';
-
-const TodoQuery = gql`
-  query ($id: ID!) {
-    todo(id: $id) {
-      id
-      title
-      description
-    }
-  }
-`;
-
-export const route = {
-  preload: ({ params }) => {
-    const todoQuery = createQuery({
-      query: TodoQuery,
-      variables: { id: params.id },
-    });
-    return todoQuery(); // Triggers the fetch
-  },
-} satisfies RouteDefinition;
-
-export default function TodoDetail() {
-  const params = useParams();
-  
-  const result = createQuery({
-    query: TodoQuery,
-    variables: () => ({ id: params.id }),
-  });
-
-  return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <div>
-        <h1>{result().data.todo.title}</h1>
-        <p>{result().data.todo.description}</p>
-      </div>
+      </Show>
     </Suspense>
   );
 }
 ```
 
-The `preload` function is called before the route renders, allowing SolidStart to start fetching data early and potentially stream it to the client.
+For dynamic variables that change based on reactive values, you'll need to recreate the query function when dependencies change.
 
 ### Request Policies
 
 The `requestPolicy` option determines how results are retrieved from the cache:
 
 ```jsx
-const result = createQuery({
-  query: TodosQuery,
+const queryTodos = createQuery(TodosQuery, 'todos-list', query, {
   requestPolicy: 'cache-and-network',
 });
+const result = createAsync(() => queryTodos());
 ```
 
 Available policies:
@@ -305,7 +222,8 @@ You can manually revalidate queries using urql's cache invalidation with the `ke
 
 ```jsx
 // src/routes/todos.tsx
-import { Suspense, For } from 'solid-js';
+import { Suspense, For, Show } from 'solid-js';
+import { createAsync, query } from '@solidjs/router';
 import { gql, keyFor } from '@urql/core';
 import { createQuery, useClient } from '@urql/solid-start';
 
@@ -320,9 +238,8 @@ const TodosQuery = gql`
 
 export default function Todos() {
   const client = useClient();
-  const [result] = createQuery({
-    query: TodosQuery,
-  });
+  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const result = createAsync(() => queryTodos());
 
   const handleRefresh = () => {
     // Invalidate the todos query using keyFor
@@ -337,11 +254,13 @@ export default function Todos() {
     <div>
       <button onClick={handleRefresh}>Refresh Todos</button>
       <Suspense fallback={<p>Loading...</p>}>
-        <ul>
-          <For each={result().data.todos}>
-            {(todo) => <li>{todo.title}</li>}
-          </For>
-        </ul>
+        <Show when={result()?.data}>
+          <ul>
+            <For each={result()!.data.todos}>
+              {(todo) => <li>{todo.title}</li>}
+            </For>
+          </ul>
+        </Show>
       </Suspense>
     </div>
   );
@@ -354,10 +273,10 @@ Alternatively, you can use SolidStart's built-in `revalidate` function to reload
 
 ```jsx
 // src/routes/todos.tsx
-import { Suspense, For } from 'solid-js';
+import { Suspense, For, Show } from 'solid-js';
+import { createAsync, query, revalidate } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid-start';
-import { revalidate } from '@solidjs/router';
 
 const TodosQuery = gql`
   query {
@@ -369,9 +288,8 @@ const TodosQuery = gql`
 `;
 
 export default function Todos() {
-  const [result] = createQuery({
-    query: TodosQuery,
-  });
+  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const result = createAsync(() => queryTodos());
 
   const handleRefresh = async () => {
     // Revalidate the current route - refetches all queries on this page
@@ -382,11 +300,13 @@ export default function Todos() {
     <div>
       <button onClick={handleRefresh}>Refresh Todos</button>
       <Suspense fallback={<p>Loading...</p>}>
-        <ul>
-          <For each={result().data.todos}>
-            {(todo) => <li>{todo.title}</li>}
-          </For>
-        </ul>
+        <Show when={result()?.data}>
+          <ul>
+            <For each={result()!.data.todos}>
+              {(todo) => <li>{todo.title}</li>}
+            </For>
+          </ul>
+        </Show>
       </Suspense>
     </div>
   );
@@ -546,17 +466,17 @@ Both approaches are valid and can even be used together depending on your applic
 Context options can be passed to customize the query behavior:
 
 ```jsx
-const result = createQuery({
-  query: TodosQuery,
-  context: () => ({
+const queryTodos = createQuery(TodosQuery, 'todos-list', query, {
+  context: {
     requestPolicy: 'cache-and-network',
     fetchOptions: {
       headers: {
         'X-Custom-Header': 'value',
       },
     },
-  }),
+  },
 });
+const result = createAsync(() => queryTodos());
 ```
 
 [You can find a list of all `Context` options in the API docs.](../api/core.md#operationcontext)

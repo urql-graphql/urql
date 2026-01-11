@@ -1,4 +1,5 @@
 import { Suspense, For, Show, createSignal } from 'solid-js';
+import { createAsync, query } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery, createMutation } from '@urql/solid-start';
 
@@ -21,7 +22,8 @@ const ADD_POKEMON_MUTATION = gql`
 `;
 
 export default function Home() {
-  const result = createQuery({ query: POKEMONS_QUERY });
+  const queryPokemons = createQuery(POKEMONS_QUERY, 'list-pokemons', query);
+  const result = createAsync(() => queryPokemons());
   const [mutationState, addPokemon] = createMutation(ADD_POKEMON_MUTATION);
   const [pokemonName, setPokemonName] = createSignal('');
 

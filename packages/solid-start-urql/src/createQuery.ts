@@ -2,53 +2,46 @@ import {
   type AnyVariables,
   type DocumentInput,
   type OperationContext,
-  type OperationResult,
   type RequestPolicy,
   createRequest,
+  type Client,
 } from '@urql/core';
-import { createAsync } from '@solidjs/router';
-import { type Accessor } from 'solid-js';
+import { query } from '@solidjs/router';
 import { useClient } from './context';
-import { type MaybeAccessor, access } from './utils';
-
-export type CreateQueryArgs<
-  Data = any,
-  Variables extends AnyVariables = AnyVariables,
-> = {
-  query: DocumentInput<Data, Variables>;
-  variables?: MaybeAccessor<Variables>;
-  requestPolicy?: MaybeAccessor<RequestPolicy>;
-  context?: MaybeAccessor<Partial<OperationContext>>;
-  pause?: MaybeAccessor<boolean>;
-  key?: string;
-};
-
-export type CreateQueryResult<
-  Data = any,
-  Variables extends AnyVariables = AnyVariables,
-> = Accessor<OperationResult<Data, Variables> | undefined>;
 
 /**
- * Creates a GraphQL query using SolidStart's createAsync primitive.
+ * Creates a cached query function using SolidStart's query primitive.
  *
  * @remarks
- * This integrates with SolidStart for SSR and automatic data fetching.
- * The query will automatically re-execute when variables change.
+ * This function creates a reusable query function that executes a GraphQL query.
+ * It uses SolidStart's query primitive for caching and deduplication.
+ * Call this at module level, then use the returned function with createAsync in your component.
  *
  * @example
  * ```tsx
  * import { createQuery } from '@urql/solid-start';
+ * import { createAsync } from '@solidjs/router';
  * import { gql } from '@urql/core';
  *
- * const TodosQuery = gql`{ todos { id title } }`;
+ * const POKEMONS_QUERY = gql`
+ *   query Pokemons {
+ *     pokemons(limit: 10) {
+ *       id
+ *       name
+ *     }
+ *   }
+ * `;
  *
- * function TodoList() {
- *   const todos = createQuery({ query: TodosQuery });
+ * const queryPokemons = createQuery(POKEMONS_QUERY, 'list-pokemons');
+ *
+ * export default function PokemonList() {
+ *   const client = useClient();
+ *   const pokemons = createAsync(() => queryPokemons(client));
  *
  *   return (
- *     <Show when={todos()?.data}>
- *       <For each={todos()?.data.todos}>
- *         {todo => <div>{todo.title}</div>}
+ *     <Show when={pokemons()?.data}>
+ *       <For each={pokemons()!.data.pokemons}>
+ *         {pokemon => <li>{pokemon.name}</li>}
  *       </For>
  *     </Show>
  *   );
@@ -58,29 +51,52 @@ export type CreateQueryResult<
 export function createQuery<
   Data = any,
   Variables extends AnyVariables = AnyVariables,
->(args: CreateQueryArgs<Data, Variables>): CreateQueryResult<Data, Variables> {
-  const client = useClient();
+>(
+  queryDocument: DocumentInput<Data, Variables>,
+  key: string,
+  queryFn: typeof query,
+  options?: {
+    variables?: Variables;
+    requestPolicy?: RequestPolicy;
+    context?: Partial<OperationContext>;
+  }
+) {
+  return queryFn(
+    async (
+      clientOrVariables?: Client | Variables,
+      variablesOrContext?: Variables | Partial<OperationContext>,
+      contextOverride?: Partial<OperationContext>
+    ) => {
+      // Determine if first arg is client or variables
+      let client: Client;
+      let variables: Variables | undefined;
+      let context: Partial<OperationContext> | undefined;
 
-  const getVariables = () => access(args.variables);
-  const getRequestPolicy = () => access(args.requestPolicy);
-  const getContext = () => access(args.context);
-  const getPause = () => access(args.pause);
+      if (
+        clientOrVariables &&
+        typeof (clientOrVariables as any).executeQuery === 'function'
+      ) {
+        // First arg is client
+        client = clientOrVariables as Client;
+        variables = variablesOrContext as Variables | undefined;
+        context = contextOverride;
+      } else {
+        // First arg is variables (or nothing), use useClient
+        client = useClient();
+        variables = clientOrVariables as Variables | undefined;
+        context = variablesOrContext as Partial<OperationContext> | undefined;
+      }
 
-  // Use createAsync to execute the query
-  const result = createAsync(
-    async () => {
-      if (getPause()) return undefined;
-
-      const request = createRequest(args.query, getVariables() as Variables);
-      const context: Partial<OperationContext> = {
-        requestPolicy: getRequestPolicy(),
-        ...getContext(),
+      const finalVariables = variables ?? options?.variables;
+      const request = createRequest(queryDocument, finalVariables as Variables);
+      const finalContext: Partial<OperationContext> = {
+        requestPolicy: options?.requestPolicy,
+        ...options?.context,
+        ...context,
       };
 
-      return await client.executeQuery(request, context).toPromise();
+      return await client.executeQuery(request, finalContext).toPromise();
     },
-    { deferStream: true }
+    key
   );
-
-  return result;
 }

@@ -1,0 +1,28 @@
+{
+  "_urql-solid-start-DXMNIqM_.js": {
+    "file": "assets/urql-solid-start-DXMNIqM_.js",
+    "name": "urql-solid-start"
+  },
+  "src/routes/index.tsx?pick=default&pick=$css": {
+    "file": "assets/index-DeFrZL7w.js",
+    "name": "index",
+    "src": "src/routes/index.tsx?pick=default&pick=$css",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_urql-solid-start-DXMNIqM_.js"
+    ]
+  },
+  "virtual:$vinxi/handler/client": {
+    "file": "assets/client-BBwkmGWL.js",
+    "name": "client",
+    "src": "virtual:$vinxi/handler/client",
+    "isEntry": true,
+    "imports": [
+      "_urql-solid-start-DXMNIqM_.js"
+    ],
+    "dynamicImports": [
+      "src/routes/index.tsx?pick=default&pick=$css"
+    ]
+  }
+}

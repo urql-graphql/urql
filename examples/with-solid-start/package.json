@@ -8,17 +8,17 @@
     "build": "vinxi build"
   },
   "dependencies": {
-    "@solidjs/router": "^0.15.0",
-    "@solidjs/start": "^1.2.0",
+    "@solidjs/router": "^0.15.4",
+    "@solidjs/start": "^1.2.1",
     "@urql/core": "link:../../packages/core",
     "@urql/solid": "link:../../packages/solid-urql",
     "@urql/solid-start": "link:../../packages/solid-start-urql",
     "graphql": "^16.9.0",
-    "solid-js": "^1.9.3",
+    "solid-js": "^1.9.10",
     "vinxi": "^0.5.0"
   },
   "devDependencies": {
-    "vite": "^6.0.0",
-    "vite-plugin-solid": "^2.10.0"
+    "vite": "^7.3.1",
+    "vite-plugin-solid": "^2.11.10"
   }
 }
