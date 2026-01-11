@@ -1,7 +1,7 @@
 {
-  "name": "@urql/solid",
-  "version": "1.0.1",
-  "description": "A highly customizable and versatile GraphQL client for Solid",
+  "name": "@urql/solid-start",
+  "version": "0.1.0",
+  "description": "A highly customizable and versatile GraphQL client for SolidStart",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/urql-graphql/urql/issues",
@@ -10,7 +10,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/urql-graphql/urql.git",
-    "directory": "packages/solid-urql"
+    "directory": "packages/solid-start-urql"
   },
   "keywords": [
     "graphql client",
@@ -18,17 +18,19 @@
     "cache",
     "graphql",
     "exchanges",
-    "solid"
+    "solid",
+    "solidstart",
+    "ssr"
   ],
-  "main": "dist/urql-solid",
-  "module": "dist/urql-solid.mjs",
-  "types": "dist/urql-solid.d.ts",
+  "main": "dist/urql-solid-start",
+  "module": "dist/urql-solid-start.mjs",
+  "types": "dist/urql-solid-start.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/urql-solid.d.ts",
-      "import": "./dist/urql-solid.mjs",
-      "require": "./dist/urql-solid.js",
+      "types": "./dist/urql-solid-start.d.ts",
+      "import": "./dist/urql-solid-start.mjs",
+      "require": "./dist/urql-solid-start.js",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"
@@ -50,18 +52,23 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.2",
+    "@solidjs/start": "^1.0.0",
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
     "jsdom": "^22.1.0",
     "vite-plugin-solid": "^2.7.0"
   },
   "peerDependencies": {
+    "@solidjs/router": ">=0.15.0",
+    "@solidjs/start": ">=1.0.0",
     "@urql/core": "^6.0.0",
+    "@urql/solid": "^1.0.0",
     "solid-js": "^1.7.7"
   },
   "dependencies": {
     "@solid-primitives/utils": "^6.2.1",
     "@urql/core": "workspace:^6.0.1",
+    "@urql/solid": "workspace:^1.0.0",
     "wonka": "^6.3.2"
   },
   "publishConfig": {
