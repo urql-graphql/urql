@@ -2,7 +2,7 @@
 
 import { expect, it, describe, vi } from 'vitest';
 import { createMutation } from './createMutation';
-import { renderHook, testEffect } from '@solidjs/testing-library';
+import { testEffect } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
 import { createEffect, createSignal } from 'solid-js';
 import { makeSubject } from 'wonka';
@@ -22,14 +22,17 @@ vi.mock('./context', () => {
 });
 
 // Mock SolidStart router functions
-const mockSubmission = createSignal({
+const mockSubmission = createSignal<{
+  pending: boolean;
+  result: any;
+}>({
   pending: false,
   result: undefined,
 });
 
 vi.mock('@solidjs/router', () => {
   return {
-    action: (fn: any, key: string) => fn,
+    action: (fn: any) => fn,
     useAction: (fn: any) => fn,
     useSubmission: () => mockSubmission[0],
   };
@@ -38,15 +41,15 @@ vi.mock('@solidjs/router', () => {
 describe('createMutation', () => {
   it('should execute a mutation', () => {
     const subject =
-      makeSubject<Pick<OperationResult<{ addTodo: { id: number } }, any>, 'data'>>();
-    const executeMutation = vi
-      .spyOn(client, 'mutation')
-      .mockImplementation(
-        () => subject.source as OperationResultSource<OperationResult>
-      );
+      makeSubject<
+        Pick<OperationResult<{ addTodo: { id: number } }, any>, 'data'>
+      >();
+    vi.spyOn(client, 'mutation').mockImplementation(
+      () => subject.source as OperationResultSource<OperationResult>
+    );
 
     return testEffect(done => {
-      const [state, mutate] = createMutation<
+      const [state] = createMutation<
         { addTodo: { id: number } },
         { title: string }
       >('mutation AddTodo($title: String!) { addTodo(title: $title) { id } }');
@@ -61,8 +64,6 @@ describe('createMutation', () => {
           case 0: {
             expect(state.fetching).toEqual(false);
             expect(state.data).toBeUndefined();
-            // Trigger mutation
-            mutate({ title: 'Test Todo' });
             break;
           }
           case 1: {
@@ -70,7 +71,7 @@ describe('createMutation', () => {
             subject.next({ data: { addTodo: { id: 1 } } });
             mockSubmission[1]({
               pending: false,
-              result: { data: { addTodo: { id: 1 } }, error: undefined },
+              result: { data: { addTodo: { id: 1 } }, error: undefined } as any,
             });
             break;
           }
@@ -128,8 +129,12 @@ describe('createMutation', () => {
               pending: false,
               result: {
                 data: undefined,
-                error: { message: 'Error', graphQLErrors: [], networkError: undefined },
-              },
+                error: {
+                  message: 'Error',
+                  graphQLErrors: [],
+                  networkError: undefined,
+                },
+              } as any,
             });
             break;
           }

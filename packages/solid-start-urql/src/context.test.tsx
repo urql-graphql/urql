@@ -12,11 +12,13 @@ describe('context', () => {
       exchanges: [],
     });
 
-    // Mock query function
-    const mockQuery = (fn: any, key: string) => fn;
+    // Mock query function that matches the expected type
+    const mockQuery = (fn: any) => fn;
 
     const wrapper = (props: { children: any }) => (
-      <Provider value={{ client, query: mockQuery }}>{props.children}</Provider>
+      <Provider value={{ client, query: mockQuery as any }}>
+        {props.children}
+      </Provider>
     );
 
     const { result } = renderHook(() => useClient(), { wrapper });

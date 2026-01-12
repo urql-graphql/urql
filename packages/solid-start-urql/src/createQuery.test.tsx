@@ -2,7 +2,7 @@
 
 import { expect, it, describe, vi } from 'vitest';
 import { createQuery } from './createQuery';
-import { renderHook, testEffect } from '@solidjs/testing-library';
+import { renderHook } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
 import { createSignal } from 'solid-js';
 import { makeSubject } from 'wonka';
@@ -20,7 +20,7 @@ vi.mock('./context', () => {
 
   const useQuery = () => {
     // Return a mock query function that just executes the callback
-    return (fn: any, key: string) => fn;
+    return (fn: any) => fn;
   };
 
   return { useClient, useQuery };
@@ -28,7 +28,7 @@ vi.mock('./context', () => {
 
 vi.mock('@solidjs/router', () => {
   return {
-    query: (fn: any, key: string) => fn,
+    query: (fn: any) => fn,
     createAsync: (fn: any) => {
       const [data, setData] = createSignal<any>();
       fn().then(setData);
@@ -48,9 +48,7 @@ describe('createQuery', () => {
       );
 
     const result = renderHook(() =>
-      createQuery<{ test: boolean }>({
-        query: '{ test }',
-      })
+      createQuery<{ test: boolean }>('{ test }', 'test-query')
     );
 
     // Trigger the query
@@ -68,10 +66,9 @@ describe('createQuery', () => {
     const executeQuery = vi.spyOn(client, 'executeQuery');
 
     renderHook(() =>
-      createQuery({
-        query: '{ test }',
+      createQuery('{ test }', 'test-query-pause', {
         pause: true,
-      })
+      } as any)
     );
 
     expect(executeQuery).not.toHaveBeenCalled();
@@ -92,10 +89,13 @@ describe('createQuery', () => {
     const [userId, setUserId] = createSignal(1);
 
     renderHook(() =>
-      createQuery<{ user: { id: number } }, { id: number }>({
-        query: '{ user(id: $id) { id } }',
-        variables: () => ({ id: userId() }),
-      })
+      createQuery<{ user: { id: number } }, { id: number }>(
+        '{ user(id: $id) { id } }',
+        'user-query',
+        {
+          variables: { id: userId() },
+        }
+      )
     );
 
     subject.next({ data: { user: { id: 1 } } });
