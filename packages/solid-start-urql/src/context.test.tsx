@@ -1,5 +1,5 @@
-/** @jsxImportSource solid-js */
 // @vitest-environment jsdom
+/* @jsxImportSource solid-js */
 
 import { expect, it, describe } from 'vitest';
 import { Provider, useClient } from './context';

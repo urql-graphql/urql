@@ -4,4 +4,7 @@ import baseConfig from '../../vitest.config';
 
 export default mergeConfig(baseConfig, {
   plugins: [solidPlugin({ hot: false })],
+  esbuild: {
+    jsxImportSource: 'solid-js',
+  },
 });
