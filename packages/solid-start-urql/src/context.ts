@@ -1,6 +1,6 @@
 import type { Client } from '@urql/core';
 import { createContext, useContext } from 'solid-js';
-import { query as defaultQuery } from '@solidjs/router';
+import type { query as defaultQuery } from '@solidjs/router';
 
 export interface UrqlContext {
   client: Client;

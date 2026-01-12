@@ -36,7 +36,6 @@ export default function Home() {
     if (result.data) {
       setPokemonName('');
       // Note: In a real app, you'd want to refetch or update the cache
-      console.log('Pokemon added:', result.data.addPokemon);
     }
   };
 
@@ -70,7 +69,9 @@ export default function Home() {
           </button>
         </form>
         <Show when={mutationState.error}>
-          <p style={{ color: 'red' }}>Error: {mutationState.error?.message}</p>
+          <p style={{ color: 'red' }}>
+            Error: {mutationState.error && mutationState.error.message}
+          </p>
         </Show>
         <Show when={mutationState.data}>
           <p style={{ color: 'green' }}>
@@ -82,7 +83,7 @@ export default function Home() {
       <section>
         <h2>Pokemon List</h2>
         <Suspense fallback={<p>Loading...</p>}>
-          <Show when={result()?.data}>
+          <Show when={result() && result()!.data}>
             <ul>
               <For each={result()!.data!.pokemons}>
                 {pokemon => <li>{pokemon.name}</li>}

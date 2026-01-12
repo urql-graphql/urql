@@ -89,11 +89,12 @@ export function createQuery<
         context = variablesOrContext as Partial<OperationContext> | undefined;
       }
 
-      const finalVariables = variables ?? options?.variables;
+      const finalVariables =
+        variables !== undefined ? variables : options && options.variables;
       const request = createRequest(queryDocument, finalVariables as Variables);
       const finalContext: Partial<OperationContext> = {
-        requestPolicy: options?.requestPolicy,
-        ...options?.context,
+        requestPolicy: options && options.requestPolicy,
+        ...(options && options.context),
         ...context,
       };
 
