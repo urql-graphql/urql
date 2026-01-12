@@ -4,6 +4,7 @@ import { expect, it, describe } from 'vitest';
 import { Provider, useClient } from './context';
 import { renderHook } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
+import type { JSX } from 'solid-js';
 
 describe('context', () => {
   it('should provide client through context', () => {
@@ -15,7 +16,7 @@ describe('context', () => {
     // Mock query function that matches the expected type
     const mockQuery = (fn: any) => fn;
 
-    const wrapper = (props: { children: any }) => (
+    const wrapper = (props: { children: any }): JSX.Element => (
       <Provider value={{ client, query: mockQuery as any }}>
         {props.children}
       </Provider>
