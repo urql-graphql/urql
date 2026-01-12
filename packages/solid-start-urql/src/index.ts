@@ -2,8 +2,8 @@
 export * from '@urql/core';
 
 // Context exports
-export { type UseClient } from './context';
-export { useClient, Provider } from './context';
+export { type UseClient, type UseQuery, type UrqlContext } from './context';
+export { useClient, useQuery, Provider } from './context';
 
 // Query exports
 export { createQuery } from './createQuery';

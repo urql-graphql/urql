@@ -59,11 +59,11 @@ const client = createClient({
 
 ### Providing the `Client`
 
-To make use of the `Client` in SolidStart we will provide it via Solid's Context API using the `Provider` export.
+To make use of the `Client` in SolidStart we will provide it via Solid's Context API using the `Provider` export. The Provider also needs the `query` function from `@solidjs/router`:
 
 ```jsx
 // src/root.tsx or src/app.tsx
-import { Router } from '@solidjs/router';
+import { Router, query } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { Suspense } from 'solid-js';
 import { createClient, Provider, cacheExchange, fetchExchange } from '@urql/solid-start';
@@ -77,7 +77,7 @@ export default function App() {
   return (
     <Router
       root={(props) => (
-        <Provider value={client}>
+        <Provider value={{ client, query }}>
           <Suspense>{props.children}</Suspense>
         </Provider>
       )}
@@ -88,7 +88,7 @@ export default function App() {
 }
 ```
 
-Now every route and component inside the `Provider` can use GraphQL queries that will be sent to our API.
+Now every route and component inside the `Provider` can use GraphQL queries that will be sent to our API. The `query` function is provided in the context so that `createQuery` can access it automatically without manual injection.
 
 ## Queries
 
@@ -101,7 +101,7 @@ For the following examples, we'll imagine that we're querying data from a GraphQ
 ```jsx
 // src/routes/todos.tsx
 import { Suspense, For, Show } from 'solid-js';
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid-start';
 
@@ -115,7 +115,7 @@ const TodosQuery = gql`
 `;
 
 export default function Todos() {
-  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const queryTodos = createQuery(TodosQuery, 'todos-list');
   const result = createAsync(() => queryTodos());
 
   return (
@@ -134,9 +134,10 @@ export default function Todos() {
 
 The `createQuery` primitive integrates with SolidStart's data fetching system:
 1. It wraps SolidStart's `query()` function to execute URQL queries with proper router context
-2. You pass the `query` function from `@solidjs/router` as the third parameter
+2. The `query` function is automatically retrieved from the URQL context (no manual injection needed)
 3. The second parameter is a cache key (string) for SolidStart's router
 4. The returned function is wrapped with `createAsync()` to get the reactive result
+5. `createQuery` must be called inside a component where it has access to the context
 
 The query automatically executes on both the server (during SSR) and the client, with SolidStart handling serialization and hydration.
 
@@ -147,7 +148,7 @@ Typically we'll also need to pass variables to our queries. Pass variables as an
 ```jsx
 // src/routes/todos/[page].tsx
 import { Suspense, For, Show } from 'solid-js';
-import { useParams, createAsync, query } from '@solidjs/router';
+import { useParams, createAsync } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid-start';
 
@@ -163,7 +164,7 @@ const TodosListQuery = gql`
 export default function TodosPage() {
   const params = useParams();
   
-  const queryTodos = createQuery(TodosListQuery, 'todos-paginated', query, {
+  const queryTodos = createQuery(TodosListQuery, 'todos-paginated', {
     variables: {
       from: parseInt(params.page) * 10,
       limit: 10,
@@ -193,7 +194,7 @@ For dynamic variables that change based on reactive values, you'll need to recre
 The `requestPolicy` option determines how results are retrieved from the cache:
 
 ```jsx
-const queryTodos = createQuery(TodosQuery, 'todos-list', query, {
+const queryTodos = createQuery(TodosQuery, 'todos-list', {
   requestPolicy: 'cache-and-network',
 });
 const result = createAsync(() => queryTodos());
@@ -223,7 +224,7 @@ You can manually revalidate queries using urql's cache invalidation with the `ke
 ```jsx
 // src/routes/todos.tsx
 import { Suspense, For, Show } from 'solid-js';
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { gql, keyFor } from '@urql/core';
 import { createQuery, useClient } from '@urql/solid-start';
 
@@ -238,7 +239,7 @@ const TodosQuery = gql`
 
 export default function Todos() {
   const client = useClient();
-  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const queryTodos = createQuery(TodosQuery, 'todos-list');
   const result = createAsync(() => queryTodos());
 
   const handleRefresh = () => {
@@ -274,7 +275,7 @@ Alternatively, you can use SolidStart's built-in `revalidate` function to reload
 ```jsx
 // src/routes/todos.tsx
 import { Suspense, For, Show } from 'solid-js';
-import { createAsync, query, revalidate } from '@solidjs/router';
+import { createAsync, revalidate } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid-start';
 
@@ -288,7 +289,7 @@ const TodosQuery = gql`
 `;
 
 export default function Todos() {
-  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const queryTodos = createQuery(TodosQuery, 'todos-list');
   const result = createAsync(() => queryTodos());
 
   const handleRefresh = async () => {
@@ -466,7 +467,7 @@ Both approaches are valid and can even be used together depending on your applic
 Context options can be passed to customize the query behavior:
 
 ```jsx
-const queryTodos = createQuery(TodosQuery, 'todos-list', query, {
+const queryTodos = createQuery(TodosQuery, 'todos-list', {
   context: {
     requestPolicy: 'cache-and-network',
     fetchOptions: {

@@ -6,8 +6,7 @@ import {
   createRequest,
   type Client,
 } from '@urql/core';
-import { query } from '@solidjs/router';
-import { useClient } from './context';
+import { useClient, useQuery } from './context';
 
 /**
  * Creates a cached query function using SolidStart's query primitive.
@@ -54,13 +53,16 @@ export function createQuery<
 >(
   queryDocument: DocumentInput<Data, Variables>,
   key: string,
-  queryFn: typeof query,
   options?: {
     variables?: Variables;
     requestPolicy?: RequestPolicy;
     context?: Partial<OperationContext>;
   }
 ) {
+  // Get the query function from context
+  const queryFn = useQuery();
+
+  // Return the result of calling the query function
   return queryFn(
     async (
       clientOrVariables?: Client | Variables,

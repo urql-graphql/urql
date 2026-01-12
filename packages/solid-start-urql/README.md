@@ -27,11 +27,11 @@ yarn add @urql/solid-start @urql/solid @urql/core graphql
 
 ### 1. Set up the Provider
 
-Wrap your app with the `Provider` to make the URQL client available:
+Wrap your app with the `Provider` to make the URQL client and query function available:
 
 ```tsx
 // src/app.tsx
-import { Router } from '@solidjs/router';
+import { Router, query } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { Provider } from '@urql/solid-start';
 import { createClient, cacheExchange, fetchExchange } from '@urql/core';
@@ -45,7 +45,7 @@ export default function App() {
   return (
     <Router
       root={props => (
-        <Provider value={client}>
+        <Provider value={{ client, query }}>
           {props.children}
         </Provider>
       )}
@@ -56,12 +56,14 @@ export default function App() {
 }
 ```
 
+> **Note:** The Provider now accepts an object with both `client` and `query`. This allows `createQuery` to automatically access the SolidStart query function without manual injection.
+
 ### 2. Use Queries
 
 ```tsx
 // src/routes/todos.tsx
 import { createQuery } from '@urql/solid-start';
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { For, Show, Suspense } from 'solid-js';
 
@@ -76,7 +78,7 @@ const TodosQuery = gql`
 `;
 
 export default function TodosPage() {
-  const queryTodos = createQuery(TodosQuery, 'todos-list', query);
+  const queryTodos = createQuery(TodosQuery, 'todos-list');
   const todos = createAsync(() => queryTodos());
 
   return (
@@ -187,14 +189,13 @@ export function LiveMessages() {
 
 ## API Reference
 
-### `createQuery(queryDocument, key, queryFn, options?)`
+### `createQuery(queryDocument, key, options?)`
 
-Creates a GraphQL query using SolidStart's `query` and `createAsync` primitives.
+Creates a GraphQL query using SolidStart's `query` and `createAsync` primitives. The `query` function is automatically retrieved from context.
 
 **Parameters:**
 - `queryDocument: DocumentInput` - GraphQL query document
 - `key: string` - Cache key for SolidStart's router
-- `queryFn: typeof query` - The `query` function from `@solidjs/router`
 - `options?: object` - Optional configuration
   - `variables?: Variables` - Query variables
   - `requestPolicy?: RequestPolicy` - Cache policy
@@ -204,35 +205,49 @@ Creates a GraphQL query using SolidStart's `query` and `createAsync` primitives.
 
 **Basic Example:**
 ```tsx
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
 
-const queryTodos = createQuery(TodosQuery, 'todos-list', query);
-const todos = createAsync(() => queryTodos());
+export default function TodosPage() {
+  const queryTodos = createQuery(TodosQuery, 'todos-list');
+  const todos = createAsync(() => queryTodos());
+  
+  return <div>{/* ... */}</div>;
+}
 ```
 
 **Example with variables:**
 ```tsx
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
 
-const queryUser = createQuery(UserQuery, 'user-details', query, {
-  variables: { id: 1 },
-});
-const user = createAsync(() => queryUser());
+export default function UserPage() {
+  const queryUser = createQuery(UserQuery, 'user-details', {
+    variables: { id: 1 },
+  });
+  const user = createAsync(() => queryUser());
+  
+  return <div>{/* ... */}</div>;
+}
 ```
 
 **Example with custom client:**
 ```tsx
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
 import { createClient } from '@urql/core';
 
 const customClient = createClient({ url: 'https://api.example.com/graphql' });
 
-const queryTodos = createQuery(TodosQuery, 'todos-list', query);
-const todos = createAsync(() => queryTodos(customClient));
+export default function CustomPage() {
+  const queryTodos = createQuery(TodosQuery, 'todos-list');
+  const todos = createAsync(() => queryTodos(customClient));
+  
+  return <div>{/* ... */}</div>;
+}
 ```
+
+> **Note:** `createQuery` must be called inside a component where it has access to the URQL context. The query function from `@solidjs/router` is automatically retrieved from the Provider.
 
 ### `createMutation(mutation, key?)`
 
@@ -292,16 +307,17 @@ const [messages] = createSubscription(
 
 ### `Provider`
 
-Context provider for the URQL client.
+Context provider for the URQL client and SolidStart query function.
 
 **Props:**
-- `value: Client` - The URQL client instance
+- `value: { client: Client; query: typeof query }` - Object containing the URQL client and query function
 
 **Example:**
 ```tsx
+import { query } from '@solidjs/router';
 import { Provider } from '@urql/solid-start';
 
-<Provider value={client}>
+<Provider value={{ client, query }}>
   <App />
 </Provider>
 ```
@@ -330,18 +346,18 @@ const todos = createQuery({
 
 ## Dynamic Queries
 
-For dynamic queries that change based on reactive values, you can create the query function inside a reactive context:
+For dynamic queries that change based on reactive values, you can pass variables to the query function:
 
 ```tsx
 import { createSignal } from 'solid-js';
-import { createAsync, query } from '@solidjs/router';
+import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
 
-const [userId, setUserId] = createSignal(1);
-
 export default function UserPage() {
+  const [userId, setUserId] = createSignal(1);
+  
   // Create the query function
-  const queryUser = createQuery(UserQuery, 'user-details', query, {
+  const queryUser = createQuery(UserQuery, 'user-details', {
     variables: { id: userId() },
   });
   
@@ -453,7 +469,7 @@ const todos = createQuery({ query: TodosQuery });
 
 `@urql/solid-start` integrates URQL with SolidStart's primitives:
 
-- **`createQuery`** wraps SolidStart's `query()` function to execute URQL queries with automatic SSR and caching. You pass the `query` function from `@solidjs/router` as a parameter, which ensures proper router context.
+- **`createQuery`** wraps SolidStart's `query()` function to execute URQL queries with automatic SSR and caching. The `query` function is automatically retrieved from the URQL context, eliminating the need for manual injection.
 - **`createMutation`** uses `action()` + `useAction()` + `useSubmission()` for form integration with fine-grained reactive stores
 - **`createSubscription`** re-exported from `@urql/solid` (works identically on client/server)
 
