@@ -10,10 +10,12 @@ export interface UrqlContext {
 export const Context = createContext<UrqlContext>();
 export const Provider = Context.Provider;
 
-const hasContext = () => {
+const hasContext = (
+  context: UrqlContext | undefined,
+  type: 'client' | 'context'
+) => {
   if (process.env.NODE_ENV !== 'production' && context === undefined) {
-    const error =
-      "No context has been specified using urql's Provider. Please create a context and add a Provider.";
+    const error = `No ${type} has been specified using urql's Provider. Please create a context and add a Provider.`;
 
     console.error(error);
     throw new Error(error);
@@ -23,13 +25,13 @@ const hasContext = () => {
 export type UseClient = () => Client;
 export const useClient: UseClient = () => {
   const context = useContext(Context);
-  hasContext();
+  hasContext(context, 'client');
   return context!.client;
 };
 
 export type UseQuery = () => typeof defaultQuery;
 export const useQuery: UseQuery = () => {
   const context = useContext(Context);
-  hasContext();
+  hasContext(context, 'context');
   return context!.query;
 };

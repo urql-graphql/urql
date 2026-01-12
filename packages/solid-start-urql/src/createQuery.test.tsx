@@ -18,7 +18,12 @@ vi.mock('./context', () => {
     return client!;
   };
 
-  return { useClient };
+  const useQuery = () => {
+    // Return a mock query function that just executes the callback
+    return (fn: any, key: string) => fn;
+  };
+
+  return { useClient, useQuery };
 });
 
 vi.mock('@solidjs/router', () => {
@@ -75,7 +80,9 @@ describe('createQuery', () => {
 
   it('should re-execute when reactive variables change', async () => {
     const subject =
-      makeSubject<Pick<OperationResult<{ user: { id: number } }, any>, 'data'>>();
+      makeSubject<
+        Pick<OperationResult<{ user: { id: number } }, any>, 'data'>
+      >();
     const executeQuery = vi
       .spyOn(client, 'executeQuery')
       .mockImplementation(
