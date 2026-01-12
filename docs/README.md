@@ -33,6 +33,8 @@ We have **Getting Started** guides for:
 - [**React/Preact**](./basics/react-preact.md) covers how to work with the bindings for React/Preact.
 - [**Vue**](./basics/vue.md) covers how to work with the bindings for Vue 3.
 - [**Svelte**](./basics/svelte.md) covers how to work with the bindings for Svelte.
+- [**Solid**](./basics/solid.md) covers how to work with the bindings for Solid.
+- [**SolidStart**](./basics/solid-start.md) covers how to work with the bindings for SolidStart.
 - [**Core Package**](./basics/core.md) covers the shared "core APIs" and how we can use them directly
   in Node.js or imperatively.
 

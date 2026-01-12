@@ -1,3 +1,4 @@
+/** @jsxImportSource solid-js */
 import { Suspense, For } from 'solid-js';
 import { gql } from '@urql/core';
 import { createQuery } from '@urql/solid';

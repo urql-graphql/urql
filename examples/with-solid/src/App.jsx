@@ -1,4 +1,10 @@
-import { createClient, Provider, cacheExchange, fetchExchange } from '@urql/solid';
+/** @jsxImportSource solid-js */
+import {
+  createClient,
+  Provider,
+  cacheExchange,
+  fetchExchange,
+} from '@urql/solid';
 import PokemonList from './PokemonList';
 
 const client = createClient({
