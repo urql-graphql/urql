@@ -73,14 +73,14 @@ export default function Home() {
             {submission.pending ? 'Adding...' : 'Add Pokemon'}
           </button>
         </form>
-        <Show when={submission.result?.error}>
+        <Show when={submission.result && submission.result.error}>
           <p style={{ color: 'red' }}>
-            Error: {submission.result!.error.message}
+            Error: {submission.result.error.message}
           </p>
         </Show>
-        <Show when={submission.result?.data}>
+        <Show when={submission.result && submission.result.data}>
           <p style={{ color: 'green' }}>
-            Added: {submission.result!.data.addPokemon.name}
+            Added: {submission.result.data.addPokemon.name}
           </p>
         </Show>
       </section>
