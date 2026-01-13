@@ -2,6 +2,8 @@
 
 `@urql/solid-start` provides URQL integration for [SolidStart](https://start.solidjs.com/), built with SolidStart's native primitives like `query`, `action`, and `createAsync`.
 
+> **Note:** This package is specifically designed for SolidStart applications with SSR. If you're building a client-side only SolidJS app, use [`@urql/solid`](https://github.com/urql-graphql/urql/tree/main/packages/solid-urql) instead. See [SolidJS vs SolidStart](#solidjs-vs-solidstart) for key differences.
+
 ## Features
 
 - 🎯 **SolidStart Native** - Built with `query`, `action`, `createAsync`, and `useAction`
@@ -483,6 +485,75 @@ This means you get:
 - ✅ Streaming responses
 - ✅ Progressive enhancement with actions
 - ✅ Full fine-grained reactivity
+
+## SolidJS vs SolidStart
+
+### When to Use Each Package
+
+| Use Case | Package | Why |
+|----------|---------|-----|
+| Client-side SPA | `@urql/solid` | Optimized for client-only apps, uses SolidJS reactivity patterns |
+| SolidStart SSR App | `@urql/solid-start` | Integrates with SolidStart's routing, SSR, and action system |
+
+### Key Differences
+
+#### Queries
+
+**@urql/solid** (Client-side):
+```tsx
+import { createQuery } from '@urql/solid';
+
+const [result] = createQuery({ query: TodosQuery });
+// Returns: [Accessor<OperationResult>, Accessor<ReExecute>]
+```
+
+**@urql/solid-start** (SSR):
+```tsx
+import { createQuery } from '@urql/solid-start';
+import { createAsync } from '@solidjs/router';
+
+const queryTodos = createQuery(TodosQuery, 'todos');
+const todos = createAsync(() => queryTodos());
+// Returns: Accessor<OperationResult | undefined>
+// Works with SSR and SolidStart's caching
+```
+
+#### Mutations
+
+**@urql/solid** (Client-side):
+```tsx
+import { createMutation } from '@urql/solid';
+
+const [result, executeMutation] = createMutation(AddTodoMutation);
+await executeMutation({ title: 'New Todo' });
+// Returns: [Accessor<OperationResult>, ExecuteMutation]
+```
+
+**@urql/solid-start** (SSR with Actions):
+```tsx
+import { createMutation } from '@urql/solid-start';
+import { useAction, useSubmission } from '@solidjs/router';
+
+const addTodoAction = createMutation(AddTodoMutation, 'add-todo');
+const addTodo = useAction(addTodoAction);
+const submission = useSubmission(addTodoAction);
+await addTodo({ title: 'New Todo' });
+// Integrates with SolidStart's action system for progressive enhancement
+```
+
+### Why Different APIs?
+
+- **SSR Support**: SolidStart queries run on the server and stream to the client
+- **Router Integration**: Automatic caching and invalidation with SolidStart's router
+- **Progressive Enhancement**: Actions work without JavaScript enabled
+- **Suspense**: Native support for SolidJS Suspense boundaries
+
+### Migration
+
+If you're moving from a SolidJS SPA to SolidStart:
+1. Change imports from `@urql/solid` to `@urql/solid-start`
+2. Wrap queries with `createAsync()`
+3. Update mutations to use the action pattern with `useAction()` and `useSubmission()`
 
 ## Resources
 

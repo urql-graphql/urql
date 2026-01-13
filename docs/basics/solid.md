@@ -7,6 +7,8 @@ order: 3
 
 This guide covers how to install and setup `@urql/solid` and the `Client`, as well as query and mutate data with Solid. The `@urql/solid` package provides reactive primitives that integrate seamlessly with Solid's fine-grained reactivity system.
 
+> **Note:** This guide is for client-side SolidJS applications. If you're building a SolidStart application with SSR, see the [SolidStart guide](./solid-start.md) instead. The packages use different APIs optimized for their respective use cases.
+
 ## Getting started
 
 ### Installation
