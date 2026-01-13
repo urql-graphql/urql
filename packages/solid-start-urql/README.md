@@ -111,6 +111,7 @@ export default function TodosPage() {
 ```tsx
 // src/components/AddTodoForm.tsx
 import { createMutation } from '@urql/solid-start';
+import { useAction, useSubmission } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { Show } from 'solid-js';
 
@@ -124,7 +125,10 @@ const AddTodoMutation = gql`
 `;
 
 export function AddTodoForm() {
-  const [state, addTodo] = createMutation(AddTodoMutation);
+  const addTodoAction = createMutation(AddTodoMutation, 'add-todo');
+  const addTodo = useAction(addTodoAction);
+  const submission = useSubmission(addTodoAction);
+  
   let inputRef: HTMLInputElement | undefined;
 
   const handleSubmit = async (e: Event) => {
@@ -140,11 +144,11 @@ export function AddTodoForm() {
   return (
     <form onSubmit={handleSubmit}>
       <input ref={inputRef} type="text" placeholder="New todo" />
-      <button type="submit" disabled={state.fetching}>
+      <button type="submit" disabled={submission.pending}>
         Add Todo
       </button>
-      <Show when={state.error}>
-        <p>Error: {state.error.message}</p>
+      <Show when={submission.result?.error}>
+        <p>Error: {submission.result!.error.message}</p>
       </Show>
     </form>
   );
@@ -249,31 +253,31 @@ export default function CustomPage() {
 
 > **Note:** `createQuery` must be called inside a component where it has access to the URQL context. The query function from `@solidjs/router` is automatically retrieved from the Provider.
 
-### `createMutation(mutation, key?)`
+### `createMutation(mutation, key)`
 
-Creates a GraphQL mutation using SolidStart's `action` and `useAction` primitives.
+Creates a GraphQL mutation action using SolidStart's `action` primitive.
 
 **Args:**
 - `mutation: DocumentInput` - GraphQL mutation document
-- `key?: string` - Optional custom cache key for SolidStart's router
+- `key: string` - Cache key for SolidStart's router
 
-**Returns:** `[State, ExecuteFunction]`
-
-**State:** Fine-grained reactive store
-```ts
-{
-  data?: Data;
-  error?: CombinedError;
-  fetching: boolean;
-}
-```
+**Returns:** `Action` - A SolidStart action that can be used with `useAction()` and `useSubmission()`
 
 **Example:**
 ```tsx
-const [state, executeMutation] = createMutation(UpdateUserMutation);
+import { createMutation } from '@urql/solid-start';
+import { useAction, useSubmission } from '@solidjs/router';
+
+const updateUserAction = createMutation(UpdateUserMutation, 'update-user');
+const updateUser = useAction(updateUserAction);
+const submission = useSubmission(updateUserAction);
 
 // Call the mutation
-const result = await executeMutation({ id: 1, name: 'Alice' });
+const result = await updateUser({ id: 1, name: 'Alice' });
+
+// Access submission state
+console.log(submission.pending); // boolean
+console.log(submission.result); // OperationResult
 ```
 
 ### `createSubscription(args, handler?)`
@@ -470,14 +474,14 @@ const todos = createQuery({ query: TodosQuery });
 `@urql/solid-start` integrates URQL with SolidStart's primitives:
 
 - **`createQuery`** wraps SolidStart's `query()` function to execute URQL queries with automatic SSR and caching. The `query` function is automatically retrieved from the URQL context, eliminating the need for manual injection.
-- **`createMutation`** uses `action()` + `useAction()` + `useSubmission()` for form integration with fine-grained reactive stores
+- **`createMutation`** creates SolidStart `action()` primitives that integrate with `useAction()` and `useSubmission()` for form handling and progressive enhancement
 - **`createSubscription`** re-exported from `@urql/solid` (works identically on client/server)
 
 This means you get:
 - ✅ Automatic server-side rendering
 - ✅ Request deduplication via SolidStart's query caching
 - ✅ Streaming responses
-- ✅ Progressive enhancement
+- ✅ Progressive enhancement with actions
 - ✅ Full fine-grained reactivity
 
 ## Resources

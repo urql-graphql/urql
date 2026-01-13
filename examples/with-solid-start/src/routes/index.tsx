@@ -1,5 +1,5 @@
 import { Suspense, For, Show, createSignal } from 'solid-js';
-import { createAsync } from '@solidjs/router';
+import { createAsync, useAction, useSubmission } from '@solidjs/router';
 import { gql } from '@urql/core';
 import { createQuery, createMutation } from '@urql/solid-start';
 
@@ -24,7 +24,12 @@ const ADD_POKEMON_MUTATION = gql`
 export default function Home() {
   const queryPokemons = createQuery(POKEMONS_QUERY, 'list-pokemons');
   const result = createAsync(() => queryPokemons());
-  const [mutationState, addPokemon] = createMutation(ADD_POKEMON_MUTATION);
+
+  // Create the mutation action inside the component where it has access to context
+  const addPokemonAction = createMutation(ADD_POKEMON_MUTATION, 'add-pokemon');
+  const addPokemon = useAction(addPokemonAction);
+  const submission = useSubmission(addPokemonAction);
+
   const [pokemonName, setPokemonName] = createSignal('');
 
   const handleSubmit = async (e: Event) => {
@@ -58,24 +63,24 @@ export default function Home() {
           />
           <button
             type="submit"
-            disabled={mutationState.fetching}
+            disabled={submission.pending}
             style={{
               padding: '8px 16px',
               'font-size': '14px',
-              cursor: mutationState.fetching ? 'not-allowed' : 'pointer',
+              cursor: submission.pending ? 'not-allowed' : 'pointer',
             }}
           >
-            {mutationState.fetching ? 'Adding...' : 'Add Pokemon'}
+            {submission.pending ? 'Adding...' : 'Add Pokemon'}
           </button>
         </form>
-        <Show when={mutationState.error}>
+        <Show when={submission.result?.error}>
           <p style={{ color: 'red' }}>
-            Error: {mutationState.error && mutationState.error.message}
+            Error: {submission.result!.error.message}
           </p>
         </Show>
-        <Show when={mutationState.data}>
+        <Show when={submission.result?.data}>
           <p style={{ color: 'green' }}>
-            Added: {mutationState.data.addPokemon.name}
+            Added: {submission.result!.data.addPokemon.name}
           </p>
         </Show>
       </section>

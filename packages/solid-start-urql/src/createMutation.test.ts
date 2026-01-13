@@ -1,10 +1,8 @@
 // @vitest-environment jsdom
 
-import { expect, it, describe, vi, beforeEach } from 'vitest';
+import { expect, it, describe, vi } from 'vitest';
 import { createMutation } from './createMutation';
-import { testEffect } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
-import { createEffect, createSignal } from 'solid-js';
 import { makeSubject } from 'wonka';
 import { OperationResult } from '@urql/core';
 
@@ -14,47 +12,30 @@ const client = createClient({
 });
 
 vi.mock('./context', () => {
-  const useClient = () => {
-    return client!;
+  return {
+    useClient: () => client,
   };
-
-  return { useClient };
 });
 
 // Mock SolidStart router functions
-let mockSubmission: any;
-
 vi.mock('@solidjs/router', () => {
   return {
-    action: (fn: any) => fn,
-    useAction: (fn: any) => fn,
-    useSubmission: () => mockSubmission[0],
+    action: (fn: any, _key?: string) => fn,
   };
 });
 
-// Helper to mark all state dependencies for tracking
-const markStateDependencies = (state: any) => {
-  state.data;
-  state.error;
-  state.extensions;
-  state.fetching;
-  state.stale;
-  state.hasNext;
-};
-
 describe('createMutation', () => {
-  beforeEach(() => {
-    // Reset submission signal before each test
-    mockSubmission = createSignal<{
-      pending: boolean;
-      result: any;
-    }>({
-      pending: false,
-      result: undefined,
-    });
+  it('should create a mutation action', () => {
+    const mutationAction = createMutation(
+      'mutation AddTodo($title: String!) { addTodo(title: $title) { id } }',
+      'add-todo'
+    );
+
+    expect(mutationAction).toBeDefined();
+    expect(typeof mutationAction).toBe('function');
   });
 
-  it('should execute a mutation', () => {
+  it('should execute a mutation through the action', async () => {
     const subject =
       makeSubject<OperationResult<{ addTodo: { id: number } }, any>>();
 
@@ -62,135 +43,85 @@ describe('createMutation', () => {
       .spyOn(client, 'executeMutation')
       .mockImplementation(() => subject.source as any);
 
-    return testEffect(done => {
-      const [state, executeMutation] = createMutation<
-        { addTodo: { id: number } },
-        { title: string }
-      >('mutation AddTodo($title: String!) { addTodo(title: $title) { id } }');
+    const mutationAction = createMutation<
+      { addTodo: { id: number } },
+      { title: string }
+    >(
+      'mutation AddTodo($title: String!) { addTodo(title: $title) { id } }',
+      'add-todo'
+    );
 
-      createEffect((run: number = 0) => {
-        markStateDependencies(state);
+    const promise = mutationAction({ title: 'Test Todo' });
 
-        switch (run) {
-          case 0: {
-            // Initial state
-            expect(state.fetching).toEqual(false);
-            expect(state.data).toBeUndefined();
+    // Emit result
+    subject.next({
+      data: { addTodo: { id: 1 } },
+      stale: false,
+      hasNext: false,
+    } as any);
 
-            // Execute the mutation
-            executeMutation({ title: 'Test Todo' });
-            break;
-          }
+    const result = await promise;
 
-          case 1: {
-            // Should be fetching
-            expect(state.fetching).toEqual(true);
+    expect(mutationSpy).toHaveBeenCalled();
+    expect(result.data).toEqual({ addTodo: { id: 1 } });
 
-            // Emit result
-            subject.next({
-              data: { addTodo: { id: 1 } },
-              stale: false,
-              hasNext: false,
-            } as any);
-            break;
-          }
-
-          case 2: {
-            // Should have data
-            expect(state.fetching).toEqual(false);
-            expect(state.data).toEqual({ addTodo: { id: 1 } });
-            done();
-            break;
-          }
-        }
-
-        return run + 1;
-      });
-    }).finally(() => mutationSpy.mockRestore());
+    mutationSpy.mockRestore();
   });
 
-  it('should update fetching state', () => {
+  it('should handle mutation errors', async () => {
     const subject = makeSubject<OperationResult<any, any>>();
 
     const mutationSpy = vi
       .spyOn(client, 'executeMutation')
       .mockImplementation(() => subject.source as any);
 
-    return testEffect(done => {
-      const [state, executeMutation] = createMutation('mutation { test }');
+    const mutationAction = createMutation('mutation { test }', 'test');
 
-      createEffect((run: number = 0) => {
-        markStateDependencies(state);
+    const promise = mutationAction({});
 
-        switch (run) {
-          case 0: {
-            expect(state.fetching).toEqual(false);
-            // Execute mutation to trigger fetching state
-            executeMutation({});
-            break;
-          }
+    // Emit error
+    subject.next({
+      data: undefined,
+      error: {
+        message: 'Error',
+        graphQLErrors: [],
+        networkError: undefined,
+      } as any,
+      stale: false,
+      hasNext: false,
+    } as any);
 
-          case 1: {
-            expect(state.fetching).toEqual(true);
-            done();
-            break;
-          }
-        }
+    const result = await promise;
 
-        return run + 1;
-      });
-    }).finally(() => mutationSpy.mockRestore());
+    expect(result.error).toBeDefined();
+    expect(result.error?.message).toEqual('Error');
+
+    mutationSpy.mockRestore();
   });
 
-  it('should handle mutation errors', () => {
+  it('should pass context to mutation', async () => {
     const subject = makeSubject<OperationResult<any, any>>();
 
     const mutationSpy = vi
       .spyOn(client, 'executeMutation')
       .mockImplementation(() => subject.source as any);
 
-    return testEffect(done => {
-      const [state, executeMutation] = createMutation('mutation { test }');
+    const mutationAction = createMutation('mutation { test }', 'test');
 
-      createEffect((run: number = 0) => {
-        markStateDependencies(state);
+    const customContext = { requestPolicy: 'network-only' as const };
+    const promise = mutationAction({}, customContext);
 
-        switch (run) {
-          case 0: {
-            expect(state.error).toBeUndefined();
-            // Execute mutation
-            executeMutation({});
-            break;
-          }
+    // Emit result
+    subject.next({
+      data: { test: 'success' },
+      stale: false,
+      hasNext: false,
+    } as any);
 
-          case 1: {
-            // Should be fetching
-            expect(state.fetching).toEqual(true);
-            // Emit error
-            subject.next({
-              data: undefined,
-              error: {
-                message: 'Error',
-                graphQLErrors: [],
-                networkError: undefined,
-              } as any,
-              stale: false,
-              hasNext: false,
-            } as any);
-            break;
-          }
+    await promise;
 
-          case 2: {
-            expect(state.error).toBeDefined();
-            expect(state.error?.message).toEqual('Error');
-            expect(state.fetching).toEqual(false);
-            done();
-            break;
-          }
-        }
+    expect(mutationSpy).toHaveBeenCalledWith(expect.anything(), customContext);
 
-        return run + 1;
-      });
-    }).finally(() => mutationSpy.mockRestore());
+    mutationSpy.mockRestore();
   });
 });

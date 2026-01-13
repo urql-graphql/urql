@@ -9,11 +9,7 @@ export { useClient, useQuery, Provider } from './context';
 export { createQuery } from './createQuery';
 
 // Mutation exports
-export {
-  type CreateMutationState,
-  type CreateMutationExecute,
-  type CreateMutationResult,
-} from './createMutation';
+export { type CreateMutationAction } from './createMutation';
 export { createMutation } from './createMutation';
 
 // Subscription exports - re-exported from @urql/solid (no SolidStart-specific changes needed)
