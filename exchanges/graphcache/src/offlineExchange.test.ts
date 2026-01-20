@@ -105,7 +105,7 @@ describe('storage', () => {
 describe('offline', () => {
   beforeAll(() => {
     vi.resetAllMocks();
-    globalThis.navigator = { onLine: true } as any;
+    vi.stubGlobal('navigator', { onLine: true });
   });
 
   it('should intercept errored mutations', () => {
