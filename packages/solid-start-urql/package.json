@@ -51,19 +51,19 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@solidjs/testing-library": "^0.8.2",
-    "@solidjs/start": "^1.0.0",
+    "@solidjs/testing-library": "^0.8.10",
+    "@solidjs/start": "^1.2.1",
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
     "jsdom": "^22.1.0",
-    "vite-plugin-solid": "^2.7.0"
+    "vite-plugin-solid": "^2.11.10"
   },
   "peerDependencies": {
     "@solidjs/router": ">=0.15.4",
     "@solidjs/start": ">=1.2.1",
     "@urql/core": "^6.0.0",
     "@urql/solid": "^1.0.0",
-    "solid-js": "^1.7.7"
+    "solid-js": "^1.9.10"
   },
   "dependencies": {
     "@solid-primitives/utils": "^6.2.1",
