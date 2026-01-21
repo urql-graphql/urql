@@ -265,19 +265,26 @@ export function useQuery<
 
         const subscription = pipe(
           source,
-          takeWhile(
-            () =>
-              (suspense && !resolve) ||
-              !result ||
-              ('hasNext' in result && result.hasNext)
-          ),
+          takeWhile(() => {
+            if (suspense && !resolve) return true;
+            if (!result || 'then' in result) return true;
+            if (suspense && !('data' in result && result.data) && !result.error)
+              return true;
+            if ('hasNext' in result && result.hasNext) return true;
+            return false;
+          }),
           subscribe(_result => {
             result = _result;
             if (resolve) resolve(result);
           })
         );
 
-        if (result == null && suspense) {
+        const opResult = result as OperationResult<Data, Variables> | undefined;
+        const shouldSuspend =
+          suspense &&
+          (opResult == null ||
+            (!('data' in opResult && opResult.data) && !opResult.error));
+        if (shouldSuspend) {
           const promise = new Promise(_resolve => {
             resolve = _resolve;
           });
