@@ -97,8 +97,8 @@ const assertValidSuspenseResult = (
   if (!hasData && !hasError) {
     throw new Error(
       `Suspense invariant violation: component rendered without data or error. ` +
-      `This should never happen - suspense should keep the component suspended. ` +
-      `Result: ${JSON.stringify({ data: result.data, error: result.error, fetching: result.fetching })}`
+        `This should never happen - suspense should keep the component suspended. ` +
+        `Result: ${JSON.stringify({ data: result.data, error: result.error, fetching: result.fetching })}`
     );
   }
 };
@@ -128,7 +128,9 @@ describe('useQuery suspense with graphcache', () => {
       const TestComponent = () => {
         const [result] = useQuery({ query });
         assertValidSuspenseResult(result);
-        return <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -183,7 +185,9 @@ describe('useQuery suspense with graphcache', () => {
         if (result.error) {
           return <div data-testid="error">{result.error.message}</div>;
         }
-        return <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -235,7 +239,11 @@ describe('useQuery suspense with graphcache', () => {
       const PopulateComponent = () => {
         const [result] = useQuery({ query });
         assertValidSuspenseResult(result);
-        return <div data-testid="populate">{result.data?.author?.name ?? 'loading'}</div>;
+        return (
+          <div data-testid="populate">
+            {result.data?.author?.name ?? 'loading'}
+          </div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -264,7 +272,9 @@ describe('useQuery suspense with graphcache', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('populate').textContent).toBe('Cached Author');
+        expect(screen.getByTestId('populate').textContent).toBe(
+          'Cached Author'
+        );
       });
 
       unmount();
@@ -272,7 +282,9 @@ describe('useQuery suspense with graphcache', () => {
       const TestComponent = () => {
         const [result] = useQuery({ query });
         assertValidSuspenseResult(result);
-        return <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+        );
       };
 
       render(
@@ -315,7 +327,11 @@ describe('useQuery suspense with graphcache', () => {
       const PopulateComponent = () => {
         const [result] = useQuery({ query: basicQuery });
         assertValidSuspenseResult(result);
-        return <div data-testid="populate">{result.data?.author?.name ?? 'loading'}</div>;
+        return (
+          <div data-testid="populate">
+            {result.data?.author?.name ?? 'loading'}
+          </div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -386,7 +402,9 @@ describe('useQuery suspense with graphcache', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('extended').textContent).toBe('test@example.com');
+        expect(screen.getByTestId('extended').textContent).toBe(
+          'test@example.com'
+        );
       });
     });
   });
@@ -409,7 +427,11 @@ describe('useQuery suspense with graphcache', () => {
       const PopulateComponent = () => {
         const [result] = useQuery({ query });
         assertValidSuspenseResult(result);
-        return <div data-testid="populate">{result.data?.author?.name ?? 'loading'}</div>;
+        return (
+          <div data-testid="populate">
+            {result.data?.author?.name ?? 'loading'}
+          </div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -438,7 +460,9 @@ describe('useQuery suspense with graphcache', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('populate').textContent).toBe('Original Name');
+        expect(screen.getByTestId('populate').textContent).toBe(
+          'Original Name'
+        );
       });
 
       unmount();
@@ -452,7 +476,9 @@ describe('useQuery suspense with graphcache', () => {
         assertValidSuspenseResult(result);
         return (
           <div>
-            <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+            <div data-testid="data">
+              {result.data?.author?.name ?? 'no data'}
+            </div>
             <div data-testid="stale">{result.stale ? 'stale' : 'fresh'}</div>
           </div>
         );
@@ -470,7 +496,9 @@ describe('useQuery suspense with graphcache', () => {
       expect(screen.getByTestId('data').textContent).toBe('Original Name');
 
       await waitFor(() => {
-        expect(network.operations.length).toBeGreaterThan(opsBeforeSecondRender);
+        expect(network.operations.length).toBeGreaterThan(
+          opsBeforeSecondRender
+        );
       });
 
       const latestOp = network.operations[network.operations.length - 1];
@@ -514,7 +542,9 @@ describe('useQuery suspense with graphcache', () => {
         return (
           <div>
             <div data-testid="author">{authorName}</div>
-            <div data-testid="hasNext">{result.hasNext ? 'streaming' : 'complete'}</div>
+            <div data-testid="hasNext">
+              {result.hasNext ? 'streaming' : 'complete'}
+            </div>
           </div>
         );
       };
@@ -578,7 +608,9 @@ describe('useQuery suspense with graphcache', () => {
         return (
           <div>
             <div data-testid="author">{authorName}</div>
-            <div data-testid="hasNext">{result.hasNext ? 'streaming' : 'complete'}</div>
+            <div data-testid="hasNext">
+              {result.hasNext ? 'streaming' : 'complete'}
+            </div>
           </div>
         );
       };
@@ -664,17 +696,27 @@ describe('useQuery suspense with graphcache', () => {
       const AuthorComponent = () => {
         const [result] = useQuery({ query: authorQuery });
         assertValidSuspenseResult(result);
-        return <div data-testid="author">{result.data?.author?.name ?? 'no author'}</div>;
+        return (
+          <div data-testid="author">
+            {result.data?.author?.name ?? 'no author'}
+          </div>
+        );
       };
 
       const PostsComponent = () => {
         const [result] = useQuery({ query: postsQuery });
         assertValidSuspenseResult(result);
-        return <div data-testid="posts">{result.data?.posts?.length ?? 0} posts</div>;
+        return (
+          <div data-testid="posts">{result.data?.posts?.length ?? 0} posts</div>
+        );
       };
 
-      const AuthorFallback = () => <div data-testid="author-fallback">Loading author...</div>;
-      const PostsFallback = () => <div data-testid="posts-fallback">Loading posts...</div>;
+      const AuthorFallback = () => (
+        <div data-testid="author-fallback">Loading author...</div>
+      );
+      const PostsFallback = () => (
+        <div data-testid="posts-fallback">Loading posts...</div>
+      );
 
       render(
         <Provider value={client}>
@@ -713,7 +755,9 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('author-fallback')).toBeNull();
-        expect(screen.getByTestId('author').textContent).toBe('Concurrent Author');
+        expect(screen.getByTestId('author').textContent).toBe(
+          'Concurrent Author'
+        );
         expect(screen.getByTestId('posts-fallback')).toBeDefined();
       });
 
@@ -765,8 +809,12 @@ describe('useQuery suspense with graphcache', () => {
         assertValidSuspenseResult(result);
         return (
           <div>
-            <div data-testid="author">{result.data?.author?.name ?? 'no author'}</div>
-            <div data-testid="error">{result.error ? 'has error' : 'no error'}</div>
+            <div data-testid="author">
+              {result.data?.author?.name ?? 'no author'}
+            </div>
+            <div data-testid="error">
+              {result.error ? 'has error' : 'no error'}
+            </div>
           </div>
         );
       };
@@ -837,7 +885,9 @@ describe('useQuery suspense with graphcache', () => {
       const TestComponent = ({ authorId }: { authorId: string }) => {
         const [result] = useQuery({ query, variables: { id: authorId } });
         assertValidSuspenseResult(result);
-        return <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -918,7 +968,9 @@ describe('useQuery suspense with graphcache', () => {
       const TestComponent = ({ authorId }: { authorId: string }) => {
         const [result] = useQuery({ query, variables: { id: authorId } });
         assertValidSuspenseResult(result);
-        return <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -1009,7 +1061,8 @@ describe('useQuery suspense with graphcache', () => {
         const [result] = useQuery({ query, pause: true });
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.author?.name ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.author?.name ?? 'none'}
           </div>
         );
       };
@@ -1025,7 +1078,9 @@ describe('useQuery suspense with graphcache', () => {
       );
 
       expect(screen.queryByTestId('fallback')).toBeNull();
-      expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+      expect(screen.getByTestId('data').textContent).toContain(
+        'fetching: false'
+      );
       expect(screen.getByTestId('data').textContent).toContain('data: none');
       expect(network.operations.length).toBe(0);
     });
@@ -1049,7 +1104,9 @@ describe('useQuery suspense with graphcache', () => {
         if (!pause) {
           assertValidSuspenseResult(result, pause);
         }
-        return <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'no data'}</div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -1115,7 +1172,8 @@ describe('useQuery suspense with graphcache', () => {
         const [result] = useQuery({ query, pause });
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.author?.name ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.author?.name ?? 'none'}
           </div>
         );
       };
@@ -1144,7 +1202,9 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'fetching: false'
+        );
         expect(screen.getByTestId('data').textContent).toContain('data: none');
       });
     });
@@ -1170,7 +1230,8 @@ describe('useQuery suspense with graphcache', () => {
         }
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.author?.name ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.author?.name ?? 'none'}
           </div>
         );
       };
@@ -1202,7 +1263,9 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('data: Fetched Author');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: Fetched Author'
+        );
       });
 
       rerender(
@@ -1215,8 +1278,12 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
-        expect(screen.getByTestId('data').textContent).toContain('data: Fetched Author');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'fetching: false'
+        );
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: Fetched Author'
+        );
       });
     });
 
@@ -1238,7 +1305,8 @@ describe('useQuery suspense with graphcache', () => {
         const [result] = useQuery({ query, pause });
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.author?.name ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.author?.name ?? 'none'}
           </div>
         );
       };
@@ -1277,7 +1345,9 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'fetching: false'
+        );
       });
 
       rerender(
@@ -1305,7 +1375,9 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('data: Cycle Author');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: Cycle Author'
+        );
       });
 
       rerender(
@@ -1318,7 +1390,9 @@ describe('useQuery suspense with graphcache', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('data: Cycle Author');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: Cycle Author'
+        );
       });
     });
 
@@ -1341,7 +1415,9 @@ describe('useQuery suspense with graphcache', () => {
         if (!pause) {
           assertValidSuspenseResult(result, pause);
         }
-        return <div data-testid="data">{result.data?.author?.name ?? 'none'}</div>;
+        return (
+          <div data-testid="data">{result.data?.author?.name ?? 'none'}</div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -1427,7 +1503,11 @@ describe('useQuery suspense with graphcache', () => {
       const PopulateComponent = () => {
         const [result] = useQuery({ query: basicQuery });
         assertValidSuspenseResult(result);
-        return <div data-testid="populate">{result.data?.author?.name ?? 'loading'}</div>;
+        return (
+          <div data-testid="populate">
+            {result.data?.author?.name ?? 'loading'}
+          </div>
+        );
       };
 
       const Fallback = () => <div data-testid="fallback">Loading...</div>;
@@ -1456,7 +1536,9 @@ describe('useQuery suspense with graphcache', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('populate').textContent).toBe('Partial Author');
+        expect(screen.getByTestId('populate').textContent).toBe(
+          'Partial Author'
+        );
       });
 
       unmount();
@@ -1465,7 +1547,8 @@ describe('useQuery suspense with graphcache', () => {
         const [result] = useQuery({ query: extendedQuery, pause });
         return (
           <div data-testid="extended">
-            fetching: {String(result.fetching)}, email: {result.data?.author?.email ?? 'none'}
+            fetching: {String(result.fetching)}, email:{' '}
+            {result.data?.author?.email ?? 'none'}
           </div>
         );
       };
@@ -1479,7 +1562,9 @@ describe('useQuery suspense with graphcache', () => {
       );
 
       expect(screen.queryByTestId('fallback')).toBeNull();
-      expect(screen.getByTestId('extended').textContent).toContain('fetching: false');
+      expect(screen.getByTestId('extended').textContent).toContain(
+        'fetching: false'
+      );
     });
   });
 });
