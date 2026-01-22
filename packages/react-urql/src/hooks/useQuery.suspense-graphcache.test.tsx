@@ -695,7 +695,9 @@ describe('useQuery suspense with graphcache', () => {
       });
 
       const authorOp = network.operations.find(
-        op => op.query.definitions[0]?.name?.value === 'AuthorQuery'
+        op =>
+          'name' in op.query.definitions[0] &&
+          op.query.definitions[0]?.name?.value === 'AuthorQuery'
       );
 
       act(() => {
@@ -716,7 +718,9 @@ describe('useQuery suspense with graphcache', () => {
       });
 
       const postsOp = network.operations.find(
-        op => op.query.definitions[0]?.name?.value === 'PostsQuery'
+        op =>
+          'name' in op.query.definitions[0] &&
+          op.query.definitions[0]?.name?.value === 'PostsQuery'
       );
 
       act(() => {
