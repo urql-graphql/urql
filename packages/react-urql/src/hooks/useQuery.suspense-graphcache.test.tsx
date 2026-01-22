@@ -1566,5 +1566,95 @@ describe('useQuery suspense with graphcache', () => {
         'fetching: false'
       );
     });
+
+    it('should clean up orphaned promise when pausing so unpause creates new subscription', async () => {
+      const network = createTestNetworkExchange();
+      const client = createTestClient(network);
+
+      const query = gql`
+        query TestQuery {
+          author {
+            __typename
+            id
+            name
+          }
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result] = useQuery({ query, pause });
+        if (!pause) {
+          assertValidSuspenseResult(result, pause);
+        }
+        return (
+          <div data-testid="data">
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.author?.name ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      expect(network.operations.length).toBe(1);
+
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+      });
+
+      const opsBeforeUnpause = network.operations.length;
+
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(
+        () => {
+          expect(network.operations.length).toBeGreaterThan(opsBeforeUnpause);
+        },
+        { timeout: 1000 }
+      );
+
+      act(() => {
+        network.respondToLatest({
+          __typename: 'Query',
+          author: {
+            __typename: 'Author',
+            id: '1',
+            name: 'Test Author',
+          },
+        });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: Test Author'
+        );
+      });
+    });
   });
 });

@@ -259,7 +259,17 @@ export function useQuery<
       source: Source<OperationResult<Data, Variables>> | null,
       suspense: boolean
     ): Partial<UseQueryState<Data, Variables>> => {
-      if (!source) return { fetching: false };
+      if (!source) {
+        const cached = cache.get(request.key);
+        if (cached != null && 'then' in cached) {
+          activePromises.delete(cached as Promise<unknown>);
+          cache.dispose(request.key);
+          client.reexecuteOperation(
+            client.createRequestOperation('teardown', request)
+          );
+        }
+        return { fetching: false };
+      }
 
       let result = cache.get(request.key);
       const isOrphanedPromise =
