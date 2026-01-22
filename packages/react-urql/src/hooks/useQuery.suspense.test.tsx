@@ -13,7 +13,7 @@ import {
 } from '@urql/core';
 
 import { Provider } from '../context';
-import { useQuery } from './useQuery';
+import { useQuery, UseQueryExecute } from './useQuery';
 
 /**
  * Creates an exchange that allows manual control over results.
@@ -226,5 +226,610 @@ describe('useQuery suspense', () => {
       },
       { timeout: 3000 }
     );
+  });
+
+  describe('pause behavior', () => {
+    it('should not suspend when initially paused', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperation = op;
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = () => {
+        const [result] = useQuery({ query, pause: true });
+        return (
+          <div data-testid="data">
+            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Should NOT show fallback - component renders immediately when paused
+      expect(screen.queryByTestId('fallback')).toBeNull();
+      expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+      expect(screen.getByTestId('data').textContent).toContain('data: none');
+
+      // No query should have been executed
+      expect(capturedOperation).toBeUndefined();
+    });
+
+    it('should start suspending when unpaused', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperation = op;
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result] = useQuery({ query, pause });
+        return <div data-testid="data">{result.data?.test ?? 'no data'}</div>;
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Initially not suspended when paused
+      expect(screen.queryByTestId('fallback')).toBeNull();
+      expect(screen.getByTestId('data')).toBeDefined();
+      expect(capturedOperation).toBeUndefined();
+
+      // Unpause - should start suspending
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Should now be suspended
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      // Query should have been executed
+      expect(capturedOperation).toBeDefined();
+
+      // Emit data
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'hello' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      // Should unsuspend and show data
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toBe('hello');
+      });
+    });
+
+    it('should stop suspending when paused while suspended', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [createPartialThenControllableExchange(resultSubject)],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result] = useQuery({ query, pause });
+        return (
+          <div data-testid="data">
+            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Initially suspended
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      // Pause while suspended
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Should stop suspending and show component
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain('data: none');
+      });
+    });
+
+    it('should keep data when paused after receiving data', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperation = op;
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result] = useQuery({ query, pause });
+        return (
+          <div data-testid="data">
+            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Wait for suspension
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      // Emit data
+      expect(capturedOperation).toBeDefined();
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'hello' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      // Wait for data to render
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('data: hello');
+      });
+
+      // Now pause
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Should still show data, not suspended
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain('data: hello');
+      });
+    });
+
+    it('should fetch data when executeQuery called while paused without suspending', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+      let executeQuery: UseQueryExecute;
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperation = op;
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = () => {
+        const [result, execute] = useQuery({ query, pause: true });
+        executeQuery = execute;
+        return (
+          <div data-testid="data">
+            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Initially not suspended
+      expect(screen.queryByTestId('fallback')).toBeNull();
+      expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+      expect(capturedOperation).toBeUndefined();
+
+      // Call executeQuery manually while paused
+      act(() => {
+        executeQuery();
+      });
+
+      // Should NOT suspend (pause is still true, so memoized source is null)
+      // Component should not be in fallback state
+      expect(screen.queryByTestId('fallback')).toBeNull();
+
+      // Query should have been executed
+      expect(capturedOperation).toBeDefined();
+
+      // Emit data
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'manual-fetch' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      // Should show data without ever having suspended
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('data: manual-fetch');
+      });
+    });
+
+    it('should handle multiple pause/unpause cycles', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperation = op;
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result] = useQuery({ query, pause });
+        return (
+          <div data-testid="data">
+            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Initially not suspended
+      expect(screen.queryByTestId('fallback')).toBeNull();
+
+      // Cycle 1: Unpause -> Pause while suspended
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+      });
+
+      // Cycle 2: Unpause -> Get data -> Pause
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      expect(capturedOperation).toBeDefined();
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'cycle2-data' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('data: cycle2-data');
+      });
+
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Data should persist while paused
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toContain('data: cycle2-data');
+      });
+    });
+
+    it('should use new variables when unpaused after variable change', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      const capturedOperations: Operation[] = [];
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperations.push(op);
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const queryWithVars = gql`
+        query TestQuery($id: ID!) {
+          test(id: $id)
+        }
+      `;
+
+      const TestComponent = ({ pause, id }: { pause: boolean; id: string }) => {
+        const [result] = useQuery({
+          query: queryWithVars,
+          variables: { id },
+          pause,
+        });
+        return (
+          <div data-testid="data">
+            data: {result.data?.test ?? 'none'}
+          </div>
+        );
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} id="1" />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Not suspended, no query executed
+      expect(screen.queryByTestId('fallback')).toBeNull();
+      expect(capturedOperations.length).toBe(0);
+
+      // Change variables while paused
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} id="2" />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Still no query
+      expect(capturedOperations.length).toBe(0);
+
+      // Unpause
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} id="2" />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Should suspend and execute query with id="2"
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      expect(capturedOperations.length).toBe(1);
+      expect(capturedOperations[0].variables).toEqual({ id: '2' });
+    });
   });
 });
