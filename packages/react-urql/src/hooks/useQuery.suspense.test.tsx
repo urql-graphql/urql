@@ -281,7 +281,8 @@ describe('useQuery suspense', () => {
         assertSuspenseInvariant(true, result.data, result.error);
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.test ?? 'none'}
           </div>
         );
       };
@@ -298,7 +299,9 @@ describe('useQuery suspense', () => {
 
       // Should NOT show fallback - component renders immediately when paused
       expect(screen.queryByTestId('fallback')).toBeNull();
-      expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+      expect(screen.getByTestId('data').textContent).toContain(
+        'fetching: false'
+      );
       expect(screen.getByTestId('data').textContent).toContain('data: none');
 
       // No query should have been executed
@@ -414,7 +417,8 @@ describe('useQuery suspense', () => {
         assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.test ?? 'none'}
           </div>
         );
       };
@@ -446,7 +450,9 @@ describe('useQuery suspense', () => {
       // Should stop suspending and show component
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'fetching: false'
+        );
         expect(screen.getByTestId('data').textContent).toContain('data: none');
       });
     });
@@ -490,7 +496,8 @@ describe('useQuery suspense', () => {
         assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.test ?? 'none'}
           </div>
         );
       };
@@ -539,7 +546,9 @@ describe('useQuery suspense', () => {
       // Should still show data, not suspended
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'fetching: false'
+        );
         expect(screen.getByTestId('data').textContent).toContain('data: hello');
       });
     });
@@ -584,7 +593,8 @@ describe('useQuery suspense', () => {
         executeQuery = execute;
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.test ?? 'none'}
           </div>
         );
       };
@@ -601,7 +611,9 @@ describe('useQuery suspense', () => {
 
       // Initially not suspended
       expect(screen.queryByTestId('fallback')).toBeNull();
-      expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+      expect(screen.getByTestId('data').textContent).toContain(
+        'fetching: false'
+      );
       expect(capturedOperation).toBeUndefined();
 
       // Call executeQuery manually while paused
@@ -629,7 +641,9 @@ describe('useQuery suspense', () => {
       // Should show data without ever having suspended
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('data: manual-fetch');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: manual-fetch'
+        );
       });
     });
 
@@ -672,7 +686,8 @@ describe('useQuery suspense', () => {
         assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
-            fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
+            fetching: {String(result.fetching)}, data:{' '}
+            {result.data?.test ?? 'none'}
           </div>
         );
       };
@@ -713,7 +728,9 @@ describe('useQuery suspense', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('fetching: false');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'fetching: false'
+        );
       });
 
       // Cycle 2: Unpause -> Get data -> Pause
@@ -741,7 +758,9 @@ describe('useQuery suspense', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('data: cycle2-data');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: cycle2-data'
+        );
       });
 
       rerender(
@@ -755,7 +774,9 @@ describe('useQuery suspense', () => {
       // Data should persist while paused
       await waitFor(() => {
         expect(screen.queryByTestId('fallback')).toBeNull();
-        expect(screen.getByTestId('data').textContent).toContain('data: cycle2-data');
+        expect(screen.getByTestId('data').textContent).toContain(
+          'data: cycle2-data'
+        );
       });
     });
 
@@ -801,9 +822,7 @@ describe('useQuery suspense', () => {
         });
         assertSuspenseInvariant(pause, result.data, result.error);
         return (
-          <div data-testid="data">
-            data: {result.data?.test ?? 'none'}
-          </div>
+          <div data-testid="data">data: {result.data?.test ?? 'none'}</div>
         );
       };
 
