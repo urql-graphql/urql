@@ -181,6 +181,8 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
     ? !!context.suspense
     : client.suspense;
 
+const activePromises = new WeakSet<Promise<unknown>>();
+
 /** Hook to run a GraphQL query and get updated GraphQL results.
  *
  * @param args - a {@link UseQueryArgs} object, to pass a `query`, `variables`, and options.
@@ -260,7 +262,11 @@ export function useQuery<
       if (!source) return { fetching: false };
 
       let result = cache.get(request.key);
-      if (!result) {
+      const isOrphanedPromise =
+        result != null &&
+        'then' in result &&
+        !activePromises.has(result as Promise<unknown>);
+      if (!result || isOrphanedPromise) {
         let resolve: (value: unknown) => void;
 
         const subscription = pipe(
@@ -289,6 +295,7 @@ export function useQuery<
             resolve = _resolve;
           });
 
+          activePromises.add(promise);
           cache.set(request.key, promise);
           throw promise;
         } else {
@@ -363,6 +370,10 @@ export function useQuery<
       if (!hasResult) updateResult({ fetching: true });
 
       return () => {
+        const cached = cache.get(request.key);
+        if (cached != null && 'then' in cached) {
+          activePromises.delete(cached as Promise<unknown>);
+        }
         cache.dispose(request.key);
         subscription.unsubscribe();
       };

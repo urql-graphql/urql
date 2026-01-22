@@ -870,4 +870,231 @@ describe('useQuery suspense', () => {
       expect(capturedOperations[0].variables).toEqual({ id: '2' });
     });
   });
+
+  describe('orphaned promise handling', () => {
+    it('should not get stuck in suspense when refetching after subscription teardown', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+      let executeQuery: UseQueryExecute;
+
+      const captureOperationExchange: Exchange = ({ forward }) => {
+        return ops$ => {
+          return pipe(
+            ops$,
+            map(op => {
+              if (op.kind !== 'teardown') {
+                capturedOperation = op;
+              }
+              return op;
+            }),
+            forward
+          );
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [
+          captureOperationExchange,
+          createPartialThenControllableExchange(resultSubject),
+        ],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result, execute] = useQuery({ query, pause });
+        executeQuery = execute;
+        assertSuspenseInvariant(pause, result.data, result.error);
+        return <div data-testid="data">{result.data?.test ?? 'no data'}</div>;
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { rerender } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Step 1: Component initially loads and suspends
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      // Step 2: First result arrives, component unsuspends
+      expect(capturedOperation).toBeDefined();
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'initial' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+        expect(screen.getByTestId('data').textContent).toBe('initial');
+      });
+
+      // Step 3: User navigates away (pause the query, tearing down subscription)
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={true} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('fallback')).toBeNull();
+      });
+
+      // Step 4: User navigates back and triggers a refetch
+      // This creates a new source and should work correctly
+      rerender(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Step 5: Call executeQuery to refetch with network-only
+      act(() => {
+        executeQuery({ requestPolicy: 'network-only' });
+      });
+
+      // The component may suspend briefly while fetching
+      // Emit the new result
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'refetched' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      // Step 6: Verify the component gets the new data and doesn't stay stuck
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('fallback')).toBeNull();
+          expect(screen.getByTestId('data').textContent).toBe('refetched');
+        },
+        { timeout: 3000 }
+      );
+    });
+
+    it('should not hang when remounting after unmount during suspension', async () => {
+      const resultSubject = makeSubject<OperationResult>();
+      let capturedOperation: Operation | undefined;
+
+      const trackSubscriptionsExchange: Exchange = () => {
+        return ops$ => {
+          const sharedOps$ = pipe(ops$, share);
+          return merge([
+            pipe(
+              sharedOps$,
+              filter(op => op.kind !== 'teardown'),
+              map(op => {
+                capturedOperation = op;
+                return op;
+              }),
+              map(
+                (operation): OperationResult => ({
+                  operation,
+                  data: undefined,
+                  error: undefined,
+                  stale: false,
+                  hasNext: false,
+                })
+              )
+            ),
+            resultSubject.source,
+          ]);
+        };
+      };
+
+      const client = new Client({
+        url: 'http://localhost:3000/graphql',
+        suspense: true,
+        exchanges: [trackSubscriptionsExchange],
+      });
+
+      const query = gql`
+        query TestQuery {
+          test
+        }
+      `;
+
+      const TestComponent = ({ pause }: { pause: boolean }) => {
+        const [result] = useQuery({ query, pause });
+        assertSuspenseInvariant(pause, result.data, result.error);
+        return <div data-testid="data">{result.data?.test ?? 'no data'}</div>;
+      };
+
+      const Fallback = () => <div data-testid="fallback">Loading...</div>;
+
+      const { unmount } = render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Initial suspension
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      // Unmount while still suspended (subscription torn down, promise orphaned)
+      unmount();
+
+      // Remount - the key test is that this doesn't hang forever
+      render(
+        <Provider value={client}>
+          <React.Suspense fallback={<Fallback />}>
+            <TestComponent pause={false} />
+          </React.Suspense>
+        </Provider>
+      );
+
+      // Should suspend again (not hang)
+      await waitFor(() => {
+        expect(screen.getByTestId('fallback')).toBeDefined();
+      });
+
+      // Emit data - the component should unsuspend
+      // This verifies the new subscription is working
+      expect(capturedOperation).toBeDefined();
+      act(() => {
+        resultSubject.next({
+          operation: capturedOperation!,
+          data: { test: 'after-remount' },
+          stale: false,
+          hasNext: false,
+        });
+      });
+
+      // The critical assertion: component should receive data and unsuspend
+      // Without the fix, this would hang because the orphaned promise never resolves
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('fallback')).toBeNull();
+          expect(screen.getByTestId('data').textContent).toBe('after-remount');
+        },
+        { timeout: 3000 }
+      );
+    });
+  });
 });
