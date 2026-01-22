@@ -5,7 +5,7 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
-import { vi, expect, it, describe, beforeAll } from 'vitest';
+import { vi, expect, it, describe, beforeAll, afterAll } from 'vitest';
 
 import { pipe, share, map, makeSubject, tap, publish } from 'wonka';
 import { queryResponse } from '../../../packages/core/src/test-utils';
@@ -106,6 +106,10 @@ describe('offline', () => {
   beforeAll(() => {
     vi.resetAllMocks();
     vi.stubGlobal('navigator', { onLine: true });
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
   });
 
   it('should intercept errored mutations', () => {
