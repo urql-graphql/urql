@@ -2,4 +2,5 @@
 '@urql/solid': patch
 ---
 
-Minor update to use a more idiomatic Solid accessor dependency.
+- Use `@solid-primitives/utils` for `access` and `MaybeAccessor` utilities instead of custom implementations. This aligns the package with standard Solid ecosystem conventions.
+  Submitted by [@davedbase](https://github.com/davedbase)
