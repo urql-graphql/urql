@@ -57,6 +57,19 @@ const createPartialThenControllableExchange = (
   };
 };
 
+const assertSuspenseInvariant = (
+  pause: boolean,
+  data: unknown,
+  error: unknown
+) => {
+  if (!pause && !data && !error) {
+    throw new Error(
+      'Invariant violation: component rendered without data or error while not paused. ' +
+        'With suspense enabled, the component should remain suspended until data or error arrives.'
+    );
+  }
+};
+
 describe('useQuery suspense', () => {
   beforeAll(() => {
     vi.spyOn(globalThis.console, 'error').mockImplementation(() => {
@@ -265,6 +278,7 @@ describe('useQuery suspense', () => {
 
       const TestComponent = () => {
         const [result] = useQuery({ query, pause: true });
+        assertSuspenseInvariant(true, result.data, result.error);
         return (
           <div data-testid="data">
             fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
@@ -327,6 +341,7 @@ describe('useQuery suspense', () => {
 
       const TestComponent = ({ pause }: { pause: boolean }) => {
         const [result] = useQuery({ query, pause });
+        assertSuspenseInvariant(pause, result.data, result.error);
         return <div data-testid="data">{result.data?.test ?? 'no data'}</div>;
       };
 
@@ -396,6 +411,7 @@ describe('useQuery suspense', () => {
 
       const TestComponent = ({ pause }: { pause: boolean }) => {
         const [result] = useQuery({ query, pause });
+        assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
             fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
@@ -471,6 +487,7 @@ describe('useQuery suspense', () => {
 
       const TestComponent = ({ pause }: { pause: boolean }) => {
         const [result] = useQuery({ query, pause });
+        assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
             fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
@@ -652,6 +669,7 @@ describe('useQuery suspense', () => {
 
       const TestComponent = ({ pause }: { pause: boolean }) => {
         const [result] = useQuery({ query, pause });
+        assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
             fetching: {String(result.fetching)}, data: {result.data?.test ?? 'none'}
@@ -781,6 +799,7 @@ describe('useQuery suspense', () => {
           variables: { id },
           pause,
         });
+        assertSuspenseInvariant(pause, result.data, result.error);
         return (
           <div data-testid="data">
             data: {result.data?.test ?? 'none'}
