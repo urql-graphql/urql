@@ -75,9 +75,11 @@ export class Store<
       ? new Set(opts.globalIDs)
       : !!opts.globalIDs;
 
-    let queryName = 'Query';
-    let mutationName = 'Mutation';
-    let subscriptionName = 'Subscription';
+    let queryName = (opts.rootFields && opts.rootFields.query) || 'Query';
+    let mutationName =
+      (opts.rootFields && opts.rootFields.mutation) || 'Mutation';
+    let subscriptionName =
+      (opts.rootFields && opts.rootFields.subscription) || 'Subscription';
     if (opts.schema) {
       const schema = buildClientSchema(opts.schema);
       queryName = schema.query || queryName;
