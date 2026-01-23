@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0
+
+### Minor Changes
+
+- Add `minimumTime` to `refocusExchange` to throttle query reexecution
+  Submitted by [@ThaUnknown](https://github.com/ThaUnknown) (See [#3825](https://github.com/urql-graphql/urql/pull/3825))
+
 ## 2.0.0
 
 ### Patch Changes
