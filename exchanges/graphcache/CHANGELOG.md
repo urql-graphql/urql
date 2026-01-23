@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 9.0.0
+
+### Major Changes
+
+- Don't serialize data to IDB. This invalidates all existing data, but greatly improves performance of read/write operations
+  Submitted by [@ThaUnknown](https://github.com/ThaUnknown) (See [#3824](https://github.com/urql-graphql/urql/pull/3824))
+
 ## 8.1.0
 
 ### Minor Changes

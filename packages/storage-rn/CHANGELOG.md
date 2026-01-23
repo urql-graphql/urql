@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+### Patch Changes
+
+- Add support for `@react-native-async-storage/async-storage` v2.0.0
+  Submitted by [@nhangeland](https://github.com/nhangeland) (See [#3836](https://github.com/urql-graphql/urql/pull/3836))
+
 ## 1.1.1
 
 ### Patch Changes
