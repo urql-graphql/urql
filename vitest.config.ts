@@ -19,6 +19,7 @@ export default defineConfig({
     clearMocks: true,
     exclude: [
       'packages/solid-urql/**',
+      'packages/solid-start-urql/**',
       '**/node_modules/**',
       '**/dist/**',
       '**/cypress/**',

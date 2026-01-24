@@ -17,7 +17,7 @@ apps through ["Normalized Caching"](./graphcache/normalized-caching.md).
 `urql` can be understood as a collection of connected parts and packages.
 When we only need to install a single package for our framework of choice. We're then able to
 declaratively send GraphQL requests to our API. All framework packages — like `urql` (for React),
-`@urql/preact`, `@urql/svelte`, and `@urql/vue` — wrap the [core package,
+`@urql/preact`, `@urql/svelte`, `@urql/solid`/`@urql/solid-start` and `@urql/vue` — wrap the [core package,
 `@urql/core`](./basics/core.md), which we can imagine as the brain
 of `urql` with most of its logic. As we progress with implementing `urql` into our application,
 we're later able to extend it by adding ["addon packages", which we call
@@ -33,6 +33,8 @@ We have **Getting Started** guides for:
 - [**React/Preact**](./basics/react-preact.md) covers how to work with the bindings for React/Preact.
 - [**Vue**](./basics/vue.md) covers how to work with the bindings for Vue 3.
 - [**Svelte**](./basics/svelte.md) covers how to work with the bindings for Svelte.
+- [**Solid**](./basics/solid.md) covers how to work with the bindings for Solid.
+- [**SolidStart**](./basics/solid-start.md) covers how to work with the bindings for SolidStart.
 - [**Core Package**](./basics/core.md) covers the shared "core APIs" and how we can use them directly
   in Node.js or imperatively.
 
