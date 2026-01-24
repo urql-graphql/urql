@@ -10,8 +10,8 @@
   "dependencies": {
     "@solidjs/router": "^0.15.4",
     "@solidjs/start": "^1.2.1",
-    "@urql/core": "link:../../packages/core",
-    "@urql/solid-start": "link:../../packages/solid-start-urql",
+    "@urql/core": "^6.0.1",
+    "@urql/solid-start": "^0.1.0",
     "graphql": "^16.9.0",
     "solid-js": "^1.9.10",
     "vinxi": "^0.5.0"

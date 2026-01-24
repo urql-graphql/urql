@@ -1,6 +1,6 @@
 {
   "name": "@urql/solid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A highly customizable and versatile GraphQL client for Solid",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",

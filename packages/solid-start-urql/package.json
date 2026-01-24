@@ -1,6 +1,6 @@
 {
   "name": "@urql/solid-start",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A highly customizable and versatile GraphQL client for SolidStart",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -68,7 +68,7 @@
   "dependencies": {
     "@solid-primitives/utils": "^6.2.1",
     "@urql/core": "workspace:^6.0.1",
-    "@urql/solid": "workspace:^1.0.0",
+    "@urql/solid": "workspace:^1.0.1",
     "wonka": "^6.3.2"
   },
   "publishConfig": {

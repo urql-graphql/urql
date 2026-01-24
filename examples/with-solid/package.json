@@ -7,8 +7,8 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@urql/core": "link:../../packages/core",
-    "@urql/solid": "link:../../packages/solid-urql",
+    "@urql/core": "^6.0.1",
+    "@urql/solid": "^1.0.1",
     "graphql": "^16.9.0",
     "solid-js": "^1.9.10"
   },
