@@ -1,6 +1,6 @@
 {
   "name": "@urql/storage-rn",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "sideEffects": false,
   "description": "Graphcache offline storage for React Native",
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -49,12 +49,12 @@
     "prepublishOnly": "run-s clean build"
   },
   "peerDependencies": {
-    "@react-native-async-storage/async-storage": "^1.15.5",
+    "@react-native-async-storage/async-storage": "^1.15.5 || ^2.0.0",
     "@react-native-community/netinfo": "^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^11.0.0",
     "@urql/exchange-graphcache": ">=5.0.0"
   },
   "devDependencies": {
-    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/netinfo": "^11.2.1",
     "@urql/core": "workspace:*",
     "@urql/exchange-graphcache": "workspace:*"

@@ -615,8 +615,8 @@ importers:
   packages/storage-rn:
     devDependencies:
       '@react-native-async-storage/async-storage':
-        specifier: ^1.21.0
-        version: 1.21.0(react-native@0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
+        specifier: ^2.2.0
+        version: 2.2.0(react-native@0.75.3(@babel/core@7.28.3)(@babel/preset-env@7.13.15(@babel/core@7.28.3))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
       '@react-native-community/netinfo':
         specifier: ^11.2.1
         version: 11.2.1(react-native@0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
@@ -2807,10 +2807,10 @@ packages:
       react: 15.x || 16.x || 16.4.0-alpha.0911da3
       react-dom: 15.x || 16.x || 16.4.0-alpha.0911da3
 
-  '@react-native-async-storage/async-storage@1.21.0':
-    resolution: {integrity: sha512-JL0w36KuFHFCvnbOXRekqVAUplmOyT/OuCQkogo6X98MtpSaJOKEAeZnYO8JB0U/RIEixZaGI5px73YbRm/oag==}
+  '@react-native-async-storage/async-storage@2.2.0':
+    resolution: {integrity: sha512-gvRvjR5JAaUZF8tv2Kcq/Gbt3JHwbKFYfmb445rhOj6NUMx3qPLixmDx5pZAyb9at1bYvJ4/eTUipU5aki45xw==}
     peerDependencies:
-      react-native: ^0.0.0-0 || >=0.60 <1.0
+      react-native: ^0.0.0-0 || >=0.65 <1.0
 
   '@react-native-community/cli-clean@14.1.0':
     resolution: {integrity: sha512-/C4j1yntLo6faztNgZnsDtgpGqa6j0+GYrxOY8LqaKAN03OCnoeUUKO6w78dycbYSGglc1xjJg2RZI/M2oF2AA==}
@@ -15160,7 +15160,7 @@ snapshots:
       react-dom: 16.14.0(react@16.14.0)
       react-lifecycles-compat: 3.0.4
 
-  '@react-native-async-storage/async-storage@1.21.0(react-native@0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))':
+  '@react-native-async-storage/async-storage@2.2.0(react-native@0.75.3(@babel/core@7.28.3)(@babel/preset-env@7.13.15(@babel/core@7.28.3))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))':
     dependencies:
       merge-options: 3.0.4
       react-native: 0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2)
