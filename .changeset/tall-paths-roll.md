@@ -4,7 +4,7 @@
 
 Initial release of `@urql/solid-start` - URQL integration built with SolidStart's native primitives.
 
-### Features
+Get started with:
 
 - **`createQuery`** - GraphQL queries using SolidStart's `query()` and `createAsync()`
 - **`createMutation`** - GraphQL mutations using SolidStart's `action()` and `useAction()`
