@@ -559,7 +559,7 @@ importers:
         specifier: workspace:^6.0.1
         version: link:../core
       '@urql/solid':
-        specifier: workspace:^1.0.0
+        specifier: workspace:^1.0.1
         version: link:../solid-urql
       solid-js:
         specifier: ^1.9.10
@@ -616,7 +616,7 @@ importers:
     devDependencies:
       '@react-native-async-storage/async-storage':
         specifier: ^2.2.0
-        version: 2.2.0(react-native@0.75.3(@babel/core@7.28.3)(@babel/preset-env@7.13.15(@babel/core@7.28.3))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
+        version: 2.2.0(react-native@0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
       '@react-native-community/netinfo':
         specifier: ^11.2.1
         version: 11.2.1(react-native@0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))
@@ -6943,6 +6943,7 @@ packages:
 
   intersection-observer@0.7.0:
     resolution: {integrity: sha512-Id0Fij0HsB/vKWGeBe9PxeY45ttRiBmhFyyt/geBdDHBYNctMRTE3dC1U3ujzz3lap+hVXlEcVaB56kZP/eEUg==}
+    deprecated: The Intersection Observer polyfill is no longer needed and can safely be removed. Intersection Observer has been Baseline since 2019.
 
   into-stream@3.1.0:
     resolution: {integrity: sha512-TcdjPibTksa1NQximqep2r17ISRiNE9fwlfbg3F8ANdvP5/yrFTew86VcO//jk4QTaMlbjypPBq76HN2zaKfZQ==}
@@ -8295,6 +8296,7 @@ packages:
   next@13.5.7:
     resolution: {integrity: sha512-W7KIRTE+hPcgGdq89P3mQLDX3m7pJ6nxSyC+YxYaUExE+cS4UledB+Ntk98tKoyhsv6fjb2TRAnD7VDvoqmeFg==}
     engines: {node: '>=16.14.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -10719,10 +10721,12 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tar@7.4.3:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tarr@1.1.0:
     resolution: {integrity: sha512-tENbQ43IQckay71stp1p1lljRhoEZpZk10FzEZKW2tJcMcnLwV3CfZdxBAERlH6nwnFvnHMS9eJOJl6IzSsG0g==}
@@ -11723,6 +11727,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-fetch@3.6.20:
     resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
@@ -15160,7 +15165,7 @@ snapshots:
       react-dom: 16.14.0(react@16.14.0)
       react-lifecycles-compat: 3.0.4
 
-  '@react-native-async-storage/async-storage@2.2.0(react-native@0.75.3(@babel/core@7.28.3)(@babel/preset-env@7.13.15(@babel/core@7.28.3))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))':
+  '@react-native-async-storage/async-storage@2.2.0(react-native@0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2))':
     dependencies:
       merge-options: 3.0.4
       react-native: 0.75.3(@babel/core@7.28.5)(@babel/preset-env@7.13.15(@babel/core@7.28.5))(@types/react@18.3.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2)
