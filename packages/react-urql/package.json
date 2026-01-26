@@ -47,6 +47,7 @@
     "@types/react": "^18.3.8",
     "@types/react-test-renderer": "^17.0.1",
     "@urql/core": "workspace:*",
+    "@urql/exchange-graphcache": "workspace:*",
     "cypress": "^13.14.0",
     "graphql": "^16.6.0",
     "react": "^18.3.1",

@@ -422,6 +422,9 @@ importers:
       '@types/react-test-renderer':
         specifier: ^17.0.1
         version: 17.0.1
+      '@urql/exchange-graphcache':
+        specifier: workspace:*
+        version: link:../../exchanges/graphcache
       cypress:
         specifier: ^13.14.0
         version: 13.14.2
