@@ -330,6 +330,22 @@ const writeSelection = (
       continue; // Skip this field
     }
 
+    // Check if mutation field entity existed BEFORE writing (for auto-invalidation)
+    let entityExistedBeforeWrite: boolean | undefined;
+    if (
+      typename === ctx.store.rootFields['mutation'] &&
+      !ctx.optimistic &&
+      fieldValue &&
+      typeof fieldValue === 'object' &&
+      !Array.isArray(fieldValue)
+    ) {
+      const key = ctx.store.keyOfEntity(fieldValue as any);
+      if (key) {
+        entityExistedBeforeWrite =
+          InMemoryData.readRecord(key, '__typename') !== undefined;
+      }
+    }
+
     if (node.selectionSet) {
       // Process the field and write links for the child entities that have been written
       if (entityKey && rootField === 'query') {
@@ -400,9 +416,9 @@ const writeSelection = (
       } else if (fieldValue && typeof fieldValue === 'object') {
         const key = ctx.store.keyOfEntity(fieldValue as any);
         if (key) {
-          const resolved = InMemoryData.readRecord(key, '__typename');
           const count = InMemoryData.getRefCount(key);
-          if ((!resolved || !count) && fieldValue.__typename) {
+          // Only invalidate if entity existed BEFORE this mutation and has no references
+          if (entityExistedBeforeWrite && !count && fieldValue.__typename) {
             invalidateType(fieldValue.__typename, [key]);
           }
         }

@@ -2229,7 +2229,7 @@ describe('optimistic updates', () => {
 });
 
 describe('mutation updates', () => {
-  it('invalidates the type when the entity is not present in the cache', () => {
+  it('does not auto-invalidate when creating a truly new entity (use updaters instead)', () => {
     vi.useFakeTimers();
 
     const authorsQuery = gql`
@@ -2326,12 +2326,9 @@ describe('mutation updates', () => {
 
     expect(response).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(2);
-    expect(reexec).toHaveBeenCalledTimes(1);
-
-    next(opOne);
-    vi.runAllTimers();
-    expect(response).toHaveBeenCalledTimes(3);
-    expect(result).toHaveBeenCalledTimes(3);
+    // With the fix, creating a truly new entity does NOT auto-invalidate
+    // existing entities. Use an updater if you need this behavior.
+    expect(reexec).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[1][0].data).toEqual({
       addAuthor: {
         id: '2',
