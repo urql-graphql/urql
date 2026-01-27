@@ -181,6 +181,11 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
     ? !!context.suspense
     : client.suspense;
 
+const hasMeaningfulResult = (
+  result: OperationResult | null | undefined
+): boolean =>
+  result != null && (result.data != null || result.error !== undefined);
+
 /** Hook to run a GraphQL query and get updated GraphQL results.
  *
  * @param args - a {@link UseQueryArgs} object, to pass a `query`, `variables`, and options.
@@ -238,7 +243,9 @@ export function useQuery<
       ? pipe(
           source,
           onPush(result => {
-            cache.set(request.key, result);
+            if (hasMeaningfulResult(result)) {
+              cache.set(request.key, result);
+            }
           })
         )
       : source;
@@ -269,11 +276,18 @@ export function useQuery<
             () =>
               (suspense && !resolve) ||
               !result ||
-              ('hasNext' in result && result.hasNext)
+              ('hasNext' in result && result.hasNext) ||
+              (suspense &&
+                !hasMeaningfulResult(result as OperationResult | undefined))
           ),
           subscribe(_result => {
             result = _result;
-            if (resolve) resolve(result);
+            if (
+              resolve &&
+              hasMeaningfulResult(result as OperationResult | undefined)
+            ) {
+              resolve(result);
+            }
           })
         );
 
@@ -350,7 +364,11 @@ export function useQuery<
         onEnd(() => {
           updateResult({ fetching: false });
         }),
-        subscribe(updateResult)
+        subscribe(result => {
+          if (!suspense || hasMeaningfulResult(result)) {
+            updateResult(result);
+          }
+        })
       );
 
       if (!hasResult) updateResult({ fetching: true });
@@ -377,7 +395,9 @@ export function useQuery<
           ? pipe(
               client.executeQuery(request, context),
               onPush(result => {
-                cache.set(request.key, result);
+                if (hasMeaningfulResult(result)) {
+                  cache.set(request.key, result);
+                }
               })
             )
           : client.executeQuery(request, context);
