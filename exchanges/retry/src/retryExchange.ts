@@ -45,11 +45,11 @@ export interface RetryExchangeOptions {
    * @defaultValue `true` - enables random exponential backoff
    */
   randomDelay?: boolean;
-  /** Specifies the maximum times an operation should be sent to the API.
+  /** Specifies the maximum number of attempts, including the initial request.
    *
    * @remarks
-   * `maxNumberAttempts` defines the number of attempts an operation should
-   * be retried until it's considered failed.
+   * `maxNumberAttempts` defines the total number of attempts before it's
+   * considered failed.
    *
    * @defaultValue `2` - Retry once, i.e. two attempts
    */
