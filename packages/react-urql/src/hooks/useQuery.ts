@@ -238,7 +238,7 @@ export function useQuery<
       ? pipe(
           source,
           onPush(result => {
-            cache.set(request.key, result);
+            cache.set(request.key, result.error ? undefined : result);
           })
         )
       : source;
@@ -377,7 +377,7 @@ export function useQuery<
           ? pipe(
               client.executeQuery(request, context),
               onPush(result => {
-                cache.set(request.key, result);
+                cache.set(request.key, result.error ? undefined : result);
               })
             )
           : client.executeQuery(request, context);
