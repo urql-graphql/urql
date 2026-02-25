@@ -201,6 +201,26 @@ describe('useQuery', () => {
     expect(query$.operation.value).toHaveProperty('variables.nested.prop', 2);
   });
 
+  it('reacts to object variables containing refs', async () => {
+    const skip = ref(0);
+
+    const { executeQuery, query$ } = createQuery({
+      query: ref('{ test }'),
+      variables: {
+        skip,
+      },
+    });
+
+    await query$;
+    expect(executeQuery).toHaveBeenCalledTimes(1);
+    expect(query$.operation.value).toHaveProperty('variables.skip', 0);
+
+    skip.value = 1;
+    await query$;
+    expect(executeQuery).toHaveBeenCalledTimes(2);
+    expect(query$.operation.value).toHaveProperty('variables.skip', 1);
+  });
+
   it('reacts to reactive variables changing', async () => {
     const prop = ref(1);
     const variables = reactive({ prop: 1, deep: { nested: { prop } } });

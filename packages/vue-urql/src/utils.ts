@@ -27,6 +27,37 @@ const isFunction = <T>(val: MaybeRefOrGetter<T>): val is () => T =>
 const toValue = <T>(source: MaybeRefOrGetter<T>): T =>
   isFunction(source) ? source() : unref(source);
 
+const isPlainObject = (
+  value: unknown
+): value is Record<string, MaybeRefOrGetter<unknown>> => {
+  if (value == null || typeof value !== 'object') {
+    return false;
+  }
+
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};
+
+const unwrapVariables = (value: unknown): unknown => {
+  const resolved = toValue(value as MaybeRefOrGetter<unknown>);
+
+  if (Array.isArray(resolved)) {
+    return resolved.map(unwrapVariables);
+  }
+
+  if (isPlainObject(resolved)) {
+    const unwrapped: Record<string, unknown> = {};
+
+    for (const key in resolved) {
+      unwrapped[key] = unwrapVariables(resolved[key]);
+    }
+
+    return unwrapped;
+  }
+
+  return resolved;
+};
+
 export const createRequestWithArgs = <
   T = any,
   V extends AnyVariables = AnyVariables,
@@ -39,7 +70,7 @@ export const createRequestWithArgs = <
   const _args = toValue(args);
   return createRequest<T, V>(
     toValue(_args.query),
-    toValue(_args.variables as MaybeRefOrGetter<V>)
+    unwrapVariables(_args.variables as MaybeRefOrGetter<V>) as V
   );
 };
 
