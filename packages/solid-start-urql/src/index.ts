@@ -12,15 +12,15 @@ export { createQuery } from './createQuery';
 export { type CreateMutationAction } from './createMutation';
 export { createMutation } from './createMutation';
 
-// Subscription exports - re-exported from @urql/solid (no SolidStart-specific changes needed)
+// Subscription exports
 export {
   type CreateSubscriptionArgs,
   type CreateSubscriptionState,
   type CreateSubscriptionExecute,
   type CreateSubscriptionResult,
   type SubscriptionHandler,
-  createSubscription,
-} from '@urql/solid';
+} from './createSubscription';
+export { createSubscription } from './createSubscription';
 
 // Utility exports
 export { type MaybeAccessor } from './utils';
