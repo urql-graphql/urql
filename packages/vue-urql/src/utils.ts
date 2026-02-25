@@ -16,47 +16,36 @@ import type { UseSubscriptionArgs } from './useSubscription';
 import type { UseQueryArgs } from './useQuery';
 
 export type MaybeRefOrGetter<T> = T | (() => T) | Ref<T>;
-export type MaybeRefOrGetterObj<T extends {}> =
+type NoRefProps<T> = T extends readonly (infer U)[]
+  ? readonly NoRefProps<U>[]
+  : T extends object
+    ? {
+        [K in keyof T]: T[K] extends Ref<any> ? never : NoRefProps<T[K]>;
+      }
+    : T;
+type UnwrapTopLevelRef<T> = T extends Ref<infer U> ? U : T;
+export type ShallowMaybeRefOrGetter<T> =
+  | NoRefProps<UnwrapTopLevelRef<T>>
+  | (() => NoRefProps<UnwrapTopLevelRef<T>>)
+  | Ref<NoRefProps<UnwrapTopLevelRef<T>>>;
+
+export type MaybeRefOrGetterObj<
+  T extends {},
+  ShallowKeys extends keyof T = never,
+> =
   T extends Record<string, never>
     ? T
-    : { [K in keyof T]: MaybeRefOrGetter<T[K]> };
+    : {
+        [K in keyof T]: K extends ShallowKeys
+          ? ShallowMaybeRefOrGetter<T[K]>
+          : MaybeRefOrGetter<T[K]>;
+      };
 
 const isFunction = <T>(val: MaybeRefOrGetter<T>): val is () => T =>
   typeof val === 'function';
 
 const toValue = <T>(source: MaybeRefOrGetter<T>): T =>
   isFunction(source) ? source() : unref(source);
-
-const isPlainObject = (
-  value: unknown
-): value is Record<string, MaybeRefOrGetter<unknown>> => {
-  if (value == null || typeof value !== 'object') {
-    return false;
-  }
-
-  const prototype = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
-};
-
-const unwrapVariables = (value: unknown): unknown => {
-  const resolved = toValue(value as MaybeRefOrGetter<unknown>);
-
-  if (Array.isArray(resolved)) {
-    return resolved.map(unwrapVariables);
-  }
-
-  if (isPlainObject(resolved)) {
-    const unwrapped: Record<string, unknown> = {};
-
-    for (const key in resolved) {
-      unwrapped[key] = unwrapVariables(resolved[key]);
-    }
-
-    return unwrapped;
-  }
-
-  return resolved;
-};
 
 export const createRequestWithArgs = <
   T = any,
@@ -70,7 +59,7 @@ export const createRequestWithArgs = <
   const _args = toValue(args);
   return createRequest<T, V>(
     toValue(_args.query),
-    unwrapVariables(_args.variables as MaybeRefOrGetter<V>) as V
+    toValue(_args.variables as MaybeRefOrGetter<V>)
   );
 };
 
