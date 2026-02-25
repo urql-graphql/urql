@@ -61,11 +61,11 @@ const client = createClient({
 
 ### Providing the `Client`
 
-To make use of the `Client` in SolidStart we will provide it via Solid's Context API using the `Provider` export. The Provider also needs the `query` function from `@solidjs/router`:
+To make use of the `Client` in SolidStart we will provide it via Solid's Context API using the `Provider` export. The Provider also needs the `query` and `action` functions from `@solidjs/router`:
 
 ```jsx
 // src/root.tsx or src/app.tsx
-import { Router, query } from '@solidjs/router';
+import { Router, action, query } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { Suspense } from 'solid-js';
 import { createClient, Provider, cacheExchange, fetchExchange } from '@urql/solid-start';
@@ -78,8 +78,8 @@ const client = createClient({
 export default function App() {
   return (
     <Router
-      root={(props) => (
-        <Provider value={{ client, query }}>
+      root={props => (
+        <Provider value={{ client, query, action }}>
           <Suspense>{props.children}</Suspense>
         </Provider>
       )}
@@ -90,7 +90,7 @@ export default function App() {
 }
 ```
 
-Now every route and component inside the `Provider` can use GraphQL queries that will be sent to our API. The `query` function is provided in the context so that `createQuery` can access it automatically without manual injection.
+Now every route and component inside the `Provider` can use GraphQL queries and mutations that will be sent to our API. The `query` and `action` functions are provided in context so that `createQuery` and `createMutation` can access them automatically.
 
 ## Queries
 
@@ -135,6 +135,7 @@ export default function Todos() {
 ```
 
 The `createQuery` primitive integrates with SolidStart's data fetching system:
+
 1. It wraps SolidStart's `query()` function to execute URQL queries with proper router context
 2. The `query` function is automatically retrieved from the URQL context (no manual injection needed)
 3. The second parameter is a cache key (string) for SolidStart's router
@@ -165,14 +166,14 @@ const TodosListQuery = gql`
 
 export default function TodosPage() {
   const params = useParams();
-  
+
   const queryTodos = createQuery(TodosListQuery, 'todos-paginated', {
     variables: {
       from: parseInt(params.page) * 10,
       limit: 10,
     },
   });
-  
+
   const result = createAsync(() => queryTodos());
 
   return (
@@ -203,6 +204,7 @@ const result = createAsync(() => queryTodos());
 ```
 
 Available policies:
+
 - `cache-first` (default): Prefer cached results, fall back to network
 - `cache-only`: Only use cached results, never send network requests
 - `network-only`: Always send a network request, ignore cache
@@ -247,9 +249,9 @@ export default function Todos() {
   const handleRefresh = () => {
     // Invalidate the todos query using keyFor
     const key = keyFor(TodosQuery);
-    client.reexecuteOperation(client.createRequestOperation('query', { 
-      key, 
-      query: TodosQuery 
+    client.reexecuteOperation(client.createRequestOperation('query', {
+      key,
+      query: TodosQuery
     }));
   };
 
@@ -437,15 +439,15 @@ import { gql } from '@urql/core';
 
 const createTodoAction = action(async (formData: FormData) => {
   const title = formData.get('title') as string;
-  
+
   // Perform mutation
   const result = await client.mutation(CreateTodo, { title }).toPromise();
-  
+
   if (!result.error) {
     // Revalidate multiple routes if needed
     await revalidate(['/todos', '/']);
   }
-  
+
   return result;
 });
 ```
@@ -453,11 +455,13 @@ const createTodoAction = action(async (formData: FormData) => {
 #### Choosing Between Approaches
 
 **Use urql's `keyFor` and `reexecuteOperation` when:**
+
 - You need to refetch a specific query after a mutation
 - You want fine-grained control over which queries to refresh
 - You're working with multiple queries on the same route and only want to refetch one
 
 **Use SolidStart's `revalidate` when:**
+
 - You want to refresh all data on a route
 - You're navigating to a different route and want to ensure fresh data
 - You want to leverage SolidStart's routing system for cache management
@@ -543,6 +547,7 @@ export default function EditTodo() {
 ```
 
 The `createMutation` primitive returns a tuple:
+
 1. A reactive state object containing `fetching`, `error`, and `data`
 2. An execute function that triggers the mutation
 
@@ -576,7 +581,7 @@ export default function NewTodo() {
   const handleSubmit = async (formData: FormData) => {
     const title = formData.get('title') as string;
     const result = await createTodo({ title });
-    
+
     if (!result.error) {
       return redirect('/todos');
     }
@@ -623,7 +628,7 @@ const [state, updateTodo] = createMutation(UpdateTodo);
 
 const handleUpdate = async () => {
   const result = await updateTodo({ id: '1', title: 'Updated' });
-  
+
   if (result.error) {
     console.error('Oh no!', result.error);
   } else {
@@ -641,11 +646,11 @@ const [state, updateTodo] = createMutation(UpdateTodo);
 
 const handleUpdate = async () => {
   const result = await updateTodo({ id: '1', title: 'Updated' });
-  
+
   if (result.error) {
     // CombinedError with network or GraphQL errors
     console.error('Mutation failed:', result.error);
-    
+
     // Check for specific error types
     if (result.error.networkError) {
       console.error('Network error:', result.error.networkError);
@@ -661,7 +666,7 @@ const handleUpdate = async () => {
 
 ## Subscriptions
 
-For GraphQL subscriptions, `@urql/solid-start` re-exports the `createSubscription` primitive from `@urql/solid`, as subscriptions work identically on both client and server:
+For GraphQL subscriptions, `@urql/solid-start` provides a `createSubscription` primitive that uses the same SolidStart `Provider` context as `createQuery` and `createMutation`:
 
 ```jsx
 import { gql } from '@urql/core';
@@ -696,9 +701,7 @@ export default function TodoSubscription() {
     <div>
       <h2>Live Updates</h2>
       <ul>
-        <For each={todos()}>
-          {(todo) => <li>{todo.title}</li>}
-        </For>
+        <For each={todos()}>{todo => <li>{todo.title}</li>}</For>
       </ul>
     </div>
   );
@@ -739,7 +742,7 @@ const client = createClient({
   fetchOptions: () => {
     const event = getRequestEvent();
     const headers: Record<string, string> = {};
-    
+
     // Forward cookies for authenticated requests
     if (event) {
       const cookie = event.request.headers.get('cookie');
@@ -747,7 +750,7 @@ const client = createClient({
         headers.cookie = cookie;
       }
     }
-    
+
     return { headers };
   },
 });
@@ -757,16 +760,17 @@ const client = createClient({
 
 ### When to Use Each Package
 
-| Use Case | Package | Why |
-|----------|---------|-----|
-| Client-side SPA | `@urql/solid` | Optimized for client-only apps, uses SolidJS reactivity patterns |
-| SolidStart SSR App | `@urql/solid-start` | Integrates with SolidStart's routing, SSR, and action system |
+| Use Case           | Package             | Why                                                              |
+| ------------------ | ------------------- | ---------------------------------------------------------------- |
+| Client-side SPA    | `@urql/solid`       | Optimized for client-only apps, uses SolidJS reactivity patterns |
+| SolidStart SSR App | `@urql/solid-start` | Integrates with SolidStart's routing, SSR, and action system     |
 
 ### Key Differences
 
 #### Queries
 
 **@urql/solid** (Client-side):
+
 ```tsx
 import { createQuery } from '@urql/solid';
 
@@ -775,6 +779,7 @@ const [result] = createQuery({ query: TodosQuery });
 ```
 
 **@urql/solid-start** (SSR):
+
 ```tsx
 import { createQuery } from '@urql/solid-start';
 import { createAsync } from '@solidjs/router';
@@ -788,6 +793,7 @@ const todos = createAsync(() => queryTodos());
 #### Mutations
 
 **@urql/solid** (Client-side):
+
 ```tsx
 import { createMutation } from '@urql/solid';
 
@@ -797,6 +803,7 @@ await executeMutation({ title: 'New Todo' });
 ```
 
 **@urql/solid-start** (SSR with Actions):
+
 ```tsx
 import { createMutation } from '@urql/solid-start';
 import { useAction, useSubmission } from '@solidjs/router';
@@ -818,6 +825,7 @@ await addTodo({ title: 'New Todo' });
 ### Migration
 
 If you're moving from a SolidJS SPA to SolidStart:
+
 1. Change imports from `@urql/solid` to `@urql/solid-start`
 2. Wrap queries with `createAsync()`
 3. Update mutations to use the action pattern with `useAction()` and `useSubmission()`
