@@ -5,9 +5,9 @@ import {
   type OperationResult,
   createRequest,
 } from '@urql/core';
-import { action, type Action } from '@solidjs/router';
+import type { Action } from '@solidjs/router';
 import { pipe, filter, take, toPromise } from 'wonka';
-import { useClient } from './context';
+import { useAction, useClient } from './context';
 
 export type CreateMutationAction<
   Data = any,
@@ -74,6 +74,8 @@ export function createMutation<
   key: string
 ): CreateMutationAction<Data, Variables> {
   const client = useClient();
+  const action = useAction();
+
   return action(
     async (variables: Variables, context?: Partial<OperationContext>) => {
       const request = createRequest(mutation, variables);
