@@ -106,6 +106,11 @@ given mutation field or subscription field is written to the cache. These side-e
 to update data in the cache that is implicitly changed on the GraphQL API, that _Graphcache_ can't
 know about automatically.
 
+For mutation fields that don't have an updater, Graphcache has a fallback: if a returned entity
+isn't currently found in the cache, it assumes a create-mutation and invalidates cached
+entities of that type. This behavior was introduced in Graphcache v7 and is skipped once an updater
+for the mutation field is added.
+
 ```ts
 interface UpdatesConfig {
   Mutation: {

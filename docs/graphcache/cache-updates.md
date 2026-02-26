@@ -59,6 +59,18 @@ cacheExchange({
 });
 ```
 
+## Default mutation invalidation
+
+Starting in [Graphcache v7](https://github.com/urql-graphql/urql/blob/main/exchanges/graphcache/CHANGELOG.md#700),
+mutations without a configured `updates.Mutation.<fieldName>` updater have a fallback behavior:
+
+- If the mutation returns an entity that can't be found in the cache yet, Graphcache treats this as
+  a "create" mutation.
+- Graphcache then invalidates cached entities of the same `__typename` as the one returned from the mutation, which can trigger related queries to refetch.
+
+As soon as you define an updater for that mutation field, this fallback behavior no longer runs and
+your updater fully controls what happens after the mutation write.
+
 An "updater" may be attached to a `Mutation` or `Subscription` field and accepts four positional
 arguments, which are the same as [the resolvers' arguments](./local-resolvers.md):
 
