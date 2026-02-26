@@ -55,7 +55,7 @@ export type UseSubscriptionArgs<
    * ```
    */
   context?: MaybeRefOrGetter<Partial<OperationContext>>;
-} & MaybeRefOrGetterObj<GraphQLRequestParams<Data, Variables>>;
+} & MaybeRefOrGetterObj<GraphQLRequestParams<Data, Variables>, 'variables'>;
 
 /** Combines previous data with an incoming subscription result’s data.
  *

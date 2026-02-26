@@ -73,7 +73,7 @@ export type UseQueryArgs<
    * documentation on the `pause` option.
    */
   pause?: MaybeRefOrGetter<boolean>;
-} & MaybeRefOrGetterObj<GraphQLRequestParams<Data, Variables>>;
+} & MaybeRefOrGetterObj<GraphQLRequestParams<Data, Variables>, 'variables'>;
 
 /** State of the current query, your {@link useQuery} function is executing.
  *
