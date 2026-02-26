@@ -2,7 +2,7 @@
 /* @jsxImportSource solid-js */
 
 import { expect, it, describe } from 'vitest';
-import { Provider, useClient } from './context';
+import { Provider, useAction, useClient } from './context';
 import { renderHook } from '@solidjs/testing-library';
 import { createClient } from '@urql/core';
 
@@ -16,9 +16,13 @@ describe('context', () => {
     // Mock query function that matches the expected type
     const mockQuery = (fn: any) => fn;
 
+    const mockAction = (fn: any) => fn;
+
     const wrapper = (props: { children: any }) => {
       return (
-        <Provider value={{ client, query: mockQuery as any }}>
+        <Provider
+          value={{ client, query: mockQuery as any, action: mockAction as any }}
+        >
           {props.children}
         </Provider>
       );
@@ -38,5 +42,29 @@ describe('context', () => {
     }).toThrow();
 
     process.env.NODE_ENV = originalEnv;
+  });
+
+  it('should provide action through context', () => {
+    const client = createClient({
+      url: '/graphql',
+      exchanges: [],
+    });
+
+    const mockQuery = (fn: any) => fn;
+    const mockAction = (fn: any) => fn;
+
+    const wrapper = (props: { children: any }) => {
+      return (
+        <Provider
+          value={{ client, query: mockQuery as any, action: mockAction as any }}
+        >
+          {props.children}
+        </Provider>
+      );
+    };
+
+    const { result } = renderHook(() => useAction(), { wrapper });
+
+    expect(result).toBe(mockAction);
   });
 });

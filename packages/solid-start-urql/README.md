@@ -29,11 +29,11 @@ yarn add @urql/solid-start @urql/solid @urql/core graphql
 
 ### 1. Set up the Provider
 
-Wrap your app with the `Provider` to make the URQL client and query function available:
+Wrap your app with the `Provider` to make the URQL client and router primitives available:
 
 ```tsx
 // src/app.tsx
-import { Router, query } from '@solidjs/router';
+import { Router, action, query } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { Provider } from '@urql/solid-start';
 import { createClient, cacheExchange, fetchExchange } from '@urql/core';
@@ -45,20 +45,14 @@ const client = createClient({
 
 export default function App() {
   return (
-    <Router
-      root={props => (
-        <Provider value={{ client, query }}>
-          {props.children}
-        </Provider>
-      )}
-    >
+    <Router root={props => <Provider value={{ client, query, action }}>{props.children}</Provider>}>
       <FileRoutes />
     </Router>
   );
 }
 ```
 
-> **Note:** The Provider now accepts an object with both `client` and `query`. This allows `createQuery` to automatically access the SolidStart query function without manual injection.
+> **Note:** The Provider accepts `client`, `query`, and `action` so `createQuery` and `createMutation` can use SolidStart APIs via context.
 
 ### 2. Use Queries
 
@@ -130,7 +124,7 @@ export function AddTodoForm() {
   const addTodoAction = createMutation(AddTodoMutation, 'add-todo');
   const addTodo = useAction(addTodoAction);
   const submission = useSubmission(addTodoAction);
-  
+
   let inputRef: HTMLInputElement | undefined;
 
   const handleSubmit = async (e: Event) => {
@@ -185,9 +179,7 @@ export function LiveMessages() {
   return (
     <div>
       <h2>Live Messages</h2>
-      <For each={messages.data}>
-        {msg => <div>{msg.text}</div>}
-      </For>
+      <For each={messages.data}>{msg => <div>{msg.text}</div>}</For>
     </div>
   );
 }
@@ -200,6 +192,7 @@ export function LiveMessages() {
 Creates a GraphQL query using SolidStart's `query` and `createAsync` primitives. The `query` function is automatically retrieved from context.
 
 **Parameters:**
+
 - `queryDocument: DocumentInput` - GraphQL query document
 - `key: string` - Cache key for SolidStart's router
 - `options?: object` - Optional configuration
@@ -210,6 +203,7 @@ Creates a GraphQL query using SolidStart's `query` and `createAsync` primitives.
 **Returns:** A query function that can be used with `createAsync`
 
 **Basic Example:**
+
 ```tsx
 import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
@@ -217,12 +211,13 @@ import { createQuery } from '@urql/solid-start';
 export default function TodosPage() {
   const queryTodos = createQuery(TodosQuery, 'todos-list');
   const todos = createAsync(() => queryTodos());
-  
+
   return <div>{/* ... */}</div>;
 }
 ```
 
 **Example with variables:**
+
 ```tsx
 import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
@@ -232,12 +227,13 @@ export default function UserPage() {
     variables: { id: 1 },
   });
   const user = createAsync(() => queryUser());
-  
+
   return <div>{/* ... */}</div>;
 }
 ```
 
 **Example with custom client:**
+
 ```tsx
 import { createAsync } from '@solidjs/router';
 import { createQuery } from '@urql/solid-start';
@@ -248,7 +244,7 @@ const customClient = createClient({ url: 'https://api.example.com/graphql' });
 export default function CustomPage() {
   const queryTodos = createQuery(TodosQuery, 'todos-list');
   const todos = createAsync(() => queryTodos(customClient));
-  
+
   return <div>{/* ... */}</div>;
 }
 ```
@@ -260,12 +256,14 @@ export default function CustomPage() {
 Creates a GraphQL mutation action using SolidStart's `action` primitive.
 
 **Args:**
+
 - `mutation: DocumentInput` - GraphQL mutation document
 - `key: string` - Cache key for SolidStart's router
 
 **Returns:** `Action` - A SolidStart action that can be used with `useAction()` and `useSubmission()`
 
 **Example:**
+
 ```tsx
 import { createMutation } from '@urql/solid-start';
 import { useAction, useSubmission } from '@solidjs/router';
@@ -287,6 +285,7 @@ console.log(submission.result); // OperationResult
 Creates a GraphQL subscription for real-time updates.
 
 **Args:**
+
 ```ts
 {
   query: DocumentInput;
@@ -297,35 +296,39 @@ Creates a GraphQL subscription for real-time updates.
 ```
 
 **Handler:** Optional function to accumulate/transform subscription data
+
 ```ts
-(previousData: Data | undefined, newData: Data) => Data
+(previousData: Data | undefined, newData: Data) => Data;
 ```
 
 **Returns:** `[State, ExecuteFunction]`
 
 **Example with handler:**
+
 ```tsx
-const [messages] = createSubscription(
-  { query: MessagesSubscription },
-  (prev = [], data) => [...prev, data.messageAdded]
-);
+const [messages] = createSubscription({ query: MessagesSubscription }, (prev = [], data) => [
+  ...prev,
+  data.messageAdded,
+]);
 ```
 
 ### `Provider`
 
-Context provider for the URQL client and SolidStart query function.
+Context provider for the URQL client and SolidStart router primitives.
 
 **Props:**
-- `value: { client: Client; query: typeof query }` - Object containing the URQL client and query function
+
+- `value: { client: Client; query: typeof query; action: typeof action }` - Object containing the URQL client and SolidStart router primitives
 
 **Example:**
+
 ```tsx
-import { query } from '@solidjs/router';
+import { action, query } from '@solidjs/router';
 import { Provider } from '@urql/solid-start';
 
-<Provider value={{ client, query }}>
+<Provider value={{ client, query, action }}>
   <App />
-</Provider>
+</Provider>;
 ```
 
 ### `useClient()`
@@ -361,20 +364,18 @@ import { createQuery } from '@urql/solid-start';
 
 export default function UserPage() {
   const [userId, setUserId] = createSignal(1);
-  
+
   // Create the query function
   const queryUser = createQuery(UserQuery, 'user-details', {
     variables: { id: userId() },
   });
-  
+
   // Wrap with createAsync to get reactive data
   const user = createAsync(() => queryUser());
-  
+
   return (
     <div>
-      <button onClick={() => setUserId(userId() + 1)}>
-        Next User
-      </button>
+      <button onClick={() => setUserId(userId() + 1)}>Next User</button>
       <Show when={user()?.data}>
         <h1>{user()!.data.user.name}</h1>
       </Show>
@@ -398,6 +399,7 @@ const [state, addTodo] = createMutation(AddTodoMutation, 'add-todo');
 ```
 
 Choose descriptive cache keys that:
+
 - Are unique within your application
 - Describe the data being cached (e.g., 'user-profile', 'todos-list')
 - Make debugging easier by being human-readable
@@ -424,9 +426,7 @@ const client = createClient({
           });
         },
         didAuthError(error) {
-          return error.graphQLErrors.some(
-            e => e.extensions?.code === 'UNAUTHENTICATED'
-          );
+          return error.graphQLErrors.some(e => e.extensions?.code === 'UNAUTHENTICATED');
         },
         async refreshAuth() {
           // Refresh token logic
@@ -477,9 +477,10 @@ const todos = createQuery({ query: TodosQuery });
 
 - **`createQuery`** wraps SolidStart's `query()` function to execute URQL queries with automatic SSR and caching. The `query` function is automatically retrieved from the URQL context, eliminating the need for manual injection.
 - **`createMutation`** creates SolidStart `action()` primitives that integrate with `useAction()` and `useSubmission()` for form handling and progressive enhancement
-- **`createSubscription`** re-exported from `@urql/solid` (works identically on client/server)
+- **`createSubscription`** uses `@urql/solid-start` context so it works with the same Provider as queries and mutations
 
 This means you get:
+
 - ✅ Automatic server-side rendering
 - ✅ Request deduplication via SolidStart's query caching
 - ✅ Streaming responses
@@ -490,16 +491,17 @@ This means you get:
 
 ### When to Use Each Package
 
-| Use Case | Package | Why |
-|----------|---------|-----|
-| Client-side SPA | `@urql/solid` | Optimized for client-only apps, uses SolidJS reactivity patterns |
-| SolidStart SSR App | `@urql/solid-start` | Integrates with SolidStart's routing, SSR, and action system |
+| Use Case           | Package             | Why                                                              |
+| ------------------ | ------------------- | ---------------------------------------------------------------- |
+| Client-side SPA    | `@urql/solid`       | Optimized for client-only apps, uses SolidJS reactivity patterns |
+| SolidStart SSR App | `@urql/solid-start` | Integrates with SolidStart's routing, SSR, and action system     |
 
 ### Key Differences
 
 #### Queries
 
 **@urql/solid** (Client-side):
+
 ```tsx
 import { createQuery } from '@urql/solid';
 
@@ -508,6 +510,7 @@ const [result] = createQuery({ query: TodosQuery });
 ```
 
 **@urql/solid-start** (SSR):
+
 ```tsx
 import { createQuery } from '@urql/solid-start';
 import { createAsync } from '@solidjs/router';
@@ -521,6 +524,7 @@ const todos = createAsync(() => queryTodos());
 #### Mutations
 
 **@urql/solid** (Client-side):
+
 ```tsx
 import { createMutation } from '@urql/solid';
 
@@ -530,6 +534,7 @@ await executeMutation({ title: 'New Todo' });
 ```
 
 **@urql/solid-start** (SSR with Actions):
+
 ```tsx
 import { createMutation } from '@urql/solid-start';
 import { useAction, useSubmission } from '@solidjs/router';
@@ -551,6 +556,7 @@ await addTodo({ title: 'New Todo' });
 ### Migration
 
 If you're moving from a SolidJS SPA to SolidStart:
+
 1. Change imports from `@urql/solid` to `@urql/solid-start`
 2. Wrap queries with `createAsync()`
 3. Update mutations to use the action pattern with `useAction()` and `useSubmission()`

@@ -2,8 +2,13 @@
 export * from '@urql/core';
 
 // Context exports
-export { type UseClient, type UseQuery, type UrqlContext } from './context';
-export { useClient, useQuery, Provider } from './context';
+export {
+  type UseAction,
+  type UseClient,
+  type UseQuery,
+  type UrqlContext,
+} from './context';
+export { useAction, useClient, useQuery, Provider } from './context';
 
 // Query exports
 export { createQuery } from './createQuery';
@@ -12,15 +17,15 @@ export { createQuery } from './createQuery';
 export { type CreateMutationAction } from './createMutation';
 export { createMutation } from './createMutation';
 
-// Subscription exports - re-exported from @urql/solid (no SolidStart-specific changes needed)
+// Subscription exports
 export {
   type CreateSubscriptionArgs,
   type CreateSubscriptionState,
   type CreateSubscriptionExecute,
   type CreateSubscriptionResult,
   type SubscriptionHandler,
-  createSubscription,
-} from '@urql/solid';
+} from './createSubscription';
+export { createSubscription } from './createSubscription';
 
 // Utility exports
 export { type MaybeAccessor } from './utils';

@@ -1,4 +1,4 @@
-import { Router, query } from '@solidjs/router';
+import { Router, action, query } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { Suspense } from 'solid-js';
 import {
@@ -17,7 +17,7 @@ export default function App() {
   return (
     <Router
       root={props => (
-        <Provider value={{ client, query }}>
+        <Provider value={{ client, query, action }}>
           <Suspense>{props.children}</Suspense>
         </Provider>
       )}

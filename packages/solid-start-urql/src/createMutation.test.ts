@@ -12,15 +12,11 @@ const client = createClient({
 });
 
 vi.mock('./context', () => {
+  const action = (fn: any, _key?: string) => fn;
+
   return {
     useClient: () => client,
-  };
-});
-
-// Mock SolidStart router functions
-vi.mock('@solidjs/router', () => {
-  return {
-    action: (fn: any, _key?: string) => fn,
+    useAction: () => action,
   };
 });
 
