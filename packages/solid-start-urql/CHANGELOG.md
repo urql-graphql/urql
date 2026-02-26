@@ -1,5 +1,17 @@
 # @urql/solid-start
 
+## 0.2.0
+
+### Minor Changes
+
+- Fix SSR runtime failures caused by importing SolidStart's `action` API at module load time by reading `action` from `Provider` context instead
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3850](https://github.com/urql-graphql/urql/pull/3850))
+
+### Patch Changes
+
+- ⚠️ Fix `createSubscription` to use `@urql/solid-start` context instead of re-exporting the Solid-only implementation from `@urql/solid`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3850](https://github.com/urql-graphql/urql/pull/3850))
+
 ## 0.1.0
 
 ### Minor Changes
