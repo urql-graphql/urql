@@ -2,7 +2,7 @@ import type { AnyVariables, Client, DocumentInput } from '@urql/core';
 import type { WatchStopHandle } from 'vue';
 import { getCurrentInstance, onMounted, onBeforeUnmount } from 'vue';
 
-import { useClient } from './useClient';
+import { useClient, DEFAULT_KEY } from './useClient';
 
 import type { UseQueryArgs, UseQueryResponse } from './useQuery';
 import { callUseQuery } from './useQuery';
@@ -126,8 +126,8 @@ export interface ClientHandle {
  * };
  * ```
  */
-export function useClientHandle(): ClientHandle {
-  const client = useClient();
+export function useClientHandle(key: string = DEFAULT_KEY): ClientHandle {
+  const client = useClient(key);
   const stops: WatchStopHandle[] = [];
 
   onBeforeUnmount(() => {
