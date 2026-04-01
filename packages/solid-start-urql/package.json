@@ -1,6 +1,6 @@
 {
   "name": "@urql/solid-start",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A highly customizable and versatile GraphQL client for SolidStart",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",

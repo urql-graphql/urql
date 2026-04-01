@@ -1,5 +1,12 @@
 # @urql/vue
 
+## 2.1.0
+
+### Minor Changes
+
+- Optional custom injection key support for `provideClient`, `install`, `useClient`, and `useClientHandle`. Multiple clients can be provided and consumed under different keys; default key remains `'$urql'` for backward compatibility
+  Submitted by [@albertcito](https://github.com/albertcito) (See [#3858](https://github.com/urql-graphql/urql/pull/3858))
+
 ## 2.0.0
 
 ### Major Changes
