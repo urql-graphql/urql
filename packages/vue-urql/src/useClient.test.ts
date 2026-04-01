@@ -26,6 +26,41 @@ describe('provideClient and useClient', () => {
     mount(TestComponent);
   });
 
+  it('provides client with custom key to current component instance', async () => {
+    const CUSTOM_KEY = 'custom-key';
+    const SUSPENSE_CLIENT = true;
+    const TestComponent = defineComponent({
+      setup() {
+        provideClient(
+          new Client({
+            url: 'test',
+            suspense: SUSPENSE_CLIENT,
+            exchanges: [],
+          })
+        );
+
+        const client = useClient();
+        expect(client).toBeDefined();
+        expect(client.value.suspense).toBe(SUSPENSE_CLIENT);
+
+        provideClient(
+          new Client({
+            url: 'test',
+            suspense: !SUSPENSE_CLIENT,
+            exchanges: [],
+          }),
+          CUSTOM_KEY
+        );
+        const customClient = useClient(CUSTOM_KEY);
+        expect(customClient).toBeDefined();
+        expect(customClient.value.suspense).toBe(!SUSPENSE_CLIENT);
+        return null;
+      },
+    });
+
+    mount(TestComponent);
+  });
+
   it('provides client to child components via provide/inject', async () => {
     const ChildComponent = defineComponent({
       setup() {

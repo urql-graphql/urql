@@ -3,6 +3,7 @@ import { inject, provide, isRef, shallowRef } from 'vue';
 import type { ClientOptions } from '@urql/core';
 import { Client } from '@urql/core';
 
+export const DEFAULT_KEY = '$urql';
 // WeakMap to store client instances as fallback when client is provided and used in the same component
 const clientsPerScope = new WeakMap<{}, Ref<Client>>();
 
@@ -32,7 +33,10 @@ const clientsPerScope = new WeakMap<{}, Ref<Client>>();
  * </script>
  * ```
  */
-export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
+export function provideClient(
+  opts: ClientOptions | Client | Ref<Client>,
+  key: string = DEFAULT_KEY
+) {
   let client: Ref<Client>;
   if (!isRef(opts)) {
     client = shallowRef(opts instanceof Client ? opts : new Client(opts));
@@ -45,7 +49,7 @@ export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
     clientsPerScope.set(scope, client);
   }
 
-  provide('$urql', client);
+  provide(key, client);
   return client.value;
 }
 
@@ -74,14 +78,18 @@ export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
  * });
  * ```
  */
-export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
+export function install(
+  app: App,
+  opts: ClientOptions | Client | Ref<Client>,
+  key: string = DEFAULT_KEY
+) {
   let client: Ref<Client>;
   if (!isRef(opts)) {
     client = shallowRef(opts instanceof Client ? opts : new Client(opts));
   } else {
     client = opts;
   }
-  app.provide('$urql', client);
+  app.provide(key, client);
 }
 
 /** Returns a provided reactive ref object of a {@link Client}.
@@ -96,7 +104,7 @@ export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
  * In development, if `useClient` is called outside of a reactive context
  * or no {@link Client} was provided, an error will be thrown.
  */
-export function useClient(): Ref<Client> {
+export function useClient(key: string = DEFAULT_KEY): Ref<Client> {
   const scope = getCurrentScope();
   if (process.env.NODE_ENV !== 'production' && !scope) {
     throw new Error(
@@ -104,7 +112,7 @@ export function useClient(): Ref<Client> {
     );
   }
 
-  let client = inject('$urql') as Ref<Client> | undefined;
+  let client = inject(key) as Ref<Client> | undefined;
   if (!client) {
     client = clientsPerScope.get(scope!);
   }
