@@ -55,6 +55,7 @@ export const computeNextState = <T extends Stateish>(
       result.data !== undefined || result.error ? result.data : prevState.data,
     fetching: !!result.fetching,
     stale: !!result.stale,
+    error: result.fetching ? prevState.error : result.error,
   };
 
   return isShallowDifferent(prevState, newState) ? newState : prevState;
