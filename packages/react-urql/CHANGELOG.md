@@ -1,5 +1,12 @@
 # urql
 
+## 5.0.2
+
+### Patch Changes
+
+- don't persist error state of old gql responses after refetch in react state
+  Submitted by [@BelgianNoise](https://github.com/BelgianNoise) (See [#3860](https://github.com/urql-graphql/urql/pull/3860))
+
 ## 5.0.1
 
 ### Patch Changes
