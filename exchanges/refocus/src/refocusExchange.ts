@@ -65,7 +65,11 @@ export const refocusExchange = (opts: RefocusOptions = {}): Exchange => {
       });
 
       const processIncomingOperation = (op: Operation) => {
-        if (op.kind === 'query' && !observedOperations.has(op.key) && (!refetchIf || refetchIf(operation))) {
+        if (
+          op.kind === 'query' &&
+          !observedOperations.has(op.key) &&
+          (!refetchIf || refetchIf(op))
+        ) {
           observedOperations.set(op.key, 1);
           watchedOperations.set(op.key, op);
         }
