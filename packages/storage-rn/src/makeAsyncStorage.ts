@@ -22,7 +22,9 @@ const parseData = (persistedData: any, fallback: any) => {
     if (persistedData) {
       return JSON.parse(persistedData);
     }
-  } catch (_err) {}
+  } catch (_err) {
+    if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+  }
 
   return fallback;
 };
@@ -66,7 +68,9 @@ export const makeAsyncStorage: (
         let persistedData: string | null = null;
         try {
           persistedData = await AsyncStorage.getItem(dataKey);
-        } catch (_err) {}
+        } catch (_err) {
+          if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+        }
         const parsed = parseData(persistedData, {});
 
         Object.assign(allData, parsed);
@@ -84,7 +88,9 @@ export const makeAsyncStorage: (
       if (syncNeeded) {
         try {
           await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
-        } catch (_err) {}
+        } catch (_err) {
+          if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+        }
       }
 
       return Object.assign(
@@ -98,7 +104,9 @@ export const makeAsyncStorage: (
         let persistedData: string | null = null;
         try {
           persistedData = await AsyncStorage.getItem(dataKey);
-        } catch (_err) {}
+        } catch (_err) {
+          if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+        }
         const parsed = parseData(persistedData, {});
         Object.assign(allData, parsed);
       }
@@ -121,20 +129,26 @@ export const makeAsyncStorage: (
 
       try {
         await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
-      } catch (_err) {}
+      } catch (_err) {
+        if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+      }
     },
 
     writeMetadata: async data => {
       try {
         await AsyncStorage.setItem(metadataKey, JSON.stringify(data));
-      } catch (_err) {}
+      } catch (_err) {
+        if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+      }
     },
 
     readMetadata: async () => {
       let persistedData: string | null = null;
       try {
         persistedData = await AsyncStorage.getItem(metadataKey);
-      } catch (_err) {}
+      } catch (_err) {
+        if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+      }
       return parseData(persistedData, []);
     },
 
@@ -156,7 +170,9 @@ export const makeAsyncStorage: (
         allData = {};
         await AsyncStorage.removeItem(dataKey);
         await AsyncStorage.removeItem(metadataKey);
-      } catch (_err) {}
+      } catch (_err) {
+        if (__DEV__) console.warn('[urql] AsyncStorage error:', _err);
+      }
     },
   };
 };
