@@ -23,7 +23,8 @@ const parseData = (persistedData: any, fallback: any) => {
       return JSON.parse(persistedData);
     }
   } catch (_err) {
-    if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+    if (process.env.NODE_ENV !== 'production')
+      console.warn('[urql] AsyncStorage error:', _err);
   }
 
   return fallback;
@@ -69,7 +70,8 @@ export const makeAsyncStorage: (
         try {
           persistedData = await AsyncStorage.getItem(dataKey);
         } catch (_err) {
-          if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+          if (process.env.NODE_ENV !== 'production')
+            console.warn('[urql] AsyncStorage error:', _err);
         }
         const parsed = parseData(persistedData, {});
 
@@ -89,7 +91,8 @@ export const makeAsyncStorage: (
         try {
           await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
         } catch (_err) {
-          if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+          if (process.env.NODE_ENV !== 'production')
+            console.warn('[urql] AsyncStorage error:', _err);
         }
       }
 
@@ -105,7 +108,8 @@ export const makeAsyncStorage: (
         try {
           persistedData = await AsyncStorage.getItem(dataKey);
         } catch (_err) {
-          if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+          if (process.env.NODE_ENV !== 'production')
+            console.warn('[urql] AsyncStorage error:', _err);
         }
         const parsed = parseData(persistedData, {});
         Object.assign(allData, parsed);
@@ -130,7 +134,8 @@ export const makeAsyncStorage: (
       try {
         await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
       } catch (_err) {
-        if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+        if (process.env.NODE_ENV !== 'production')
+          console.warn('[urql] AsyncStorage error:', _err);
       }
     },
 
@@ -138,7 +143,8 @@ export const makeAsyncStorage: (
       try {
         await AsyncStorage.setItem(metadataKey, JSON.stringify(data));
       } catch (_err) {
-        if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+        if (process.env.NODE_ENV !== 'production')
+          console.warn('[urql] AsyncStorage error:', _err);
       }
     },
 
@@ -147,7 +153,8 @@ export const makeAsyncStorage: (
       try {
         persistedData = await AsyncStorage.getItem(metadataKey);
       } catch (_err) {
-        if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+        if (process.env.NODE_ENV !== 'production')
+          console.warn('[urql] AsyncStorage error:', _err);
       }
       return parseData(persistedData, []);
     },
@@ -171,7 +178,8 @@ export const makeAsyncStorage: (
         await AsyncStorage.removeItem(dataKey);
         await AsyncStorage.removeItem(metadataKey);
       } catch (_err) {
-        if (process.env.NODE_ENV !== 'production') console.warn('[urql] AsyncStorage error:', _err);
+        if (process.env.NODE_ENV !== 'production')
+          console.warn('[urql] AsyncStorage error:', _err);
       }
     },
   };
