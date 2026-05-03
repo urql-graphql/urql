@@ -657,6 +657,18 @@ export type CacheExchangeOpts = {
    * @see {@link https://urql.dev/goto/docs/graphcache/offline} for the full Offline Support docs.
    */
   storage?: StorageAdapter;
+  /** Enables cross-tab cache synchronization via the BroadcastChannel API.
+   *
+   * @remarks
+   * Pass a channel name string or an existing `BroadcastChannel` instance.
+   * When a mutation (including optimistic updates) writes to the cache in one
+   * browser tab, the delta is broadcast to all other tabs sharing the same
+   * channel so their caches update in sync without extra network requests.
+   *
+   * Optimistic updates appear instantly in other tabs and are rolled back if
+   * the mutation fails, matching the behaviour in the originating tab.
+   */
+  broadcastChannel?: BroadcastChannel | string;
 };
 
 /** Cache Resolver, which may resolve or replace data during cache reads.

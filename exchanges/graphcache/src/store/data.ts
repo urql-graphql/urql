@@ -71,6 +71,7 @@ export let currentOperation: null | OperationType = null;
 export let currentDependencies: null | Dependencies = null;
 export let currentForeignData = false;
 export let currentOptimistic = false;
+let broadcastCapture: Set<string> | null = null;
 
 export function makeData(data: DataField | void, isArray?: false): Data;
 export function makeData(data: DataField | void, isArray: true): DataField[];
@@ -448,6 +449,8 @@ const updateDependencies = (entityKey: string, fieldKey?: string) => {
 };
 
 const updatePersist = (entityKey: string, fieldKey: string) => {
+  if (broadcastCapture)
+    broadcastCapture.add(serializeKeys(entityKey, fieldKey));
   if (!currentOptimistic && currentData!.storage) {
     currentData!.persist.add(serializeKeys(entityKey, fieldKey));
   }
@@ -676,6 +679,79 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
   extractNodeMapFields(fieldInfos, seenFieldKeys, entityKey, links);
   extractNodeMapFields(fieldInfos, seenFieldKeys, entityKey, records);
   return fieldInfos;
+};
+
+export const startBroadcastCapture = () => {
+  broadcastCapture = new Set();
+};
+
+/** Serializes writes captured since the last `startBroadcastCapture` call.
+ * Must be called between `initDataState` and `clearDataState`. */
+export const serializePendingDelta = (): SerializedEntries => {
+  const entries: SerializedEntries = {};
+  const keys = broadcastCapture;
+  broadcastCapture = null;
+  if (!keys || !keys.size) return entries;
+  const prevOptimistic = currentOptimistic;
+  currentOptimistic = true;
+  for (const key of keys.keys()) {
+    const { entityKey, fieldKey } = deserializeKeyInfo(key);
+    let x: void | Link | EntityField;
+    if ((x = readLink(entityKey, fieldKey)) !== undefined) {
+      entries[key] = `:${stringifyVariables(x)}`;
+    } else if ((x = readRecord(entityKey, fieldKey)) !== undefined) {
+      entries[key] = stringifyVariables(x);
+    } else {
+      entries[key] = undefined;
+    }
+  }
+  currentOptimistic = prevOptimistic;
+  return entries;
+};
+
+/** Applies a serialized cache delta to `data`, overwriting existing values.
+ *
+ * Pass a numeric `layerKey` to write into an optimistic layer (the layer is
+ * created if it doesn't yet exist). Omit `layerKey` (or pass `null`) to write
+ * directly to the base layer.
+ *
+ * `isOptimistic` controls whether the layer is treated as a pending optimistic
+ * update (`true`, the layer persists until explicitly resolved) or as a
+ * commutative commit (`false`, the layer becomes commutative+dirty and will be
+ * squashed into the base layer by `clearDataState`'s squash loop).
+ *
+ * When a `layerKey` is given, the layer is positioned at the back of
+ * `optimisticOrder` (i.e. lowest read priority). This means locally-pending
+ * optimistic layers continue to overshadow the foreign data, and the squash
+ * loop can fold a foreign commit straight into the base layer without being
+ * blocked by unrelated local layers. */
+export const applyDelta = (
+  data: InMemoryData,
+  entries: SerializedEntries,
+  layerKey: number | null = null,
+  isOptimistic: boolean = layerKey !== null
+) => {
+  initDataState('write', data, layerKey, isOptimistic);
+  if (layerKey !== null) {
+    const idx = data.optimisticOrder.indexOf(layerKey);
+    if (idx > -1 && idx !== data.optimisticOrder.length - 1) {
+      data.optimisticOrder.splice(idx, 1);
+      data.optimisticOrder.push(layerKey);
+    }
+  }
+  for (const key in entries) {
+    const value = entries[key];
+    const { entityKey, fieldKey } = deserializeKeyInfo(key);
+    if (value === undefined) {
+      writeLink(entityKey, fieldKey, undefined);
+      writeRecord(entityKey, fieldKey, undefined);
+    } else if (value[0] === ':') {
+      writeLink(entityKey, fieldKey, JSON.parse(value.slice(1)));
+    } else {
+      writeRecord(entityKey, fieldKey, JSON.parse(value));
+    }
+  }
+  clearDataState();
 };
 
 export const persistData = () => {

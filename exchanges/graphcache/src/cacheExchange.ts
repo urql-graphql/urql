@@ -12,6 +12,7 @@ import {
   filter,
   map,
   merge,
+  onEnd,
   pipe,
   share,
   fromArray,
@@ -24,7 +25,12 @@ import { _write } from './operations/write';
 import { addMetadata, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store } from './store/store';
-import type { Data, Dependencies, CacheExchangeOpts } from './types';
+import type {
+  Data,
+  Dependencies,
+  CacheExchangeOpts,
+  SerializedEntries,
+} from './types';
 
 import {
   initDataState,
@@ -33,6 +39,9 @@ import {
   hydrateData,
   reserveLayer,
   hasLayer,
+  startBroadcastCapture,
+  serializePendingDelta,
+  applyDelta,
 } from './store/data';
 
 interface OperationResultWithMeta extends Partial<OperationResult> {
@@ -47,6 +56,23 @@ type OperationMap = Map<number, Operation>;
 type ResultMap = Map<number, Data | null>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Map<string, Operations>;
+
+type CacheBroadcastMessage =
+  | {
+      type: 'cacheOptimisticUpdate';
+      tabId: string;
+      mutationKey: number;
+      entries: SerializedEntries;
+      deps: string[];
+    }
+  | {
+      type: 'cacheUpdate';
+      tabId: string;
+      mutationKey: number;
+      entries: SerializedEntries;
+      deps: string[];
+    }
+  | { type: 'cacheRollback'; tabId: string; mutationKey: number };
 
 /** Exchange factory that creates a normalized cache exchange.
  *
@@ -78,6 +104,36 @@ export const cacheExchange =
       });
     }
 
+    const broadcastOpt = opts && opts.broadcastChannel;
+    const tabId =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random()
+            .toString(36)
+            .slice(2)
+            .padStart(11, '0')}`;
+    // true if user only provided a channel id not full object
+    const weOwnChannel = typeof broadcastOpt === 'string';
+    const channel: BroadcastChannel | null =
+      typeof BroadcastChannel !== 'undefined' && broadcastOpt
+        ? weOwnChannel
+          ? new BroadcastChannel(broadcastOpt as string)
+          : (broadcastOpt as BroadcastChannel)
+        : null;
+
+    // Local layer keys allocated for remote optimistic updates. Local keys
+    // come from `phash` which produces signed 32-bit integers, so starting
+    // above 2^32 guarantees no collision with `operation.key` values.
+    let remoteLayerCounter = 0x100000000;
+    // Mapping from `${remoteTabId}:${remoteMutationKey}` to the local layer
+    // key that holds that remote mutation's optimistic data, plus the
+    // dependencies the originating tab reported (so we can re-execute the
+    // right queries when the layer is committed or rolled back).
+    const remoteOptimisticLayers: Map<
+      string,
+      { localKey: number; deps: Set<string> }
+    > = new Map();
+
     const optimisticKeysToDependencies: OptimisticDependencies = new Map();
     const mutationResultBuffer: OperationResult[] = [];
     const operations: OperationMap = new Map();
@@ -88,6 +144,11 @@ export const cacheExchange =
 
     let reexecutingOperations: Operations = new Set();
     let dependentOperations: Operations = new Set();
+    let pendingBroadcasts: Array<{
+      mutationKey: number;
+      entries: SerializedEntries;
+      deps: Dependencies;
+    }> = [];
 
     const isBlockedByOptimisticUpdate = (
       dependencies: Dependencies
@@ -165,6 +226,7 @@ export const cacheExchange =
       ) {
         operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
+        if (channel) startBroadcastCapture();
         initDataState('write', store.data, operation.key, true, false);
         const { dependencies } = _write(
           store,
@@ -172,6 +234,7 @@ export const cacheExchange =
           undefined,
           undefined
         );
+        const optimisticDelta = channel ? serializePendingDelta() : null;
         clearDataState();
         if (dependencies.size) {
           // Update blocked optimistic dependencies
@@ -184,6 +247,19 @@ export const cacheExchange =
           executePendingOperations(operation, pendingOperations, true);
           // Mark operation as optimistic
           optimistic = true;
+          if (
+            channel &&
+            optimisticDelta &&
+            Object.keys(optimisticDelta).length
+          ) {
+            channel.postMessage({
+              type: 'cacheOptimisticUpdate',
+              tabId,
+              mutationKey: operation.key,
+              entries: optimisticDelta,
+              deps: [...dependencies],
+            } as CacheBroadcastMessage);
+          }
         }
       }
 
@@ -252,6 +328,9 @@ export const cacheExchange =
       // Retrieve the original operation to get unfiltered variables
       const operation =
         operations.get(result.operation.key) || result.operation;
+      const hadOptimistic = channel
+        ? optimisticKeysToDependencies.has(operation.key)
+        : false;
       if (operation.kind === 'mutation') {
         // Collect previous dependencies that have been written for optimistic updates
         const dependencies = optimisticKeysToDependencies.get(operation.key);
@@ -267,6 +346,7 @@ export const cacheExchange =
       if (data) {
         // Write the result to cache and collect all dependencies that need to be
         // updated
+        if (channel && operation.kind === 'mutation') startBroadcastCapture();
         initDataState('write', store.data, operation.key, false, false);
         const writeDependencies = _write(
           store,
@@ -274,6 +354,16 @@ export const cacheExchange =
           data,
           result.error
         ).dependencies;
+        if (channel && operation.kind === 'mutation') {
+          const entries = serializePendingDelta();
+          if (Object.keys(entries).length) {
+            pendingBroadcasts.push({
+              mutationKey: operation.key,
+              entries,
+              deps: writeDependencies,
+            });
+          }
+        }
         clearDataState();
         collectPendingOperations(pendingOperations, writeDependencies);
         const prevData =
@@ -301,6 +391,13 @@ export const cacheExchange =
         }
       } else {
         noopDataState(store.data, operation.key);
+        if (channel && hadOptimistic) {
+          channel.postMessage({
+            type: 'cacheRollback',
+            tabId,
+            mutationKey: operation.key,
+          } as CacheBroadcastMessage);
+        }
       }
 
       // Update this operation's dependencies if it's a query
@@ -317,6 +414,92 @@ export const cacheExchange =
         stale: result.stale,
       };
     };
+
+    const reexecuteForDeps = (depsToCheck: Set<string>) => {
+      const pending: Operations = new Set();
+      collectPendingOperations(pending, depsToCheck);
+      for (const key of pending) {
+        const op = operations.get(key);
+        if (op) client.reexecuteOperation(toRequestPolicy(op, 'cache-first'));
+      }
+    };
+
+    const handleBroadcastMessage = (event: MessageEvent) => {
+      const msg = event.data as CacheBroadcastMessage | undefined;
+      if (!msg || msg.tabId === tabId) return;
+      const remoteKey = `${msg.tabId}:${msg.mutationKey}`;
+
+      if (msg.type === 'cacheOptimisticUpdate') {
+        // Allocate a local layer key in a number space disjoint from
+        // `operation.key` (which is a 32-bit hash). This prevents the remote
+        // optimistic write from clobbering layers reserved for the receiver's
+        // own queries or mutations that might happen to share the same key.
+        const localKey = remoteLayerCounter++;
+        applyDelta(store.data, msg.entries, localKey, true);
+        remoteOptimisticLayers.set(remoteKey, {
+          localKey,
+          deps: new Set(msg.deps),
+        });
+        reexecuteForDeps(new Set(msg.deps));
+      } else if (msg.type === 'cacheUpdate') {
+        const existing = remoteOptimisticLayers.get(remoteKey);
+        if (existing) {
+          // Commit the new entries through the existing remote layer as a
+          // commutative+dirty layer so `clearDataState`'s squash loop folds
+          // it into the base layer cleanly. This replaces the optimistic
+          // data with the authoritative result in a single step.
+          applyDelta(store.data, msg.entries, existing.localKey, false);
+          remoteOptimisticLayers.delete(remoteKey);
+        } else {
+          // No prior optimistic update from this remote mutation — write
+          // straight to the base layer.
+          applyDelta(store.data, msg.entries);
+        }
+        reexecuteForDeps(new Set(msg.deps));
+      } else if (msg.type === 'cacheRollback') {
+        const existing = remoteOptimisticLayers.get(remoteKey);
+        if (!existing) return;
+        noopDataState(store.data, existing.localKey);
+        remoteOptimisticLayers.delete(remoteKey);
+        reexecuteForDeps(existing.deps);
+      }
+    };
+
+    let removeBroadcastListeners: (() => void) | null = null;
+    if (channel) {
+      channel.addEventListener('message', handleBroadcastMessage);
+
+      // If this tab unloads while remote tabs still hold optimistic layers
+      // we created, broadcast a rollback for each so they don't leak.
+      // `pagehide` is more reliable than `beforeunload` on mobile browsers,
+      // so we listen for both and de-duplicate via a flag.
+      let unloadHandled = false;
+      const handleUnload = () => {
+        if (unloadHandled || !channel) return;
+        unloadHandled = true;
+        for (const mutationKey of optimisticKeysToDependencies.keys()) {
+          channel.postMessage({
+            type: 'cacheRollback',
+            tabId,
+            mutationKey,
+          } as CacheBroadcastMessage);
+        }
+      };
+
+      const hasWindow = typeof window !== 'undefined';
+      if (hasWindow) {
+        window.addEventListener('pagehide', handleUnload);
+        window.addEventListener('beforeunload', handleUnload);
+      }
+
+      removeBroadcastListeners = () => {
+        channel.removeEventListener('message', handleBroadcastMessage);
+        if (hasWindow) {
+          window.removeEventListener('pagehide', handleUnload);
+          window.removeEventListener('beforeunload', handleUnload);
+        }
+      };
+    }
 
     return operations$ => {
       // Filter by operations that are cacheable and attempt to query them from the cache
@@ -445,6 +628,17 @@ export const cacheExchange =
           const cacheResult = updateCacheWithResult(result, pendingOperations);
           // Execute all dependent queries
           executePendingOperations(result.operation, pendingOperations, false);
+          if (channel && pendingBroadcasts.length) {
+            for (const broadcast of pendingBroadcasts)
+              channel.postMessage({
+                type: 'cacheUpdate',
+                tabId,
+                mutationKey: broadcast.mutationKey,
+                entries: broadcast.entries,
+                deps: [...broadcast.deps],
+              } as CacheBroadcastMessage);
+            pendingBroadcasts = [];
+          }
           return cacheResult;
         })
       );
@@ -480,14 +674,32 @@ export const cacheExchange =
           // Execute all dependent queries as a single batch
           executePendingOperations(result.operation, pendingOperations, false);
 
+          if (channel && pendingBroadcasts.length) {
+            for (const broadcast of pendingBroadcasts)
+              channel.postMessage({
+                type: 'cacheUpdate',
+                tabId,
+                mutationKey: broadcast.mutationKey,
+                entries: broadcast.entries,
+                deps: [...broadcast.deps],
+              } as CacheBroadcastMessage);
+            pendingBroadcasts = [];
+          }
+
           return fromArray(results);
         })
       );
 
-      return merge([
-        nonOptimisticResults$,
-        optimisticMutationCompletion$,
-        cacheResult$,
-      ]);
+      return pipe(
+        merge([
+          nonOptimisticResults$,
+          optimisticMutationCompletion$,
+          cacheResult$,
+        ]),
+        onEnd(() => {
+          if (removeBroadcastListeners) removeBroadcastListeners();
+          if (channel && weOwnChannel) channel.close();
+        })
+      );
     };
   };
