@@ -33,21 +33,6 @@
       "pre-commit": "lint-staged --quiet --relative"
     }
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "react-native"
-      ],
-      "allowedVersions": {
-        "styled-components": "5"
-      }
-    },
-    "overrides": {
-      "graphql": "^16.6.0",
-      "styled-components": "^5.2.3",
-      "wonka": "^6.3.2"
-    }
-  },
   "devDependencies": {
     "@0no-co/graphql.web": "^1.0.13",
     "@actions/artifact": "^2.3.2",

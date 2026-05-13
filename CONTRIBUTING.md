@@ -171,11 +171,13 @@ changes are merged. It will always open a **"Version Packages" PR** which is kep
 documents all changes that are made and will show in its description what all new changelogs are
 going to contain for their new entries.
 
-Once a "Version Packages" PR is approved by a contributor and merged, the action will automatically
-take care of creating the release, publishing all updated packages to the npm registry, and creating
+Once a "Version Packages" PR is approved by a contributor and merged, the release workflow will
+pause at the `npm` environment approval gate. After approval, the action will automatically take care
+of creating the release, publishing all updated packages to the npm registry, and creating
 appropriate tags on GitHub too.
 
-This process is automated, but the changelog should be checked for errors.
+This process is automated, but the changelog should be checked for errors before approving the `npm`
+environment deployment.
 
 As to **when** to merge the automated PR and publish? Maybe not after every change. Typically there
 are two release batches: hotfixes and release batches. We expect that a hotfix for a single package
