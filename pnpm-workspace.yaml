@@ -2,3 +2,21 @@ packages:
   - 'packages/*'
   - 'exchanges/*'
   - '!examples/*'
+overrides:
+  graphql: '^16.6.0'
+  styled-components: '^5.2.3'
+  wonka: '^6.3.2'
+peerDependencyRules:
+  ignoreMissing:
+    - react-native
+  allowedVersions:
+    styled-components: '5'
+allowBuilds:
+  '@parcel/watcher': true
+  core-js: false
+  core-js-pure: false
+  cypress: true
+  ejs: false
+  esbuild: true
+  fsevents: false
+  husky-v4: false
