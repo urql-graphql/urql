@@ -120,12 +120,13 @@ export const getDeferredCacheForClient = (
   client: Client
 ): Cache<DeferredCacheEntry> => {
   if (!(client as ClientWithCache)._deferred) {
+    const operations$ = (client as Partial<Client>).operations$;
     const reclaim = new Set();
     const map = new Map<number, DeferredCacheEntry>();
 
-    if (client.operations$ /* not available in mocks */) {
+    if (operations$ /* not available in mocks */) {
       pipe(
-        client.operations$,
+        operations$,
         subscribe(operation => {
           if (operation.kind === 'teardown' && reclaim.has(operation.key)) {
             const state = map.get(operation.key);
@@ -149,7 +150,7 @@ export const getDeferredCacheForClient = (
         map.delete(key);
       },
       dispose(key) {
-        if (client.operations$) {
+        if (operations$) {
           reclaim.add(key);
         } else {
           const state = map.get(key);
