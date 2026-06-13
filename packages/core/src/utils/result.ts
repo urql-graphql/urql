@@ -28,9 +28,14 @@ export const makeResult = (
   result: ExecutionResult,
   response?: any
 ): OperationResult => {
+  // NOTE: Some transports (e.g. Apollo Federation's multipart subscriptions) wrap
+  // the actual result in a `payload` property. We unwrap it here, mirroring the
+  // handling in `mergeResultPatch`, so that the first delivered result is parsed
+  // correctly rather than being treated as "No Content".
+  const json = result.payload || result;
   if (
-    !('data' in result) &&
-    (!('errors' in result) || !Array.isArray(result.errors))
+    !('data' in json) &&
+    (!('errors' in json) || !Array.isArray(json.errors))
   ) {
     throw new Error('No Content');
   }
@@ -38,14 +43,14 @@ export const makeResult = (
   const defaultHasNext = operation.kind === 'subscription';
   return {
     operation,
-    data: result.data,
-    error: Array.isArray(result.errors)
+    data: json.data,
+    error: Array.isArray(json.errors)
       ? new CombinedError({
-          graphQLErrors: result.errors,
+          graphQLErrors: json.errors,
           response,
         })
       : undefined,
-    extensions: result.extensions ? { ...result.extensions } : undefined,
+    extensions: json.extensions ? { ...json.extensions } : undefined,
     hasNext: result.hasNext == null ? defaultHasNext : result.hasNext,
     stale: false,
   };

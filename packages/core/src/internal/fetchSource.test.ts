@@ -371,6 +371,96 @@ describe('on multipart/mixed', () => {
       },
     });
   });
+
+  it('unwraps the payload property on the first streamed response', async () => {
+    // Reproduction for https://github.com/urql-graphql/urql/issues/3763
+    // Some servers (e.g. Apollo Federation's multipart subscriptions) wrap each
+    // response in a `payload` property. The first response should be parsed
+    // correctly rather than being dropped as "No Content".
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'multipart/mixed';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from('\r\n---'),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  payload: {
+                    data: { count: 0, __typename: 'Subscription' },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  payload: {
+                    data: { count: 1, __typename: 'Subscription' },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const subscriptionOperation: Operation = makeOperation(
+      'subscription',
+      {
+        query: gql`
+          subscription {
+            count
+          }
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(subscriptionOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({ count: 0, __typename: 'Subscription' });
+    expect(chunks[0].error).toBeUndefined();
+
+    expect(chunks[1].data).toEqual({ count: 1, __typename: 'Subscription' });
+    expect(chunks[2].hasNext).toBe(false);
+  });
 });
 
 describe('on text/event-stream', () => {
