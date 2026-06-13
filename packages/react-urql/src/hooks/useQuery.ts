@@ -291,6 +291,15 @@ export function useQuery<
         throw result;
       }
 
+      if (suspense && result != null && !('then' in result) && result.error) {
+        const errorResult = result;
+        queueMicrotask(() => {
+          if (cache.get(request.key) === errorResult) {
+            cache.clear(request.key);
+          }
+        });
+      }
+
       return (result as OperationResult<Data, Variables>) || { fetching: true };
     },
     [cache, request]
