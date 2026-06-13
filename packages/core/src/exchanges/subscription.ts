@@ -170,13 +170,12 @@ export const subscriptionExchange =
             complete() {
               if (!isComplete) {
                 isComplete = true;
-                if (operation.kind === 'subscription') {
+                if (result && result.hasNext) {
+                  nextResult({ hasNext: false });
+                } else if (operation.kind === 'subscription') {
                   client.reexecuteOperation(
                     makeOperation('teardown', operation, operation.context)
                   );
-                }
-                if (result && result.hasNext) {
-                  nextResult({ hasNext: false });
                 }
                 observer.complete();
               }
