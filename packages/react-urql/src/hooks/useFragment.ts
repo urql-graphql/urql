@@ -292,6 +292,8 @@ const maskFragment = <Data>(
       } else if (Array.isArray(value)) {
         if (selection.selectionSet) {
           maskedData[fieldAlias] = value.map(item => {
+            if (item === null) return null;
+
             const result = maskFragment(
               item,
               selection.selectionSet as SelectionSetNode,

@@ -1,6 +1,7 @@
 import { pipe, subscribe } from 'wonka';
 import type { Client, OperationResult } from '@urql/core';
 import type { DeferredState } from './defer';
+import { resolveDeferredState } from './defer';
 
 /** A pending suspense {@link Promise} that the `useFragment` hook throws.
  *
@@ -119,20 +120,42 @@ export const getDeferredCacheForClient = (
   client: Client
 ): Cache<DeferredCacheEntry> => {
   if (!(client as ClientWithCache)._deferred) {
+    const reclaim = new Set();
     const map = new Map<number, DeferredCacheEntry>();
+
+    if (client.operations$ /* not available in mocks */) {
+      pipe(
+        client.operations$,
+        subscribe(operation => {
+          if (operation.kind === 'teardown' && reclaim.has(operation.key)) {
+            const state = map.get(operation.key);
+            if (state) resolveDeferredState(state);
+            reclaim.delete(operation.key);
+            map.delete(operation.key);
+          }
+        })
+      );
+    }
 
     (client as ClientWithCache)._deferred = {
       get(key) {
         return map.get(key);
       },
       set(key, value) {
+        reclaim.delete(key);
         map.set(key, value);
       },
       clear(key) {
         map.delete(key);
       },
       dispose(key) {
-        map.delete(key);
+        if (client.operations$) {
+          reclaim.add(key);
+        } else {
+          const state = map.get(key);
+          if (state) resolveDeferredState(state);
+          map.delete(key);
+        }
       },
     };
   }
