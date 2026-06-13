@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import type { Ref, WatchStopHandle } from 'vue';
-import { shallowRef, watchEffect } from 'vue';
+import { shallowRef, watch, watchEffect } from 'vue';
 
-import type { Subscription } from 'wonka';
 import { pipe, subscribe, onEnd } from 'wonka';
 
 import type {
@@ -292,8 +291,6 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   stops && stops.push(teardown, teardownQuery);
 
   const then: UseQueryResponse<T, V>['then'] = (onFulfilled, onRejected) => {
-    let sub: Subscription | void;
-
     const promise = new Promise<UseQueryState<T, V>>(resolve => {
       // If there's no source (e.g. the query is paused) or we already hold a
       // settled result — for instance one that the `ssrExchange` replayed
@@ -305,18 +302,17 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
       if (!source.value || (!fetching.value && !stale.value)) {
         return resolve(state);
       }
-      let hasResult = false;
-      sub = pipe(
-        source.value,
-        subscribe(() => {
-          if (!state.fetching.value && !state.stale.value) {
-            if (sub) sub.unsubscribe();
-            hasResult = true;
+
+      const stop = watch(
+        [fetching, stale],
+        ([isFetching, isStale]) => {
+          if (!isFetching && !isStale) {
+            stop();
             resolve(state);
           }
-        })
+        },
+        { flush: 'sync' }
       );
-      if (hasResult) sub.unsubscribe();
     });
 
     return promise.then(onFulfilled, onRejected);
