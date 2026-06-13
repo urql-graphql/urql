@@ -51,6 +51,7 @@ import { invalidateType } from './invalidate';
 export interface WriteResult {
   data: null | Data;
   dependencies: Dependencies;
+  refetchDependencies: Dependencies;
 }
 
 /** Writes a GraphQL response to the cache.
@@ -104,6 +105,7 @@ export const _write = (
   const result: WriteResult = {
     data: data || InMemoryData.makeData(),
     dependencies: InMemoryData.currentDependencies!,
+    refetchDependencies: InMemoryData.currentRefetchDependencies!,
   };
   const kind = store.rootFields[operation.operation];
 

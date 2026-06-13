@@ -67,8 +67,10 @@ let currentOwnership: null | WeakSet<any> = null;
 let currentDataMapping: null | WeakMap<any, any> = null;
 let currentData: null | InMemoryData = null;
 let currentOptimisticKey: null | number = null;
+let currentDataChanges: null | Dependencies = null;
 export let currentOperation: null | OperationType = null;
 export let currentDependencies: null | Dependencies = null;
+export let currentRefetchDependencies: null | Dependencies = null;
 export let currentForeignData = false;
 export let currentOptimistic = false;
 
@@ -111,6 +113,8 @@ export const initDataState = (
   currentOperation = operationType;
   currentData = data;
   currentDependencies = new Set();
+  currentRefetchDependencies = new Set();
+  currentDataChanges = new Set();
   currentOptimistic = !!isOptimistic;
   currentForeignData = !!isForeignData;
   if (process.env.NODE_ENV !== 'production') {
@@ -194,6 +198,8 @@ export const clearDataState = () => {
   currentOperation = null;
   currentData = null;
   currentDependencies = null;
+  currentRefetchDependencies = null;
+  currentDataChanges = null;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
@@ -447,6 +453,25 @@ const updateDependencies = (entityKey: string, fieldKey?: string) => {
   }
 };
 
+export const markDependencyForRefetch = (
+  entityKey: string,
+  fieldKey?: string
+) => {
+  if (entityKey !== currentData!.queryRootKey) {
+    currentRefetchDependencies!.add(entityKey);
+  } else if (fieldKey !== undefined && fieldKey !== '__typename') {
+    currentRefetchDependencies!.add(joinKeys(entityKey, fieldKey));
+  }
+};
+
+export const hasCurrentDataChange = (
+  entityKey: string,
+  fieldKey: string
+): boolean => currentDataChanges!.has(serializeKeys(entityKey, fieldKey));
+
+export const isQueryRoot = (entityKey: string): boolean =>
+  entityKey === currentData!.queryRootKey;
+
 const updatePersist = (entityKey: string, fieldKey: string) => {
   if (!currentOptimistic && currentData!.storage) {
     currentData!.persist.add(serializeKeys(entityKey, fieldKey));
@@ -518,6 +543,7 @@ export const writeRecord = (
   const existing = getNode(currentData!.records, entityKey, fieldKey);
   if (!isEqualLinkOrScalar(existing, value)) {
     updateDependencies(entityKey, fieldKey);
+    currentDataChanges!.add(serializeKeys(entityKey, fieldKey));
     updatePersist(entityKey, fieldKey);
   }
 
@@ -547,6 +573,7 @@ export const writeLink = (
   const existing = getNode(currentData!.links, entityKey, fieldKey);
   if (!isEqualLinkOrScalar(existing, link)) {
     updateDependencies(entityKey, fieldKey);
+    currentDataChanges!.add(serializeKeys(entityKey, fieldKey));
     updatePersist(entityKey, fieldKey);
   }
 

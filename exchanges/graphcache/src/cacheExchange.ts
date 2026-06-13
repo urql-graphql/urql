@@ -110,6 +110,23 @@ export const cacheExchange =
       }
     };
 
+    const collectRefetchOperations = (
+      pendingOperations: Operations,
+      dependencies: undefined | Dependencies
+    ) => {
+      if (dependencies) {
+        for (const dep of dependencies.values()) {
+          const keys = deps.get(dep);
+          if (keys) {
+            for (const key of keys.values()) {
+              requestedRefetch.add(key);
+              pendingOperations.add(key);
+            }
+          }
+        }
+      }
+    };
+
     const executePendingOperations = (
       operation: Operation,
       pendingOperations: Operations,
@@ -166,7 +183,7 @@ export const cacheExchange =
         operations.set(operation.key, operation);
         // This executes an optimistic update for mutations and registers it if necessary
         initDataState('write', store.data, operation.key, true, false);
-        const { dependencies } = _write(
+        const { dependencies, refetchDependencies } = _write(
           store,
           operation as any,
           undefined,
@@ -181,6 +198,7 @@ export const cacheExchange =
           // Update related queries
           const pendingOperations: Operations = new Set();
           collectPendingOperations(pendingOperations, dependencies);
+          collectRefetchOperations(pendingOperations, refetchDependencies);
           executePendingOperations(operation, pendingOperations, true);
           // Mark operation as optimistic
           optimistic = true;
@@ -268,14 +286,15 @@ export const cacheExchange =
         // Write the result to cache and collect all dependencies that need to be
         // updated
         initDataState('write', store.data, operation.key, false, false);
-        const writeDependencies = _write(
+        const { dependencies: writeDependencies, refetchDependencies } = _write(
           store,
           operation,
           data,
           result.error
-        ).dependencies;
+        );
         clearDataState();
         collectPendingOperations(pendingOperations, writeDependencies);
+        collectRefetchOperations(pendingOperations, refetchDependencies);
         const prevData =
           operation.kind === 'query' ? results.get(operation.key) : null;
         initDataState(

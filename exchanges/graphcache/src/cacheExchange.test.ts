@@ -480,6 +480,175 @@ describe('data dependencies', () => {
     );
   });
 
+  it('preserves same-transaction updates while invalidating for refetch', () => {
+    const eventsQuery = gql`
+      {
+        calendarEvents {
+          id
+          name
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        createCalendarEvent {
+          calendarEventInstance {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const initialEventsData = {
+      __typename: 'Query',
+      calendarEvents: [
+        {
+          __typename: 'CalendarEvent',
+          id: '1',
+          name: 'Existing event',
+        },
+      ],
+    };
+
+    const refetchedEventsData = {
+      __typename: 'Query',
+      calendarEvents: [
+        ...initialEventsData.calendarEvents,
+        {
+          __typename: 'CalendarEvent',
+          id: '2',
+          name: 'Created event',
+        },
+        {
+          __typename: 'CalendarEvent',
+          id: '3',
+          name: 'Background event',
+        },
+      ],
+    };
+
+    const mutationData = {
+      __typename: 'Mutation',
+      createCalendarEvent: {
+        __typename: 'CreateCalendarEventResult',
+        calendarEventInstance: {
+          __typename: 'CalendarEvent',
+          id: '2',
+          name: 'Created event',
+        },
+      },
+    };
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const reexec = vi
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const opQuery = client.createRequestOperation('query', {
+      key: 1,
+      query: eventsQuery,
+      variables: undefined,
+    });
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+      variables: undefined,
+    });
+
+    let queryResponses = 0;
+    const response = vi.fn((forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        queryResponses++;
+        return {
+          ...queryResponse,
+          operation: forwardOp,
+          data: queryResponses === 1 ? initialEventsData : refetchedEventsData,
+        };
+      } else if (forwardOp.key === 2) {
+        return {
+          ...queryResponse,
+          operation: forwardOp,
+          data: mutationData,
+        };
+      }
+
+      return undefined as any;
+    });
+
+    const updates = {
+      Mutation: {
+        createCalendarEvent: vi.fn((result, _args, cache) => {
+          const created = result.createCalendarEvent.calendarEventInstance;
+          const events = cache.resolve('Query', 'calendarEvents');
+          if (Array.isArray(events)) {
+            cache.link('Query', 'calendarEvents', [...events, created]);
+          }
+
+          cache.invalidate('Query', 'calendarEvents');
+        }),
+      },
+    };
+
+    const result = vi.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response), share);
+
+    pipe(
+      cacheExchange({ updates })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(opQuery);
+    next(opMutation);
+
+    const queryResults = result.mock.calls
+      .map(([res]) => res)
+      .filter(res => res.operation.key === opQuery.key);
+
+    expect(response).toHaveBeenCalledTimes(3);
+    expect(reexec.mock.calls[0][0]).toHaveProperty(
+      'context.requestPolicy',
+      'cache-and-network'
+    );
+    expect(reexec.mock.calls[1][0]).toHaveProperty(
+      'context.requestPolicy',
+      'network-only'
+    );
+
+    expect(queryResults).toHaveLength(3);
+    expect(queryResults).toContainEqual(
+      expect.objectContaining({
+        stale: true,
+        data: expect.objectContaining({
+          calendarEvents: [
+            expect.objectContaining({ id: '1' }),
+            expect.objectContaining({ id: '2' }),
+          ],
+        }),
+      })
+    );
+    expect(queryResults).toContainEqual(
+      expect.objectContaining({
+        stale: false,
+        data: expect.objectContaining({
+          calendarEvents: [
+            expect.objectContaining({ id: '1' }),
+            expect.objectContaining({ id: '2' }),
+            expect.objectContaining({ id: '3' }),
+          ],
+        }),
+      })
+    );
+  });
+
   it('does not notify related queries when a mutation update does not change the data', () => {
     vi.useFakeTimers();
 

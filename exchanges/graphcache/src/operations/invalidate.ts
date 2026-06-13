@@ -17,6 +17,15 @@ export const invalidateEntity = (
 
   for (let i = 0, l = fields.length; i < l; i++) {
     const { fieldKey } = fields[i];
+    if (
+      !InMemoryData.currentOptimistic &&
+      InMemoryData.isQueryRoot(entityKey) &&
+      InMemoryData.hasCurrentDataChange(entityKey, fieldKey)
+    ) {
+      InMemoryData.markDependencyForRefetch(entityKey, fieldKey);
+      continue;
+    }
+
     if (InMemoryData.readLink(entityKey, fieldKey) !== undefined) {
       InMemoryData.writeLink(entityKey, fieldKey, undefined);
     } else {
