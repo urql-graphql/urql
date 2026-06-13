@@ -192,6 +192,76 @@ const getPage = (
   return page;
 };
 
+/** Reorders cached pages into their logical cursor order.
+ *
+ * @remarks
+ * `inspectFields` returns a connection's pages in the order they were written
+ * to the cache, which isn't guaranteed to match the order they should be
+ * concatenated in. When two pages are in flight at the same time and the later
+ * page's response is written first, the pages would otherwise be merged in the
+ * wrong order.
+ *
+ * Each forward page continues the page whose `endCursor` equals its `after`
+ * (and each backward page the one whose `startCursor` equals its `before`), so
+ * we can place every linked page directly after the page it continues from.
+ * Pages without a known predecessor — including the base page and any page
+ * whose predecessor isn't cached — keep their original order, so this only ever
+ * corrects pages that have a resolvable place in the chain.
+ */
+type PageEntry = { args: Variables; page: Page };
+
+const sortPages = (pages: Array<PageEntry>): Array<PageEntry> => {
+  if (pages.length < 2) return pages;
+
+  // Index pages by the cursor at each of their boundaries so a page can find
+  // the page it directly continues from.
+  const byEndCursor = new Map<string, number>();
+  const byStartCursor = new Map<string, number>();
+  for (let i = 0; i < pages.length; i++) {
+    const { endCursor, startCursor } = pages[i].page.pageInfo;
+    if (typeof endCursor === 'string') byEndCursor.set(endCursor, i);
+    if (typeof startCursor === 'string') byStartCursor.set(startCursor, i);
+  }
+
+  const predecessors = new Array<number | undefined>(pages.length);
+  const children: number[][] = pages.map(() => []);
+  let hasLink = false;
+  for (let i = 0; i < pages.length; i++) {
+    const { args } = pages[i];
+    let predecessor: number | undefined;
+    if (typeof args.after === 'string') {
+      predecessor = byEndCursor.get(args.after);
+    } else if (typeof args.before === 'string') {
+      predecessor = byStartCursor.get(args.before);
+    }
+    if (predecessor !== undefined && predecessor !== i) {
+      predecessors[i] = predecessor;
+      children[predecessor].push(i);
+      hasLink = true;
+    }
+  }
+
+  if (!hasLink) return pages;
+
+  // Emit each root (a page without a known predecessor) at its original
+  // position, immediately followed by the chain of pages that continue from it.
+  const sorted: Array<PageEntry> = [];
+  const seen = new Set<number>();
+  const emit = (index: number): void => {
+    if (seen.has(index)) return;
+    seen.add(index);
+    sorted.push(pages[index]);
+    for (let i = 0; i < children[index].length; i++) emit(children[index][i]);
+  };
+  for (let i = 0; i < pages.length; i++) {
+    if (predecessors[i] === undefined) emit(i);
+  }
+  // Emit any pages left out by a cursor cycle, preserving their original order.
+  for (let i = 0; i < pages.length; i++) emit(i);
+
+  return sorted;
+};
+
 /** Creates a {@link Resolver} that combines pages that comply to the Relay pagination spec.
  *
  * @param params - A {@link PaginationParams} configuration object.
@@ -226,13 +296,7 @@ export const relayPagination = (
       return undefined;
     }
 
-    let typename: string | null = null;
-    let startEdges: NullArray<string> = [];
-    let endEdges: NullArray<string> = [];
-    let startNodes: NullArray<string> = [];
-    let endNodes: NullArray<string> = [];
-    let pageInfo: PageInfo = { ...defaultPageInfo };
-
+    const unsortedPages: Array<PageEntry> = [];
     for (let i = 0; i < size; i++) {
       const { fieldKey, arguments: args } = fieldInfos[i];
       if (args === null || !compareArgs(fieldArgs, args)) {
@@ -240,9 +304,22 @@ export const relayPagination = (
       }
 
       const page = getPage(cache, entityKey, fieldKey);
-      if (page === null) {
-        continue;
+      if (page !== null) {
+        unsortedPages.push({ args, page });
       }
+    }
+
+    const pages = sortPages(unsortedPages);
+
+    let typename: string | null = null;
+    let startEdges: NullArray<string> = [];
+    let endEdges: NullArray<string> = [];
+    let startNodes: NullArray<string> = [];
+    let endNodes: NullArray<string> = [];
+    let pageInfo: PageInfo = { ...defaultPageInfo };
+
+    for (let i = 0; i < pages.length; i++) {
+      const { args, page } = pages[i];
       if (page.nodes.length === 0 && page.edges.length === 0 && typename) {
         continue;
       }

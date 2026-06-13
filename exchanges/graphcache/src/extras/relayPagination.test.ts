@@ -262,6 +262,194 @@ describe('as resolver', () => {
     });
   });
 
+  it('keeps pages in cursor order even when a later page is written first', () => {
+    const Pagination = gql`
+      query ($cursor: String) {
+        __typename
+        items(first: 1, after: $cursor) {
+          __typename
+          edges {
+            __typename
+            node {
+              __typename
+              id
+            }
+          }
+          nodes {
+            __typename
+            id
+          }
+          pageInfo {
+            __typename
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    `;
+
+    const store = new Store({
+      resolvers: {
+        Query: {
+          items: relayPagination(),
+        },
+      },
+    });
+
+    const pageOne = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(1)],
+        nodes: [itemNode(1)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: true,
+          endCursor: '1',
+        },
+      },
+    };
+
+    const pageTwo = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(2)],
+        nodes: [itemNode(2)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: false,
+          endCursor: null,
+        },
+      },
+    };
+
+    // The second page's response is written to the cache before the first
+    // page's, as can happen when both requests are in flight at the same time.
+    write(store, { query: Pagination, variables: { cursor: '1' } }, pageTwo);
+    write(store, { query: Pagination, variables: { cursor: null } }, pageOne);
+
+    const res = query(store, { query: Pagination });
+
+    expect(res.partial).toBe(false);
+    expect(res.data).toEqual({
+      ...pageTwo,
+      items: {
+        ...pageTwo.items,
+        edges: [pageOne.items.edges[0], pageTwo.items.edges[0]],
+        nodes: [pageOne.items.nodes[0], pageTwo.items.nodes[0]],
+      },
+    });
+  });
+
+  it('keeps an orphaned page (uncached predecessor) in its original position', () => {
+    const Pagination = gql`
+      query ($cursor: String) {
+        __typename
+        items(first: 2, after: $cursor) {
+          __typename
+          edges {
+            __typename
+            node {
+              __typename
+              id
+            }
+          }
+          nodes {
+            __typename
+            id
+          }
+          pageInfo {
+            __typename
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    `;
+
+    const store = new Store({
+      resolvers: {
+        Query: {
+          items: relayPagination(),
+        },
+      },
+    });
+
+    const pageOne = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(1), itemEdge(2)],
+        nodes: [itemNode(1), itemNode(2)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: true,
+          endCursor: '2',
+        },
+      },
+    };
+
+    // Continues pageOne: `after: '2'` matches pageOne's endCursor.
+    const pageTwo = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(3), itemEdge(4)],
+        nodes: [itemNode(3), itemNode(4)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: true,
+          endCursor: '4',
+        },
+      },
+    };
+
+    // Orphan: its predecessor (endCursor '100') was never cached, so its
+    // position can't be derived and it must stay where it was written.
+    const pageThree = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(5), itemEdge(6)],
+        nodes: [itemNode(5), itemNode(6)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: false,
+          endCursor: null,
+        },
+      },
+    };
+
+    write(store, { query: Pagination, variables: { cursor: null } }, pageOne);
+    write(store, { query: Pagination, variables: { cursor: '2' } }, pageTwo);
+    write(
+      store,
+      { query: Pagination, variables: { cursor: '100' } },
+      pageThree
+    );
+
+    const res = query(store, { query: Pagination });
+
+    expect(res.partial).toBe(false);
+    expect(res.data).toHaveProperty('items.edges', [
+      pageOne.items.edges[0],
+      pageOne.items.edges[1],
+      pageTwo.items.edges[0],
+      pageTwo.items.edges[1],
+      pageThree.items.edges[0],
+      pageThree.items.edges[1],
+    ]);
+    expect(res.data).toHaveProperty('items.nodes', [
+      pageOne.items.nodes[0],
+      pageOne.items.nodes[1],
+      pageTwo.items.nodes[0],
+      pageTwo.items.nodes[1],
+      pageThree.items.nodes[0],
+      pageThree.items.nodes[1],
+    ]);
+  });
+
   it('works with simultaneous forward and backward pagination (outwards merging)', () => {
     const Pagination = gql`
       query ($first: Int, $last: Int, $before: String, $after: String) {
