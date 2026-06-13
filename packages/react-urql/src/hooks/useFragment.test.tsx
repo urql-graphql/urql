@@ -13,6 +13,7 @@ vi.mock('../context', () => {
 import React, { Suspense } from 'react';
 import { renderHook, render, act, cleanup } from '@testing-library/react';
 import { makeSubject } from 'wonka';
+import { createRequest } from '@urql/core';
 
 import { useFragment } from './useFragment';
 import { useQuery } from './useQuery';
@@ -194,6 +195,48 @@ describe('useFragment masking', () => {
         id: '1',
         name: null,
         author: null,
+      },
+    });
+  });
+
+  it('should preserve null items in nullable lists', () => {
+    const { result } = renderHook(() =>
+      useFragment({
+        query: `
+          fragment TodoFields on Todo {
+            id
+            __typename
+            assignees { id name __typename }
+          }`,
+        data: {
+          __typename: 'Todo',
+          id: '1',
+          assignees: [
+            null,
+            {
+              __typename: 'User',
+              id: '2',
+              name: 'Jovi',
+              role: 'admin',
+            },
+          ],
+        },
+      })
+    );
+
+    expect(result.current).toEqual({
+      fetching: false,
+      data: {
+        __typename: 'Todo',
+        id: '1',
+        assignees: [
+          null,
+          {
+            __typename: 'User',
+            id: '2',
+            name: 'Jovi',
+          },
+        ],
       },
     });
   });
@@ -434,5 +477,53 @@ describe('useFragment suspense', () => {
     await act(async () => {});
 
     expect(view.container.textContent).toBe('Hello');
+  });
+
+  it('disposes deferred cache entries on unmount', async () => {
+    const client = useClient() as any;
+    const subject = makeSubject<any>();
+    client.suspense = true;
+    client.executeQuery = vi.fn(() => subject.source);
+
+    const query = `
+      query {
+        song {
+          id
+          __typename
+          ...SongFields @defer
+        }
+      }
+
+      fragment SongFields on Song {
+        title
+      }
+    `;
+
+    const SongFromQuery = () => {
+      useQuery<any>({ query });
+      return null;
+    };
+
+    const view = render(
+      <Suspense fallback={<p>loading</p>}>
+        <SongFromQuery />
+      </Suspense>
+    );
+
+    act(() => {
+      subject.next({
+        data: { song: { __typename: 'Song', id: '1' } },
+        hasNext: true,
+        stale: false,
+      });
+    });
+    await act(async () => {});
+
+    const key = createRequest(query, undefined).key;
+    expect(client._deferred.get(key)).toBeTruthy();
+
+    view.unmount();
+
+    expect(client._deferred.get(key)).toBeUndefined();
   });
 });

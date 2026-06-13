@@ -388,13 +388,14 @@ export function useQuery<
       if (!hasResult) updateResult({ fetching: true });
 
       return () => {
+        deferredCache.dispose(request.key);
         cache.dispose(request.key);
         subscription.unsubscribe();
       };
     } else {
       updateResult({ fetching: false });
     }
-  }, [cache, state[0], state[2][1]]);
+  }, [cache, deferredCache, state[0], state[2][1]]);
 
   const executeQuery = React.useCallback(
     (opts?: Partial<OperationContext>) => {
