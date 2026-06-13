@@ -295,7 +295,14 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     let sub: Subscription | void;
 
     const promise = new Promise<UseQueryState<T, V>>(resolve => {
-      if (!source.value) {
+      // If there's no source (e.g. the query is paused) or we already hold a
+      // settled result — for instance one that the `ssrExchange` replayed
+      // synchronously during hydration — resolve without subscribing again.
+      // Subscribing here would re-dispatch the operation, and since the SSR
+      // result has already been consumed by the ongoing subscription, that
+      // would trigger a redundant network request.
+      // See: https://github.com/urql-graphql/urql/issues/3722
+      if (!source.value || (!fetching.value && !stale.value)) {
         return resolve(state);
       }
       let hasResult = false;
