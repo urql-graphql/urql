@@ -400,6 +400,9 @@ importers:
 
   packages/react-urql:
     dependencies:
+      '@0no-co/graphql.web':
+        specifier: ^1.0.13
+        version: 1.0.13(graphql@16.9.0)
       '@urql/core':
         specifier: workspace:^6.0.2
         version: link:../core
