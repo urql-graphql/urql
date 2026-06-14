@@ -6,6 +6,7 @@ type CacheEntry = OperationResult | Promise<unknown> | undefined;
 interface Cache {
   get(key: number): CacheEntry;
   set(key: number, value: CacheEntry): void;
+  clear(key: number): void;
   dispose(key: number): void;
 }
 
@@ -37,6 +38,10 @@ export const getCacheForClient = (client: Client): Cache => {
       set(key, value) {
         reclaim.delete(key);
         map.set(key, value);
+      },
+      clear(key) {
+        reclaim.delete(key);
+        map.delete(key);
       },
       dispose(key) {
         reclaim.add(key);

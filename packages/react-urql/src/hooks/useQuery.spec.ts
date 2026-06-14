@@ -1,9 +1,27 @@
 // @vitest-environment jsdom
 
-import { renderHook, act } from '@testing-library/react';
-import { interval, map, pipe } from 'wonka';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  act,
+  waitFor,
+} from '@testing-library/react';
+import React from 'react';
+import { delay, fromValue, interval, map, onStart, pipe } from 'wonka';
 import { RequestPolicy } from '@urql/core';
-import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  afterEach,
+  describe,
+  beforeAll,
+  Mock,
+} from 'vitest';
 
 import { useClient } from '../context';
 import { useQuery } from './useQuery';
@@ -24,7 +42,11 @@ vi.mock('../context', () => {
 });
 
 // @ts-ignore
-const client = useClient() as { executeQuery: Mock };
+const client = useClient() as {
+  executeQuery: Mock;
+  suspense?: boolean;
+  _react?: unknown;
+};
 
 const mockQuery = `
   query todo($id: ID!) {
@@ -49,7 +71,19 @@ describe('useQuery', () => {
   });
 
   beforeEach(() => {
+    client.suspense = false;
+    delete client._react;
+    client.executeQuery.mockImplementation(() =>
+      pipe(
+        interval(1000 / 60),
+        map(i => ({ data: i, error: i + 1 }))
+      )
+    );
     client.executeQuery.mockClear();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('should set fetching to true and run effect on first mount', () => {
@@ -264,6 +298,99 @@ describe('useQuery', () => {
     const [, executeQuery] = result.current;
     act(() => executeQuery());
     expect(client.executeQuery).toBeCalledTimes(2);
+  });
+
+  it('should refetch suspense errors after an error boundary is reset', async () => {
+    let requests = 0;
+    const queryError = new Error('Query failed');
+
+    class ErrorBoundary extends React.Component<
+      React.PropsWithChildren,
+      { error: Error | null }
+    > {
+      state: { error: Error | null } = { error: null };
+
+      static getDerivedStateFromError(error: Error) {
+        return { error };
+      }
+
+      render() {
+        if (this.state.error) {
+          return React.createElement(
+            'button',
+            {
+              onClick: () => this.setState({ error: null }),
+            },
+            'Try again'
+          );
+        }
+
+        return this.props.children;
+      }
+    }
+
+    const QueryUser = () => {
+      const [state] = useQuery({
+        query: mockQuery,
+        variables: mockVariables,
+      });
+
+      if (state.error) {
+        throw state.error;
+      }
+
+      return React.createElement('p', null, 'Loaded');
+    };
+
+    client.suspense = true;
+    client.executeQuery.mockImplementation(() =>
+      pipe(
+        fromValue({ error: queryError }),
+        delay(10),
+        onStart(() => {
+          requests++;
+        })
+      )
+    );
+
+    const preventQueryError = (event: ErrorEvent) => {
+      if (event.error === queryError) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('error', preventQueryError);
+
+    try {
+      render(
+        React.createElement(
+          ErrorBoundary,
+          null,
+          React.createElement(
+            React.Suspense,
+            { fallback: React.createElement('p', null, 'Loading') },
+            React.createElement(QueryUser)
+          )
+        )
+      );
+
+      expect(screen.getByText('Loading')).toBeTruthy();
+      const retryButton = await screen.findByRole('button', {
+        name: 'Try again',
+      });
+      const requestsBeforeRetry = requests;
+      expect(requestsBeforeRetry).toBeGreaterThan(0);
+
+      fireEvent.click(retryButton);
+
+      expect(screen.getByText('Loading')).toBeTruthy();
+      await screen.findByRole('button', { name: 'Try again' });
+      await waitFor(() =>
+        expect(requests).toBeGreaterThan(requestsBeforeRetry)
+      );
+    } finally {
+      window.removeEventListener('error', preventQueryError);
+    }
   });
 
   it('should pause executing the query if pause is true', () => {
