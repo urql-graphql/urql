@@ -99,6 +99,57 @@ describe('useQuery', () => {
     expect(query.data.value).toEqual({ test: true });
   });
 
+  it('does not subscribe to queries again when awaited', async () => {
+    const subject = makeSubject<any>();
+    let subscriptions = 0;
+    const source = ((sink: any) => {
+      subscriptions++;
+      return subject.source(sink);
+    }) as OperationResultSource<OperationResult>;
+
+    const executeQuery = vi
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(() => source);
+
+    const query = useQuery({
+      query: `{ test }`,
+    });
+
+    expect(subscriptions).toBe(1);
+
+    const promise = query.then(value => value);
+
+    expect(subscriptions).toBe(1);
+
+    subject.next({ data: { test: true } });
+
+    const result = await promise;
+
+    expect(executeQuery).toHaveBeenCalledTimes(1);
+    expect(subscriptions).toBe(1);
+    expect(result.fetching.value).toBe(false);
+    expect(result.data.value).toEqual({ test: true });
+  });
+
+  it('resolves as a promise-like after the query has already settled', async () => {
+    const subject = makeSubject<any>();
+    vi.spyOn(client, 'executeQuery').mockImplementation(
+      () => subject.source as OperationResultSource<OperationResult>
+    );
+
+    const query = useQuery({
+      query: `{ test }`,
+    });
+
+    subject.next({ data: { test: true } });
+
+    expect(query.fetching.value).toBe(false);
+
+    const result = await query;
+
+    expect(result.data.value).toEqual({ test: true });
+  });
+
   it('runs queries as a promise-like that resolves even when the query changes', async () => {
     const doc = ref('{ test }');
 
