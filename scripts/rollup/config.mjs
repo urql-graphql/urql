@@ -34,6 +34,14 @@ const input = settings.sources.reduce((acc, source) => {
     const rel = relative(source.dir, process.cwd());
     plugins.push({
       async writeBundle() {
+        // NOTE: This package.json only exists to support legacy, file-based
+        // resolution for the subpath (e.g. `@urql/exchange-graphcache/extras`).
+        // Bundlers and runtimes that understand the `exports` field resolve the
+        // subpath through the root package.json's `exports` map instead. We must
+        // not emit an `exports` field here, since its targets point at the parent
+        // `dist/` directory (`../dist/...`) and the spec requires every `exports`
+        // target to begin with `./`. Metro (Expo/React Native) validates this and
+        // warns otherwise. See https://github.com/urql-graphql/urql/issues/3779
         const packageJson = JSON.stringify(
           {
             name: source.name,
@@ -43,15 +51,6 @@ const input = settings.sources.reduce((acc, source) => {
             module: join(rel, source.module),
             types: join(rel, source.types),
             source: join(rel, source.source),
-            exports: {
-              '.': {
-                types: join(rel, source.types),
-                import: join(rel, source.module),
-                require: join(rel, source.main),
-                source: join(rel, source.source),
-              },
-              './package.json': './package.json',
-            },
           },
           null,
           2
