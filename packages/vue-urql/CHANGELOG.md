@@ -1,5 +1,16 @@
 # @urql/vue
 
+## 2.1.1
+
+### Patch Changes
+
+- Stop `useQuery` from re-executing (and hitting the network) during SSR hydration when it's awaited for Suspense. Awaiting the query subscribed to the operation a second time, which re-dispatched it after the `ssrExchange` result had already been consumed, triggering a redundant network request even with `staleWhileRevalidate: false`. The awaited promise now resolves with the already-settled result instead of re-subscribing
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3884](https://github.com/urql-graphql/urql/pull/3884))
+- ⚠️ Fix `await useQuery()` in Vue to wait on the composable's existing reactive state instead of creating an additional query source subscription
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3890](https://github.com/urql-graphql/urql/pull/3890))
+- Updated dependencies (See [#3879](https://github.com/urql-graphql/urql/pull/3879), [#3881](https://github.com/urql-graphql/urql/pull/3881), [#3885](https://github.com/urql-graphql/urql/pull/3885), and [#3886](https://github.com/urql-graphql/urql/pull/3886))
+  - @urql/core@6.0.2
+
 ## 2.1.0
 
 ### Minor Changes

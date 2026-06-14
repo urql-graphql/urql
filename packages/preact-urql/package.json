@@ -59,7 +59,7 @@
     "preact": ">= 10.0.0"
   },
   "dependencies": {
-    "@urql/core": "workspace:^6.0.1",
+    "@urql/core": "workspace:^6.0.2",
     "wonka": "^6.3.2"
   },
   "publishConfig": {

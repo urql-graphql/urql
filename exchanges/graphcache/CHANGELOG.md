@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 9.0.1
+
+### Patch Changes
+
+- ⚠️ Fix `relayPagination` merging pages in the order they were written to the cache rather than in their cursor order. When multiple pages were requested concurrently and a later page's response was written before an earlier one's, the combined `edges`/`nodes` could transiently end up in the wrong order. Pages are now reordered along their cursor chain (via `after`/`endCursor` and `before`/`startCursor`) before being concatenated, while pages without a known predecessor keep their original order
+  Submitted by [@moriyuu](https://github.com/moriyuu) (See [#3877](https://github.com/urql-graphql/urql/pull/3877))
+- Remove the invalid `exports` field from the generated subpath `package.json` files (e.g. `@urql/exchange-graphcache/extras`, `@urql/exchange-graphcache/default-storage`, `@urql/core/internal`, `@urql/next/rsc`). These targets pointed at the parent `dist/` directory (`../dist/...`), which violates the Node.js package-exports spec requirement that every `exports` target begin with `./`. Metro (Expo 53 / React Native 0.79) validates this and logged a warning for every affected package. Subpath resolution continues to work: `exports`-aware bundlers resolve through the root `package.json`, while legacy resolution relies on the `main`/`module`/`types` fields that remain in place
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3886](https://github.com/urql-graphql/urql/pull/3886))
+- Updated dependencies (See [#3879](https://github.com/urql-graphql/urql/pull/3879), [#3881](https://github.com/urql-graphql/urql/pull/3881), [#3885](https://github.com/urql-graphql/urql/pull/3885), and [#3886](https://github.com/urql-graphql/urql/pull/3886))
+  - @urql/core@6.0.2
+
 ## 9.0.0
 
 ### Major Changes

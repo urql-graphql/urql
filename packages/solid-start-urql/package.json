@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@solid-primitives/utils": "^6.2.1",
-    "@urql/core": "workspace:^6.0.1",
+    "@urql/core": "workspace:^6.0.2",
     "@urql/solid": "workspace:^1.0.1",
     "wonka": "^6.3.2"
   },

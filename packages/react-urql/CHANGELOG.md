@@ -1,5 +1,14 @@
 # urql
 
+## 5.0.3
+
+### Patch Changes
+
+- ⚠️ Fix React Suspense error-boundary resets reusing cached error results instead of retrying the query
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3887](https://github.com/urql-graphql/urql/pull/3887))
+- Updated dependencies (See [#3879](https://github.com/urql-graphql/urql/pull/3879), [#3881](https://github.com/urql-graphql/urql/pull/3881), [#3885](https://github.com/urql-graphql/urql/pull/3885), and [#3886](https://github.com/urql-graphql/urql/pull/3886))
+  - @urql/core@6.0.2
+
 ## 5.0.2
 
 ### Patch Changes

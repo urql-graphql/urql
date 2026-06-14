@@ -1,5 +1,18 @@
 # @urql/core
 
+## 6.0.2
+
+### Patch Changes
+
+- Prevent `mapExchange` from forwarding async-mapped operations after their teardown has already been received
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3879](https://github.com/urql-graphql/urql/pull/3879))
+- Unwrap the `payload` property in `makeResult` so that the first incremental/multipart response is parsed correctly. Previously, transports that wrap each result in a `payload` property (e.g. Apollo Federation's multipart subscriptions) would have their first response dropped as "No Content", while subsequent responses were handled correctly by `mergeResultPatch`
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3881](https://github.com/urql-graphql/urql/pull/3881))
+- Emit terminal subscription results before ending completed subscriptions, preventing teardown races from dropping GraphQL errors
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3885](https://github.com/urql-graphql/urql/pull/3885))
+- Remove the invalid `exports` field from the generated subpath `package.json` files (e.g. `@urql/exchange-graphcache/extras`, `@urql/exchange-graphcache/default-storage`, `@urql/core/internal`, `@urql/next/rsc`). These targets pointed at the parent `dist/` directory (`../dist/...`), which violates the Node.js package-exports spec requirement that every `exports` target begin with `./`. Metro (Expo 53 / React Native 0.79) validates this and logged a warning for every affected package. Subpath resolution continues to work: `exports`-aware bundlers resolve through the root `package.json`, while legacy resolution relies on the `main`/`module`/`types` fields that remain in place
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3886](https://github.com/urql-graphql/urql/pull/3886))
+
 ## 6.0.1
 
 ### Patch Changes
