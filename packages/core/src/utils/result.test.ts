@@ -38,6 +38,41 @@ describe('makeResult', () => {
     const result = makeResult(subscriptionOperation, origResult);
     expect(result.hasNext).toBe(true);
   });
+
+  it('unwraps the payload property on the first result', () => {
+    const origResult = {
+      payload: {
+        data: {
+          __typename: 'Subscription',
+          event: 1,
+        },
+        errors: ['error message'],
+        extensions: {
+          extensionKey: 'extensionValue',
+        },
+      },
+    };
+
+    const result = makeResult(subscriptionOperation, origResult);
+
+    expect(result.data).toEqual({
+      __typename: 'Subscription',
+      event: 1,
+    });
+    expect(result.extensions).toEqual({
+      extensionKey: 'extensionValue',
+    });
+    expect(result.error).toMatchInlineSnapshot(
+      `[CombinedError: [GraphQL] error message]`
+    );
+    expect(result.hasNext).toBe(true);
+  });
+
+  it('throws "No Content" for an empty payload property', () => {
+    expect(() =>
+      makeResult(subscriptionOperation, { payload: {} })
+    ).toThrowError('No Content');
+  });
 });
 
 describe('mergeResultPatch (defer/stream latest', () => {
