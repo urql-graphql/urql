@@ -8,8 +8,8 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@urql/core": "^6.0.1",
-    "@urql/vue": "^2.1.0",
+    "@urql/core": "^6.0.2",
+    "@urql/vue": "^2.1.1",
     "graphql": "^16.6.0",
     "vue": "^3.2.47"
   },
