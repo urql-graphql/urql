@@ -1,4 +1,13 @@
-import { map, tap, pipe, fromValue, toArray, toPromise } from 'wonka';
+import {
+  map,
+  tap,
+  pipe,
+  fromValue,
+  makeSubject,
+  subscribe,
+  toArray,
+  toPromise,
+} from 'wonka';
 import { vi, expect, describe, it } from 'vitest';
 
 import { Client } from '../client';
@@ -103,6 +112,53 @@ describe('onOperation', () => {
     expect(onOperation).toBeCalledWith(queryOperation);
     expect(onExchangeResult).toBeCalledTimes(1);
     expect(onExchangeResult).toBeCalledWith(mockOperation);
+  });
+
+  it('does not delay teardowns or forward operations cancelled while mapping', async () => {
+    const teardownOperation = makeOperation(
+      'teardown',
+      queryOperation,
+      queryOperation.context
+    );
+    const onOperation = vi.fn(
+      operation =>
+        new Promise<Operation>(resolve => {
+          setTimeout(() => resolve(operation), 0);
+        })
+    );
+    const onExchangeResult = vi.fn();
+    const onResult = vi.fn();
+    const { source, next } = makeSubject<Operation>();
+
+    const exchangeArgs = {
+      forward: op$ =>
+        pipe(
+          op$,
+          tap(onExchangeResult),
+          map((operation: Operation) => makeResult(operation, { data: null }))
+        ),
+      client: {} as Client,
+      dispatchDebug: () => null,
+    };
+
+    pipe(
+      source,
+      mapExchange({ onOperation })(exchangeArgs),
+      subscribe(onResult)
+    );
+
+    next(queryOperation);
+    next(teardownOperation);
+
+    expect(onOperation).toBeCalledTimes(1);
+    expect(onOperation).toBeCalledWith(queryOperation);
+    expect(onExchangeResult).toBeCalledTimes(1);
+    expect(onExchangeResult).toBeCalledWith(teardownOperation);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(onExchangeResult).toBeCalledTimes(1);
+    expect(onResult).toBeCalledTimes(1);
   });
 });
 

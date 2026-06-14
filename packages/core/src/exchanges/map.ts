@@ -1,4 +1,11 @@
-import { mergeMap, fromValue, fromPromise, pipe } from 'wonka';
+import {
+  filter,
+  mergeMap,
+  fromValue,
+  fromPromise,
+  pipe,
+  takeUntil,
+} from 'wonka';
 import type { Operation, OperationResult, Exchange } from '../types';
 import type { CombinedError } from '../utils';
 
@@ -18,6 +25,8 @@ export interface MapExchangeOpts {
    * Hint: The callback may also be promisified and return a new {@link Operation} asynchronously,
    * provided you place your {@link mapExchange} after all synchronous {@link Exchange | Exchanges},
    * like after your `cacheExchange`.
+   *
+   * Teardown operations are forwarded immediately and don't invoke this callback.
    */
   onOperation?(operation: Operation): Promise<Operation> | Operation | void;
   /** Accepts a callback for incoming `OperationResult`s.
@@ -77,10 +86,22 @@ export const mapExchange = ({
         pipe(
           ops$,
           mergeMap(operation => {
+            if (operation.kind === 'teardown') return fromValue(operation);
+
             const newOperation =
               (onOperation && onOperation(operation)) || operation;
             return 'then' in newOperation
-              ? fromPromise(newOperation)
+              ? pipe(
+                  fromPromise(newOperation),
+                  takeUntil(
+                    pipe(
+                      ops$,
+                      filter(
+                        op => op.kind === 'teardown' && op.key === operation.key
+                      )
+                    )
+                  )
+                )
               : fromValue(newOperation);
           })
         ),
