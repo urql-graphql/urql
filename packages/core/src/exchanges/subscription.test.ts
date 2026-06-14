@@ -3,6 +3,7 @@ import { vi, expect, it } from 'vitest';
 import {
   empty,
   publish,
+  subscribe,
   fromValue,
   pipe,
   Source,
@@ -10,7 +11,7 @@ import {
   toPromise,
 } from 'wonka';
 
-import { Client } from '../client';
+import { Client, createClient } from '../client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
 import { stringifyDocument } from '../utils';
 import { OperationResult } from '../types';
@@ -79,6 +80,39 @@ it('should tear down the operation if the source subscription ends', async () =>
 
   expect(unsubscribe).not.toHaveBeenCalled();
   expect(reexecuteOperation).toHaveBeenCalled();
+});
+
+it('emits terminal subscription results before ending completed subscriptions', async () => {
+  const forwardSubscription = vi.fn<SubscriptionForwarder>(() => ({
+    subscribe(observer) {
+      observer.next({ errors: [new Error('boom')] });
+      observer.complete();
+      return { unsubscribe: vi.fn() };
+    },
+  }));
+
+  const client = createClient({
+    url: 'test',
+    exchanges: [subscriptionExchange({ forwardSubscription })],
+  });
+
+  const results: OperationResult[] = [];
+  pipe(
+    client.executeRequestOperation(subscriptionOperation),
+    subscribe(result => {
+      results.push(result);
+    })
+  );
+
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(forwardSubscription).toHaveBeenCalledTimes(1);
+  expect(results).toHaveLength(2);
+  expect(results[0]).toHaveProperty('hasNext', true);
+  expect(results[0].error?.message).toContain('boom');
+  expect(results[1]).toHaveProperty('hasNext', false);
+  expect(results[1].error?.message).toContain('boom');
 });
 
 it('should allow providing a custom isSubscriptionOperation implementation', async () => {
