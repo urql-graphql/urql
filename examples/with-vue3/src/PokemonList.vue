@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { gql, useQuery } from '@urql/vue';
 
 export default {
@@ -26,7 +26,7 @@ export default {
           }
         }
       `,
-      variables: { skip },
+      variables: () => ({ skip: skip.value }),
     });
 
     return {

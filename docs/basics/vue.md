@@ -214,6 +214,9 @@ All inputs that are passed to `useQuery` may also be [reactive
 state](https://v3.vuejs.org/guide/reactivity-fundamentals.html). This means that both the inputs and
 outputs of `useQuery` are reactive and may change over time.
 
+When composing variables from refs, make `variables` itself reactive by passing a getter or computed
+ref. A plain object containing refs will be sent as that plain object.
+
 ```jsx
 <template>
   <ul v-if="data">
@@ -223,11 +226,13 @@ outputs of `useQuery` are reactive and may change over time.
 </template>
 
 <script>
+import { ref } from 'vue';
 import { gql, useQuery } from '@urql/vue';
 
 export default {
   setup() {
     const from = ref(0);
+    const variables = () => ({ from: from.value, limit: 10 });
 
     const result = useQuery({
       query: gql`
@@ -238,7 +243,7 @@ export default {
           }
         }
       `,
-      variables: { from, limit: 10 }
+      variables
     });
 
     return {
@@ -267,13 +272,20 @@ prevent `null` variables from being executed. We can do this by computing `pause
 whenever these variables are falsy:
 
 ```js
-import { reactive } from 'vue'
+import { computed } from 'vue';
 import { gql, useQuery } from '@urql/vue';
 
 export default {
   props: ['from', 'limit'],
-  setup({ from, limit }) {
-    const shouldPause = computed(() => from == null || limit == null);
+  setup(props) {
+    const variables = () => ({
+      from: props.from,
+      limit: props.limit,
+    });
+    const shouldPause = computed(
+      () => props.from == null || props.limit == null
+    );
+
     return useQuery({
       query: gql`
         query ($from: Int!, $limit: Int!) {
@@ -283,7 +295,7 @@ export default {
           }
         }
       `,
-      variables: { from, limit },
+      variables,
       pause: shouldPause
     });
   }
