@@ -1,6 +1,7 @@
 {
   "name": "@urql/exchange-graphcache-tachometer-benchmark",
   "version": "1.0.0",
+  "private": true,
   "description": "Comprehensive Tachometer benchmarks for urql/graphcache",
   "main": "index.js",
   "scripts": {
