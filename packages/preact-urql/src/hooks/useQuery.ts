@@ -22,10 +22,12 @@ import type {
   OperationResult,
   Operation,
 } from '@urql/core';
+import { makeDeferredState, updateDeferredResult } from '@urql/core';
 
 import { useClient } from '../context';
 import { useSource } from './useSource';
 import { useRequest } from './useRequest';
+import { getDeferredCacheForClient } from './cache';
 import { initialState } from './constants';
 
 /** Input arguments for the {@link useQuery} hook.
@@ -283,6 +285,21 @@ export function useQuery<
 
         // Create a suspense source and cache it for the given request
         if (suspense) {
+          // Install stable promises for missing fields inside `@defer`
+          // selections so masked fragment boundaries can resolve directly
+          // from the stream as later patches arrive.
+          const deferredCache = getDeferredCacheForClient(client);
+          let deferredState = deferredCache.get(request.key);
+          if (!deferredState) {
+            deferredState = makeDeferredState();
+            deferredCache.set(request.key, deferredState);
+          }
+
+          source = pipe(
+            source,
+            map(result => updateDeferredResult(request, result, deferredState!))
+          );
+
           source = toSuspenseSource(source);
           if (typeof window !== 'undefined') {
             sources.set(request.key, source);
@@ -350,6 +367,11 @@ export function useQuery<
   useEffect(() => {
     sources.delete(request.key); // Delete any cached suspense source
     if (!isSuspense(client, args.context)) update(query$);
+    return () => {
+      // Reclaim the operation's deferred state (resolving any still-pending
+      // promises) once it tears down, so no suspended boundary hangs.
+      getDeferredCacheForClient(client).dispose(request.key);
+    };
   }, [update, client, query$, request, args.context]);
 
   if (isSuspense(client, args.context)) {

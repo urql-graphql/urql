@@ -1,3 +1,4 @@
+export * from './useFragment';
 export * from './useQuery';
 export * from './useMutation';
 export * from './useSubscription';

@@ -18,12 +18,12 @@ import type {
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { getCacheForClient, getDeferredCacheForClient } from './cache';
-import type { DeferredState } from './defer';
+import type { DeferredState } from '@urql/core';
 import {
   makeDeferredState,
   resolveDeferredState,
   updateDeferredResult,
-} from './defer';
+} from '@urql/core';
 
 import {
   deferDispatch,
@@ -248,13 +248,11 @@ export function useQuery<
   const source = React.useMemo(() => {
     if (args.pause) return null;
 
-    let source: Source<OperationResult<Data, Variables>> = client.executeQuery(
-      request,
-      {
+    const source: Source<OperationResult<Data, Variables>> =
+      client.executeQuery(request, {
         requestPolicy: args.requestPolicy,
         ...args.context,
-      }
-    );
+      });
 
     if (suspense) {
       let deferredState = deferredCache.get(request.key);

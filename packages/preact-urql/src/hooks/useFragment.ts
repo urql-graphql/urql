@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import * as React from 'react';
-import type { FragmentDefinitionNode } from '@0no-co/graphql.web';
-import { Kind } from '@0no-co/graphql.web';
+import { useMemo, useCallback, useState } from 'preact/hooks';
 
 import type {
   GraphQLRequestParams,
@@ -18,8 +16,6 @@ import { useRequest } from './useRequest';
 import type { FragmentPromise } from './cache';
 import { getFragmentCacheForClient } from './cache';
 
-import { hasDepsChanged } from './state';
-
 /** Input arguments for the {@link useFragment} hook. */
 export type UseFragmentArgs<Data = any> = {
   /** Partial {@link OperationContext} used to configure this hook.
@@ -29,15 +25,6 @@ export type UseFragmentArgs<Data = any> = {
    * so only `context.suspense` is read here. When set, it overrides the
    * {@link Client.suspense} flag for this hook and controls whether it suspends
    * while a fragment’s deferred data is still incomplete.
-   *
-   * @example
-   * ```ts
-   * const result = useFragment({
-   *   query,
-   *   data,
-   *   context: { suspense: true },
-   * });
-   * ```
    */
   context?: Partial<OperationContext>;
   /** A GraphQL document to mask this fragment against.
@@ -55,12 +42,7 @@ export type UseFragmentArgs<Data = any> = {
   name?: string;
 };
 
-/** State of the current query, your {@link useFragment} hook is executing.
- *
- * @remarks
- * `UseFragmentState` is returned by {@link useFragment} and
- * gives you the masked data for the fragment.
- */
+/** State of the masked fragment your {@link useFragment} hook returns. */
 export interface UseFragmentState<Data> {
   /** Indicates whether `useFragment` is waiting for a new result.
    *
@@ -106,9 +88,14 @@ const getFragmentCacheKey = (
   return key;
 };
 
+const hasDepsChanged = <T extends { length: number }>(a: T, b: T) => {
+  for (let i = 0, l = b.length; i < l; i++) if (a[i] !== b[i]) return true;
+  return false;
+};
+
 /** Hook to mask a GraphQL Fragment given its data. (BETA)
  *
- * @param args - a {@link UseFragmentArgs} object, to pass a `fragment` and `data`.
+ * @param args - a {@link UseFragmentArgs} object, to pass a `query` and `data`.
  * @returns a {@link UseFragmentState} result.
  *
  * @remarks
@@ -123,7 +110,7 @@ const getFragmentCacheKey = (
  *
  * @example
  * ```ts
- * import { gql, useFragment } from 'urql';
+ * import { gql, useFragment } from '@urql/preact';
  *
  * const TodoFields = gql`
  *   fragment TodoFields on Todo { id name }
@@ -147,13 +134,15 @@ export function useFragment<Data>(
 
   const request = useRequest(args.query, EMPTY_VARIABLES);
 
-  const fragment = React.useMemo(() => {
-    return request.query.definitions.find(
-      x =>
-        x.kind === Kind.FRAGMENT_DEFINITION &&
-        ((args.name && x.name.value === args.name) || !args.name)
-    ) as FragmentDefinitionNode | undefined;
-  }, [request.query, args.name]);
+  const fragments = useMemo(
+    () => getFragments(request.query.definitions),
+    [request.query]
+  );
+
+  const fragment = useMemo(
+    () => (args.name ? fragments[args.name] : Object.values(fragments)[0]),
+    [fragments, args.name]
+  );
 
   if (!fragment) {
     throw new Error(
@@ -163,12 +152,7 @@ export function useFragment<Data>(
     );
   }
 
-  const fragments = React.useMemo(
-    () => getFragments(request.query.definitions),
-    [request.query]
-  );
-
-  const getSnapshot = React.useCallback(
+  const getSnapshot = useCallback(
     (
       request: GraphQLRequest<Data, AnyVariables>,
       data: Data | null,
@@ -206,7 +190,7 @@ export function useFragment<Data>(
         throw newResult.pending;
       } else if (cached) {
         // We're still waiting on data and already suspended once; re-throw the
-        // same promise so React keeps showing the suspense boundary's fallback.
+        // same promise so Preact keeps showing the suspense boundary's fallback.
         throw cached;
       } else {
         let _resolve!: () => void;
@@ -223,7 +207,7 @@ export function useFragment<Data>(
 
   const deps = [client, request, args.data, suspense] as const;
 
-  const [state, setState] = React.useState(
+  const [state, setState] = useState(
     () => [getSnapshot(request, args.data, suspense), deps] as const
   );
 

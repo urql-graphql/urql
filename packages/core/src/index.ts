@@ -16,3 +16,22 @@ export {
   makeOperation,
   getOperationName,
 } from './utils';
+
+export {
+  maskFragment,
+  getFragments,
+  makeDeferredState,
+  resolveDeferredState,
+  isDeferredPromise,
+  updateDeferredResult,
+  makeCache,
+  getDeferredCacheForClient,
+} from './utils';
+
+export type {
+  FragmentMap,
+  MaskFragmentResult,
+  DeferredState,
+  DeferredPromise,
+  Cache,
+} from './utils';
