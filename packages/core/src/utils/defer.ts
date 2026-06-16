@@ -62,7 +62,7 @@ export const isDeferredPromise = (value: any): value is DeferredPromise =>
  *
  * @beta
  */
-export const resolveDeferredState = (state: DeferredState) => {
+export const resolveDeferredState = (state: DeferredState): void => {
   state.promises.forEach(promise => promise._resolve());
   state.promises.clear();
 };
