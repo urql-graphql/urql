@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import type { Source } from 'wonka';
-import { pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
+import { pipe, subscribe, onEnd, onPush, takeWhile, map } from 'wonka';
 import * as React from 'react';
 
 import type {
@@ -17,7 +17,13 @@ import type {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { getCacheForClient } from './cache';
+import { getCacheForClient, getDeferredCacheForClient } from './cache';
+import type { DeferredState } from '@urql/core';
+import {
+  makeDeferredState,
+  resolveDeferredState,
+  updateDeferredResult,
+} from '@urql/core';
 
 import {
   deferDispatch,
@@ -223,29 +229,47 @@ export function useQuery<
 >(args: UseQueryArgs<Variables, Data>): UseQueryResponse<Data, Variables> {
   const client = useClient();
   const cache = getCacheForClient(client);
+  const deferredCache = getDeferredCacheForClient(client);
   const suspense = isSuspense(client, args.context);
   const request = useRequest(args.query, args.variables as Variables);
+
+  const wrapSuspenseSource = React.useCallback(
+    (source: Source<OperationResult<Data, Variables>>, state: DeferredState) =>
+      pipe(
+        source,
+        map(result => updateDeferredResult(request, result, state)),
+        onPush(result => {
+          cache.set(request.key, result);
+        })
+      ),
+    [cache, request]
+  );
 
   const source = React.useMemo(() => {
     if (args.pause) return null;
 
-    const source = client.executeQuery(request, {
-      requestPolicy: args.requestPolicy,
-      ...args.context,
-    });
+    const source: Source<OperationResult<Data, Variables>> =
+      client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+        ...args.context,
+      });
 
-    return suspense
-      ? pipe(
-          source,
-          onPush(result => {
-            cache.set(request.key, result);
-          })
-        )
-      : source;
+    if (suspense) {
+      let deferredState = deferredCache.get(request.key);
+      if (!deferredState) {
+        deferredState = makeDeferredState();
+        deferredCache.set(request.key, deferredState);
+      }
+
+      return wrapSuspenseSource(source, deferredState);
+    }
+
+    return source;
   }, [
-    cache,
     client,
+    deferredCache,
     request,
+    wrapSuspenseSource,
     suspense,
     args.pause,
     args.requestPolicy,
@@ -365,13 +389,14 @@ export function useQuery<
       if (!hasResult) updateResult({ fetching: true });
 
       return () => {
+        deferredCache.dispose(request.key);
         cache.dispose(request.key);
         subscription.unsubscribe();
       };
     } else {
       updateResult({ fetching: false });
     }
-  }, [cache, state[0], state[2][1]]);
+  }, [cache, deferredCache, state[0], state[2][1]]);
 
   const executeQuery = React.useCallback(
     (opts?: Partial<OperationContext>) => {
@@ -382,21 +407,26 @@ export function useQuery<
       };
 
       deferDispatch(setState, state => {
-        const source = suspense
-          ? pipe(
-              client.executeQuery(request, context),
-              onPush(result => {
-                cache.set(request.key, result);
-              })
-            )
-          : client.executeQuery(request, context);
+        let source: Source<OperationResult<Data, Variables>> =
+          client.executeQuery(request, context);
+        if (suspense) {
+          const currentDeferredState = deferredCache.get(request.key);
+          if (currentDeferredState) resolveDeferredState(currentDeferredState);
+
+          const deferredState = makeDeferredState();
+          deferredCache.set(request.key, deferredState);
+
+          source = wrapSuspenseSource(source, deferredState);
+        }
+
         return [source, state[1], deps];
       });
     },
     [
       client,
-      cache,
+      deferredCache,
       request,
+      wrapSuspenseSource,
       suspense,
       args.requestPolicy,
       args.context,
