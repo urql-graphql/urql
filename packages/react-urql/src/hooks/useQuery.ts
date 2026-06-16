@@ -18,6 +18,7 @@ import type {
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { getCacheForClient, getDeferredCacheForClient } from './cache';
+import type { DeferredState } from './defer';
 import {
   makeDeferredState,
   resolveDeferredState,
@@ -232,6 +233,18 @@ export function useQuery<
   const suspense = isSuspense(client, args.context);
   const request = useRequest(args.query, args.variables as Variables);
 
+  const wrapSuspenseSource = React.useCallback(
+    (source: Source<OperationResult<Data, Variables>>, state: DeferredState) =>
+      pipe(
+        source,
+        map(result => updateDeferredResult(request, result, state)),
+        onPush(result => {
+          cache.set(request.key, result);
+        })
+      ),
+    [cache, request]
+  );
+
   const source = React.useMemo(() => {
     if (args.pause) return null;
 
@@ -250,25 +263,15 @@ export function useQuery<
         deferredCache.set(request.key, deferredState);
       }
 
-      source = pipe(
-        source,
-        map(result => updateDeferredResult(request, result, deferredState!))
-      );
-
-      return pipe(
-        source,
-        onPush(result => {
-          cache.set(request.key, result);
-        })
-      );
+      return wrapSuspenseSource(source, deferredState);
     }
 
     return source;
   }, [
-    cache,
     client,
     deferredCache,
     request,
+    wrapSuspenseSource,
     suspense,
     args.pause,
     args.requestPolicy,
@@ -415,13 +418,7 @@ export function useQuery<
           const deferredState = makeDeferredState();
           deferredCache.set(request.key, deferredState);
 
-          source = pipe(
-            source,
-            map(result => updateDeferredResult(request, result, deferredState)),
-            onPush(result => {
-              cache.set(request.key, result);
-            })
-          );
+          source = wrapSuspenseSource(source, deferredState);
         }
 
         return [source, state[1], deps];
@@ -429,9 +426,9 @@ export function useQuery<
     },
     [
       client,
-      cache,
       deferredCache,
       request,
+      wrapSuspenseSource,
       suspense,
       args.requestPolicy,
       args.context,

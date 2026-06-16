@@ -21,7 +21,7 @@ type FragmentCacheEntry = FragmentPromise | undefined;
 type DeferredCacheEntry = DeferredState | undefined;
 
 interface Cache<Entry> {
-  get(key: number): Entry;
+  get(key: number): Entry | undefined;
   set(key: number, value: Entry): void;
   clear(key: number): void;
   dispose(key: number): void;
@@ -33,39 +33,59 @@ interface ClientWithCache extends Client {
   _react?: Cache<CacheEntry>;
 }
 
+const makeCache = <Entry>(
+  client?: Client,
+  onClear?: (value: Entry) => void,
+  deferDispose?: boolean
+): Cache<Entry> => {
+  const operations$ = client && (client as Partial<Client>).operations$;
+  const reclaim = new Set<number>();
+  const map = new Map<number, Entry>();
+
+  const clear = (key: number) => {
+    const value = map.get(key);
+    if (value !== undefined && onClear) onClear(value);
+    reclaim.delete(key);
+    map.delete(key);
+  };
+
+  if (operations$ /* not available in mocks */) {
+    pipe(
+      operations$,
+      subscribe(operation => {
+        if (operation.kind === 'teardown' && reclaim.has(operation.key)) {
+          clear(operation.key);
+        }
+      })
+    );
+  }
+
+  return {
+    get(key) {
+      return map.get(key);
+    },
+    set(key, value) {
+      reclaim.delete(key);
+      map.set(key, value);
+    },
+    clear,
+    dispose(key) {
+      if (operations$ || deferDispose) {
+        reclaim.add(key);
+      } else {
+        clear(key);
+      }
+    },
+  };
+};
+
 export const getCacheForClient = (client: Client): Cache<CacheEntry> => {
   if (!(client as ClientWithCache)._react) {
-    const reclaim = new Set();
-    const map = new Map<number, CacheEntry>();
-
-    if (client.operations$ /* not available in mocks */) {
-      pipe(
-        client.operations$,
-        subscribe(operation => {
-          if (operation.kind === 'teardown' && reclaim.has(operation.key)) {
-            reclaim.delete(operation.key);
-            map.delete(operation.key);
-          }
-        })
-      );
-    }
-
-    (client as ClientWithCache)._react = {
-      get(key) {
-        return map.get(key);
-      },
-      set(key, value) {
-        reclaim.delete(key);
-        map.set(key, value);
-      },
-      clear(key) {
-        reclaim.delete(key);
-        map.delete(key);
-      },
-      dispose(key) {
-        reclaim.add(key);
-      },
-    };
+    (client as ClientWithCache)._react = makeCache<CacheEntry>(
+      client,
+      undefined,
+      true
+    );
   }
 
   return (client as ClientWithCache)._react!;
@@ -86,22 +106,7 @@ export const getFragmentCacheForClient = (
   client: Client
 ): Cache<FragmentCacheEntry> => {
   if (!(client as ClientWithCache)._fragments) {
-    const map = new Map<number, FragmentCacheEntry>();
-
-    (client as ClientWithCache)._fragments = {
-      get(key) {
-        return map.get(key);
-      },
-      set(key, value) {
-        map.set(key, value);
-      },
-      clear(key) {
-        map.delete(key);
-      },
-      dispose(key) {
-        map.delete(key);
-      },
-    };
+    (client as ClientWithCache)._fragments = makeCache<FragmentCacheEntry>();
   }
 
   return (client as ClientWithCache)._fragments!;
@@ -120,45 +125,12 @@ export const getDeferredCacheForClient = (
   client: Client
 ): Cache<DeferredCacheEntry> => {
   if (!(client as ClientWithCache)._deferred) {
-    const operations$ = (client as Partial<Client>).operations$;
-    const reclaim = new Set();
-    const map = new Map<number, DeferredCacheEntry>();
-
-    if (operations$ /* not available in mocks */) {
-      pipe(
-        operations$,
-        subscribe(operation => {
-          if (operation.kind === 'teardown' && reclaim.has(operation.key)) {
-            const state = map.get(operation.key);
-            if (state) resolveDeferredState(state);
-            reclaim.delete(operation.key);
-            map.delete(operation.key);
-          }
-        })
-      );
-    }
-
-    (client as ClientWithCache)._deferred = {
-      get(key) {
-        return map.get(key);
-      },
-      set(key, value) {
-        reclaim.delete(key);
-        map.set(key, value);
-      },
-      clear(key) {
-        map.delete(key);
-      },
-      dispose(key) {
-        if (operations$) {
-          reclaim.add(key);
-        } else {
-          const state = map.get(key);
-          if (state) resolveDeferredState(state);
-          map.delete(key);
-        }
-      },
-    };
+    (client as ClientWithCache)._deferred = makeCache<DeferredCacheEntry>(
+      client,
+      state => {
+        if (state) resolveDeferredState(state);
+      }
+    );
   }
 
   return (client as ClientWithCache)._deferred!;

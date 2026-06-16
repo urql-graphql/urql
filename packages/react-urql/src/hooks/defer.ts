@@ -1,10 +1,14 @@
-import type {
-  FragmentDefinitionNode,
-  InlineFragmentNode,
-  SelectionSetNode,
-} from '@0no-co/graphql.web';
+import type { SelectionSetNode } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
 import type { AnyVariables, GraphQLRequest, OperationResult } from '@urql/core';
+import {
+  getFieldKey,
+  getFragments,
+  hasDirective,
+  isHeuristicFragmentMatch,
+  isOptionalSelection,
+  type FragmentMap,
+} from './selection';
 
 export type DeferredPromise = Promise<unknown> & {
   _resolve: (value?: unknown) => void;
@@ -56,30 +60,6 @@ const makeDeferredPromise = (): DeferredPromise => {
   return promise;
 };
 
-const hasDirective = (
-  node: { directives?: readonly { name: { value: string } }[] },
-  name: string
-): boolean => {
-  const directives = (node as any)._directives;
-  return !!(
-    (directives && directives[name]) ||
-    (node.directives && node.directives.some(x => x.name.value === name))
-  );
-};
-
-const isOptionalSelection = (node: {
-  directives?: readonly { name: { value: string } }[];
-}): boolean => {
-  return hasDirective(node, 'include') || hasDirective(node, 'skip');
-};
-
-const getFieldKey = (selection: {
-  alias?: { value: string };
-  name: { value: string };
-}) => {
-  return selection.alias ? selection.alias.value : selection.name.value;
-};
-
 const getPathKey = (path: readonly (string | number)[]) => JSON.stringify(path);
 
 const getDeferredPromise = (
@@ -116,7 +96,7 @@ const isObjectLike = (value: unknown): value is Record<string, any> =>
 const updateArray = (
   data: readonly any[],
   selectionSet: SelectionSetNode,
-  fragments: Record<string, FragmentDefinitionNode>,
+  fragments: FragmentMap,
   state: DeferredState,
   path: readonly (string | number)[],
   isDeferred: boolean,
@@ -148,7 +128,7 @@ const updateArray = (
 const updateSelectionSet = (
   data: any,
   selectionSet: SelectionSetNode,
-  fragments: Record<string, FragmentDefinitionNode>,
+  fragments: FragmentMap,
   state: DeferredState,
   path: readonly (string | number)[],
   isDeferred: boolean,
@@ -250,35 +230,6 @@ const updateSelectionSet = (
   return next || data;
 };
 
-const isHeuristicFragmentMatch = (
-  fragment: InlineFragmentNode | FragmentDefinitionNode,
-  data: any,
-  fragments: Record<string, FragmentDefinitionNode>
-): boolean => {
-  if (
-    !fragment.typeCondition ||
-    fragment.typeCondition.name.value === data.__typename
-  ) {
-    return true;
-  }
-
-  return fragment.selectionSet.selections.every(selection => {
-    if (selection.kind === Kind.FIELD) {
-      const fieldKey = getFieldKey(selection);
-      const couldBeExcluded =
-        isOptionalSelection(selection) || hasDirective(selection, 'defer');
-      return data[fieldKey] !== undefined && !couldBeExcluded;
-    } else if (selection.kind === Kind.INLINE_FRAGMENT) {
-      return isHeuristicFragmentMatch(selection, data, fragments);
-    } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
-      const fragment = fragments[selection.name.value];
-      return !!fragment && isHeuristicFragmentMatch(fragment, data, fragments);
-    }
-
-    return true;
-  });
-};
-
 export const updateDeferredResult = <
   Data = any,
   Variables extends AnyVariables = AnyVariables,
@@ -301,14 +252,7 @@ export const updateDeferredResult = <
     return result;
   }
 
-  const fragments = request.query.definitions.reduce<
-    Record<string, FragmentDefinitionNode>
-  >((acc, definition) => {
-    if (definition.kind === Kind.FRAGMENT_DEFINITION) {
-      acc[definition.name.value] = definition;
-    }
-    return acc;
-  }, {});
+  const fragments = getFragments(request.query.definitions);
 
   const data = updateSelectionSet(
     result.data,
