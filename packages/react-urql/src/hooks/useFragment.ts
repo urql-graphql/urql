@@ -3,7 +3,6 @@
 import * as React from 'react';
 import type {
   FragmentDefinitionNode,
-  InlineFragmentNode,
   SelectionSetNode,
 } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
@@ -21,6 +20,14 @@ import { useRequest } from './useRequest';
 import type { FragmentPromise } from './cache';
 import { getFragmentCacheForClient } from './cache';
 import { isDeferredPromise } from './defer';
+import {
+  getFieldKey,
+  getFragments,
+  hasDirective,
+  isHeuristicFragmentMatch,
+  isOptionalSelection,
+  type FragmentMap,
+} from './selection';
 
 import { hasDepsChanged } from './state';
 
@@ -167,16 +174,10 @@ export function useFragment<Data>(
     );
   }
 
-  const fragments = React.useMemo(() => {
-    return request.query.definitions.reduce<
-      Record<string, FragmentDefinitionNode>
-    >((acc, frag) => {
-      if (frag.kind === Kind.FRAGMENT_DEFINITION) {
-        acc[frag.name.value] = frag;
-      }
-      return acc;
-    }, {});
-  }, [request.query]);
+  const fragments = React.useMemo(
+    () => getFragments(request.query.definitions),
+    [request.query]
+  );
 
   const getSnapshot = React.useCallback(
     (
@@ -248,23 +249,17 @@ export function useFragment<Data>(
 const maskFragment = <Data>(
   data: Data,
   selectionSet: SelectionSetNode,
-  fragments: Record<string, FragmentDefinitionNode>
+  fragments: FragmentMap
 ): { data: Data; fulfilled: boolean; pending?: Promise<unknown> } => {
   const maskedData = {};
   let isDataComplete = true;
   let pending: Promise<unknown> | undefined;
 
   selectionSet.selections.forEach(selection => {
-    const hasIncludeOrSkip =
-      selection.directives &&
-      selection.directives.some(
-        x => x.name.value === 'include' || x.name.value === 'skip'
-      );
+    const hasIncludeOrSkip = isOptionalSelection(selection);
 
     if (selection.kind === Kind.FIELD) {
-      const fieldAlias = selection.alias
-        ? selection.alias.value
-        : selection.name.value;
+      const fieldAlias = getFieldKey(selection);
 
       let value = data[fieldAlias];
       if (isDeferredPromise(value)) {
@@ -329,9 +324,7 @@ const maskFragment = <Data>(
         return;
       }
 
-      const hasDefer =
-        selection.directives &&
-        selection.directives.some(x => x.name.value === 'defer');
+      const hasDefer = hasDirective(selection, 'defer');
 
       const result = maskFragment(data, selection.selectionSet, fragments);
       if (!result.fulfilled && !hasIncludeOrSkip && !hasDefer) {
@@ -343,9 +336,7 @@ const maskFragment = <Data>(
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
       const fragment = fragments[selection.name.value];
 
-      const hasDefer =
-        selection.directives &&
-        selection.directives.some(x => x.name.value === 'defer');
+      const hasDefer = hasDirective(selection, 'defer');
 
       if (!fragment || !isHeuristicFragmentMatch(fragment, data, fragments)) {
         return;
@@ -361,38 +352,4 @@ const maskFragment = <Data>(
   });
 
   return { data: maskedData as Data, fulfilled: isDataComplete, pending };
-};
-
-const isHeuristicFragmentMatch = (
-  fragment: InlineFragmentNode | FragmentDefinitionNode,
-  data: any,
-  fragments: Record<string, FragmentDefinitionNode>
-): boolean => {
-  if (
-    !fragment.typeCondition ||
-    fragment.typeCondition.name.value === data.__typename
-  )
-    return true;
-
-  return fragment.selectionSet.selections.every(selection => {
-    if (selection.kind === Kind.FIELD) {
-      const fieldAlias = selection.alias
-        ? selection.alias.value
-        : selection.name.value;
-      const couldBeExcluded =
-        selection.directives &&
-        selection.directives.some(
-          x =>
-            x.name.value === 'include' ||
-            x.name.value === 'skip' ||
-            x.name.value === 'defer'
-        );
-      return data[fieldAlias] !== undefined && !couldBeExcluded;
-    } else if (selection.kind === Kind.INLINE_FRAGMENT) {
-      return isHeuristicFragmentMatch(selection, data, fragments);
-    } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
-      const fragment = fragments[selection.name.value];
-      return !!fragment && isHeuristicFragmentMatch(fragment, data, fragments);
-    }
-  });
 };
