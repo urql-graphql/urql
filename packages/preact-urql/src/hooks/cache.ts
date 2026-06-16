@@ -1,4 +1,4 @@
-import type { Client, OperationResult, Cache } from '@urql/core';
+import type { Client, Cache } from '@urql/core';
 import { makeCache } from '@urql/core';
 
 export { getDeferredCacheForClient } from '@urql/core';
@@ -7,7 +7,7 @@ export { getDeferredCacheForClient } from '@urql/core';
  *
  * @remarks
  * `_resolve` is called once the masked fragment’s data is fully present,
- * which tells React to retry rendering the suspended boundary.
+ * which tells Preact to retry rendering the suspended boundary.
  *
  * @internal
  */
@@ -15,34 +15,19 @@ export type FragmentPromise = Promise<unknown> & {
   _resolve: () => void;
 };
 
-type CacheEntry = OperationResult | Promise<unknown> | undefined;
 type FragmentCacheEntry = FragmentPromise | undefined;
 
 interface ClientWithCache extends Client {
   _fragments?: Cache<FragmentCacheEntry>;
-  _react?: Cache<CacheEntry>;
 }
-
-export const getCacheForClient = (client: Client): Cache<CacheEntry> => {
-  if (!(client as ClientWithCache)._react) {
-    (client as ClientWithCache)._react = makeCache<CacheEntry>(
-      client,
-      undefined,
-      true
-    );
-  }
-
-  return (client as ClientWithCache)._react!;
-};
 
 /** Cache of pending `useFragment` suspense promises, keyed by an entity-aware key.
  *
  * @remarks
- * Unlike {@link getCacheForClient}, this cache stores the {@link FragmentPromise}
- * a `useFragment` hook throws while its deferred data is still streaming in. It’s
- * kept separately so that multiple `useFragment` hooks rendering different entities
- * (e.g. siblings in a list) don’t share — and prematurely resolve — each other’s
- * promises.
+ * Stores the {@link FragmentPromise} a `useFragment` hook throws while its
+ * deferred data is still streaming in, kept separately so that multiple
+ * `useFragment` hooks rendering different entities (e.g. siblings in a list)
+ * don’t share — and prematurely resolve — each other’s promises.
  *
  * @internal
  */

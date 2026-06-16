@@ -1,6 +1,6 @@
 import type { SelectionSetNode } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
-import type { AnyVariables, GraphQLRequest, OperationResult } from '@urql/core';
+import type { AnyVariables, GraphQLRequest, OperationResult } from '../types';
 import {
   getFieldKey,
   getFragments,
@@ -10,32 +10,58 @@ import {
   type FragmentMap,
 } from './selection';
 
+/** A stable {@link Promise} installed into a streamed result for a field inside
+ * a `@defer`-red selection that hasn’t arrived yet. (BETA)
+ *
+ * @remarks
+ * Framework bindings can throw this promise to suspend (or read its resolved
+ * `_value`) so a `@defer`-red boundary can resolve directly from the query
+ * stream — without depending on a parent component re-render to hand fresh data
+ * down via props (which doesn’t happen during server streams).
+ *
+ * @beta
+ */
 export type DeferredPromise = Promise<unknown> & {
   _resolve: (value?: unknown) => void;
   _resolved?: boolean;
-  /** The streamed-in value, once the deferred patch has arrived.
-   *
-   * @remarks
-   * `useFragment` reads this directly when re-masking after the promise has
-   * resolved. This is what allows a deferred boundary to resolve during a
-   * server stream, where the parent component holding `useQuery` won't
-   * re-render to hand down fresh data via props.
-   */
+  /** The streamed-in value, once the deferred patch has arrived. */
   _value?: unknown;
   _urqlDeferred: true;
 };
 
+/** Per-operation state tracking the {@link DeferredPromise}s installed for a
+ * streamed result, keyed by their path in the result data. (BETA)
+ *
+ * @beta
+ */
 export interface DeferredState {
   promises: Map<string, DeferredPromise>;
 }
 
+/** Creates an empty {@link DeferredState}. (BETA)
+ *
+ * @beta
+ */
 export const makeDeferredState = (): DeferredState => ({
   promises: new Map(),
 });
 
+/** Returns whether a value is a {@link DeferredPromise}. (BETA)
+ *
+ * @beta
+ */
 export const isDeferredPromise = (value: any): value is DeferredPromise =>
   !!value && value._urqlDeferred === true && typeof value.then === 'function';
 
+/** Resolves and clears every pending {@link DeferredPromise} in a
+ * {@link DeferredState}. (BETA)
+ *
+ * @remarks
+ * This is called when a stream ends (`hasNext` becomes falsy) or when the
+ * operation is torn down, so no boundary stays suspended indefinitely.
+ *
+ * @beta
+ */
 export const resolveDeferredState = (state: DeferredState) => {
   state.promises.forEach(promise => promise._resolve());
   state.promises.clear();
@@ -182,8 +208,8 @@ const updateSelectionSet = (
         }
 
         // Resolve the deferred promise for this path with the streamed-in
-        // value (already processed for nested defers) so a suspended
-        // `useFragment` can read it without waiting on a parent rerender.
+        // value (already processed for nested defers) so a suspended consumer
+        // can read it without waiting on a parent rerender.
         resolveDeferredPath(state, fieldPath, resolvedValue);
       }
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
@@ -230,6 +256,21 @@ const updateSelectionSet = (
   return next || data;
 };
 
+/** Installs and resolves {@link DeferredPromise}s on a streamed
+ * {@link OperationResult} for fields inside `@defer`-red selections. (BETA)
+ *
+ * @remarks
+ * While `result.hasNext` is `true`, missing non-optional fields inside a
+ * `@defer`-red selection are replaced by stable {@link DeferredPromise}s stored
+ * on the passed {@link DeferredState}. As later patches arrive, the promises are
+ * resolved with the streamed-in value (and removed). When the stream ends, all
+ * remaining promises are resolved.
+ *
+ * Bindings call this on each result of a suspense-enabled query stream so that
+ * `@defer`-red fragment boundaries can resolve directly from the stream.
+ *
+ * @beta
+ */
 export const updateDeferredResult = <
   Data = any,
   Variables extends AnyVariables = AnyVariables,
