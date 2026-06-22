@@ -1,6 +1,9 @@
 /* eslint-disable prefer-rest-params */
-import { Kind } from '@0no-co/graphql.web';
-import type { DocumentNode, DefinitionNode } from './utils/graphql';
+import {
+  Kind,
+  type DocumentNode,
+  type DefinitionNode,
+} from '@0no-co/graphql.web';
 import type { AnyVariables, TypedDocumentNode } from './types';
 import { keyDocument, stringifyDocument } from './utils';
 

@@ -1,4 +1,4 @@
-import type { GraphQLError } from '../utils/graphql';
+import type { GraphQLError } from '@0no-co/graphql.web';
 import { pipe, filter, merge, map, tap } from 'wonka';
 import type { Exchange, OperationResult, Operation } from '../types';
 import { addMetadata, CombinedError } from '../utils';
