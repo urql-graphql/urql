@@ -1,5 +1,10 @@
-import { Kind, parse, print } from '@0no-co/graphql.web';
-import type { DocumentNode, DefinitionNode } from './graphql';
+import {
+  Kind,
+  parse,
+  print,
+  type DocumentNode,
+  type DefinitionNode,
+} from '@0no-co/graphql.web';
 import type { HashValue } from './hash';
 import { phash } from './hash';
 import { stringifyVariables } from './variables';

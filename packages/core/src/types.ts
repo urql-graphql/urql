@@ -1,9 +1,10 @@
-import type { GraphQLError, DocumentNode } from './utils/graphql';
 import type {
   Kind,
   DirectiveNode,
   ValueNode,
   TypeNode,
+  GraphQLError,
+  DocumentNode,
 } from '@0no-co/graphql.web';
 import type { Subscription, Source } from 'wonka';
 import type { Client } from './client';
