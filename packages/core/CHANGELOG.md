@@ -1,5 +1,12 @@
 # @urql/core
 
+## 6.0.3
+
+### Patch Changes
+
+- Drop internal type switch between `graphql` and `@0no-co/graphql.web`'s types, since the latter now does this already automatically
+  Submitted by [@kitten](https://github.com/kitten) (See [#3893](https://github.com/urql-graphql/urql/pull/3893))
+
 ## 6.0.2
 
 ### Patch Changes

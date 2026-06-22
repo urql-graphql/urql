@@ -52,7 +52,7 @@
     "@urql/core": "^6.0.0"
   },
   "dependencies": {
-    "@urql/core": "workspace:^6.0.2",
+    "@urql/core": "workspace:^6.0.3",
     "wonka": "^6.3.2"
   },
   "devDependencies": {
