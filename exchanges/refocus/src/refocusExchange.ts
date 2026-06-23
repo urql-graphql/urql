@@ -2,6 +2,15 @@ import { pipe, tap } from 'wonka';
 import type { Exchange, Operation } from '@urql/core';
 
 export interface RefocusOptions {
+  /** Predicate allowing you to selectively opt out `Operation`s from reexecuting.
+   *
+   * @remarks
+   * `refetchIf` is called for all active queries. If this function returns false
+   * query is not reexecuted.
+   *
+   * By default, all queries will be refetched.
+   */
+  refetchIf?: (op: Operation) => boolean;
   /** The minimum time in milliseconds to wait before another refocus can trigger.
    * @defaultValue `0`
    */
@@ -24,7 +33,7 @@ export interface RefocusOptions {
  * only refetch queries that are currently active.
  */
 export const refocusExchange = (opts: RefocusOptions = {}): Exchange => {
-  const { minimumTime = 0 } = opts;
+  const { minimumTime = 0, refetchIf } = opts;
 
   return ({ client, forward }) =>
     ops$ => {
@@ -56,7 +65,11 @@ export const refocusExchange = (opts: RefocusOptions = {}): Exchange => {
       });
 
       const processIncomingOperation = (op: Operation) => {
-        if (op.kind === 'query' && !observedOperations.has(op.key)) {
+        if (
+          op.kind === 'query' &&
+          !observedOperations.has(op.key) &&
+          (!refetchIf || refetchIf(op))
+        ) {
           observedOperations.set(op.key, 1);
           watchedOperations.set(op.key, op);
         }
