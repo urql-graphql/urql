@@ -262,6 +262,7 @@ export function useQuery<
       let result = cache.get(request.key);
       if (!result) {
         let resolve: (value: unknown) => void;
+        let promise: Promise<unknown> | void;
 
         const subscription = pipe(
           source,
@@ -271,6 +272,16 @@ export function useQuery<
               !result ||
               ('hasNext' in result && result.hasNext)
           ),
+          onEnd(() => {
+            // A torn-down source never resolves its promise, so evict and
+            // resolve it to let React retry the render
+            if (promise && !result) {
+              if (cache.get(request.key) === promise) {
+                cache.clear(request.key);
+              }
+              if (resolve) resolve(undefined);
+            }
+          }),
           subscribe(_result => {
             result = _result;
             if (resolve) resolve(result);
@@ -278,7 +289,7 @@ export function useQuery<
         );
 
         if (result == null && suspense) {
-          const promise = new Promise(_resolve => {
+          promise = new Promise(_resolve => {
             resolve = _resolve;
           });
 
@@ -288,6 +299,15 @@ export function useQuery<
           subscription.unsubscribe();
         }
       } else if (suspense && result != null && 'then' in result) {
+        // A settled promise still in the cache has lost its subscription, so
+        // evict it rather than re-throw it and lock React into a render loop
+        const thenable = result;
+        const onSettled = () => {
+          if (cache.get(request.key) === thenable) {
+            cache.clear(request.key);
+          }
+        };
+        thenable.then(onSettled, onSettled);
         throw result;
       }
 
