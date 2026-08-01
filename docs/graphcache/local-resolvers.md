@@ -516,7 +516,7 @@ information from `info` about our field. For instance, we can:
 - Read the current field's name using `info.fieldName`
 - Read the current field's key using `info.parentFieldKey`
 - Read the current parent entity's key using `info.parentKey`
-- Read the current parent entity's typename using `info.parentTypename`
+- Read the current parent entity's typename using `info.parentTypeName`
 - Access the current operation's raw variables using `info.variables`
 - Access the current operation's raw fragments using `info.fragments`
 
