@@ -81,6 +81,41 @@ describe('useFragment masking', () => {
     });
   });
 
+  it('updates the masked data when the fragment name changes', () => {
+    const client = makeClient();
+    const query = `
+      fragment TodoIdentity on Todo { id __typename }
+      fragment TodoDetails on Todo { name __typename }
+    `;
+    const data = {
+      __typename: 'Todo',
+      id: '1',
+      name: 'Learn urql',
+    };
+    const view = renderProbe(client, {
+      query,
+      name: 'TodoIdentity',
+      data,
+    });
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', id: '1' },
+    });
+
+    view.rerender(
+      h(Provider, {
+        value: client,
+        children: [h(Probe, { query, name: 'TodoDetails', data })],
+      })
+    );
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', name: 'Learn urql' },
+    });
+  });
+
   it('marks fetching for a missing non-optional field', () => {
     renderProbe(makeClient(), {
       query: `fragment TodoFields on Todo { id name __typename }`,

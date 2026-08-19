@@ -88,6 +88,35 @@ describe('useFragment masking', () => {
     });
   });
 
+  it('updates the masked data when the fragment name changes', () => {
+    const query = `
+      fragment TodoIdentity on Todo { id __typename }
+      fragment TodoDetails on Todo { name __typename }
+    `;
+    const data = {
+      __typename: 'Todo',
+      id: '1',
+      name: 'Learn urql',
+    };
+
+    const { result, rerender } = renderHook(
+      ({ name }) => useFragment({ query, name, data }),
+      { initialProps: { name: 'TodoIdentity' } }
+    );
+
+    expect(result.current).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', id: '1' },
+    });
+
+    rerender({ name: 'TodoDetails' });
+
+    expect(result.current).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', name: 'Learn urql' },
+    });
+  });
+
   it('should correctly mask data w/ null attribute', () => {
     const { result } = renderHook(() =>
       useFragment({

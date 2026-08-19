@@ -205,7 +205,7 @@ export function useFragment<Data>(
     [cache, fragment, fragments]
   );
 
-  const deps = [client, request, args.data, suspense] as const;
+  const deps = [client, request, fragment, args.data, suspense] as const;
 
   const [state, setState] = useState(
     () => [getSnapshot(request, args.data, suspense), deps] as const
