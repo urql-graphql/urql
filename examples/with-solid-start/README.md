@@ -12,6 +12,8 @@ This example demonstrates how to use URQL with SolidStart.
 
 ## Getting Started
 
+This example requires Node.js 24 or newer.
+
 ```bash
 pnpm install
 pnpm start
