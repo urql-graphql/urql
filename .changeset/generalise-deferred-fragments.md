@@ -8,8 +8,8 @@ hook into `@urql/core`, so other framework bindings can reuse it. `@urql/core` n
 BETA — `maskFragment`, which masks a piece of `data` against a fragment's selection set and
 reports whether it's fulfilled or still streaming in, alongside the deferred-fragment helpers
 `updateDeferredResult`, `makeDeferredState`, `resolveDeferredState`, `isDeferredPromise`, and
-`getDeferredCacheForClient`. Together these install stable promises for missing fields inside
-`@defer` selections and resolve them directly from a query stream.
+`getDeferredCacheForClient`. Together these associate stable sidecar promises with missing fields
+inside `@defer` selections and resolve them directly from a query stream without changing result data.
 
 Add a BETA `useFragment` hook to the Preact bindings, mirroring the React hook. Given a fragment
 document and a piece of `data`, it returns the data masked to that fragment. When the `Client`

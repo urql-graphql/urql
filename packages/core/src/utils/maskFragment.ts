@@ -1,7 +1,11 @@
 import type { SelectionSetNode } from '@0no-co/graphql.web';
 import { Kind } from '@0no-co/graphql.web';
 
-import { isDeferredPromise } from './defer';
+import {
+  copyDeferredFields,
+  getDeferredFieldPromise,
+  setDeferredFieldPromise,
+} from './defer';
 import {
   getFieldKey,
   hasDirective,
@@ -35,15 +39,14 @@ export interface MaskFragmentResult<Data> {
  * `maskFragment` walks the selection set and returns the subset of `data` that
  * the selection selects. When a non-optional field is still missing — for
  * instance while a `@defer`-red part is streaming in — `fulfilled` is `false`
- * and, if the query stream installed a {@link DeferredPromise} for it, that
+ * and, if the query stream associated a {@link DeferredPromise} with it, that
  * promise is surfaced via `pending`.
  *
  * Bindings decide what to do with an incomplete result: a Suspense-based
  * binding throws `pending`, while others surface `fetching: !fulfilled`.
  *
- * Note: masked data may transiently contain a still-pending
- * {@link DeferredPromise} on a `@defer`-red field while it streams in, so that a
- * nested consumer rendering that field can suspend on it in turn.
+ * Deferred promises are kept in sidecar metadata, so neither the input nor the
+ * returned masked GraphQL data exposes internal promise values.
  *
  * @beta
  */
@@ -63,21 +66,22 @@ export const maskFragment = <Data>(
       const fieldAlias = getFieldKey(selection);
 
       let value = data[fieldAlias];
-      if (isDeferredPromise(value)) {
-        if (!value._resolved) {
+      const deferred =
+        value === undefined && data && typeof data === 'object'
+          ? getDeferredFieldPromise(data, fieldAlias)
+          : undefined;
+      if (deferred) {
+        if (!deferred._resolved) {
           // The deferred patch hasn't arrived yet; surface the stream-owned
-          // promise so a binding can suspend on it. The promise is preserved on
-          // the masked data so that a nested consumer rendering this field can
-          // suspend on it in turn.
+          // promise so a binding can suspend without changing GraphQL data.
           isDataComplete = false;
-          if (!pending) pending = value;
-          maskedData[fieldAlias] = value;
+          if (!pending) pending = deferred;
+          setDeferredFieldPromise(maskedData, fieldAlias, deferred);
           return;
         }
-        // The deferred patch has streamed in: read its value directly off the
-        // resolved promise, rather than relying on a parent rerender to hand
-        // down fresh data via props (which doesn't happen during SSR streams).
-        value = value._value;
+        // The deferred patch has streamed in: read its value from the sidecar
+        // promise rather than relying on a parent rerender to pass fresh props.
+        value = deferred._value;
       }
 
       if (value === undefined) {
@@ -134,6 +138,7 @@ export const maskFragment = <Data>(
       }
 
       Object.assign(maskedData, result.data);
+      copyDeferredFields(result.data as object, maskedData);
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {
       const fragment = fragments[selection.name.value];
 
@@ -149,6 +154,7 @@ export const maskFragment = <Data>(
         if (!pending) pending = result.pending;
       }
       Object.assign(maskedData, result.data);
+      copyDeferredFields(result.data as object, maskedData);
     }
   });
 

@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { gql } from '../gql';
 import { createRequest } from './request';
 import {
+  getDeferredFieldPromise,
   isDeferredPromise,
   makeDeferredState,
   resolveDeferredState,
@@ -39,17 +40,16 @@ describe('isDeferredPromise', () => {
 });
 
 describe('updateDeferredResult', () => {
-  it('installs a stable promise for a missing deferred field while streaming', () => {
+  it('keeps a stable promise outside GraphQL data while streaming', () => {
     const request = createRequest(query, {});
     const state = makeDeferredState();
+    const data = { todo: { id: '1', __typename: 'Todo' } };
 
-    const result = updateDeferredResult(
-      request,
-      makeResult({ todo: { id: '1', __typename: 'Todo' } }, true),
-      state
-    );
+    const result = updateDeferredResult(request, makeResult(data, true), state);
 
-    const pending = (result.data as any).todo.name;
+    const pending = getDeferredFieldPromise(data.todo, 'name')!;
+    expect(result.data).toBe(data);
+    expect((result.data as any).todo.name).toBeUndefined();
     expect(isDeferredPromise(pending)).toBe(true);
     expect(pending._resolved).toBe(false);
     expect(state.promises.size).toBe(1);
@@ -59,12 +59,9 @@ describe('updateDeferredResult', () => {
     const request = createRequest(query, {});
     const state = makeDeferredState();
 
-    const first = updateDeferredResult(
-      request,
-      makeResult({ todo: { id: '1', __typename: 'Todo' } }, true),
-      state
-    );
-    const pending = (first.data as any).todo.name;
+    const data = { todo: { id: '1', __typename: 'Todo' } };
+    updateDeferredResult(request, makeResult(data, true), state);
+    const pending = getDeferredFieldPromise(data.todo, 'name')!;
 
     updateDeferredResult(
       request,
@@ -99,12 +96,9 @@ describe('updateDeferredResult', () => {
     const request = createRequest(query, {});
     const state = makeDeferredState();
 
-    const first = updateDeferredResult(
-      request,
-      makeResult({ todo: { id: '1', __typename: 'Todo' } }, true),
-      state
-    );
-    const pending = (first.data as any).todo.name;
+    const data = { todo: { id: '1', __typename: 'Todo' } };
+    updateDeferredResult(request, makeResult(data, true), state);
+    const pending = getDeferredFieldPromise(data.todo, 'name')!;
     expect(pending._resolved).toBe(false);
 
     updateDeferredResult(
@@ -123,12 +117,9 @@ describe('resolveDeferredState', () => {
     const request = createRequest(query, {});
     const state = makeDeferredState();
 
-    const first = updateDeferredResult(
-      request,
-      makeResult({ todo: { id: '1', __typename: 'Todo' } }, true),
-      state
-    );
-    const pending = (first.data as any).todo.name;
+    const data = { todo: { id: '1', __typename: 'Todo' } };
+    updateDeferredResult(request, makeResult(data, true), state);
+    const pending = getDeferredFieldPromise(data.todo, 'name')!;
 
     resolveDeferredState(state);
 

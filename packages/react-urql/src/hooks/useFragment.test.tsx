@@ -14,8 +14,11 @@ import React, { Suspense } from 'react';
 import { renderHook, render, act, cleanup } from '@testing-library/react';
 import { makeSubject } from 'wonka';
 import { createRequest } from '@urql/core';
+import type { TypedDocumentNode } from '@urql/core';
 
+import { getFragmentPromise } from './cache';
 import { useFragment } from './useFragment';
+import type { UseFragmentState } from './useFragment';
 import { useQuery } from './useQuery';
 import { useClient } from '../context';
 
@@ -26,6 +29,41 @@ const mockQuery = `
     __typename
   }
 `;
+
+type FilmData = { __typename: 'Film'; id: string; title: string };
+declare const tadaFragmentRefs: unique symbol;
+type TadaFragmentOf = {
+  readonly [tadaFragmentRefs]: { FilmItem: 'Film' };
+};
+type Incremental<Data> =
+  | Data
+  | { [Key in keyof Data]?: Key extends '__typename' ? Data[Key] : never };
+type CodegenFragmentType<Data> = {
+  ' $fragmentRefs'?: { FilmItemFragment: Data };
+};
+
+// Compile-time coverage for gql.tada's opaque FragmentOf shape and GraphQL
+// Code Generator's incremental FragmentType shape. The fragment document alone
+// determines the returned data type; the masked input has its own generic.
+const useCheckFragmentReferenceInterop = (
+  tadaFragment: TypedDocumentNode<FilmData, never>,
+  codegenFragment: TypedDocumentNode<FilmData, unknown>,
+  tada: TadaFragmentOf | null | undefined,
+  codegen:
+    | CodegenFragmentType<Incremental<FilmData>>
+    | Record<PropertyKey, never>
+) => {
+  const tadaResult: UseFragmentState<FilmData> = useFragment({
+    fragment: tadaFragment,
+    data: tada,
+  });
+  const codegenResult: UseFragmentState<FilmData> = useFragment({
+    fragment: codegenFragment,
+    data: codegen,
+  });
+  return [tadaResult, codegenResult];
+};
+void useCheckFragmentReferenceInterop;
 
 beforeEach(() => {
   cleanup();
@@ -41,9 +79,9 @@ beforeEach(() => {
 describe('useFragment masking', () => {
   it('should correctly mask data', () => {
     const { result } = renderHook(
-      ({ query }) =>
+      ({ fragment }) =>
         useFragment({
-          query,
+          fragment,
           data: {
             __typename: 'Todo',
             id: '1',
@@ -51,7 +89,7 @@ describe('useFragment masking', () => {
             completed: true,
           },
         }),
-      { initialProps: { query: mockQuery } }
+      { initialProps: { fragment: mockQuery } }
     );
 
     expect(result.current).toEqual({
@@ -67,7 +105,7 @@ describe('useFragment masking', () => {
   it('should correctly take a named fragment to mask data', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `fragment x on X { foo bar } fragment TodoFields on Todo { id name __typename }`,
+        fragment: `fragment x on X { foo bar } fragment TodoFields on Todo { id name __typename }`,
         name: 'TodoFields',
         data: {
           __typename: 'Todo',
@@ -100,7 +138,7 @@ describe('useFragment masking', () => {
     };
 
     const { result, rerender } = renderHook(
-      ({ name }) => useFragment({ query, name, data }),
+      ({ name }) => useFragment({ fragment: query, name, data }),
       { initialProps: { name: 'TodoIdentity' } }
     );
 
@@ -120,7 +158,7 @@ describe('useFragment masking', () => {
   it('should correctly mask data w/ null attribute', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: mockQuery,
+        fragment: mockQuery,
         data: { __typename: 'Todo', id: '1', name: null, completed: true },
       })
     );
@@ -138,7 +176,7 @@ describe('useFragment masking', () => {
   it('should correctly indicate loading w/ undefined attribute', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: mockQuery,
+        fragment: mockQuery,
         data: {
           __typename: 'Todo',
           id: '1',
@@ -160,7 +198,7 @@ describe('useFragment masking', () => {
   it('should correctly mask data w/ nested object', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `
+        fragment: `
           fragment TodoFields on Todo {
             id
             name
@@ -200,7 +238,7 @@ describe('useFragment masking', () => {
   it('should correctly mask data w/ nested selection that is null', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `
+        fragment: `
           fragment TodoFields on Todo {
             id
             name
@@ -231,7 +269,7 @@ describe('useFragment masking', () => {
   it('should preserve null items in nullable lists', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `
+        fragment: `
           fragment TodoFields on Todo {
             id
             __typename
@@ -273,7 +311,7 @@ describe('useFragment masking', () => {
   it('should correctly mark loading w/ nested selection that is undefined', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `
+        fragment: `
           fragment TodoFields on Todo {
             id
             name
@@ -303,7 +341,7 @@ describe('useFragment masking', () => {
   it('should correctly mark resolved w/ deferred nested fragment-selection that is undefined', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `
+        fragment: `
           fragment TodoFields on Todo {
             id
             name
@@ -336,7 +374,7 @@ describe('useFragment masking', () => {
   it('should correctly mark loading w/ non-deferred nested fragment-selection that is undefined', () => {
     const { result } = renderHook(() =>
       useFragment({
-        query: `
+        fragment: `
           fragment TodoFields on Todo {
             id
             name
@@ -368,10 +406,18 @@ describe('useFragment masking', () => {
 
   it('returns null data without masking when data is null', () => {
     const { result } = renderHook(() =>
-      useFragment({ query: mockQuery, data: null })
+      useFragment({ fragment: mockQuery, data: null })
     );
 
     expect(result.current).toEqual({ fetching: false, data: null });
+  });
+
+  it('returns undefined data without masking when data is undefined', () => {
+    const { result } = renderHook(() =>
+      useFragment({ fragment: mockQuery, data: undefined })
+    );
+
+    expect(result.current).toEqual({ fetching: false, data: undefined });
   });
 });
 
@@ -380,7 +426,7 @@ describe('useFragment suspense', () => {
 
   const Song = ({ data }: { data: any }) => {
     const result = useFragment<any>({
-      query: SongFields,
+      fragment: SongFields,
       data,
       context: { suspense: true },
     });
@@ -417,28 +463,21 @@ describe('useFragment suspense', () => {
     const first = { title: undefined };
     const second = { title: undefined };
     const request = createRequest(SongFields, {});
+    const fragment = request.query.definitions[0] as any;
 
     render(
       <Suspense fallback={<p>loading</p>}>
         <Song data={first} />
       </Suspense>
     );
-    const firstPromise = client._fragments.get(
-      request.key,
-      'SongFields',
-      first
-    );
+    const firstPromise = getFragmentPromise(client, fragment, first);
 
     render(
       <Suspense fallback={<p>loading</p>}>
         <Song data={second} />
       </Suspense>
     );
-    const secondPromise = client._fragments.get(
-      request.key,
-      'SongFields',
-      second
-    );
+    const secondPromise = getFragmentPromise(client, fragment, second);
 
     expect(firstPromise).toBeInstanceOf(Promise);
     expect(secondPromise).toBeInstanceOf(Promise);
@@ -458,8 +497,18 @@ describe('useFragment suspense', () => {
       artist: undefined,
     };
     const request = createRequest(query, {});
+    const fragments = request.query.definitions;
+    const fragmentByName = (name: string) =>
+      fragments.find(
+        fragment => 'name' in fragment && fragment.name?.value === name
+      ) as any;
     const Fragment = ({ name }: { name: string }) => {
-      useFragment({ query, name, data, context: { suspense: true } });
+      useFragment({
+        fragment: query,
+        name,
+        data,
+        context: { suspense: true },
+      });
       return null;
     };
 
@@ -468,16 +517,20 @@ describe('useFragment suspense', () => {
         <Fragment name="SongTitle" />
       </Suspense>
     );
-    const titlePromise = client._fragments.get(request.key, 'SongTitle', data);
+    const titlePromise = getFragmentPromise(
+      client,
+      fragmentByName('SongTitle'),
+      data
+    );
 
     render(
       <Suspense fallback={<p>loading</p>}>
         <Fragment name="SongArtist" />
       </Suspense>
     );
-    const artistPromise = client._fragments.get(
-      request.key,
-      'SongArtist',
+    const artistPromise = getFragmentPromise(
+      client,
+      fragmentByName('SongArtist'),
       data
     );
 
@@ -520,6 +573,98 @@ describe('useFragment suspense', () => {
     expect(view.container.textContent).toBe('AB');
   });
 
+  it('suspends siblings without entity IDs independently', async () => {
+    const Title = ({ data }: { data: any }) => {
+      const result = useFragment<any>({
+        fragment: `fragment TitleFields on Song { title __typename }`,
+        data,
+        context: { suspense: true },
+      });
+      return <p>{result.data.title}</p>;
+    };
+    const first: { __typename: string; title: string | undefined } = {
+      __typename: 'Song',
+      title: undefined,
+    };
+    const second: { __typename: string; title: string | undefined } = {
+      __typename: 'Song',
+      title: undefined,
+    };
+
+    const view = render(
+      <>
+        <Suspense fallback={<p>loading-first</p>}>
+          <Title data={first} />
+        </Suspense>
+        <Suspense fallback={<p>loading-second</p>}>
+          <Title data={second} />
+        </Suspense>
+      </>
+    );
+    expect(view.container.textContent).toBe('loading-firstloading-second');
+
+    first.title = 'First';
+    view.rerender(
+      <>
+        <Suspense fallback={<p>loading-first</p>}>
+          <Title data={first} />
+        </Suspense>
+        <Suspense fallback={<p>loading-second</p>}>
+          <Title data={second} />
+        </Suspense>
+      </>
+    );
+    await act(async () => {});
+    expect(view.container.textContent).toBe('Firstloading-second');
+  });
+
+  it('keeps named fragments in one document independent', async () => {
+    const document = `
+      fragment TitleFields on Song { title __typename }
+      fragment ArtistFields on Song { artist __typename }
+    `;
+    const data = {
+      __typename: 'Song',
+      title: undefined as string | undefined,
+      artist: undefined as string | undefined,
+    };
+    const Field = ({ name }: { name: string }) => {
+      const result = useFragment<any>({
+        fragment: document,
+        name,
+        data,
+        context: { suspense: true },
+      });
+      return <p>{result.data.title || result.data.artist}</p>;
+    };
+
+    const view = render(
+      <>
+        <Suspense fallback={<p>loading-title</p>}>
+          <Field name="TitleFields" />
+        </Suspense>
+        <Suspense fallback={<p>loading-artist</p>}>
+          <Field name="ArtistFields" />
+        </Suspense>
+      </>
+    );
+    expect(view.container.textContent).toBe('loading-titleloading-artist');
+
+    data.title = 'Hello';
+    view.rerender(
+      <>
+        <Suspense fallback={<p>loading-title</p>}>
+          <Field name="TitleFields" />
+        </Suspense>
+        <Suspense fallback={<p>loading-artist</p>}>
+          <Field name="ArtistFields" />
+        </Suspense>
+      </>
+    );
+    await act(async () => {});
+    expect(view.container.textContent).toBe('Helloloading-artist');
+  });
+
   it('resolves deferred fragment suspense from the query stream without a parent rerender', async () => {
     const client = useClient() as any;
     const subject = makeSubject<any>();
@@ -544,7 +689,7 @@ describe('useFragment suspense', () => {
       });
 
       const fragment = useFragment<any>({
-        query: `fragment SongFields on Song { title }`,
+        fragment: `fragment SongFields on Song { title }`,
         data: queryResult.data.song,
       });
 

@@ -48,7 +48,7 @@ afterEach(() => cleanup());
 describe('useFragment masking', () => {
   it('masks data to the selected fields', () => {
     renderProbe(makeClient(), {
-      query: `fragment TodoFields on Todo { id name __typename }`,
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
       data: {
         __typename: 'Todo',
         id: '1',
@@ -65,7 +65,7 @@ describe('useFragment masking', () => {
 
   it('takes a named fragment to mask data', () => {
     renderProbe(makeClient(), {
-      query: `fragment x on X { foo } fragment TodoFields on Todo { id name __typename }`,
+      fragment: `fragment x on X { foo } fragment TodoFields on Todo { id name __typename }`,
       name: 'TodoFields',
       data: {
         __typename: 'Todo',
@@ -93,7 +93,7 @@ describe('useFragment masking', () => {
       name: 'Learn urql',
     };
     const view = renderProbe(client, {
-      query,
+      fragment: query,
       name: 'TodoIdentity',
       data,
     });
@@ -106,7 +106,7 @@ describe('useFragment masking', () => {
     view.rerender(
       h(Provider, {
         value: client,
-        children: [h(Probe, { query, name: 'TodoDetails', data })],
+        children: [h(Probe, { fragment: query, name: 'TodoDetails', data })],
       })
     );
 
@@ -118,7 +118,7 @@ describe('useFragment masking', () => {
 
   it('marks fetching for a missing non-optional field', () => {
     renderProbe(makeClient(), {
-      query: `fragment TodoFields on Todo { id name __typename }`,
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
       data: { __typename: 'Todo', id: '1', name: undefined },
     });
 
@@ -130,7 +130,7 @@ describe('useFragment masking', () => {
 
   it('treats a missing @defer-red fragment spread as fulfilled', () => {
     renderProbe(makeClient(), {
-      query: `
+      fragment: `
         fragment TodoFields on Todo {
           id name __typename
           ...AuthorFields @defer
@@ -150,11 +150,20 @@ describe('useFragment masking', () => {
 
   it('returns null data without masking when data is null', () => {
     renderProbe(makeClient(), {
-      query: `fragment TodoFields on Todo { id name __typename }`,
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
       data: null,
     });
 
     expect(snapshot).toEqual({ fetching: false, data: null });
+  });
+
+  it('returns undefined data without masking when data is undefined', () => {
+    renderProbe(makeClient(), {
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
+      data: undefined,
+    });
+
+    expect(snapshot).toEqual({ fetching: false, data: undefined });
   });
 });
 
@@ -163,7 +172,7 @@ describe('useFragment suspense', () => {
 
   it('throws a suspense promise while a field is missing', () => {
     const { thrown, rendered } = captureSuspense(makeClient(), {
-      query: SongFields,
+      fragment: SongFields,
       data: { __typename: 'Song', id: '1', title: undefined },
       context: { suspense: true },
     });
@@ -175,12 +184,12 @@ describe('useFragment suspense', () => {
   it('does not share suspense promises between unidentified objects', () => {
     const client = makeClient();
     const first = captureSuspense(client, {
-      query: SongFields,
+      fragment: SongFields,
       data: { title: undefined },
       context: { suspense: true },
     });
     const second = captureSuspense(client, {
-      query: SongFields,
+      fragment: SongFields,
       data: { title: undefined },
       context: { suspense: true },
     });
@@ -203,13 +212,13 @@ describe('useFragment suspense', () => {
       artist: undefined,
     };
     const title = captureSuspense(client, {
-      query,
+      fragment: query,
       name: 'SongTitle',
       data,
       context: { suspense: true },
     });
     const artist = captureSuspense(client, {
-      query,
+      fragment: query,
       name: 'SongArtist',
       data,
       context: { suspense: true },
@@ -222,7 +231,7 @@ describe('useFragment suspense', () => {
 
   it('does not suspend when the data is already complete', () => {
     const { thrown, rendered } = captureSuspense(makeClient(), {
-      query: SongFields,
+      fragment: SongFields,
       data: { __typename: 'Song', id: '1', title: 'World' },
       context: { suspense: true },
     });

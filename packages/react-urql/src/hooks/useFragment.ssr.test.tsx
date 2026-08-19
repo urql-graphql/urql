@@ -76,7 +76,7 @@ describe('useFragment SSR streaming', () => {
 
     const Deferred = ({ data }: { data: any }) => {
       const fragment = useFragment<any>({
-        query: `fragment SongFields on Song { title }`,
+        fragment: `fragment SongFields on Song { title }`,
         data,
         context: { suspense: true },
       });
@@ -144,7 +144,7 @@ describe('useFragment SSR streaming', () => {
 
     const Author = ({ data }: { data: any }) => {
       const fragment = useFragment<any>({
-        query: `fragment AuthorFields on Author { name }`,
+        fragment: `fragment AuthorFields on Author { name }`,
         data,
         context: { suspense: true },
       });
@@ -186,7 +186,7 @@ describe('useFragment SSR streaming', () => {
 
     const PostBody = ({ post }: { post: any }) => {
       const fragment = useFragment<any>({
-        query: `
+        fragment: `
           fragment PostFields on Post {
             author {
               __typename

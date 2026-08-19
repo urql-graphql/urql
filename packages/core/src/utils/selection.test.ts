@@ -96,4 +96,25 @@ describe('isHeuristicFragmentMatch', () => {
       isHeuristicFragmentMatch(fragment, { __typename: 'Other', id: '1' }, {})
     ).toBe(false);
   });
+
+  it('matches when conditional fields are absent or present', () => {
+    const conditional = getFragments(gql`
+      fragment NodeFields on Node {
+        id
+        name @include(if: true)
+        email @skip(if: false)
+      }
+    `.definitions).NodeFields;
+
+    expect(
+      isHeuristicFragmentMatch(conditional, { __typename: 'User', id: '1' }, {})
+    ).toBe(true);
+    expect(
+      isHeuristicFragmentMatch(
+        conditional,
+        { __typename: 'User', id: '1', name: 'Jovi', email: 'jovi@test.dev' },
+        {}
+      )
+    ).toBe(true);
+  });
 });

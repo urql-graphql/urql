@@ -90,7 +90,7 @@ interface ClientWithDeferredCache extends Client {
  *
  * @remarks
  * Bindings store one {@link DeferredState} per operation here (keyed by
- * `request.key`) so that the {@link DeferredPromise}s installed by
+ * `request.key`) so that the {@link DeferredPromise}s associated by
  * {@link updateDeferredResult} are shared between the query stream and any
  * consumer suspending on a `@defer`-red boundary. Entries are reclaimed on
  * teardown, resolving any still-pending promises so no boundary stays suspended.

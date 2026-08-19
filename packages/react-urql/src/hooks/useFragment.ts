@@ -9,19 +9,22 @@ import type {
   AnyVariables,
   Client,
   OperationContext,
-  GraphQLRequest,
 } from '@urql/core';
 import { maskFragment, getFragments } from '@urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import type { FragmentPromise } from './cache';
-import { getFragmentCacheForClient } from './cache';
+import {
+  deleteFragmentPromise,
+  getFragmentPromise,
+  setFragmentPromise,
+} from './cache';
 
 import { hasDepsChanged } from './state';
 
 /** Input arguments for the {@link useFragment} hook. */
-export type UseFragmentArgs<Data = any> = {
+export type UseFragmentArgs<Data = any, Input = Data> = {
   /** Partial {@link OperationContext} used to configure this hook.
    *
    * @remarks
@@ -33,7 +36,7 @@ export type UseFragmentArgs<Data = any> = {
    * @example
    * ```ts
    * const result = useFragment({
-   *   query,
+   *   fragment,
    *   data,
    *   context: { suspense: true },
    * });
@@ -46,16 +49,20 @@ export type UseFragmentArgs<Data = any> = {
    * This Document should contain atleast one FragmentDefinitionNode or
    * a FragmentDefinitionNode with the same name as the `name` property.
    */
-  query: GraphQLRequestParams<Data, AnyVariables>['query'];
-  /** A JSON object which we will extract properties from to get to the
-   * masked fragment.
+  fragment: GraphQLRequestParams<Data, any>['query'];
+  /** A JSON object containing this fragment's fields.
+   *
+   * @remarks
+   * `Input` is separate from `Data` so fragment-reference types from gql.tada
+   * and GraphQL Code Generator can be passed directly. `null` and `undefined`
+   * are returned unchanged.
    */
-  data: Data | null;
+  data: Input | null | undefined;
   /** An optional name of the fragment to use from the passed Document. */
   name?: string;
 };
 
-/** State of the current query, your {@link useFragment} hook is executing.
+/** State of the fragment your {@link useFragment} hook is reading.
  *
  * @remarks
  * `UseFragmentState` is returned by {@link useFragment} and
@@ -88,8 +95,8 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  *
  * @remarks
  * `useFragment` allows GraphQL fragments to mask their data.
- * Given {@link UseFragmentArgs.query} and {@link UseFragmentArgs.data}, it will
- * return the masked data for the fragment contained in query.
+ * Given {@link UseFragmentArgs.fragment} and {@link UseFragmentArgs.data}, it
+ * returns the data selected by that fragment.
  *
  * Additionally, if the `suspense` option is enabled on the `Client`,
  * the `useFragment` hook will suspend instead of indicating that it’s
@@ -107,20 +114,19 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
  * const Todo = (props) => {
  *   const result = useFragment({
  *     data: props.todo,
- *     query: TodoFields,
+ *     fragment: TodoFields,
  *   });
  *   // ...
  * };
  * ```
  */
-export function useFragment<Data>(
-  args: UseFragmentArgs<Data>
+export function useFragment<Data = any, Input = Data>(
+  args: UseFragmentArgs<Data, Input>
 ): UseFragmentState<Data> {
   const client = useClient();
-  const cache = getFragmentCacheForClient(client);
   const suspense = isSuspense(client, args.context);
 
-  const request = useRequest(args.query, EMPTY_VARIABLES);
+  const request = useRequest(args.fragment, EMPTY_VARIABLES);
 
   const fragment = React.useMemo(() => {
     return request.query.definitions.find(
@@ -145,15 +151,16 @@ export function useFragment<Data>(
 
   const getSnapshot = React.useCallback(
     (
-      request: GraphQLRequest<Data, AnyVariables>,
-      data: Data | null,
+      data: Input | null | undefined,
       suspense: boolean
     ): UseFragmentState<Data> => {
-      if (data === null) {
-        return { data: null, fetching: false };
+      if (data == null) {
+        return { data: data as null | undefined, fetching: false };
+      } else if (typeof data !== 'object' || Array.isArray(data)) {
+        throw new Error('useFragment expects data to be a fragment object.');
       } else if (!suspense) {
         const newResult = maskFragment<Data>(
-          data,
+          data as Data,
           fragment.selectionSet,
           fragments
         );
@@ -161,11 +168,9 @@ export function useFragment<Data>(
         return { data: newResult.data, fetching: !newResult.fulfilled };
       }
 
-      const key = request.key;
-      const fragmentName = fragment.name.value;
-      const cached = cache.get(key, fragmentName, data);
+      const cached = getFragmentPromise(client, fragment, data);
       const newResult = maskFragment<Data>(
-        data,
+        data as Data,
         fragment.selectionSet,
         fragments
       );
@@ -173,7 +178,7 @@ export function useFragment<Data>(
       if (newResult.fulfilled) {
         if (cached) {
           cached._resolve();
-          cache.dispose(key, fragmentName, data);
+          deleteFragmentPromise(client, fragment, data);
         }
         return { data: newResult.data, fetching: false };
       } else if (newResult.pending) {
@@ -190,22 +195,22 @@ export function useFragment<Data>(
           _resolve = () => resolve(undefined);
         }) as FragmentPromise;
         promise._resolve = _resolve;
-        cache.set(key, fragmentName, data, promise);
+        setFragmentPromise(client, fragment, data, promise);
         throw promise;
       }
     },
-    [cache, fragment, fragments]
+    [client, fragment, fragments]
   );
 
   const deps = [client, request, fragment, args.data, suspense] as const;
 
   const [state, setState] = React.useState(
-    () => [getSnapshot(request, args.data, suspense), deps] as const
+    () => [getSnapshot(args.data, suspense), deps] as const
   );
 
   const currentResult = state[0];
   if (hasDepsChanged(state[1], deps)) {
-    setState([getSnapshot(request, args.data, suspense), deps]);
+    setState([getSnapshot(args.data, suspense), deps]);
   }
 
   return currentResult;

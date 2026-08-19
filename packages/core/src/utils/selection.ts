@@ -93,7 +93,7 @@ export const isHeuristicFragmentMatch = (
     if (selection.kind === Kind.FIELD) {
       const couldBeExcluded =
         isOptionalSelection(selection) || hasDirective(selection, 'defer');
-      return data[getFieldKey(selection)] !== undefined && !couldBeExcluded;
+      return couldBeExcluded || data[getFieldKey(selection)] !== undefined;
     } else if (selection.kind === Kind.INLINE_FRAGMENT) {
       return isHeuristicFragmentMatch(selection, data, fragments);
     } else if (selection.kind === Kind.FRAGMENT_SPREAD) {

@@ -8,7 +8,7 @@ the hook's `context`) has `suspense` enabled, it suspends while deferred fragmen
 is still streaming in, and otherwise reports the in-progress state via its `fetching`
 flag.
 
-React `useQuery` now installs stable promises for missing fields inside `@defer`
-selections and resolves them directly from the query stream as later results arrive.
+React `useQuery` now associates stable sidecar promises with missing fields inside
+`@defer` selections and resolves them directly from the query stream as later results arrive.
 This lets deferred fragments wake Suspense boundaries during server streams without
 depending on a parent component rerender.
