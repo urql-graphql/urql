@@ -172,6 +172,54 @@ describe('useFragment suspense', () => {
     expect(thrown).toBeInstanceOf(Promise);
   });
 
+  it('does not share suspense promises between unidentified objects', () => {
+    const client = makeClient();
+    const first = captureSuspense(client, {
+      query: SongFields,
+      data: { title: undefined },
+      context: { suspense: true },
+    });
+    const second = captureSuspense(client, {
+      query: SongFields,
+      data: { title: undefined },
+      context: { suspense: true },
+    });
+
+    expect(first.thrown).toBeInstanceOf(Promise);
+    expect(second.thrown).toBeInstanceOf(Promise);
+    expect(second.thrown).not.toBe(first.thrown);
+  });
+
+  it('scopes suspense promises by fragment name', () => {
+    const client = makeClient();
+    const query = `
+      fragment SongTitle on Song { title }
+      fragment SongArtist on Song { artist }
+    `;
+    const data = {
+      __typename: 'Song',
+      id: '1',
+      title: undefined,
+      artist: undefined,
+    };
+    const title = captureSuspense(client, {
+      query,
+      name: 'SongTitle',
+      data,
+      context: { suspense: true },
+    });
+    const artist = captureSuspense(client, {
+      query,
+      name: 'SongArtist',
+      data,
+      context: { suspense: true },
+    });
+
+    expect(title.thrown).toBeInstanceOf(Promise);
+    expect(artist.thrown).toBeInstanceOf(Promise);
+    expect(artist.thrown).not.toBe(title.thrown);
+  });
+
   it('does not suspend when the data is already complete', () => {
     const { thrown, rendered } = captureSuspense(makeClient(), {
       query: SongFields,

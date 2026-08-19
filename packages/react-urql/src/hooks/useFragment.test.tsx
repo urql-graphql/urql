@@ -376,9 +376,11 @@ describe('useFragment masking', () => {
 });
 
 describe('useFragment suspense', () => {
+  const SongFields = `fragment SongFields on Song { id title __typename }`;
+
   const Song = ({ data }: { data: any }) => {
     const result = useFragment<any>({
-      query: `fragment SongFields on Song { id title __typename }`,
+      query: SongFields,
       data,
       context: { suspense: true },
     });
@@ -408,6 +410,80 @@ describe('useFragment suspense', () => {
     await act(async () => {});
 
     expect(view.container.textContent).toBe('Hello');
+  });
+
+  it('does not share suspense promises between unidentified objects', () => {
+    const client = useClient() as any;
+    const first = { title: undefined };
+    const second = { title: undefined };
+    const request = createRequest(SongFields, {});
+
+    render(
+      <Suspense fallback={<p>loading</p>}>
+        <Song data={first} />
+      </Suspense>
+    );
+    const firstPromise = client._fragments.get(
+      request.key,
+      'SongFields',
+      first
+    );
+
+    render(
+      <Suspense fallback={<p>loading</p>}>
+        <Song data={second} />
+      </Suspense>
+    );
+    const secondPromise = client._fragments.get(
+      request.key,
+      'SongFields',
+      second
+    );
+
+    expect(firstPromise).toBeInstanceOf(Promise);
+    expect(secondPromise).toBeInstanceOf(Promise);
+    expect(secondPromise).not.toBe(firstPromise);
+  });
+
+  it('scopes suspense promises by fragment name', () => {
+    const client = useClient() as any;
+    const query = `
+      fragment SongTitle on Song { title }
+      fragment SongArtist on Song { artist }
+    `;
+    const data = {
+      __typename: 'Song',
+      id: '1',
+      title: undefined,
+      artist: undefined,
+    };
+    const request = createRequest(query, {});
+    const Fragment = ({ name }: { name: string }) => {
+      useFragment({ query, name, data, context: { suspense: true } });
+      return null;
+    };
+
+    render(
+      <Suspense fallback={<p>loading</p>}>
+        <Fragment name="SongTitle" />
+      </Suspense>
+    );
+    const titlePromise = client._fragments.get(request.key, 'SongTitle', data);
+
+    render(
+      <Suspense fallback={<p>loading</p>}>
+        <Fragment name="SongArtist" />
+      </Suspense>
+    );
+    const artistPromise = client._fragments.get(
+      request.key,
+      'SongArtist',
+      data
+    );
+
+    expect(titlePromise).toBeInstanceOf(Promise);
+    expect(artistPromise).toBeInstanceOf(Promise);
+    expect(artistPromise).not.toBe(titlePromise);
   });
 
   it('does not suspend when the data is already complete', () => {

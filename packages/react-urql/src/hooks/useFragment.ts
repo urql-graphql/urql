@@ -81,31 +81,6 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
     ? !!context.suspense
     : client.suspense;
 
-/** Derives a cache key for a fragment’s suspense promise.
- *
- * @remarks
- * The base {@link GraphQLRequest.key} only identifies the fragment document, so
- * it’s shared across every `useFragment` hook using the same fragment. To avoid
- * sibling hooks (e.g. items in a list) sharing — and prematurely resolving —
- * each other’s suspense promises, we fold the entity’s identity (`__typename`
- * and `id`/`_id`) into the key when it’s available.
- */
-const getFragmentCacheKey = (
-  request: GraphQLRequest<any, AnyVariables>,
-  data: any
-): number => {
-  let key = request.key;
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
-    const id = data.id != null ? data.id : data._id;
-    if (data.__typename != null && id != null) {
-      const identity = `${data.__typename}:${id}`;
-      for (let i = 0, l = identity.length; i < l; i++)
-        key = (key << 5) + key + identity.charCodeAt(i);
-    }
-  }
-  return key;
-};
-
 /** Hook to mask a GraphQL Fragment given its data. (BETA)
  *
  * @param args - a {@link UseFragmentArgs} object, to pass a `fragment` and `data`.
@@ -186,8 +161,9 @@ export function useFragment<Data>(
         return { data: newResult.data, fetching: !newResult.fulfilled };
       }
 
-      const key = getFragmentCacheKey(request, data);
-      const cached = cache.get(key);
+      const key = request.key;
+      const fragmentName = fragment.name.value;
+      const cached = cache.get(key, fragmentName, data);
       const newResult = maskFragment<Data>(
         data,
         fragment.selectionSet,
@@ -197,7 +173,7 @@ export function useFragment<Data>(
       if (newResult.fulfilled) {
         if (cached) {
           cached._resolve();
-          cache.dispose(key);
+          cache.dispose(key, fragmentName, data);
         }
         return { data: newResult.data, fetching: false };
       } else if (newResult.pending) {
@@ -214,7 +190,7 @@ export function useFragment<Data>(
           _resolve = () => resolve(undefined);
         }) as FragmentPromise;
         promise._resolve = _resolve;
-        cache.set(key, promise);
+        cache.set(key, fragmentName, data, promise);
         throw promise;
       }
     },
