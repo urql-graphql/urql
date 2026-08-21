@@ -586,6 +586,21 @@ export interface OperationContext {
    * this option to `'force'`.
    */
   preferGetMethod?: boolean | 'force' | 'within-url-limit';
+  /** Instructs fetch exchanges to use an HTTP QUERY request.
+   *
+   * @remarks
+   * When set to `true`, built-in fetch exchanges send query operations as
+   * body-bearing HTTP QUERY requests. Mutations and subscriptions are unaffected.
+   * Multipart requests continue to use POST.
+   *
+   * This option takes precedence over {@link OperationContext.preferGetMethod}.
+   * The GraphQL server and HTTP infrastructure must support the QUERY method.
+   * Cross-origin browser requests require the server's CORS policy to allow QUERY.
+   * Browser HTTP caches may not cache QUERY responses yet.
+   *
+   * @see {@link https://www.rfc-editor.org/rfc/rfc10008.html} for the HTTP QUERY method.
+   */
+  preferQueryMethod?: boolean;
   /** A configuration flag indicating whether this operation may trigger "Suspense".
    *
    * @remarks
