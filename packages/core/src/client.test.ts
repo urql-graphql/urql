@@ -153,6 +153,18 @@ describe('promisified methods', () => {
     expect(queryResult).toHaveProperty('then');
   });
 
+  it('passes preferQueryMethod to query operations', () => {
+    client = createClient({
+      url,
+      exchanges: [exchangeMock] as any[],
+      preferQueryMethod: true,
+    });
+
+    client.query(query.query, query.variables).subscribe(() => {});
+
+    expect(receivedOps[0].context.preferQueryMethod).toBe(true);
+  });
+
   it('mutation', () => {
     const mut = gql`
       mutation {

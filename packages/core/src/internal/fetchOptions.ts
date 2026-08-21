@@ -7,7 +7,7 @@ import {
 
 import type { AnyVariables, GraphQLRequest, Operation } from '../types';
 
-/** Abstract definition of the JSON data sent during GraphQL HTTP POST requests. */
+/** Abstract definition of the JSON data sent during GraphQL HTTP requests. */
 export interface FetchBody {
   query?: string;
   documentId?: string;
@@ -68,7 +68,9 @@ export const makeFetchURL = (
   body?: FetchBody
 ): string => {
   const useGETMethod =
-    operation.kind === 'query' && operation.context.preferGetMethod;
+    operation.kind === 'query' &&
+    !operation.context.preferQueryMethod &&
+    operation.context.preferGetMethod;
   if (!useGETMethod || !body) return operation.context.url;
 
   const urlParts = splitOutSearchParams(operation.context.url);
@@ -105,7 +107,9 @@ const serializeBody = (
   body?: FetchBody
 ): FormData | string | undefined => {
   const omitBody =
-    operation.kind === 'query' && !!operation.context.preferGetMethod;
+    operation.kind === 'query' &&
+    !operation.context.preferQueryMethod &&
+    !!operation.context.preferGetMethod;
   if (body && !omitBody) {
     const json = stringifyVariables(body);
     const files = extractFiles(body.variables);
@@ -183,11 +187,15 @@ export const makeFetchOptions = (
   }
 
   const serializedBody = serializeBody(operation, body);
+  const useQUERYMethod =
+    operation.kind === 'query' &&
+    operation.context.preferQueryMethod &&
+    typeof serializedBody === 'string';
   if (typeof serializedBody === 'string' && !headers['content-type'])
     headers['content-type'] = 'application/json';
   return {
     ...extraOptions,
-    method: serializedBody ? 'POST' : 'GET',
+    method: serializedBody ? (useQUERYMethod ? 'QUERY' : 'POST') : 'GET',
     body: serializedBody,
     headers,
   };

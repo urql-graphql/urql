@@ -3,7 +3,11 @@
 import { expect, describe, it } from 'vitest';
 import { Kind } from '@0no-co/graphql.web';
 import { makeOperation } from '../utils/operation';
-import { queryOperation, mutationOperation } from '../test-utils';
+import {
+  queryOperation,
+  mutationOperation,
+  subscriptionOperation,
+} from '../test-utils';
 import { makeFetchBody, makeFetchURL, makeFetchOptions } from './fetchOptions';
 
 describe('makeFetchBody', () => {
@@ -88,6 +92,17 @@ describe('makeFetchURL', () => {
     expect(makeFetchURL(operation, body)).toMatchInlineSnapshot(
       '"http://localhost:3000/graphql?query=query+getUser%28%24name%3A+String%29+%7B%0A++user%28name%3A+%24name%29+%7B%0A++++id%0A++++firstName%0A++++lastName%0A++%7D%0A%7D&operationName=getUser&variables=%7B%22name%22%3A%22Clara%22%7D"'
     );
+  });
+
+  it('keeps the request body out of the URL when QUERY is preferred', () => {
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      ...queryOperation.context,
+      preferGetMethod: 'force',
+      preferQueryMethod: true,
+    });
+
+    const body = makeFetchBody(operation);
+    expect(makeFetchURL(operation, body)).toBe('http://localhost:3000/graphql');
   });
 
   it('returns a query parameter URL when GET is preferred and only a path is provided', () => {
@@ -207,6 +222,67 @@ describe('makeFetchOptions', () => {
         "method": "GET",
       }
     `);
+  });
+
+  it('creates a QUERY request with a JSON body when preferred', () => {
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      ...queryOperation.context,
+      preferGetMethod: 'force',
+      preferQueryMethod: true,
+    });
+
+    const body = makeFetchBody(operation);
+    const options = makeFetchOptions(operation, body);
+    expect(options.body).toBe(makeFetchOptions(queryOperation, body).body);
+    expect(options).toMatchObject({
+      body: expect.any(String),
+      headers: {
+        accept:
+          'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
+        'content-type': 'application/json',
+      },
+      method: 'QUERY',
+    });
+  });
+
+  it('keeps mutations on POST when QUERY is preferred', () => {
+    const operation = makeOperation(mutationOperation.kind, mutationOperation, {
+      ...mutationOperation.context,
+      preferQueryMethod: true,
+    });
+
+    const body = makeFetchBody(operation);
+    expect(makeFetchOptions(operation, body).method).toBe('POST');
+  });
+
+  it('keeps subscriptions on POST when QUERY is preferred', () => {
+    const operation = makeOperation(
+      subscriptionOperation.kind,
+      subscriptionOperation,
+      {
+        ...subscriptionOperation.context,
+        preferQueryMethod: true,
+      }
+    );
+
+    const body = makeFetchBody(operation);
+    expect(makeFetchOptions(operation, body).method).toBe('POST');
+  });
+
+  it('keeps multipart queries on POST when QUERY is preferred', () => {
+    const operation = makeOperation(queryOperation.kind, queryOperation, {
+      ...queryOperation.context,
+      preferQueryMethod: true,
+    });
+    operation.variables = {
+      ...operation.variables,
+      file: new Blob(),
+    };
+
+    const body = makeFetchBody(operation);
+    const options = makeFetchOptions(operation, body);
+    expect(options.method).toBe('POST');
+    expect(options.body).toBeInstanceOf(FormData);
   });
 
   it('creates a POST multipart request when a file is detected', () => {

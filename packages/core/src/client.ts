@@ -167,6 +167,21 @@ export interface ClientOptions {
    * requests for queries.
    */
   preferGetMethod?: boolean | 'force' | 'within-url-limit';
+  /** Instructs fetch exchanges to use an HTTP QUERY request.
+   *
+   * @remarks
+   * This changes the {@link OperationContext.preferQueryMethod} option, which tells fetch exchanges
+   * to use body-bearing QUERY requests for query operations instead of GET or POST requests.
+   * Mutations and subscriptions are unaffected. Multipart requests continue to use POST.
+   *
+   * This option takes precedence over {@link ClientOptions.preferGetMethod}.
+   * The GraphQL server and HTTP infrastructure must support the QUERY method.
+   * Cross-origin browser requests require the server's CORS policy to allow QUERY.
+   * Browser HTTP caches may not cache QUERY responses yet.
+   *
+   * @see {@link https://www.rfc-editor.org/rfc/rfc10008.html} for the HTTP QUERY method.
+   */
+  preferQueryMethod?: boolean;
 }
 
 /** The `Client` is the central hub for your GraphQL operations and holds `urql`'s state.
@@ -551,6 +566,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     fetch: opts.fetch,
     preferGetMethod:
       opts.preferGetMethod != null ? opts.preferGetMethod : 'within-url-limit',
+    ...(opts.preferQueryMethod != null
+      ? { preferQueryMethod: opts.preferQueryMethod }
+      : {}),
     requestPolicy: opts.requestPolicy || 'cache-first',
   };
 
