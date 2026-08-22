@@ -411,7 +411,14 @@ export const gc = () => {
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
-  for (const entityKey of currentData!.gc.keys()) {
+  const gcIterator = currentData!.gc[Symbol.iterator]();
+  for (
+    let gcEntry = gcIterator.next();
+    !gcEntry.done;
+    gcEntry = gcIterator.next()
+  ) {
+    const entityKey = gcEntry.value;
+
     // Remove the current key from the GC batch
     currentData!.gc.delete(entityKey);
 
@@ -640,22 +647,30 @@ const squashLayer = (layerKey: number) => {
 
   const links = currentData!.links.optimistic.get(layerKey);
   if (links) {
-    for (const entry of links.entries()) {
-      const entityKey = entry[0];
-      const keyMap = entry[1];
+    const linksIterator = links[Symbol.iterator]();
+    for (
+      let linksEntry = linksIterator.next();
+      !linksEntry.done;
+      linksEntry = linksIterator.next()
+    ) {
+      const keyMap = linksEntry.value[1];
       for (const fieldKey in keyMap) {
-        writeLink(entityKey, fieldKey, keyMap[fieldKey]);
+        writeLink(linksEntry.value[0], fieldKey, keyMap[fieldKey]);
       }
     }
   }
 
   const records = currentData!.records.optimistic.get(layerKey);
   if (records) {
-    for (const entry of records.entries()) {
-      const entityKey = entry[0];
-      const keyMap = entry[1];
+    const recordsIterator = records[Symbol.iterator]();
+    for (
+      let recordsEntry = recordsIterator.next();
+      !recordsEntry.done;
+      recordsEntry = recordsIterator.next()
+    ) {
+      const keyMap = recordsEntry.value[1];
       for (const fieldKey in keyMap) {
-        writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
+        writeRecord(recordsEntry.value[0], fieldKey, keyMap[fieldKey]);
       }
     }
   }
@@ -683,15 +698,20 @@ export const persistData = () => {
     currentOptimistic = true;
     currentOperation = 'read';
     const entries: SerializedEntries = {};
-    for (const key of currentData!.persist.keys()) {
-      const { entityKey, fieldKey } = deserializeKeyInfo(key);
+    const persistIterator = currentData!.persist[Symbol.iterator]();
+    for (
+      let persistEntry = persistIterator.next();
+      !persistEntry.done;
+      persistEntry = persistIterator.next()
+    ) {
+      const { entityKey, fieldKey } = deserializeKeyInfo(persistEntry.value);
       let x: void | Link | EntityField;
       if ((x = readLink(entityKey, fieldKey)) !== undefined) {
-        entries[key] = `:${stringifyVariables(x)}`;
+        entries[persistEntry.value] = `:${stringifyVariables(x)}`;
       } else if ((x = readRecord(entityKey, fieldKey)) !== undefined) {
-        entries[key] = stringifyVariables(x);
+        entries[persistEntry.value] = stringifyVariables(x);
       } else {
-        entries[key] = undefined;
+        entries[persistEntry.value] = undefined;
       }
     }
 

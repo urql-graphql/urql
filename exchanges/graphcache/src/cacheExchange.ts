@@ -92,8 +92,13 @@ export const cacheExchange =
     const isBlockedByOptimisticUpdate = (
       dependencies: Dependencies
     ): boolean => {
-      for (const dep of dependencies.values())
-        if (blockedDependencies.has(dep)) return true;
+      const depsIterator = dependencies[Symbol.iterator]();
+      for (
+        let depsEntry = depsIterator.next();
+        !depsEntry.done;
+        depsEntry = depsIterator.next()
+      )
+        if (blockedDependencies.has(depsEntry.value)) return true;
       return false;
     };
 
@@ -103,9 +108,22 @@ export const cacheExchange =
     ) => {
       if (dependencies) {
         // Collect operations that will be updated due to cache changes
-        for (const dep of dependencies.values()) {
-          const keys = deps.get(dep);
-          if (keys) for (const key of keys.values()) pendingOperations.add(key);
+        const depsIterator = dependencies[Symbol.iterator]();
+        for (
+          let depsEntry = depsIterator.next();
+          !depsEntry.done;
+          depsEntry = depsIterator.next()
+        ) {
+          const keys = deps.get(depsEntry.value);
+          if (keys) {
+            const keysIterator = keys[Symbol.iterator]();
+            for (
+              let keysEntry = keysIterator.next();
+              !keysEntry.done;
+              keysEntry = keysIterator.next()
+            )
+              pendingOperations.add(keysEntry.value);
+          }
         }
       }
     };
@@ -116,15 +134,21 @@ export const cacheExchange =
       isOptimistic: boolean
     ) => {
       // Reexecute collected operations and delete them from the mapping
-      for (const key of pendingOperations.values()) {
-        if (key !== operation.key) {
-          const op = operations.get(key);
+      const pendingIterator = pendingOperations[Symbol.iterator]();
+      for (
+        let pendingEntry = pendingIterator.next();
+        !pendingEntry.done;
+        pendingEntry = pendingIterator.next()
+      ) {
+        if (pendingEntry.value !== operation.key) {
+          const op = operations.get(pendingEntry.value);
           if (op) {
             // Collect all dependent operations if the reexecuting operation is a query
-            if (operation.kind === 'query') dependentOperations.add(key);
+            if (operation.kind === 'query')
+              dependentOperations.add(pendingEntry.value);
             let policy: RequestPolicy = 'cache-first';
-            if (requestedRefetch.has(key)) {
-              requestedRefetch.delete(key);
+            if (requestedRefetch.has(pendingEntry.value)) {
+              requestedRefetch.delete(pendingEntry.value);
               policy = 'cache-and-network';
             }
             client.reexecuteOperation(toRequestPolicy(op, policy));
@@ -175,7 +199,13 @@ export const cacheExchange =
         clearDataState();
         if (dependencies.size) {
           // Update blocked optimistic dependencies
-          for (const dep of dependencies.values()) blockedDependencies.add(dep);
+          const depsIterator = dependencies[Symbol.iterator]();
+          for (
+            let depsEntry = depsIterator.next();
+            !depsEntry.done;
+            depsEntry = depsIterator.next()
+          )
+            blockedDependencies.add(depsEntry.value);
           // Store optimistic dependencies for update
           optimisticKeysToDependencies.set(operation.key, dependencies);
           // Update related queries
@@ -205,9 +235,14 @@ export const cacheExchange =
 
     // This updates the known dependencies for the passed operation
     const updateDependencies = (op: Operation, dependencies: Dependencies) => {
-      for (const dep of dependencies.values()) {
-        let depOps = deps.get(dep);
-        if (!depOps) deps.set(dep, (depOps = new Set()));
+      const depsIterator = dependencies[Symbol.iterator]();
+      for (
+        let depsEntry = depsIterator.next();
+        !depsEntry.done;
+        depsEntry = depsIterator.next()
+      ) {
+        let depOps = deps.get(depsEntry.value);
+        if (!depOps) deps.set(depsEntry.value, (depOps = new Set()));
         depOps.add(op.key);
       }
     };
