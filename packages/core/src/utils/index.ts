@@ -9,7 +9,7 @@ export * from './operation';
 export * from './selection';
 export * from './defer';
 export * from './maskFragment';
-export * from './cache';
+export * from './fragmentSource';
 
 export const noop = () => {
   /* noop */
