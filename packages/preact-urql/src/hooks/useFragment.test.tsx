@@ -1,0 +1,342 @@
+// @vitest-environment jsdom
+
+import { FunctionalComponent as FC, h } from 'preact';
+import { render, cleanup, act } from '@testing-library/preact';
+import { expect, it, describe, beforeEach, afterEach } from 'vitest';
+
+import { useFragment, UseFragmentState } from './useFragment';
+import { Provider } from '../context';
+
+const makeClient = (overrides: Record<string, any> = {}): any => ({
+  suspense: false,
+  ...overrides,
+});
+
+let snapshot: UseFragmentState<any> | undefined;
+
+const Probe: FC<any> = props => {
+  snapshot = useFragment(props);
+  return null;
+};
+
+const renderProbe = (client: any, props: any) =>
+  render(h(Provider, { value: client, children: [h(Probe, props)] }));
+
+// Renders the hook and captures either the masked state or a thrown suspense
+// promise, without a Suspense boundary, so we can assert the suspense bridge.
+const captureSuspense = (client: any, props: any) => {
+  let thrown: unknown;
+  let rendered: UseFragmentState<any> | undefined;
+  const Catcher: FC = () => {
+    try {
+      rendered = useFragment(props);
+    } catch (error) {
+      thrown = error;
+    }
+    return null;
+  };
+  render(h(Provider, { value: client, children: [h(Catcher, {})] }));
+  return { thrown, rendered };
+};
+
+beforeEach(() => {
+  snapshot = undefined;
+});
+
+afterEach(() => cleanup());
+
+describe('useFragment masking', () => {
+  it('masks data to the selected fields', () => {
+    renderProbe(makeClient(), {
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
+      data: {
+        __typename: 'Todo',
+        id: '1',
+        name: 'Learn urql',
+        completed: true,
+      },
+    });
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', id: '1', name: 'Learn urql' },
+    });
+  });
+
+  it('takes a named fragment to mask data', () => {
+    renderProbe(makeClient(), {
+      fragment: `fragment x on X { foo } fragment TodoFields on Todo { id name __typename }`,
+      name: 'TodoFields',
+      data: {
+        __typename: 'Todo',
+        id: '1',
+        name: 'Learn urql',
+        completed: true,
+      },
+    });
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', id: '1', name: 'Learn urql' },
+    });
+  });
+
+  it('updates the masked data when the fragment name changes', () => {
+    const client = makeClient();
+    const query = `
+      fragment TodoIdentity on Todo { id __typename }
+      fragment TodoDetails on Todo { name __typename }
+    `;
+    const data = {
+      __typename: 'Todo',
+      id: '1',
+      name: 'Learn urql',
+    };
+    const view = renderProbe(client, {
+      fragment: query,
+      name: 'TodoIdentity',
+      data,
+    });
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', id: '1' },
+    });
+
+    view.rerender(
+      h(Provider, {
+        value: client,
+        children: [h(Probe, { fragment: query, name: 'TodoDetails', data })],
+      })
+    );
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', name: 'Learn urql' },
+    });
+  });
+
+  it('marks fetching for a missing non-optional field', () => {
+    renderProbe(makeClient(), {
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
+      data: { __typename: 'Todo', id: '1', name: undefined },
+    });
+
+    expect(snapshot).toEqual({
+      fetching: true,
+      data: { __typename: 'Todo', id: '1' },
+    });
+  });
+
+  it('treats a missing @defer-red fragment spread as fulfilled', () => {
+    renderProbe(makeClient(), {
+      fragment: `
+        fragment TodoFields on Todo {
+          id name __typename
+          ...AuthorFields @defer
+        }
+
+        fragment AuthorFields on Todo { author { id name __typename } }
+      `,
+      name: 'TodoFields',
+      data: { __typename: 'Todo', id: '1', name: null, author: undefined },
+    });
+
+    expect(snapshot).toEqual({
+      fetching: false,
+      data: { __typename: 'Todo', id: '1', name: null },
+    });
+  });
+
+  it('returns null data without masking when data is null', () => {
+    renderProbe(makeClient(), {
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
+      data: null,
+    });
+
+    expect(snapshot).toEqual({ fetching: false, data: null });
+  });
+
+  it('returns undefined data without masking when data is undefined', () => {
+    renderProbe(makeClient(), {
+      fragment: `fragment TodoFields on Todo { id name __typename }`,
+      data: undefined,
+    });
+
+    expect(snapshot).toEqual({ fetching: false, data: undefined });
+  });
+});
+
+describe('useFragment suspense', () => {
+  const SongFields = `fragment SongFields on Song { id title __typename }`;
+
+  it('throws a suspense promise while a field is missing', () => {
+    const { thrown, rendered } = captureSuspense(makeClient(), {
+      fragment: SongFields,
+      data: { __typename: 'Song', id: '1', title: undefined },
+      context: { suspense: true },
+    });
+
+    expect(rendered).toBeUndefined();
+    expect(thrown).toBeInstanceOf(Promise);
+  });
+
+  it('does not share suspense promises between unidentified objects', () => {
+    const client = makeClient();
+    const first = captureSuspense(client, {
+      fragment: SongFields,
+      data: { title: undefined },
+      context: { suspense: true },
+    });
+    const second = captureSuspense(client, {
+      fragment: SongFields,
+      data: { title: undefined },
+      context: { suspense: true },
+    });
+
+    expect(first.thrown).toBeInstanceOf(Promise);
+    expect(second.thrown).toBeInstanceOf(Promise);
+    expect(second.thrown).not.toBe(first.thrown);
+  });
+
+  it('scopes suspense promises by fragment name', () => {
+    const client = makeClient();
+    const query = `
+      fragment SongTitle on Song { title }
+      fragment SongArtist on Song { artist }
+    `;
+    const data = {
+      __typename: 'Song',
+      id: '1',
+      title: undefined,
+      artist: undefined,
+    };
+    const title = captureSuspense(client, {
+      fragment: query,
+      name: 'SongTitle',
+      data,
+      context: { suspense: true },
+    });
+    const artist = captureSuspense(client, {
+      fragment: query,
+      name: 'SongArtist',
+      data,
+      context: { suspense: true },
+    });
+
+    expect(title.thrown).toBeInstanceOf(Promise);
+    expect(artist.thrown).toBeInstanceOf(Promise);
+    expect(artist.thrown).not.toBe(title.thrown);
+  });
+
+  it('does not suspend when the data is already complete', () => {
+    const { thrown, rendered } = captureSuspense(makeClient(), {
+      fragment: SongFields,
+      data: { __typename: 'Song', id: '1', title: 'World' },
+      context: { suspense: true },
+    });
+
+    expect(thrown).toBeUndefined();
+    expect(rendered).toEqual({
+      fetching: false,
+      data: { __typename: 'Song', id: '1', title: 'World' },
+    });
+  });
+
+  it('does not re-suspend for an entity it has already committed', async () => {
+    const client = makeClient();
+    let thrown: unknown;
+    const Catcher: FC<any> = props => {
+      thrown = undefined;
+      try {
+        snapshot = useFragment(props);
+      } catch (error) {
+        thrown = error;
+      }
+      return null;
+    };
+    const propsFor = (data: any) => ({
+      fragment: SongFields,
+      data,
+      context: { suspense: true },
+    });
+
+    const view = render(
+      h(Provider, {
+        value: client,
+        children: [
+          h(Catcher, propsFor({ __typename: 'Song', id: '1', title: 'Hello' })),
+        ],
+      })
+    );
+    // Flush the commit effect that records the committed entity.
+    await act(async () => {});
+    expect(thrown).toBeUndefined();
+
+    // A refetch streams again and the deferred field is missing once more;
+    // the hook keeps the committed data instead of re-suspending.
+    view.rerender(
+      h(Provider, {
+        value: client,
+        children: [
+          h(
+            Catcher,
+            propsFor({ __typename: 'Song', id: '1', title: undefined })
+          ),
+        ],
+      })
+    );
+    await act(async () => {});
+
+    expect(thrown).toBeUndefined();
+    expect(snapshot).toEqual({
+      fetching: true,
+      data: { __typename: 'Song', id: '1', title: 'Hello' },
+    });
+  });
+
+  it('suspends again when moving to a different entity', async () => {
+    const client = makeClient();
+    let thrown: unknown;
+    const Catcher: FC<any> = props => {
+      thrown = undefined;
+      try {
+        snapshot = useFragment(props);
+      } catch (error) {
+        thrown = error;
+      }
+      return null;
+    };
+    const propsFor = (data: any) => ({
+      fragment: SongFields,
+      data,
+      context: { suspense: true },
+    });
+
+    const view = render(
+      h(Provider, {
+        value: client,
+        children: [
+          h(Catcher, propsFor({ __typename: 'Song', id: '1', title: 'Hello' })),
+        ],
+      })
+    );
+    await act(async () => {});
+    expect(thrown).toBeUndefined();
+
+    view.rerender(
+      h(Provider, {
+        value: client,
+        children: [
+          h(
+            Catcher,
+            propsFor({ __typename: 'Song', id: '2', title: undefined })
+          ),
+        ],
+      })
+    );
+    await act(async () => {});
+
+    expect(thrown).toBeInstanceOf(Promise);
+  });
+});
