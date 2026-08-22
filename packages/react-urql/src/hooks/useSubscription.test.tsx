@@ -17,7 +17,9 @@ vi.mock('../context', async () => {
 
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { OperationContext } from '@urql/core';
+import { renderHook } from '@testing-library/react';
+import { CombinedError, OperationContext } from '@urql/core';
+import { fromValue, makeSubject, merge, never } from 'wonka';
 
 import { useSubscription, UseSubscriptionState } from './useSubscription';
 import { useClient } from '../context';
@@ -45,7 +47,10 @@ const SubscriptionUser = ({
 };
 
 beforeEach(() => {
-  client.executeSubscription.mockClear();
+  client.executeSubscription.mockReset();
+  client.executeSubscription.mockImplementation(() =>
+    merge([fromValue({ data: 1234, error: 5678 }), never])
+  );
   state = undefined;
 });
 
@@ -92,6 +97,53 @@ describe('execute subscription', () => {
     renderer.create(<SubscriptionUser q={query} />);
     act(() => execute && execute());
     expect(client.executeSubscription).toBeCalledTimes(2);
+  });
+});
+
+describe('fetching', () => {
+  it('remains active when subscription results arrive', () => {
+    const subject = makeSubject<{ data: number }>();
+    client.executeSubscription.mockReturnValue(subject.source);
+    const { result } = renderHook(() => useSubscription({ query }));
+
+    act(() => subject.next({ data: 1234 }));
+
+    expect(result.current[0].fetching).toBe(true);
+  });
+
+  it('becomes inactive when the subscription completes', () => {
+    const subject = makeSubject<{ data: number }>();
+    client.executeSubscription.mockReturnValue(subject.source);
+    const { result } = renderHook(() => useSubscription({ query }));
+
+    expect(result.current[0].fetching).toBe(true);
+    act(() => subject.complete());
+    expect(result.current[0].fetching).toBe(false);
+  });
+
+  it('preserves subscription errors on completion', () => {
+    const subject = makeSubject<{
+      data: undefined;
+      error: CombinedError;
+    }>();
+    const error = new CombinedError({ networkError: new Error('test') });
+    client.executeSubscription.mockReturnValue(subject.source);
+    const { result } = renderHook(() => useSubscription({ query }));
+
+    act(() => subject.next({ data: undefined, error }));
+    act(() => subject.complete());
+
+    expect(result.current[0]).toMatchObject({ fetching: false, error });
+  });
+
+  it('remains active after local Strict Mode cleanup', () => {
+    const subject = makeSubject<{ data: number }>();
+    client.executeSubscription.mockReturnValue(subject.source);
+    const { result } = renderHook(() => useSubscription({ query }), {
+      wrapper: React.StrictMode,
+    });
+
+    expect(result.current[0].fetching).toBe(true);
   });
 });
 
