@@ -16,3 +16,11 @@ export {
   makeOperation,
   getOperationName,
 } from './utils';
+
+export { maskFragment, getFragments, makeFragmentSource } from './utils';
+
+export type {
+  FragmentMap,
+  MaskFragmentResult,
+  FragmentSourceArgs,
+} from './utils';
