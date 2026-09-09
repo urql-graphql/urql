@@ -181,7 +181,10 @@ describe('Client deferred tracking', () => {
     const results = makeSubject<OperationResult>();
     const exchange: Exchange = () => ops$ =>
       merge([
-        pipe(ops$, filter((): boolean => false)) as any,
+        pipe(
+          ops$,
+          filter((): boolean => false)
+        ) as any,
         results.source,
       ]);
     const client = createClient({

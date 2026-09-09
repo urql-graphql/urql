@@ -100,7 +100,9 @@ export const makeFragmentSource = <Data = any, Input = Data>(
       observer.next({ data: args.data as Data, fulfilled: true });
       observer.complete();
     } else if (typeof args.data !== 'object' || Array.isArray(args.data)) {
-      throw new Error('makeFragmentSource expects data to be a fragment object.');
+      throw new Error(
+        'makeFragmentSource expects data to be a fragment object.'
+      );
     } else {
       update();
     }
