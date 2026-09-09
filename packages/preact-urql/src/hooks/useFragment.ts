@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useMemo, useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import {
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import { pipe, subscribe } from 'wonka';
 import type { FragmentDefinitionNode } from '@0no-co/graphql.web';
 
