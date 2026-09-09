@@ -26,8 +26,7 @@ import { useQuery } from './useQuery';
 import * as context from '../context';
 
 const { useClient } = context;
-const setClient = (client: unknown) =>
-  (context as any).__setClient(client);
+const setClient = (client: unknown) => (context as any).__setClient(client);
 
 /** Creates a real `Client` whose exchange issues results from a subject.
  *
@@ -39,7 +38,13 @@ const setClient = (client: unknown) =>
 const makeStreamedClient = () => {
   const results = makeSubject<any>();
   const exchange: Exchange = () => ops$ =>
-    merge([pipe(ops$, filter((): boolean => false)) as any, results.source]);
+    merge([
+      pipe(
+        ops$,
+        filter((): boolean => false)
+      ) as any,
+      results.source,
+    ]);
   const client = createClient({
     url: 'http://0.0.0.0',
     suspense: true,

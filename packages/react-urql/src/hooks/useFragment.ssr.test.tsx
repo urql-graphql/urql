@@ -25,8 +25,7 @@ import { useQuery } from './useQuery';
 import { useFragment } from './useFragment';
 import * as context from '../context';
 
-const setClient = (client: unknown) =>
-  (context as any).__setClient(client);
+const setClient = (client: unknown) => (context as any).__setClient(client);
 
 /** Creates a real `Client` whose exchange issues results from a subject.
  *
@@ -38,7 +37,10 @@ const makeStreamedClient = () => {
   const results = makeSubject<any>();
   const exchange: Exchange = () => ops$ =>
     merge([
-      wonkaPipe(ops$, filter((): boolean => false)) as any,
+      wonkaPipe(
+        ops$,
+        filter((): boolean => false)
+      ) as any,
       results.source,
     ]);
   const client = createClient({
