@@ -860,6 +860,61 @@ describe('deduplication behavior', () => {
     expect(onOperation).toHaveBeenCalledTimes(2);
     expect(onResult).toHaveBeenCalledTimes(2);
   });
+
+  it('blocks repeated reexecutes of operations that are in-flight', async () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let resolve;
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        onPush(onOperation),
+        mergeMap(op =>
+          fromPromise(
+            new Promise<void>(res => {
+              resolve = res;
+            }).then(() => ({
+              hasNext: false,
+              stale: false,
+              data: 'test',
+              operation: op,
+            }))
+          )
+        )
+      );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+    expect(onOperation).toHaveBeenCalledTimes(1);
+
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+
+    expect(onOperation).toHaveBeenCalledTimes(1);
+
+    resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('shared sources behavior', () => {
