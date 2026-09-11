@@ -724,7 +724,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           queue.push(operation);
           Promise.resolve().then(dispatchOperation);
         } else {
-          dispatched.delete(operation.key);
+          if (queued) dispatched.delete(operation.key);
           Promise.resolve().then(dispatchOperation);
         }
       }
