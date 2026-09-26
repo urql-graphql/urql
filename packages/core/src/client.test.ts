@@ -860,6 +860,50 @@ describe('deduplication behavior', () => {
     expect(onOperation).toHaveBeenCalledTimes(2);
     expect(onResult).toHaveBeenCalledTimes(2);
   });
+
+  // See https://github.com/urql-graphql/urql/issues/3254
+  it('unblocks query operations dropped by an exchange on reexecuteOperation', async () => {
+    const onOperation = vi.fn();
+    const onResult = vi.fn();
+
+    let hasSent = false;
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        onPush(onOperation),
+        map(op => ({
+          hasNext: false,
+          stale: false,
+          data: 'test',
+          operation: op,
+        })),
+        // Drop the first result, like Graphcache does for a blocked cache miss
+        filter(() => hasSent || !(hasSent = true))
+      );
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'cache-first',
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+    expect(onOperation).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(0);
+
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+    client.reexecuteOperation(operation);
+    await Promise.resolve();
+
+    expect(onOperation).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('shared sources behavior', () => {

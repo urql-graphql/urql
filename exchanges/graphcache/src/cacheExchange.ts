@@ -84,6 +84,7 @@ export const cacheExchange =
     const results: ResultMap = new Map();
     const blockedDependencies: Dependencies = new Set();
     const requestedRefetch: Operations = new Set();
+    const inFlightOperations: Operations = new Set();
     const deps: DependentOperations = new Map();
 
     let reexecutingOperations: Operations = new Set();
@@ -151,11 +152,13 @@ export const cacheExchange =
         // Pre-reserve the position of the result layer
         reserveLayer(store.data, operation.key);
         operations.set(operation.key, operation);
+        inFlightOperations.add(operation.key);
       } else if (operation.kind === 'teardown') {
         // Delete reference to operation if any exists to release it
         operations.delete(operation.key);
         results.delete(operation.key);
         reexecutingOperations.delete(operation.key);
+        inFlightOperations.delete(operation.key);
         // Mark operation layer as done
         noopDataState(store.data, operation.key);
         return operation;
@@ -346,7 +349,9 @@ export const cacheExchange =
             res.outcome === 'miss' &&
             res.operation.context.requestPolicy !== 'cache-only' &&
             !isBlockedByOptimisticUpdate(res.dependencies) &&
-            !reexecutingOperations.has(res.operation.key)
+            !reexecutingOperations.has(res.operation.key) &&
+            // Deduplicate cache misses for operations that are already in-flight
+            !inFlightOperations.has(res.operation.key)
         ),
         map(res => {
           dispatchDebug({
@@ -440,6 +445,7 @@ export const cacheExchange =
           result => !optimisticKeysToDependencies.has(result.operation.key)
         ),
         map(result => {
+          if (!result.hasNext) inFlightOperations.delete(result.operation.key);
           const pendingOperations: Operations = new Set();
           // Update the cache with the incoming API result
           const cacheResult = updateCacheWithResult(result, pendingOperations);

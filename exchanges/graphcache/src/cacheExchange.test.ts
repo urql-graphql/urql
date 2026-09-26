@@ -2229,6 +2229,115 @@ describe('optimistic updates', () => {
     vi.runAllTimers();
     expect(result).toHaveBeenCalledTimes(3);
   });
+
+  // See https://github.com/urql-graphql/urql/issues/3254
+  it('does not stall queries dropped while blocked by an optimistic update', async () => {
+    const authorsQuery = gql`
+      query {
+        authors {
+          id
+          name
+        }
+      }
+    `;
+
+    const authorIdsQuery = gql`
+      query {
+        authors {
+          id
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        deleteAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const author = { __typename: 'Author', id: '123', name: 'Author' };
+
+    let pending: (() => void)[] = [];
+    const tick = async () => {
+      for (let i = 0; i < 20; i++) await Promise.resolve();
+    };
+    const flush = async () => {
+      await tick();
+      const resolvers = pending;
+      pending = [];
+      resolvers.forEach(resolve => resolve());
+      await tick();
+    };
+
+    // Network exchange that holds responses until `flush()`
+    const network: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        mergeMap(op =>
+          fromPromise(
+            new Promise<OperationResult>(resolve => {
+              pending.push(() =>
+                resolve({
+                  operation: op,
+                  data:
+                    op.kind === 'mutation'
+                      ? { __typename: 'Mutation', deleteAuthor: author }
+                      : { __typename: 'Query', authors: [author] },
+                  hasNext: false,
+                  stale: false,
+                })
+              );
+            })
+          )
+        )
+      );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [
+        cacheExchange({
+          optimistic: {
+            deleteAuthor: () => ({ ...author, name: '[REDACTED OFFLINE]' }),
+          },
+          updates: {
+            Mutation: {
+              deleteAuthor: (_data, _args, cache) => {
+                cache.invalidate({ __typename: 'Author', id: '123' });
+              },
+            },
+          },
+        }),
+        network,
+      ],
+    });
+
+    const onResult = vi.fn();
+
+    pipe(
+      client.query(authorsQuery, {}),
+      subscribe(() => {})
+    );
+    await flush();
+
+    // The optimistic update invalidates Author:123 while the mutation is in-flight
+    pipe(
+      client.mutation(mutation, {}),
+      subscribe(() => {})
+    );
+    await tick();
+
+    // A new query mounts, misses, and is dropped since it's blocked by the optimistic update
+    pipe(client.query(authorIdsQuery, {}), subscribe(onResult));
+    await tick();
+    expect(onResult).toHaveBeenCalledTimes(0);
+
+    for (let i = 0; i < 3; i++) await flush();
+    expect(onResult).toHaveBeenCalled();
+  });
 });
 
 describe('mutation updates', () => {
