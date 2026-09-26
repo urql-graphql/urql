@@ -1,6 +1,7 @@
 import {
   gql,
   createClient,
+  Exchange,
   ExchangeIO,
   Operation,
   OperationResult,
@@ -23,6 +24,8 @@ import {
   tap,
   publish,
   delay,
+  fromPromise,
+  subscribe,
 } from 'wonka';
 
 import { minifyIntrospectionQuery } from '@urql/introspection';
@@ -3210,6 +3213,76 @@ describe('looping protection', () => {
 
     expect(extendedData).toMatchObject({ stale: false });
     expect(client.reexecuteOperation).toHaveBeenCalledTimes(4);
+  });
+});
+
+describe('deduplication', () => {
+  it('deduplicates reexecutes of in-flight query operations', async () => {
+    const authorsQuery = gql`
+      query {
+        authors {
+          id
+          name
+        }
+      }
+    `;
+
+    const author = { __typename: 'Author', id: '123', name: 'Author' };
+
+    const tick = async () => {
+      for (let i = 0; i < 20; i++) await Promise.resolve();
+    };
+
+    let resolve: () => void = () => {};
+    const onNetwork = vi.fn();
+    const network: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        tap(onNetwork),
+        mergeMap(op =>
+          fromPromise(
+            new Promise<void>(res => {
+              resolve = res;
+            }).then(
+              (): OperationResult => ({
+                operation: op,
+                data: { __typename: 'Query', authors: [author] },
+                hasNext: false,
+                stale: false,
+              })
+            )
+          )
+        )
+      );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [cacheExchange({}), network],
+    });
+
+    const onResult = vi.fn();
+    const operation = client.createRequestOperation('query', {
+      key: 1,
+      query: authorsQuery,
+      variables: {},
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+    await tick();
+    expect(onNetwork).toHaveBeenCalledTimes(1);
+
+    for (let i = 0; i < 4; i++) {
+      client.reexecuteOperation(operation);
+      await tick();
+    }
+
+    expect(onNetwork).toHaveBeenCalledTimes(1);
+
+    resolve();
+    await tick();
+    expect(onNetwork).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledTimes(1);
   });
 });
 
