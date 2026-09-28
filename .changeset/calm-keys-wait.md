@@ -2,4 +2,4 @@
 '@urql/exchange-graphcache': patch
 ---
 
-Deduplicate cache misses and refetches of queries that already have a network request in flight. Previously, reexecuting a pending query repeatedly, e.g. when subscription events kept updating its dependencies, could send duplicate requests, including for partial or `cache-and-network` results.
+Defer requests that subscription results cause for queries that already have a request in flight. Previously, a burst of subscription events updating a slow query could send a duplicate request for every other event. The query is now refetched once, after its in-flight request completes.

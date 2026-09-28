@@ -85,6 +85,10 @@ export const cacheExchange =
     const blockedDependencies: Dependencies = new Set();
     const requestedRefetch: Operations = new Set();
     const inFlightOperations: Operations = new Set();
+    // Queries that deferred a request, and are refetched once their in-flight request completes
+    const refetchOperations: Operations = new Set();
+    // Reexecutes of in-flight queries that subscription results caused
+    const deferredReexecutes = new WeakSet<Operation>();
     const deps: DependentOperations = new Map();
 
     let reexecutingOperations: Operations = new Set();
@@ -123,15 +127,20 @@ export const cacheExchange =
           if (op) {
             // Collect all dependent operations if the reexecuting operation is a query
             if (operation.kind === 'query') dependentOperations.add(key);
-            // A request that's in-flight was sent before this mutation, so it can't
-            // replace a request for the updated data
-            if (operation.kind === 'mutation') inFlightOperations.delete(key);
             let policy: RequestPolicy = 'cache-first';
             if (requestedRefetch.has(key)) {
               requestedRefetch.delete(key);
               policy = 'cache-and-network';
             }
-            client.reexecuteOperation(toRequestPolicy(op, policy));
+            const reexecute = toRequestPolicy(op, policy);
+            // Subscription results may update a query repeatedly while its request is in-flight,
+            // so any request they cause is deferred until the in-flight request completes
+            if (
+              operation.kind === 'subscription' &&
+              inFlightOperations.has(key)
+            )
+              deferredReexecutes.add(reexecute);
+            client.reexecuteOperation(reexecute);
           }
         }
       }
@@ -148,6 +157,18 @@ export const cacheExchange =
       }
     };
 
+    // Checks whether a reexecute's request is deferred until the query's in-flight request
+    // completes, in which case the query is refetched then
+    const deferRequest = (operation: Operation): boolean => {
+      if (
+        !deferredReexecutes.has(operation) ||
+        !inFlightOperations.has(operation.key)
+      )
+        return false;
+      refetchOperations.add(operation.key);
+      return true;
+    };
+
     // This registers queries with the data layer to ensure commutativity
     const prepareForwardedOperation = (operation: Operation) => {
       let optimistic = false;
@@ -156,12 +177,14 @@ export const cacheExchange =
         reserveLayer(store.data, operation.key);
         operations.set(operation.key, operation);
         inFlightOperations.add(operation.key);
+        refetchOperations.delete(operation.key);
       } else if (operation.kind === 'teardown') {
         // Delete reference to operation if any exists to release it
         operations.delete(operation.key);
         results.delete(operation.key);
         reexecutingOperations.delete(operation.key);
         inFlightOperations.delete(operation.key);
+        refetchOperations.delete(operation.key);
         // Mark operation layer as done
         noopDataState(store.data, operation.key);
         return operation;
@@ -353,8 +376,7 @@ export const cacheExchange =
             res.operation.context.requestPolicy !== 'cache-only' &&
             !isBlockedByOptimisticUpdate(res.dependencies) &&
             !reexecutingOperations.has(res.operation.key) &&
-            // Deduplicate cache misses for operations that are already in-flight
-            !inFlightOperations.has(res.operation.key)
+            !deferRequest(res.operation)
         ),
         map(res => {
           dispatchDebug({
@@ -410,8 +432,7 @@ export const cacheExchange =
           if (!shouldReexecute) {
             /*noop*/
           } else if (!isBlockedByOptimisticUpdate(res.dependencies)) {
-            // Don't refetch operations that already have a request in-flight
-            if (!inFlightOperations.has(res.operation.key))
+            if (!deferRequest(res.operation))
               client.reexecuteOperation(
                 toRequestPolicy(
                   operations.get(res.operation.key) || res.operation,
@@ -450,12 +471,28 @@ export const cacheExchange =
           result => !optimisticKeysToDependencies.has(result.operation.key)
         ),
         map(result => {
-          if (!result.hasNext) inFlightOperations.delete(result.operation.key);
+          const { key } = result.operation;
+          let refetch = false;
+          if (!result.hasNext) {
+            inFlightOperations.delete(key);
+            refetch = refetchOperations.delete(key);
+          }
           const pendingOperations: Operations = new Set();
           // Update the cache with the incoming API result
           const cacheResult = updateCacheWithResult(result, pendingOperations);
           // Execute all dependent queries
           executePendingOperations(result.operation, pendingOperations, false);
+          if (refetch) {
+            // This result is older than the subscription results that deferred a request,
+            // so the query is refetched
+            cacheResult.stale = true;
+            client.reexecuteOperation(
+              toRequestPolicy(
+                operations.get(key) || result.operation,
+                'network-only'
+              )
+            );
+          }
           return cacheResult;
         })
       );
