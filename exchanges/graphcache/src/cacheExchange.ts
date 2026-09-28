@@ -123,6 +123,9 @@ export const cacheExchange =
           if (op) {
             // Collect all dependent operations if the reexecuting operation is a query
             if (operation.kind === 'query') dependentOperations.add(key);
+            // A request that's in-flight was sent before this mutation, so it can't
+            // replace a request for the updated data
+            if (operation.kind === 'mutation') inFlightOperations.delete(key);
             let policy: RequestPolicy = 'cache-first';
             if (requestedRefetch.has(key)) {
               requestedRefetch.delete(key);

@@ -3578,6 +3578,106 @@ describe('deduplication', () => {
       expect.objectContaining({ stale: false })
     );
   });
+
+  it('refetches in-flight queries that a mutation invalidated', async () => {
+    const authorsQuery = gql`
+      query {
+        authors {
+          id
+          name
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        deleteAuthor
+      }
+    `;
+
+    const author = { __typename: 'Author', id: '123', name: 'Author' };
+
+    let pending: (() => void)[] = [];
+    const tick = async () => {
+      for (let i = 0; i < 20; i++) await Promise.resolve();
+    };
+    const flush = async () => {
+      await tick();
+      const resolvers = pending;
+      pending = [];
+      resolvers.forEach(resolve => resolve());
+      await tick();
+    };
+
+    // Network exchange that holds query responses until `flush()`
+    const network: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        mergeMap(op =>
+          op.kind === 'mutation'
+            ? fromValue({
+                operation: op,
+                data: { __typename: 'Mutation', deleteAuthor: true },
+                hasNext: false,
+                stale: false,
+              })
+            : fromPromise(
+                new Promise<OperationResult>(resolve => {
+                  pending.push(() =>
+                    resolve({
+                      operation: op,
+                      data: { __typename: 'Query', authors: [author] },
+                      hasNext: false,
+                      stale: false,
+                    })
+                  );
+                })
+              )
+        )
+      );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [
+        cacheExchange({
+          updates: {
+            Mutation: {
+              deleteAuthor: (_data, _args, cache) => {
+                cache.invalidate({ __typename: 'Author', id: '123' });
+              },
+            },
+          },
+        }),
+        network,
+      ],
+    });
+
+    const onResult = vi.fn();
+    pipe(client.query(authorsQuery, {}), subscribe(onResult));
+    await flush();
+
+    // Reload the query, then invalidate it while the reload is in-flight
+    pipe(
+      client.query(authorsQuery, {}, { requestPolicy: 'network-only' }),
+      subscribe(() => {})
+    );
+    await tick();
+    pipe(
+      client.mutation(mutation, {}),
+      subscribe(() => {})
+    );
+    await tick();
+
+    for (let i = 0; i < 3; i++) await flush();
+
+    // The reload's result is older than the mutation, so it can't restore
+    // Author:123, and the query ends up with `data: null`
+    const lastResult = onResult.mock.calls[onResult.mock.calls.length - 1][0];
+    expect(lastResult.data).toMatchObject({
+      authors: [{ id: '123', name: 'Author' }],
+    });
+  });
 });
 
 describe('commutativity', () => {
