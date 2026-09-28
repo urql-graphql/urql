@@ -407,12 +407,14 @@ export const cacheExchange =
           if (!shouldReexecute) {
             /*noop*/
           } else if (!isBlockedByOptimisticUpdate(res.dependencies)) {
-            client.reexecuteOperation(
-              toRequestPolicy(
-                operations.get(res.operation.key) || res.operation,
-                'network-only'
-              )
-            );
+            // Don't refetch operations that already have a request in-flight
+            if (!inFlightOperations.has(res.operation.key))
+              client.reexecuteOperation(
+                toRequestPolicy(
+                  operations.get(res.operation.key) || res.operation,
+                  'network-only'
+                )
+              );
           } else if (requestPolicy === 'cache-and-network') {
             requestedRefetch.add(res.operation.key);
           }
