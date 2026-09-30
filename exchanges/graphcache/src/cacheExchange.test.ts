@@ -1,13 +1,19 @@
 import {
   gql,
   createClient,
+  Exchange,
   ExchangeIO,
   Operation,
   OperationResult,
   CombinedError,
 } from '@urql/core';
 
-import { print, stripIgnoredCharacters } from 'graphql';
+import {
+  print,
+  stripIgnoredCharacters,
+  buildSchema,
+  introspectionFromSchema,
+} from 'graphql';
 import { vi, expect, it, describe } from 'vitest';
 
 import {
@@ -23,6 +29,8 @@ import {
   tap,
   publish,
   delay,
+  fromPromise,
+  subscribe,
 } from 'wonka';
 
 import { minifyIntrospectionQuery } from '@urql/introspection';
@@ -2226,6 +2234,122 @@ describe('optimistic updates', () => {
     vi.runAllTimers();
     expect(result).toHaveBeenCalledTimes(3);
   });
+
+  // See https://github.com/urql-graphql/urql/issues/3254
+  it('does not stall queries dropped while blocked by an optimistic update', async () => {
+    const authorsQuery = gql`
+      query {
+        authors {
+          id
+          name
+        }
+      }
+    `;
+
+    const authorIdsQuery = gql`
+      query {
+        authors {
+          id
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        deleteAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const author = { __typename: 'Author', id: '123', name: 'Author' };
+
+    let pending: (() => void)[] = [];
+    const tick = async () => {
+      for (let i = 0; i < 20; i++) await Promise.resolve();
+    };
+    const flush = async () => {
+      await tick();
+      const resolvers = pending;
+      pending = [];
+      resolvers.forEach(resolve => resolve());
+      await tick();
+    };
+
+    // Network exchange that holds responses until `flush()`
+    const network: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        mergeMap(op =>
+          fromPromise(
+            new Promise<OperationResult>(resolve => {
+              pending.push(() =>
+                resolve({
+                  operation: op,
+                  data:
+                    op.kind === 'mutation'
+                      ? { __typename: 'Mutation', deleteAuthor: author }
+                      : { __typename: 'Query', authors: [author] },
+                  hasNext: false,
+                  stale: false,
+                })
+              );
+            })
+          )
+        )
+      );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [
+        cacheExchange({
+          optimistic: {
+            deleteAuthor: () => ({ ...author, name: '[REDACTED OFFLINE]' }),
+          },
+          updates: {
+            Mutation: {
+              deleteAuthor: (_data, _args, cache) => {
+                cache.invalidate({ __typename: 'Author', id: '123' });
+              },
+            },
+          },
+        }),
+        network,
+      ],
+    });
+
+    const onResult = vi.fn();
+
+    pipe(
+      client.query(authorsQuery, {}),
+      subscribe(() => {})
+    );
+    await flush();
+
+    // The optimistic update invalidates Author:123 while the mutation is in-flight
+    pipe(
+      client.mutation(mutation, {}),
+      subscribe(() => {})
+    );
+    await tick();
+
+    // A new query mounts, misses, and is dropped since it's blocked by the optimistic update
+    pipe(client.query(authorIdsQuery, {}), subscribe(onResult));
+    await tick();
+    expect(onResult).toHaveBeenCalledTimes(0);
+
+    for (let i = 0; i < 3; i++) await flush();
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          authors: [expect.objectContaining({ id: '123' })],
+        }),
+        stale: false,
+      })
+    );
+  });
 });
 
 describe('mutation updates', () => {
@@ -3210,6 +3334,425 @@ describe('looping protection', () => {
 
     expect(extendedData).toMatchObject({ stale: false });
     expect(client.reexecuteOperation).toHaveBeenCalledTimes(4);
+  });
+});
+
+describe('deduplication', () => {
+  const tick = async () => {
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+  };
+
+  // Network exchange that holds query results until `flush()` with the data from when the
+  // request was sent, and emits subscription results from `events`. `null` data never resolves
+  const makeNetwork = (getData: (operation: Operation) => any) => {
+    let pending: (() => void)[] = [];
+    const events = makeSubject<any>();
+    const onRequest = vi.fn();
+
+    const exchange: Exchange = () => ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        tap(onRequest),
+        mergeMap(operation => {
+          if (operation.kind === 'subscription') {
+            return pipe(
+              events.source,
+              map(
+                (data): OperationResult => ({
+                  operation,
+                  data,
+                  hasNext: true,
+                  stale: false,
+                })
+              )
+            );
+          }
+
+          const data = getData(operation);
+          const result: OperationResult = {
+            operation,
+            data,
+            hasNext: false,
+            stale: false,
+          };
+          if (operation.kind === 'mutation') return fromValue(result);
+          return fromPromise(
+            new Promise<OperationResult>(resolve => {
+              if (data !== null) pending.push(() => resolve(result));
+            })
+          );
+        })
+      );
+
+    const flush = async () => {
+      await tick();
+      const resolvers = pending;
+      pending = [];
+      resolvers.forEach(resolve => resolve());
+      await tick();
+    };
+
+    return { exchange, events, flush, onRequest };
+  };
+
+  const authorsQuery = gql`
+    query {
+      authors {
+        id
+        name
+      }
+    }
+  `;
+
+  const authorQuery = gql`
+    query {
+      author(id: "123") {
+        id
+        name
+        bio
+      }
+    }
+  `;
+
+  const authorUpdated = gql`
+    subscription {
+      authorUpdated {
+        id
+        name
+      }
+    }
+  `;
+
+  const resolvers = {
+    Query: {
+      author: (_parent: any, args: any) => ({
+        __typename: 'Author',
+        id: args.id,
+      }),
+    },
+  };
+
+  it('defers requests that subscription results cause for in-flight queries', async () => {
+    let name = 'Author';
+    const author = () => ({
+      __typename: 'Author',
+      id: '123',
+      name,
+      bio: 'Bio',
+    });
+    const { exchange, events, flush, onRequest } = makeNetwork(() => ({
+      __typename: 'Query',
+      authors: [author()],
+      author: author(),
+    }));
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [cacheExchange({ resolvers }), exchange],
+    });
+
+    pipe(
+      client.query(authorsQuery, {}),
+      subscribe(() => {})
+    );
+    await flush();
+    pipe(
+      client.subscription(authorUpdated, {}),
+      subscribe(() => {})
+    );
+
+    // `bio` isn't cached, so this query is a cache miss
+    const onResult = vi.fn();
+    pipe(client.query(authorQuery, {}), subscribe(onResult));
+    await tick();
+    expect(onRequest).toHaveBeenCalledTimes(3);
+
+    // Update the author repeatedly while the query's request is in-flight
+    for (const update of ['N1', 'N2', 'N3', 'N4']) {
+      name = update;
+      events.next({
+        __typename: 'Subscription',
+        authorUpdated: { __typename: 'Author', id: '123', name },
+      });
+      await tick();
+    }
+
+    expect(onRequest).toHaveBeenCalledTimes(3);
+
+    // The in-flight request's result is older than the updates, so the query is refetched once
+    await flush();
+    expect(onRequest).toHaveBeenCalledTimes(4);
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({ stale: true })
+    );
+
+    await flush();
+    expect(onRequest).toHaveBeenCalledTimes(4);
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          author: expect.objectContaining({ name: 'N4', bio: 'Bio' }),
+        }),
+        stale: false,
+      })
+    );
+  });
+
+  it('defers refetches of partial results that subscription results cause for in-flight queries', async () => {
+    const schema = introspectionFromSchema(
+      buildSchema(`
+        type Query {
+          authors: [Author!]!
+          author(id: ID!): Author
+        }
+
+        type Author {
+          id: ID!
+          name: String
+          bio: String
+        }
+
+        type Subscription {
+          authorUpdated: Author
+        }
+      `)
+    );
+
+    let name = 'Author';
+    const author = () => ({
+      __typename: 'Author',
+      id: '123',
+      name,
+      bio: 'Bio',
+    });
+    const { exchange, events, flush, onRequest } = makeNetwork(() => ({
+      __typename: 'Query',
+      authors: [author()],
+      author: author(),
+    }));
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [cacheExchange({ schema, resolvers }), exchange],
+    });
+
+    pipe(
+      client.query(authorsQuery, {}),
+      subscribe(() => {})
+    );
+    await flush();
+    pipe(
+      client.subscription(authorUpdated, {}),
+      subscribe(() => {})
+    );
+
+    // `bio` is nullable and isn't cached, so this is a partial result, and it's refetched
+    const onResult = vi.fn();
+    pipe(client.query(authorQuery, {}), subscribe(onResult));
+    await tick();
+    expect(onRequest).toHaveBeenCalledTimes(3);
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({ stale: true })
+    );
+
+    for (const update of ['N1', 'N2', 'N3', 'N4']) {
+      name = update;
+      events.next({
+        __typename: 'Subscription',
+        authorUpdated: { __typename: 'Author', id: '123', name },
+      });
+      await tick();
+    }
+
+    expect(onRequest).toHaveBeenCalledTimes(3);
+
+    await flush();
+    expect(onRequest).toHaveBeenCalledTimes(4);
+    await flush();
+    expect(onRequest).toHaveBeenCalledTimes(4);
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          author: expect.objectContaining({ name: 'N4', bio: 'Bio' }),
+        }),
+        stale: false,
+      })
+    );
+  });
+
+  it('refetches in-flight queries that a subscription result invalidated', async () => {
+    const authorQuery = gql`
+      query {
+        author {
+          id
+          name
+        }
+      }
+    `;
+
+    const subscription = gql`
+      subscription {
+        authorUpdated
+      }
+    `;
+
+    let name = 'Before';
+    const { exchange, events, flush } = makeNetwork(() => ({
+      __typename: 'Query',
+      author: { __typename: 'Author', id: '123', name },
+    }));
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [
+        cacheExchange({
+          updates: {
+            Subscription: {
+              authorUpdated: (_data, _args, cache) => {
+                cache.invalidate({ __typename: 'Author', id: '123' });
+              },
+            },
+          },
+        }),
+        exchange,
+      ],
+    });
+
+    pipe(
+      client.subscription(subscription, {}),
+      subscribe(() => {})
+    );
+
+    const onResult = vi.fn();
+    pipe(client.query(authorQuery, {}), subscribe(onResult));
+    await flush();
+
+    // Reload the query, then change and invalidate the author while the reload is in-flight
+    pipe(
+      client.query(authorQuery, {}, { requestPolicy: 'network-only' }),
+      subscribe(() => {})
+    );
+    await tick();
+    name = 'After';
+    events.next({ __typename: 'Subscription', authorUpdated: true });
+    await tick();
+
+    for (let i = 0; i < 3; i++) await flush();
+
+    // The reload was sent before the event, so its result is out of date and the query is refetched
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          author: expect.objectContaining({ id: '123', name: 'After' }),
+        }),
+        stale: false,
+      })
+    );
+  });
+
+  it('refetches in-flight queries that a mutation invalidated', async () => {
+    const mutation = gql`
+      mutation {
+        deleteAuthor
+      }
+    `;
+
+    const author = { __typename: 'Author', id: '123', name: 'Author' };
+    const { exchange, flush } = makeNetwork(operation =>
+      operation.kind === 'mutation'
+        ? { __typename: 'Mutation', deleteAuthor: true }
+        : { __typename: 'Query', authors: [author] }
+    );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [
+        cacheExchange({
+          updates: {
+            Mutation: {
+              deleteAuthor: (_data, _args, cache) => {
+                cache.invalidate({ __typename: 'Author', id: '123' });
+              },
+            },
+          },
+        }),
+        exchange,
+      ],
+    });
+
+    const onResult = vi.fn();
+    pipe(client.query(authorsQuery, {}), subscribe(onResult));
+    await flush();
+
+    // Reload the query, then invalidate it while the reload is in-flight
+    pipe(
+      client.query(authorsQuery, {}, { requestPolicy: 'network-only' }),
+      subscribe(() => {})
+    );
+    await tick();
+    pipe(
+      client.mutation(mutation, {}),
+      subscribe(() => {})
+    );
+    await tick();
+
+    for (let i = 0; i < 3; i++) await flush();
+
+    // The reload's result is older than the mutation, so it can't restore Author:123 by itself
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          authors: [expect.objectContaining({ id: '123', name: 'Author' })],
+        }),
+      })
+    );
+  });
+
+  it('does not defer other reexecutes of in-flight queries', async () => {
+    let requests = 0;
+    const author = { __typename: 'Author', id: '123', name: 'Author' };
+    // The first request never completes
+    const { exchange, flush, onRequest } = makeNetwork(() =>
+      requests++ ? { __typename: 'Query', authors: [author] } : null
+    );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [cacheExchange({}), exchange],
+    });
+
+    const onResult = vi.fn();
+    const operation = client.createRequestOperation('query', {
+      key: 1,
+      query: authorsQuery,
+      variables: {},
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(onResult));
+    await tick();
+    expect(onRequest).toHaveBeenCalledTimes(1);
+
+    for (let i = 0; i < 2; i++) {
+      client.reexecuteOperation(
+        client.createRequestOperation(
+          'query',
+          { key: 1, query: authorsQuery, variables: {} },
+          { requestPolicy: 'cache-and-network' }
+        )
+      );
+      await tick();
+    }
+
+    await flush();
+    expect(onRequest).toHaveBeenCalledTimes(2);
+    expect(onResult).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          authors: [expect.objectContaining({ id: '123' })],
+        }),
+      })
+    );
   });
 });
 
