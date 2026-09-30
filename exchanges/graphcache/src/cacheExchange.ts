@@ -414,6 +414,8 @@ export const cacheExchange =
           const stale =
             requestPolicy !== 'cache-only' &&
             (shouldReexecute ||
+              // A request for the operation is in-flight, so a newer result will follow
+              inFlightOperations.has(res.operation.key) ||
               (res.outcome === 'partial' &&
                 reexecutingOperations.has(res.operation.key) &&
                 hasLayer(store.data, res.operation.key)));

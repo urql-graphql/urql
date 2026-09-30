@@ -3709,6 +3709,65 @@ describe('deduplication', () => {
     );
   });
 
+  it('does not resolve network-only queries from the cache while their request is in-flight', async () => {
+    const mutation = gql`
+      mutation {
+        updateAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const authors = [{ __typename: 'Author', id: '123', name: 'Author' }];
+    const { exchange, flush } = makeNetwork(operation =>
+      operation.kind === 'mutation'
+        ? {
+            __typename: 'Mutation',
+            updateAuthor: { __typename: 'Author', id: '123', name: 'Renamed' },
+          }
+        : { __typename: 'Query', authors: [...authors] }
+    );
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [cacheExchange({}), exchange],
+    });
+
+    pipe(
+      client.query(authorsQuery, {}),
+      subscribe(() => {})
+    );
+    await flush();
+
+    // An author is added on the server, and the list is reloaded
+    authors.push({ __typename: 'Author', id: '456', name: 'New' });
+    let reloaded: OperationResult | undefined;
+    client
+      .query(authorsQuery, {}, { requestPolicy: 'network-only' })
+      .toPromise()
+      .then(result => {
+        reloaded = result;
+      });
+    await tick();
+
+    // A mutation updates the list while the reload is in-flight
+    pipe(
+      client.mutation(mutation, {}),
+      subscribe(() => {})
+    );
+    await tick();
+
+    // The cached list is stale, so the reload doesn't resolve with it
+    expect(reloaded).toBeUndefined();
+
+    await flush();
+    expect(reloaded).toMatchObject({
+      data: { authors: [{ id: '123', name: 'Renamed' }, { id: '456' }] },
+      stale: false,
+    });
+  });
+
   it('does not defer other reexecutes of in-flight queries', async () => {
     let requests = 0;
     const author = { __typename: 'Author', id: '123', name: 'Author' };
