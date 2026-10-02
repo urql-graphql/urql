@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 9.0.2
+
+### Patch Changes
+
+- Defer requests that subscription results cause for queries that already have a request in flight. Previously, a burst of subscription events updating a slow query could send a duplicate request for every other event. The query is now refetched once, after its in-flight request completes
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3912](https://github.com/urql-graphql/urql/pull/3912))
+- Mark cached results of queries as `stale` while a network request for them is in flight. Previously, when a mutation updated a `network-only` query while its request was in flight, the query's cached result looked final, so `toPromise()` resolved with it before the request completed
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3913](https://github.com/urql-graphql/urql/pull/3913))
+
 ## 9.0.1
 
 ### Patch Changes
