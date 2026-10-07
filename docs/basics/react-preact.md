@@ -21,6 +21,8 @@ with at first. We'll install the package with our package manager of choice.
 yarn add urql
 # or
 npm install --save urql
+# or
+deno install urql
 ```
 
 To use `urql` with Preact, we have to install `@urql/preact` instead of `urql` and import from
