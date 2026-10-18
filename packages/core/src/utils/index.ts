@@ -7,8 +7,7 @@ export * from './formatDocument';
 export * from './streamUtils';
 export * from './operation';
 export * from './selection';
-export * from './defer';
-export * from './maskFragment';
+export * from './fragmentOwner';
 export * from './fragmentSource';
 
 export const noop = () => {

@@ -40,16 +40,16 @@ import type {
   DebugEvent,
 } from './types';
 
-import type { DeferredState } from './utils';
 import {
   createRequest,
   withPromise,
   noop,
   makeOperation,
   getOperationType,
-  makeDeferredState,
-  resolveDeferredState,
-  updateDeferredResult,
+  getDeferSkeleton,
+  makeOwnerChannel,
+  updateOwnerChannel,
+  endOwnerChannel,
 } from './utils';
 
 /** Configuration options passed when creating a new {@link Client}.
@@ -619,26 +619,20 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         takeWhile(result => !!result.hasNext, true)
       );
     } else {
-      // Associate stable sidecar promises with missing `@defer` fields while
-      // results are streaming in, and resolve them as patches arrive. The
-      // metadata lives outside of the result data, so this is inert for
-      // consumers that don't read it (see `maskFragment`).
-      let deferredState: DeferredState | void;
+      // Record which objects of a streamed `@defer` result can host deferred
+      // fragment data, so a fragment can read its own data from this stream.
+      // Documents without `@defer` skip this entirely.
+      const skeleton = getDeferSkeleton(operation.query);
+      if (skeleton) {
+        const channel = makeOwnerChannel();
+        result$ = pipe(
+          result$,
+          onPush(result => updateOwnerChannel(channel, skeleton, result)),
+          onEnd(() => endOwnerChannel(channel))
+        );
+      }
       result$ = pipe(
         result$,
-        map(result => {
-          if (result.hasNext || deferredState) {
-            updateDeferredResult(
-              operation,
-              result,
-              deferredState || (deferredState = makeDeferredState())
-            );
-          }
-          return result;
-        }),
-        onEnd(() => {
-          if (deferredState) resolveDeferredState(deferredState);
-        }),
         // Add `stale: true` flag when a new operation is sent for queries
         switchMap(result => {
           const value$ = fromValue(result);

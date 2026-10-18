@@ -17,10 +17,10 @@ export {
   getOperationName,
 } from './utils';
 
-export { maskFragment, getFragments, makeFragmentSource } from './utils';
+export { makeFragmentStore, makeFragmentSource } from './utils';
 
 export type {
-  FragmentMap,
-  MaskFragmentResult,
+  FragmentSnapshot,
+  FragmentStore,
   FragmentSourceArgs,
 } from './utils';

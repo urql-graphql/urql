@@ -83,7 +83,7 @@ const renderToString = (
       },
     });
 
-    Promise.resolve().then(drive).catch(reject);
+    sleep(10).then(drive).catch(reject);
   });
 
 beforeEach(() => {
@@ -169,6 +169,7 @@ describe('useFragment SSR streaming', () => {
     // The non-deferred field is in the shell, and the deferred fragment was
     // streamed in and resolved server-side — without any parent rerender.
     expect(html).toContain('Song');
+    expect(html).toContain('<p>loading</p>');
     expect(html).toContain('Hello');
   });
 

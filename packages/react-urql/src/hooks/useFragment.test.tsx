@@ -1,10 +1,9 @@
 // @vitest-environment jsdom
 
-import { vi, expect, it, describe, beforeEach } from 'vitest';
+import { vi, expect, it, describe, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../context', () => {
   const state = { current: {} };
-
   return {
     useClient: () => state.current,
     __setClient(client: unknown) {
@@ -14,28 +13,24 @@ vi.mock('../context', () => {
 });
 
 import React, { Suspense } from 'react';
-import { renderHook, render, act, cleanup } from '@testing-library/react';
-import { filter, makeSubject, merge, pipe, subscribe } from 'wonka';
-import { createClient, createRequest } from '@urql/core';
-import type { Exchange, TypedDocumentNode } from '@urql/core';
+import { render, act, cleanup } from '@testing-library/react';
+import { filter, makeSubject, merge, pipe } from 'wonka';
+import {
+  createClient,
+  createRequest,
+  CombinedError,
+  makeResult,
+  mergeResultPatch,
+} from '@urql/core';
+import type { Exchange } from '@urql/core';
 
-import { getFragmentPromise } from './cache';
 import { useFragment } from './useFragment';
-import type { UseFragmentState } from './useFragment';
 import { useQuery } from './useQuery';
 import * as context from '../context';
 
-const { useClient } = context;
 const setClient = (client: unknown) => (context as any).__setClient(client);
 
-/** Creates a real `Client` whose exchange issues results from a subject.
- *
- * @remarks
- * Deferred tracking lives in the `Client`'s result pipeline, so tests that
- * stream `@defer` results must run through a real client rather than mocking
- * `executeQuery`.
- */
-const makeStreamedClient = () => {
+const makeStreamedClient = (suspense = true) => {
   const results = makeSubject<any>();
   const exchange: Exchange = () => ops$ =>
     merge([
@@ -47,900 +42,468 @@ const makeStreamedClient = () => {
     ]);
   const client = createClient({
     url: 'http://0.0.0.0',
-    suspense: true,
+    suspense,
     exchanges: [exchange],
   });
   return { client, results };
 };
 
-const mockQuery = `
-  fragment TodoFields on Todo {
-    id
-    name
-    __typename
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+class Boundary extends React.Component<
+  { children: React.ReactNode; onError?: (e: unknown) => void },
+  { error?: unknown }
+> {
+  state: { error?: unknown } = {};
+  static getDerivedStateFromError(error: unknown) {
+    return { error };
   }
+  componentDidCatch(error: unknown) {
+    this.props.onError?.(error);
+  }
+  render() {
+    return this.state.error ? <b>error</b> : this.props.children;
+  }
+}
+
+const songQuery = `
+  query { song { id __typename ...SongFields @defer } }
+  fragment SongFields on Song { title }
 `;
+const SongFields = 'fragment SongFields on Song { title }';
 
-type FilmData = { __typename: 'Film'; id: string; title: string };
-declare const tadaFragmentRefs: unique symbol;
-type TadaFragmentOf = {
-  readonly [tadaFragmentRefs]: { FilmItem: 'Film' };
-};
-type Incremental<Data> =
-  | Data
-  | { [Key in keyof Data]?: Key extends '__typename' ? Data[Key] : never };
-type CodegenFragmentType<Data> = {
-  ' $fragmentRefs'?: { FilmItemFragment: Data };
+/** Renders the first `song` reference it sees and never re-renders the child. */
+const FrozenParent = ({ children }: { children: (ref: any) => any }) => {
+  const [result] = useQuery<any>({ query: songQuery });
+  const ref = React.useRef<any>(null);
+  if (!ref.current && result.data) ref.current = result.data.song;
+  return ref.current ? children(ref.current) : null;
 };
 
-// Compile-time coverage for gql.tada's opaque FragmentOf shape and GraphQL
-// Code Generator's incremental FragmentType shape. The fragment document alone
-// determines the returned data type; the masked input has its own generic.
-const useCheckFragmentReferenceInterop = (
-  tadaFragment: TypedDocumentNode<FilmData, never>,
-  codegenFragment: TypedDocumentNode<FilmData, unknown>,
-  tada: TadaFragmentOf | null | undefined,
-  codegen:
-    | CodegenFragmentType<Incremental<FilmData>>
-    | Record<PropertyKey, never>
-) => {
-  const tadaResult: UseFragmentState<FilmData> = useFragment({
-    fragment: tadaFragment,
-    data: tada,
-  });
-  const codegenResult: UseFragmentState<FilmData> = useFragment({
-    fragment: codegenFragment,
-    data: codegen,
-  });
-  return [tadaResult, codegenResult];
-};
-void useCheckFragmentReferenceInterop;
-
-beforeEach(() => {
+beforeEach(() => setClient({}));
+afterEach(() => {
   cleanup();
-  // Reset to a fresh mock client (and its per-client caches) between tests.
-  setClient({});
+  vi.restoreAllMocks();
 });
 
-describe('useFragment masking', () => {
-  it('should correctly mask data', () => {
-    const { result } = renderHook(
-      ({ fragment }) =>
-        useFragment({
-          fragment,
-          data: {
-            __typename: 'Todo',
-            id: '1',
-            name: 'Learn urql',
-            completed: true,
-          },
-        }),
-      { initialProps: { fragment: mockQuery } }
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: 'Learn urql',
-      },
-    });
-  });
-
-  it('should correctly take a named fragment to mask data', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `fragment x on X { foo bar } fragment TodoFields on Todo { id name __typename }`,
-        name: 'TodoFields',
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: 'Learn urql',
-          completed: true,
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: 'Learn urql',
-      },
-    });
-  });
-
-  it('updates the masked data when the fragment name changes', () => {
-    const query = `
-      fragment TodoIdentity on Todo { id __typename }
-      fragment TodoDetails on Todo { name __typename }
-    `;
-    const data = {
-      __typename: 'Todo',
-      id: '1',
-      name: 'Learn urql',
-    };
-
-    const { result, rerender } = renderHook(
-      ({ name }) => useFragment({ fragment: query, name, data }),
-      { initialProps: { name: 'TodoIdentity' } }
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: { __typename: 'Todo', id: '1' },
-    });
-
-    rerender({ name: 'TodoDetails' });
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: { __typename: 'Todo', name: 'Learn urql' },
-    });
-  });
-
-  it('should correctly mask data w/ null attribute', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: mockQuery,
-        data: { __typename: 'Todo', id: '1', name: null, completed: true },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: null,
-      },
-    });
-  });
-
-  it('should correctly indicate loading w/ undefined attribute', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: mockQuery,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: undefined,
-          completed: true,
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: true,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-      },
-    });
-  });
-
-  it('should correctly mask data w/ nested object', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `
-          fragment TodoFields on Todo {
-            id
-            name
-            __typename
-            author { id name __typename }
-          }`,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: null,
-          completed: true,
-          author: {
-            id: '1',
-            name: 'Jovi',
-            __typename: 'Author',
-            awardWinner: true,
-          },
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: null,
-        author: {
-          __typename: 'Author',
-          id: '1',
-          name: 'Jovi',
-        },
-      },
-    });
-  });
-
-  it('should correctly mask data w/ nested selection that is null', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `
-          fragment TodoFields on Todo {
-            id
-            name
-            __typename
-            author { id name __typename }
-          }`,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: null,
-          completed: true,
-          author: null,
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: null,
-        author: null,
-      },
-    });
-  });
-
-  it('should preserve null items in nullable lists', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `
-          fragment TodoFields on Todo {
-            id
-            __typename
-            assignees { id name __typename }
-          }`,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          assignees: [
-            null,
-            {
-              __typename: 'User',
-              id: '2',
-              name: 'Jovi',
-              role: 'admin',
-            },
-          ],
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        assignees: [
-          null,
-          {
-            __typename: 'User',
-            id: '2',
-            name: 'Jovi',
-          },
-        ],
-      },
-    });
-  });
-
-  it('should correctly mark loading w/ nested selection that is undefined', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `
-          fragment TodoFields on Todo {
-            id
-            name
-            __typename
-            author { id name __typename }
-          }`,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: null,
-          completed: true,
-          author: undefined,
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: true,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: null,
-      },
-    });
-  });
-
-  it('should correctly mark resolved w/ deferred nested fragment-selection that is undefined', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `
-          fragment TodoFields on Todo {
-            id
-            name
-            __typename
-            ...AuthorFields @defer
-          }
-
-          fragment AuthorFields on Todo { author { id name __typename } }
-        `,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: null,
-          completed: true,
-          author: undefined,
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: false,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: null,
-      },
-    });
-  });
-
-  it('should correctly mark loading w/ non-deferred nested fragment-selection that is undefined', () => {
-    const { result } = renderHook(() =>
-      useFragment({
-        fragment: `
-          fragment TodoFields on Todo {
-            id
-            name
-            __typename
-            ...AuthorFields
-          }
-
-          fragment AuthorFields on Todo { author { id name __typename } }
-        `,
-        data: {
-          __typename: 'Todo',
-          id: '1',
-          name: null,
-          completed: true,
-          author: undefined,
-        },
-      })
-    );
-
-    expect(result.current).toEqual({
-      fetching: true,
-      data: {
-        __typename: 'Todo',
-        id: '1',
-        name: null,
-      },
-    });
-  });
-
-  it('returns null data without masking when data is null', () => {
-    const { result } = renderHook(() =>
-      useFragment({ fragment: mockQuery, data: null })
-    );
-
-    expect(result.current).toEqual({ fetching: false, data: null });
-  });
-
-  it('returns undefined data without masking when data is undefined', () => {
-    const { result } = renderHook(() =>
-      useFragment({ fragment: mockQuery, data: undefined })
-    );
-
-    expect(result.current).toEqual({ fetching: false, data: undefined });
-  });
-});
-
-describe('useFragment suspense', () => {
-  const SongFields = `fragment SongFields on Song { id title __typename }`;
-
-  const Song = ({ data }: { data: any }) => {
-    const result = useFragment<any>({
-      fragment: SongFields,
-      data,
-      context: { suspense: true },
-    });
-    return <p>{result.data ? result.data.title : 'no-title'}</p>;
-  };
-
-  it('suspends while a deferred field is missing, then renders once it arrives', async () => {
-    const incomplete = { __typename: 'Song', id: '1', title: undefined };
-    const complete = { __typename: 'Song', id: '1', title: 'Hello' };
-
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={incomplete} />
-      </Suspense>
-    );
-
-    // The fragment isn't fulfilled yet, so the boundary shows its fallback.
-    expect(view.container.textContent).toBe('loading');
-
-    // The deferred patch arrives: the parent re-renders with the merged data.
-    view.rerender(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={complete} />
-      </Suspense>
-    );
-    // Flush the resolution of the suspense promise inside act(...).
-    await act(async () => {});
-
-    expect(view.container.textContent).toBe('Hello');
-  });
-
-  it('does not share suspense promises between unidentified objects', () => {
-    const client = useClient() as any;
-    const first = { title: undefined };
-    const second = { title: undefined };
-    const request = createRequest(SongFields, {});
-    const fragment = request.query.definitions[0] as any;
-
-    render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={first} />
-      </Suspense>
-    );
-    const firstPromise = getFragmentPromise(client, fragment, first);
-
-    render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={second} />
-      </Suspense>
-    );
-    const secondPromise = getFragmentPromise(client, fragment, second);
-
-    expect(firstPromise).toBeInstanceOf(Promise);
-    expect(secondPromise).toBeInstanceOf(Promise);
-    expect(secondPromise).not.toBe(firstPromise);
-  });
-
-  it('scopes suspense promises by fragment name', () => {
-    const client = useClient() as any;
-    const query = `
-      fragment SongTitle on Song { title }
-      fragment SongArtist on Song { artist }
-    `;
-    const data = {
-      __typename: 'Song',
-      id: '1',
-      title: undefined,
-      artist: undefined,
-    };
-    const request = createRequest(query, {});
-    const fragments = request.query.definitions;
-    const fragmentByName = (name: string) =>
-      fragments.find(
-        fragment => 'name' in fragment && fragment.name?.value === name
-      ) as any;
-    const Fragment = ({ name }: { name: string }) => {
-      useFragment({
-        fragment: query,
-        name,
-        data,
-        context: { suspense: true },
-      });
+describe('useFragment', () => {
+  it('returns the reference itself when complete', () => {
+    setClient(makeStreamedClient(false).client);
+    const ref = { __typename: 'Song', id: '1', title: 'Hello' };
+    let out: any;
+    const C = () => {
+      out = useFragment<any>({ fragment: SongFields, data: ref });
       return null;
     };
-
-    render(
-      <Suspense fallback={<p>loading</p>}>
-        <Fragment name="SongTitle" />
-      </Suspense>
-    );
-    const titlePromise = getFragmentPromise(
-      client,
-      fragmentByName('SongTitle'),
-      data
-    );
-
-    render(
-      <Suspense fallback={<p>loading</p>}>
-        <Fragment name="SongArtist" />
-      </Suspense>
-    );
-    const artistPromise = getFragmentPromise(
-      client,
-      fragmentByName('SongArtist'),
-      data
-    );
-
-    expect(titlePromise).toBeInstanceOf(Promise);
-    expect(artistPromise).toBeInstanceOf(Promise);
-    expect(artistPromise).not.toBe(titlePromise);
+    const { rerender } = render(<C />);
+    const first = out;
+    rerender(<C />);
+    expect(out.data).toBe(ref);
+    expect(out).toBe(first);
   });
 
-  it('does not suspend when the data is already complete', () => {
-    const complete = { __typename: 'Song', id: '2', title: 'World' };
-
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={complete} />
-      </Suspense>
-    );
-
-    expect(view.container.textContent).toBe('World');
-  });
-
-  it('does not re-suspend for an entity it has already committed', async () => {
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: '1', title: 'Hello' }} />
-      </Suspense>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Hello');
-
-    // A refetch streams again and the deferred field is missing once more;
-    // the boundary must not fall back but keep showing the committed data.
-    view.rerender(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: '1', title: undefined }} />
-      </Suspense>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Hello');
-
-    view.rerender(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: '1', title: 'World' }} />
-      </Suspense>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('World');
-  });
-
-  it('suspends again when moving to a different entity', async () => {
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: '1', title: 'Hello' }} />
-      </Suspense>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Hello');
-
-    view.rerender(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: '2', title: undefined }} />
-      </Suspense>
-    );
-    // React keeps the previous children hidden next to the fallback while an
-    // already-revealed boundary re-suspends during an update.
-    expect(view.container.textContent).toContain('loading');
-  });
-
-  it('applies a refetch patch to a committed fragment without re-suspending', async () => {
-    const { client, results } = makeStreamedClient();
+  it('suspends on a deferred spread and resolves from the stream without a parent rerender', async () => {
+    const { client, results } = makeStreamedClient(true);
     setClient(client);
+    const operation = client.createRequestOperation(
+      'query',
+      createRequest(songQuery, undefined)
+    );
+    const Song = ({ data }: any) => (
+      <p>{useFragment<any>({ fragment: SongFields, data }).data.title}</p>
+    );
 
+    const { container } = render(
+      <Suspense fallback={<i>page</i>}>
+        <FrozenParent>
+          {ref => (
+            <Suspense fallback={<i>song</i>}>
+              <Song data={ref} />
+            </Suspense>
+          )}
+        </FrozenParent>
+      </Suspense>
+    );
+
+    const first = makeResult(operation, {
+      data: { song: { __typename: 'Song', id: '1' } },
+      hasNext: true,
+    });
+    await act(async () => {
+      results.next(first);
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<i>song</i>');
+
+    await act(async () => {
+      results.next(
+        mergeResultPatch(first, {
+          incremental: [{ path: ['song'], data: { title: 'Hello' } }],
+          hasNext: false,
+        })
+      );
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<p>Hello</p>');
+  });
+
+  it('reports fetching without Suspense and updates without a parent rerender', async () => {
+    const { client, results } = makeStreamedClient(false);
+    setClient(client);
+    const operation = client.createRequestOperation(
+      'query',
+      createRequest(songQuery, undefined)
+    );
+    const seen: any[] = [];
+    const Song = ({ data }: any) => {
+      seen.push(useFragment<any>({ fragment: SongFields, data }));
+      return null;
+    };
+    render(<FrozenParent>{ref => <Song data={ref} />}</FrozenParent>);
+
+    const first = makeResult(operation, {
+      data: { song: { __typename: 'Song', id: '1' } },
+      hasNext: true,
+    });
+    await act(async () => {
+      results.next(first);
+      await sleep(10);
+    });
+    expect(seen[seen.length - 1]).toEqual({ fetching: true, data: undefined });
+
+    await act(async () => {
+      results.next(
+        mergeResultPatch(first, {
+          incremental: [{ path: ['song'], data: { title: 'Hello' } }],
+          hasNext: false,
+        })
+      );
+      await sleep(10);
+    });
+    expect(seen[seen.length - 1]).toMatchObject({
+      fetching: false,
+      data: { title: 'Hello' },
+    });
+  });
+
+  it('resolves list siblings independently', async () => {
+    const { client, results } = makeStreamedClient(true);
+    setClient(client);
     const query = `
-      query {
-        song {
-          id
-          __typename
-          ...SongFields @defer
-        }
-      }
-
-      fragment SongFields on Song {
-        id
-        title
-        __typename
-      }
+      query { songs { id __typename ...SongFields @defer } }
+      fragment SongFields on Song { title }
     `;
-
     const operation = client.createRequestOperation(
       'query',
       createRequest(query, undefined)
     );
-
-    pipe(
-      client.executeRequestOperation(operation),
-      subscribe(() => {
-        /*noop*/
-      })
+    const Song = ({ data }: any) => (
+      <p>{useFragment<any>({ fragment: SongFields, data }).data.title}</p>
     );
-
-    // The first stream has completed; the fragment commits its data.
-    const complete = {
-      song: { __typename: 'Song', id: '1', title: 'Hello' },
+    const Page = () => {
+      const [result] = useQuery<any>({ query });
+      const refs = React.useRef<any[]>();
+      if (!refs.current) refs.current = result.data.songs;
+      return refs.current!.map((song: any) => (
+        <Suspense key={song.id} fallback={<i>{song.id}</i>}>
+          <Song data={song} />
+        </Suspense>
+      ));
     };
-    results.next({ operation, data: complete, hasNext: false, stale: false });
-
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={complete.song} />
+    const { container } = render(
+      <Suspense fallback={<i>page</i>}>
+        <Page />
       </Suspense>
     );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Hello');
 
-    // A refetch streams again: its initial payload misses the deferred
-    // field, but the committed boundary keeps rendering the previous data.
-    const partial = { song: { __typename: 'Song', id: '1' } };
-    act(() => {
-      results.next({ operation, data: partial, hasNext: true, stale: false });
+    const first = makeResult(operation, {
+      data: {
+        songs: [
+          { __typename: 'Song', id: '1' },
+          { __typename: 'Song', id: '2' },
+        ],
+      },
+      hasNext: true,
     });
-    view.rerender(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={partial.song} />
-      </Suspense>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Hello');
-
-    // The deferred patch resolves through the fragment source, updating the
-    // committed boundary in place without a parent rerender.
-    act(() => {
-      results.next({
-        operation,
-        data: { song: { __typename: 'Song', id: '1', title: 'World' } },
-        hasNext: false,
-        stale: false,
-      });
+    await act(async () => {
+      results.next(first);
+      await sleep(10);
     });
-    await act(async () => {});
-    expect(view.container.textContent).toBe('World');
+    await act(async () => {
+      results.next(
+        mergeResultPatch(first, {
+          incremental: [{ path: ['songs', 1], data: { title: 'Second' } }],
+          hasNext: true,
+        })
+      );
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<i>1</i><p>Second</p>');
   });
 
-  it('suspends siblings independently by their entity identity', async () => {
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: 'a', title: 'A' }} />
-        <Song data={{ __typename: 'Song', id: 'b', title: undefined }} />
-      </Suspense>
-    );
-
-    // One sibling is still pending, so the shared boundary shows the fallback.
-    expect(view.container.textContent).toBe('loading');
-
-    view.rerender(
-      <Suspense fallback={<p>loading</p>}>
-        <Song data={{ __typename: 'Song', id: 'a', title: 'A' }} />
-        <Song data={{ __typename: 'Song', id: 'b', title: 'B' }} />
-      </Suspense>
-    );
-    await act(async () => {});
-
-    expect(view.container.textContent).toBe('AB');
-  });
-
-  it('suspends siblings without entity IDs independently', async () => {
-    const Title = ({ data }: { data: any }) => {
-      const result = useFragment<any>({
-        fragment: `fragment TitleFields on Song { title __typename }`,
-        data,
-        context: { suspense: true },
-      });
-      return <p>{result.data.title}</p>;
-    };
-    const first: { __typename: string; title: string | undefined } = {
-      __typename: 'Song',
-      title: undefined,
-    };
-    const second: { __typename: string; title: string | undefined } = {
-      __typename: 'Song',
-      title: undefined,
-    };
-
-    const view = render(
-      <>
-        <Suspense fallback={<p>loading-first</p>}>
-          <Title data={first} />
-        </Suspense>
-        <Suspense fallback={<p>loading-second</p>}>
-          <Title data={second} />
-        </Suspense>
-      </>
-    );
-    expect(view.container.textContent).toBe('loading-firstloading-second');
-
-    first.title = 'First';
-    view.rerender(
-      <>
-        <Suspense fallback={<p>loading-first</p>}>
-          <Title data={first} />
-        </Suspense>
-        <Suspense fallback={<p>loading-second</p>}>
-          <Title data={second} />
-        </Suspense>
-      </>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Firstloading-second');
-  });
-
-  it('keeps named fragments in one document independent', async () => {
-    const document = `
-      fragment TitleFields on Song { title __typename }
-      fragment ArtistFields on Song { artist __typename }
-    `;
-    const data = {
-      __typename: 'Song',
-      title: undefined as string | undefined,
-      artist: undefined as string | undefined,
-    };
-    const Field = ({ name }: { name: string }) => {
-      const result = useFragment<any>({
-        fragment: document,
-        name,
-        data,
-        context: { suspense: true },
-      });
-      return <p>{result.data.title || result.data.artist}</p>;
-    };
-
-    const view = render(
-      <>
-        <Suspense fallback={<p>loading-title</p>}>
-          <Field name="TitleFields" />
-        </Suspense>
-        <Suspense fallback={<p>loading-artist</p>}>
-          <Field name="ArtistFields" />
-        </Suspense>
-      </>
-    );
-    expect(view.container.textContent).toBe('loading-titleloading-artist');
-
-    data.title = 'Hello';
-    view.rerender(
-      <>
-        <Suspense fallback={<p>loading-title</p>}>
-          <Field name="TitleFields" />
-        </Suspense>
-        <Suspense fallback={<p>loading-artist</p>}>
-          <Field name="ArtistFields" />
-        </Suspense>
-      </>
-    );
-    await act(async () => {});
-    expect(view.container.textContent).toBe('Helloloading-artist');
-  });
-
-  it('resolves deferred fragment suspense from the query stream without a parent rerender', async () => {
-    const { client, results } = makeStreamedClient();
+  it('streams a spread on an interface type condition', async () => {
+    const { client, results } = makeStreamedClient(true);
     setClient(client);
-
     const query = `
-      query {
-        song {
-          id
-          __typename
-          ...SongFields @defer
-        }
-      }
-
-      fragment SongFields on Song {
-        title
-      }
+      query { node { id __typename ...NodeFields @defer } }
+      fragment NodeFields on Node { createdAt }
     `;
-
-    // Results are matched to the hook's operation by their request key.
     const operation = client.createRequestOperation(
       'query',
       createRequest(query, undefined)
     );
-
-    const SongFromQuery = () => {
-      const [queryResult] = useQuery<any>({ query });
-
-      const fragment = useFragment<any>({
-        fragment: `fragment SongFields on Song { title }`,
-        data: queryResult.data.song,
-      });
-
-      return <p>{fragment.data.title}</p>;
+    const Node = ({ data }: any) => (
+      <p>
+        {
+          useFragment<any>({
+            fragment: 'fragment NodeFields on Node { createdAt }',
+            data,
+          }).data.createdAt
+        }
+      </p>
+    );
+    const Page = () => {
+      const [result] = useQuery<any>({ query });
+      const ref = React.useRef<any>();
+      if (!ref.current) ref.current = result.data.node;
+      return (
+        <Suspense fallback={<i>node</i>}>
+          <Node data={ref.current} />
+        </Suspense>
+      );
     };
-
-    const view = render(
-      <Suspense fallback={<p>loading</p>}>
-        <SongFromQuery />
+    const { container } = render(
+      <Suspense fallback={<i>page</i>}>
+        <Page />
       </Suspense>
     );
-
-    expect(view.container.textContent).toBe('loading');
-
-    act(() => {
-      results.next({
-        operation,
-        data: { song: { __typename: 'Song', id: '1' } },
-        hasNext: true,
-        stale: false,
-      });
+    const first = makeResult(operation, {
+      data: { node: { __typename: 'Todo', id: '1' } },
+      hasNext: true,
     });
-    await act(async () => {});
-
-    expect(view.container.textContent).toBe('loading');
-
-    act(() => {
-      results.next({
-        operation,
-        data: {
-          song: { __typename: 'Song', id: '1', title: 'Hello' },
-        },
-        hasNext: false,
-        stale: false,
-      });
+    await act(async () => {
+      results.next(first);
+      await sleep(10);
     });
-    await act(async () => {});
-
-    expect(view.container.textContent).toBe('Hello');
+    expect(container.innerHTML).toBe('<i>node</i>');
+    await act(async () => {
+      results.next(
+        mergeResultPatch(first, {
+          incremental: [{ path: ['node'], data: { createdAt: 'yesterday' } }],
+          hasNext: false,
+        })
+      );
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<p>yesterday</p>');
   });
 
-  it('updates a non-suspense useFragment when a deferred patch arrives', async () => {
-    const { client, results } = makeStreamedClient();
-    (client as any).suspense = false;
+  it('throws the scoped GraphQL error when a deferred fragment fails', async () => {
+    const { client, results } = makeStreamedClient(true);
     setClient(client);
+    const operation = client.createRequestOperation(
+      'query',
+      createRequest(songQuery, undefined)
+    );
+    const caught: any[] = [];
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const Song = ({ data }: any) => (
+      <p>{useFragment<any>({ fragment: SongFields, data }).data.title}</p>
+    );
+    const { container } = render(
+      <Suspense fallback={<i>page</i>}>
+        <FrozenParent>
+          {ref => (
+            <Boundary onError={e => caught.push(e)}>
+              <Suspense fallback={<i>song</i>}>
+                <Song data={ref} />
+              </Suspense>
+            </Boundary>
+          )}
+        </FrozenParent>
+      </Suspense>
+    );
+    const first = makeResult(operation, {
+      data: { song: { __typename: 'Song', id: '1' } },
+      hasNext: true,
+    });
+    await act(async () => {
+      results.next(first);
+      await sleep(10);
+    });
+    await act(async () => {
+      results.next(
+        mergeResultPatch(first, {
+          incremental: [
+            {
+              path: ['song'],
+              data: null,
+              errors: [{ message: 'boom', path: ['song', 'title'] }],
+            },
+          ],
+          hasNext: false,
+        } as any)
+      );
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<b>error</b>');
+    expect(caught[0]).toBeInstanceOf(CombinedError);
+    expect(caught[0].graphQLErrors[0].message).toBe('boom');
+  });
 
-    const query = `
-      query {
-        song {
-          id
-          __typename
-          ...SongFields @defer
-        }
-      }
+  it('reports the scoped error without Suspense', async () => {
+    const { client, results } = makeStreamedClient(false);
+    setClient(client);
+    const operation = client.createRequestOperation(
+      'query',
+      createRequest(songQuery, undefined)
+    );
+    const seen: any[] = [];
+    const Song = ({ data }: any) => {
+      seen.push(useFragment<any>({ fragment: SongFields, data }));
+      return null;
+    };
+    render(<FrozenParent>{ref => <Song data={ref} />}</FrozenParent>);
+    const first = makeResult(operation, {
+      data: { song: { __typename: 'Song', id: '1' } },
+      hasNext: true,
+    });
+    await act(async () => {
+      results.next(first);
+      await sleep(10);
+      results.next(
+        mergeResultPatch(first, {
+          incremental: [
+            {
+              path: ['song'],
+              data: null,
+              errors: [{ message: 'boom', path: ['song', 'title'] }],
+            },
+          ],
+          hasNext: false,
+        } as any)
+      );
+      await sleep(10);
+    });
+    const last = seen[seen.length - 1];
+    expect(last.fetching).toBe(false);
+    expect(last.data).toBeUndefined();
+    expect(last.error.graphQLErrors[0].message).toBe('boom');
+  });
 
-      fragment SongFields on Song {
-        title
-      }
-    `;
+  it('never suspends on incomplete data no stream will deliver, and warns', async () => {
+    setClient(makeStreamedClient(true).client);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const Card = ({ song }: any) => (
+      <p>
+        {String(
+          useFragment<any>({
+            fragment: 'fragment S on Song { id title }',
+            data: song,
+          }).data.title
+        )}
+      </p>
+    );
+    const { container } = render(
+      <Suspense fallback={<i>fallback</i>}>
+        <Card song={{ __typename: 'Song', id: '1' }} />
+      </Suspense>
+    );
+    await act(() => sleep(10));
+    expect(container.innerHTML).toBe('<p>undefined</p>');
+    expect(warn.mock.calls[0][0]).toContain('missing "title"');
+  });
 
+  it('does not re-suspend for an entity it has already shown when a refetch streams', async () => {
+    const { client, results } = makeStreamedClient(true);
+    setClient(client);
+    const operation = client.createRequestOperation(
+      'query',
+      createRequest(songQuery, undefined)
+    );
+    const Song = ({ data }: any) => {
+      const r = useFragment<any>({ fragment: SongFields, data });
+      return <p>{r.data.title + (r.fetching ? '…' : '')}</p>;
+    };
+    const Page = () => {
+      const [result] = useQuery<any>({ query: songQuery });
+      return (
+        <Suspense fallback={<i>song</i>}>
+          <Song data={result.data.song} />
+        </Suspense>
+      );
+    };
+    const { container } = render(
+      <Suspense fallback={<i>page</i>}>
+        <Page />
+      </Suspense>
+    );
+    await act(async () => {
+      results.next(
+        makeResult(operation, {
+          data: { song: { __typename: 'Song', id: '1', title: 'Old' } },
+          hasNext: false,
+        })
+      );
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<p>Old</p>');
+
+    const refetch = makeResult(operation, {
+      data: { song: { __typename: 'Song', id: '1' } },
+      hasNext: true,
+    });
+    await act(async () => {
+      results.next(refetch);
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<p>Old…</p>');
+
+    await act(async () => {
+      results.next(
+        mergeResultPatch(refetch, {
+          incremental: [{ path: ['song'], data: { title: 'New' } }],
+          hasNext: false,
+        })
+      );
+      await sleep(10);
+    });
+    expect(container.innerHTML).toBe('<p>New</p>');
+  });
+
+  it('does not track streamed queries without @defer', async () => {
+    const { client, results } = makeStreamedClient(false);
+    setClient(client);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const query = `query { song { id __typename } }`;
     const operation = client.createRequestOperation(
       'query',
       createRequest(query, undefined)
     );
-
-    // Drive the query stream directly; the client's result pipeline installs
-    // the sidecar promises for the missing deferred fields.
-    pipe(
-      client.executeRequestOperation(operation),
-      subscribe(() => {
-        /*noop*/
-      })
-    );
-
-    const first = { song: { __typename: 'Song', id: '1' } };
-    results.next({ operation, data: first, hasNext: true, stale: false });
-
-    const Song = ({ data }: { data: any }) => {
-      const fragment = useFragment<any>({
-        fragment: `fragment SongFields on Song { title }`,
-        data,
-      });
-      return <p>{fragment.fetching ? 'fetching' : fragment.data.title}</p>;
+    const seen: any[] = [];
+    const Song = ({ data }: any) => {
+      seen.push(useFragment<any>({ fragment: SongFields, data }));
+      return null;
     };
-
-    const view = render(<Song data={first.song} />);
-    expect(view.container.textContent).toBe('fetching');
-
-    // The deferred patch resolves the sidecar promise; the hook updates
-    // through the fragment source without any parent rerender.
-    act(() => {
-      results.next({
-        operation,
-        data: { song: { __typename: 'Song', id: '1', title: 'Hello' } },
-        hasNext: false,
-        stale: false,
-      });
+    const Page = () => {
+      const [result] = useQuery<any>({ query });
+      return result.data ? <Song data={result.data.song} /> : null;
+    };
+    render(<Page />);
+    await act(async () => {
+      results.next(
+        makeResult(operation, {
+          data: { song: { __typename: 'Song', id: '1' } },
+          hasNext: true,
+        })
+      );
+      await sleep(10);
     });
-    await act(async () => {});
-
-    expect(view.container.textContent).toBe('Hello');
+    // No owner was recorded, so the incomplete reference is returned as-is
+    // instead of waiting on a stream that will never deliver `title`.
+    expect(seen[seen.length - 1]).toMatchObject({
+      fetching: false,
+      data: { id: '1' },
+    });
   });
 });

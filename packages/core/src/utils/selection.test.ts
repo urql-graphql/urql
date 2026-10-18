@@ -7,10 +7,7 @@ import {
   getFieldKey,
   getFragments,
   hasDirective,
-  isDeferredSelection,
-  isHeuristicFragmentMatch,
   isOptionalSelection,
-  shouldInclude,
 } from './selection';
 
 const fieldsOf = (source: string): Record<string, FieldNode> => {
@@ -57,27 +54,6 @@ describe('hasDirective', () => {
   });
 });
 
-describe('directive evaluation', () => {
-  it('evaluates @include and @skip against variables', () => {
-    const fields = fieldsOf(
-      `fragment F on T { a @include(if: $include) b @skip(if: $skip) }`
-    );
-    expect(shouldInclude(fields.a, { include: true })).toBe(true);
-    expect(shouldInclude(fields.a, { include: false })).toBe(false);
-    expect(shouldInclude(fields.b, { skip: true })).toBe(false);
-    expect(shouldInclude(fields.b, { skip: false })).toBe(true);
-  });
-
-  it('evaluates @defer(if:) against variables', () => {
-    const fields = fieldsOf(
-      `fragment F on T { a @defer(if: $defer) b @defer }`
-    );
-    expect(isDeferredSelection(fields.a, { defer: true })).toBe(true);
-    expect(isDeferredSelection(fields.a, { defer: false })).toBe(false);
-    expect(isDeferredSelection(fields.b, {})).toBe(true);
-  });
-});
-
 describe('isOptionalSelection', () => {
   it('is true for @include/@skip and false otherwise', () => {
     const fields = fieldsOf(
@@ -86,58 +62,5 @@ describe('isOptionalSelection', () => {
     expect(isOptionalSelection(fields.a)).toBe(true);
     expect(isOptionalSelection(fields.b)).toBe(true);
     expect(isOptionalSelection(fields.c)).toBe(false);
-  });
-});
-
-describe('isHeuristicFragmentMatch', () => {
-  const fragment = getFragments(gql`
-    fragment AuthorFields on Author {
-      id
-      name
-      __typename
-    }
-  `.definitions).AuthorFields;
-
-  it('matches when the type condition equals __typename', () => {
-    expect(
-      isHeuristicFragmentMatch(fragment, { __typename: 'Author' }, {})
-    ).toBe(true);
-  });
-
-  it('matches heuristically when every selected field is present', () => {
-    expect(
-      isHeuristicFragmentMatch(
-        fragment,
-        { __typename: 'Other', id: '1', name: 'x' },
-        {}
-      )
-    ).toBe(true);
-  });
-
-  it('does not match when a selected field is missing', () => {
-    expect(
-      isHeuristicFragmentMatch(fragment, { __typename: 'Other', id: '1' }, {})
-    ).toBe(false);
-  });
-
-  it('matches when conditional fields are absent or present', () => {
-    const conditional = getFragments(gql`
-      fragment NodeFields on Node {
-        id
-        name @include(if: true)
-        email @skip(if: false)
-      }
-    `.definitions).NodeFields;
-
-    expect(
-      isHeuristicFragmentMatch(conditional, { __typename: 'User', id: '1' }, {})
-    ).toBe(true);
-    expect(
-      isHeuristicFragmentMatch(
-        conditional,
-        { __typename: 'User', id: '1', name: 'Jovi', email: 'jovi@test.dev' },
-        {}
-      )
-    ).toBe(true);
   });
 });
