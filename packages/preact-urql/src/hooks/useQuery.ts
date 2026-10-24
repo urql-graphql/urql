@@ -10,6 +10,7 @@ import {
   switchMap,
   map,
   scan,
+  subscribe,
 } from 'wonka';
 
 import type {
@@ -205,6 +206,13 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
       sink(signal);
     } else {
       hasSuspended = true;
+      // Keep a streamed (`hasNext`) query alive while suspended, so the retry
+      // render joins the same stream instead of re-executing it.
+      pipe(
+        shared,
+        takeWhile(result => !!(result as any).hasNext),
+        subscribe(() => {})
+      );
       sink(0 /* End */);
       throw new Promise<T>(_resolve => {
         resolve = _resolve;

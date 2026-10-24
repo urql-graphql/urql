@@ -46,6 +46,10 @@ import {
   noop,
   makeOperation,
   getOperationType,
+  getDeferSkeleton,
+  makeOwnerChannel,
+  updateOwnerChannel,
+  endOwnerChannel,
 } from './utils';
 
 /** Configuration options passed when creating a new {@link Client}.
@@ -615,6 +619,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         takeWhile(result => !!result.hasNext, true)
       );
     } else {
+      // Record which objects of a streamed `@defer` result can host deferred
+      // fragment data, so a fragment can read its own data from this stream.
+      // Documents without `@defer` skip this entirely.
+      const skeleton = getDeferSkeleton(operation.query);
+      if (skeleton) {
+        const channel = makeOwnerChannel();
+        result$ = pipe(
+          result$,
+          onPush(result => updateOwnerChannel(channel, skeleton, result)),
+          onEnd(() => endOwnerChannel(channel))
+        );
+      }
       result$ = pipe(
         result$,
         // Add `stale: true` flag when a new operation is sent for queries
