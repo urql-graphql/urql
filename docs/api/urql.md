@@ -84,6 +84,32 @@ some additional setup.
 [Read more about how to use the `useSubscription` API on the "Subscriptions"
 page.](../advanced/subscriptions.md)
 
+## useFragment
+
+> **Beta:** may change in a minor release while the GraphQL incremental delivery RFC is a draft.
+
+Reads a fragment from the reference a parent passed down, and waits for it when the parent query
+spread the fragment with `@defer`. Accepts a single required options object:
+
+| Prop       | Type                     | Description                                                                     |
+| ---------- | ------------------------ | ------------------------------------------------------------------------------- |
+| `fragment` | `string \| DocumentNode` | A document containing the fragment to read.                                     |
+| `data`     | `?object`                | The fragment reference passed down by the parent.                               |
+| `name`     | `?string`                | The fragment to use when the document contains several.                         |
+| `context`  | `?object`                | Only `context.suspense` is read; it overrides the `Client`'s `suspense` option. |
+
+It returns an object with:
+
+- `data`: the reference itself (or its streamed-in successor) once every field is present.
+- `fetching`: `true` while a deferred patch for it is in flight.
+- `error`: a [`CombinedError`](./core.md#combinederror) with the GraphQL errors under its path, if
+  the query ended without delivering it.
+
+With Suspense, the hook suspends instead of returning `fetching: true`, and throws `error` to the
+nearest error boundary.
+
+[Read more about deferred fragments on the "React/Preact" page.](../basics/react-preact.md#deferred-fragments)
+
 ## Query Component
 
 This component is a wrapper around [`useQuery`](#usequery), exposing a [render prop
