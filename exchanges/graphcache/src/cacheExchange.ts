@@ -95,11 +95,16 @@ export const cacheExchange =
     let dependentOperations: Operations = new Set();
 
     // Mutations with the same variables share an `Operation.key`, so each
-    // mutation's optimistic layer is keyed by its client instance instead
-    const getLayerKey = (operation: Operation): number =>
-      operation.kind === 'mutation' && operation.context._instance
-        ? (operation.key * 31 + operation.context._instance) | 0
+    // mutation's optimistic layer is keyed by its client instance instead.
+    // The instance is spread by the golden ratio, so that small keys and
+    // instances can't add up to another operation's key
+    const getLayerKey = (operation: Operation): number => {
+      const instance =
+        operation.kind === 'mutation' && operation.context._instance;
+      return instance
+        ? (Math.imul(operation.key, 31) + Math.imul(instance, 0x9e3779b1)) | 0
         : operation.key;
+    };
 
     const isBlockedByOptimisticUpdate = (
       dependencies: Dependencies
