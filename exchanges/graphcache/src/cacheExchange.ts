@@ -94,6 +94,13 @@ export const cacheExchange =
     let reexecutingOperations: Operations = new Set();
     let dependentOperations: Operations = new Set();
 
+    // Mutations with the same variables share an `Operation.key`, so each
+    // mutation's optimistic layer is keyed by its client instance instead
+    const getLayerKey = (operation: Operation): number =>
+      operation.kind === 'mutation' && operation.context._instance
+        ? (operation.key * 31 + operation.context._instance) | 0
+        : operation.key;
+
     const isBlockedByOptimisticUpdate = (
       dependencies: Dependencies
     ): boolean => {
@@ -192,9 +199,10 @@ export const cacheExchange =
         operation.kind === 'mutation' &&
         operation.context.requestPolicy !== 'network-only'
       ) {
-        operations.set(operation.key, operation);
+        const layerKey = getLayerKey(operation);
+        operations.set(layerKey, operation);
         // This executes an optimistic update for mutations and registers it if necessary
-        initDataState('write', store.data, operation.key, true, false);
+        initDataState('write', store.data, layerKey, true, false);
         const { dependencies } = _write(
           store,
           operation as any,
@@ -206,7 +214,7 @@ export const cacheExchange =
           // Update blocked optimistic dependencies
           for (const dep of dependencies.values()) blockedDependencies.add(dep);
           // Store optimistic dependencies for update
-          optimisticKeysToDependencies.set(operation.key, dependencies);
+          optimisticKeysToDependencies.set(layerKey, dependencies);
           // Update related queries
           const pendingOperations: Operations = new Set();
           collectPendingOperations(pendingOperations, dependencies);
@@ -279,24 +287,24 @@ export const cacheExchange =
       pendingOperations: Operations
     ): OperationResult => {
       // Retrieve the original operation to get unfiltered variables
-      const operation =
-        operations.get(result.operation.key) || result.operation;
+      const layerKey = getLayerKey(result.operation);
+      const operation = operations.get(layerKey) || result.operation;
       if (operation.kind === 'mutation') {
         // Collect previous dependencies that have been written for optimistic updates
-        const dependencies = optimisticKeysToDependencies.get(operation.key);
+        const dependencies = optimisticKeysToDependencies.get(layerKey);
         collectPendingOperations(pendingOperations, dependencies);
-        optimisticKeysToDependencies.delete(operation.key);
+        optimisticKeysToDependencies.delete(layerKey);
       }
 
       if (operation.kind === 'subscription' || result.hasNext)
-        reserveLayer(store.data, operation.key, true);
+        reserveLayer(store.data, layerKey, true);
 
       let queryDependencies: undefined | Dependencies;
       let data: Data | null = result.data;
       if (data) {
         // Write the result to cache and collect all dependencies that need to be
         // updated
-        initDataState('write', store.data, operation.key, false, false);
+        initDataState('write', store.data, layerKey, false, false);
         const writeDependencies = _write(
           store,
           operation,
@@ -307,13 +315,7 @@ export const cacheExchange =
         collectPendingOperations(pendingOperations, writeDependencies);
         const prevData =
           operation.kind === 'query' ? results.get(operation.key) : null;
-        initDataState(
-          'read',
-          store.data,
-          operation.key,
-          false,
-          prevData !== data
-        );
+        initDataState('read', store.data, layerKey, false, prevData !== data);
         const queryResult = _query(
           store,
           operation,
@@ -329,7 +331,7 @@ export const cacheExchange =
           results.set(operation.key, data);
         }
       } else {
-        noopDataState(store.data, operation.key);
+        noopDataState(store.data, layerKey);
       }
 
       // Update this operation's dependencies if it's a query
@@ -470,7 +472,8 @@ export const cacheExchange =
       const nonOptimisticResults$ = pipe(
         result$,
         filter(
-          result => !optimisticKeysToDependencies.has(result.operation.key)
+          result =>
+            !optimisticKeysToDependencies.has(getLayerKey(result.operation))
         ),
         map(result => {
           const { key } = result.operation;
@@ -504,7 +507,7 @@ export const cacheExchange =
       const optimisticMutationCompletion$ = pipe(
         result$,
         filter(result =>
-          optimisticKeysToDependencies.has(result.operation.key)
+          optimisticKeysToDependencies.has(getLayerKey(result.operation))
         ),
         mergeMap((result: OperationResult): Source<OperationResult> => {
           const length = mutationResultBuffer.push(result);
@@ -513,7 +516,10 @@ export const cacheExchange =
           }
 
           for (let i = 0; i < mutationResultBuffer.length; i++) {
-            reserveLayer(store.data, mutationResultBuffer[i].operation.key);
+            reserveLayer(
+              store.data,
+              getLayerKey(mutationResultBuffer[i].operation)
+            );
           }
 
           blockedDependencies.clear();
