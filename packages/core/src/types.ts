@@ -308,6 +308,19 @@ export type CacheOutcome = 'miss' | 'partial' | 'hit';
  */
 export type AnyVariables = { [prop: string]: any } | void | undefined;
 
+/** The type of the `variables` passed alongside a document.
+ *
+ * @remarks
+ * A typed document decides the `Variables`, so an object with a field the document's variables
+ * don't have is a type error. An untyped document takes them from the passed object instead.
+ *
+ * @privateRemarks
+ * Equal to `Variables` once inferred. TypeScript infers from a type parameter inside an
+ * intersection at a lower priority, so the document's `Variables` win over the object's.
+ * Unlike `NoInfer`, the object still fills them in when the document carries none.
+ */
+export type VariablesInput<Variables> = Variables & ({} | void);
+
 /** A GraphQL request representing a single execution in GraphQL.
  *
  * @remarks
@@ -374,7 +387,9 @@ export interface GraphQLRequest<
  *
  * @privateRemarks
  * The wrapping union type is needed for passthrough or wrapper utilities that wrap
- * functions like `useQuery` with generics.
+ * functions like `useQuery` with generics. `variables` is a {@link VariablesInput} in the last
+ * member, so a typed `query` decides `Variables` and an untyped one takes them from the object.
+ * The conditional members use `NoInfer`, as TypeScript infers from their branches at full priority.
  */
 export type GraphQLRequestParams<
   Data = any,
@@ -384,7 +399,7 @@ export type GraphQLRequestParams<
       query: DocumentInput<Data, Variables>;
     } & (Variables extends void
       ? {
-          variables?: Variables;
+          variables?: NoInfer<Variables>;
         }
       : Variables extends {
             [P in keyof Variables]: undefined extends Variables[P]
@@ -396,14 +411,14 @@ export type GraphQLRequestParams<
                   : never;
           }
         ? {
-            variables?: Variables;
+            variables?: NoInfer<Variables>;
           }
         : {
-            variables: Variables;
+            variables: NoInfer<Variables>;
           }))
   | {
       query: DocumentInput<Data, Variables>;
-      variables: Variables;
+      variables: VariablesInput<Variables>;
     };
 
 /** Metadata used to annotate an `Operation` in development for the `urql-devtools`.
