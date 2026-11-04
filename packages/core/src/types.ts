@@ -374,7 +374,8 @@ export interface GraphQLRequest<
  *
  * @privateRemarks
  * The wrapping union type is needed for passthrough or wrapper utilities that wrap
- * functions like `useQuery` with generics.
+ * functions like `useQuery` with generics. `variables` is `NoInfer` so that `Variables`
+ * comes from `query` alone and object literals get excess property checks.
  */
 export type GraphQLRequestParams<
   Data = any,
@@ -384,7 +385,7 @@ export type GraphQLRequestParams<
       query: DocumentInput<Data, Variables>;
     } & (Variables extends void
       ? {
-          variables?: Variables;
+          variables?: NoInfer<Variables>;
         }
       : Variables extends {
             [P in keyof Variables]: undefined extends Variables[P]
@@ -396,14 +397,14 @@ export type GraphQLRequestParams<
                   : never;
           }
         ? {
-            variables?: Variables;
+            variables?: NoInfer<Variables>;
           }
         : {
-            variables: Variables;
+            variables: NoInfer<Variables>;
           }))
   | {
       query: DocumentInput<Data, Variables>;
-      variables: Variables;
+      variables: NoInfer<Variables>;
     };
 
 /** Metadata used to annotate an `Operation` in development for the `urql-devtools`.

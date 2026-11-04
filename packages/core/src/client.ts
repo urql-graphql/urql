@@ -345,7 +345,7 @@ export interface Client {
    */
   query<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentInput<Data, Variables>,
-    variables: Variables,
+    variables: NoInfer<Variables>,
     context?: Partial<OperationContext>
   ): OperationResultSource<OperationResult<Data, Variables>>;
 
@@ -371,7 +371,7 @@ export interface Client {
    */
   readQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentInput<Data, Variables>,
-    variables: Variables,
+    variables: NoInfer<Variables>,
     context?: Partial<OperationContext>
   ): OperationResult<Data, Variables> | null;
 
@@ -437,7 +437,7 @@ export interface Client {
    */
   subscription<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentInput<Data, Variables>,
-    variables: Variables,
+    variables: NoInfer<Variables>,
     context?: Partial<OperationContext>
   ): OperationResultSource<OperationResult<Data, Variables>>;
 
@@ -506,7 +506,7 @@ export interface Client {
    */
   mutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentInput<Data, Variables>,
-    variables: Variables,
+    variables: NoInfer<Variables>,
     context?: Partial<OperationContext>
   ): OperationResultSource<OperationResult<Data, Variables>>;
 
