@@ -1723,6 +1723,220 @@ describe('as resolver', () => {
     expect(res.partial).toBe(false);
     expect(res.data).toEqual(pageOne);
   });
+
+  it('preserves pageInfo fields reported by a forward page', () => {
+    const Pagination = gql`
+      query ($cursor: String) {
+        __typename
+        items(first: 1, after: $cursor) {
+          __typename
+          edges {
+            __typename
+            node {
+              __typename
+              id
+            }
+          }
+          nodes {
+            __typename
+            id
+          }
+          pageInfo {
+            __typename
+            hasNextPage
+            endCursor
+            hasPreviousPage
+            startCursor
+          }
+        }
+      }
+    `;
+
+    const store = new Store({
+      resolvers: {
+        Query: {
+          items: relayPagination(),
+        },
+      },
+    });
+
+    const pageOne = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(1)],
+        nodes: [itemNode(1)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: true,
+          endCursor: '1',
+        },
+      },
+    };
+
+    const pageTwo = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(2)],
+        nodes: [itemNode(2)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: false,
+          endCursor: null,
+          hasPreviousPage: true,
+        },
+      },
+    };
+
+    write(store, { query: Pagination, variables: { cursor: null } }, pageOne);
+    write(store, { query: Pagination, variables: { cursor: '1' } }, pageTwo);
+
+    const res = query(store, { query: Pagination });
+
+    expect(res.partial).toBe(false);
+    expect(res.data).toEqual({
+      ...pageTwo,
+      items: {
+        ...pageTwo.items,
+        edges: [pageOne.items.edges[0], pageTwo.items.edges[0]],
+        nodes: [pageOne.items.nodes[0], pageTwo.items.nodes[0]],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: false,
+          endCursor: null,
+          hasPreviousPage: true,
+          startCursor: null,
+        },
+      },
+    });
+  });
+
+  it('preserves pageInfo fields of a lone forward page', () => {
+    const Pagination = gql`
+      query ($cursor: String) {
+        __typename
+        items(first: 1, after: $cursor) {
+          __typename
+          edges {
+            __typename
+            node {
+              __typename
+              id
+            }
+          }
+          nodes {
+            __typename
+            id
+          }
+          pageInfo {
+            __typename
+            hasNextPage
+            endCursor
+            hasPreviousPage
+            startCursor
+          }
+        }
+      }
+    `;
+
+    const store = new Store({
+      resolvers: {
+        Query: {
+          items: relayPagination(),
+        },
+      },
+    });
+
+    const page = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(1)],
+        nodes: [itemNode(1)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: true,
+          endCursor: '1',
+          hasPreviousPage: true,
+          startCursor: '1',
+        },
+      },
+    };
+
+    write(store, { query: Pagination, variables: { cursor: '0' } }, page);
+
+    const res = query(store, {
+      query: Pagination,
+      variables: { cursor: '0' },
+    });
+
+    expect(res.partial).toBe(false);
+    expect(res.data).toEqual(page);
+  });
+
+  it('preserves pageInfo fields of a lone backward page', () => {
+    const Pagination = gql`
+      query ($cursor: String) {
+        __typename
+        items(last: 1, before: $cursor) {
+          __typename
+          edges {
+            __typename
+            node {
+              __typename
+              id
+            }
+          }
+          nodes {
+            __typename
+            id
+          }
+          pageInfo {
+            __typename
+            hasNextPage
+            endCursor
+            hasPreviousPage
+            startCursor
+          }
+        }
+      }
+    `;
+
+    const store = new Store({
+      resolvers: {
+        Query: {
+          items: relayPagination(),
+        },
+      },
+    });
+
+    const page = {
+      __typename: 'Query',
+      items: {
+        __typename: 'ItemsConnection',
+        edges: [itemEdge(-1)],
+        nodes: [itemNode(-1)],
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: true,
+          endCursor: '-1',
+          hasPreviousPage: true,
+          startCursor: '-1',
+        },
+      },
+    };
+
+    write(store, { query: Pagination, variables: { cursor: '0' } }, page);
+
+    const res = query(store, {
+      query: Pagination,
+      variables: { cursor: '0' },
+    });
+
+    expect(res.partial).toBe(false);
+    expect(res.data).toEqual(page);
+  });
 });
 
 describe('as directive', () => {
