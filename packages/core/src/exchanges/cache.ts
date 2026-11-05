@@ -53,6 +53,8 @@ export const mapTypeNames = (operation: Operation): Operation => {
 export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache: ResultCache = new Map();
   const operationCache: OperationCache = new Map();
+  // Typenames that were invalidated while a query's request was in-flight, by operation key
+  const inFlightInvalidations = new Map<number, Set<string>>();
 
   const isOperationCached = (operation: Operation) =>
     operation.kind === 'query' &&
@@ -118,6 +120,13 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
       filter(
         op => op.kind !== 'query' || op.context.requestPolicy !== 'cache-only'
       ),
+      tap(op => {
+        if (op.kind === 'teardown') {
+          inFlightInvalidations.delete(op.key);
+        } else if (op.kind === 'query' && !inFlightInvalidations.has(op.key)) {
+          inFlightInvalidations.set(op.key, new Set());
+        }
+      }),
       forward,
       tap(response => {
         let { operation } = response;
@@ -154,6 +163,8 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
               operationCache.set(typeName, (operations = new Set()));
             for (const key of operations.values()) pendingOperations.add(key);
             operations.clear();
+            for (const invalidated of inFlightInvalidations.values())
+              invalidated.add(typeName);
           }
 
           for (const key of pendingOperations.values()) {
@@ -163,7 +174,25 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
               reexecuteOperation(client, operation);
             }
           }
-        } else if (operation.kind === 'query' && response.data) {
+        } else if (operation.kind === 'query') {
+          const invalidated = inFlightInvalidations.get(operation.key);
+          if (!response.hasNext) inFlightInvalidations.delete(operation.key);
+
+          if (!response.data) return;
+
+          if (
+            !response.hasNext &&
+            invalidated &&
+            typenames.some(typeName => invalidated.has(typeName))
+          ) {
+            // This result may be older than the invalidation, which the client couldn't
+            // reexecute while the request was in-flight, so the query is refetched instead
+            resultCache.delete(operation.key);
+            response.stale = true;
+            reexecuteOperation(client, operation);
+            return;
+          }
+
           resultCache.set(operation.key, response);
           for (let i = 0; i < typenames.length; i++) {
             const typeName = typenames[i];
