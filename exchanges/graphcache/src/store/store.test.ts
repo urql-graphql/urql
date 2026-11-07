@@ -1027,6 +1027,34 @@ describe('Store with storage', () => {
     InMemoryData.clearDataState();
   });
 
+  it('persists data written while the storage is still being read', () => {
+    const storage: StorageAdapter = {
+      readData: vi.fn(),
+      writeData: vi.fn(),
+    };
+
+    store.data.hydrating = true;
+
+    InMemoryData.initDataState('write', store.data, 1);
+    InMemoryData.writeRecord('Query', 'fresh', true);
+    InMemoryData.clearDataState();
+
+    InMemoryData.hydrateData(store.data, storage, {
+      'Query.fresh': 'false',
+      'Query.stored': 'true',
+    });
+
+    InMemoryData.initDataState('read', store.data, null);
+    expect(InMemoryData.readRecord('Query', 'fresh')).toBe(true);
+    expect(InMemoryData.readRecord('Query', 'stored')).toBe(true);
+    InMemoryData.persistData();
+    InMemoryData.clearDataState();
+
+    expect(storage.writeData).toHaveBeenCalledWith({
+      'Query.fresh': 'true',
+    });
+  });
+
   it("should warn if an optimistic field doesn't exist in the schema's mutations", () => {
     new Store({
       schema: minifyIntrospectionQuery(
