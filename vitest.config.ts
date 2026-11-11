@@ -5,6 +5,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   resolve: {
     alias: {
+      'preact/compat':
+        __dirname +
+        '/packages/preact-urql/node_modules/preact/compat/dist/compat.js',
       'preact/hooks':
         __dirname +
         '/packages/preact-urql/node_modules/preact/hooks/dist/hooks.js',

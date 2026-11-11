@@ -12,3 +12,5 @@ order: 2
 
 The `@urql/preact` API is the same as the React `urql` API.
 Please refer to [the "urql" API docs](./urql.md) for details on the Preact API.
+
+`useFragment` is the same as well; import `Suspense` from `preact/compat` to use it with Suspense.

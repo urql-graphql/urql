@@ -189,10 +189,10 @@ GraphQL Code Generator generates type helpers to type your component props based
 Again, here is an example with the React bindings:
 
 ```tsx
-import { FragmentType, useFragment } from './gql/fragment-masking';
+import { useFragment } from 'urql';
+import type { FragmentType } from './gql/fragment-masking';
 import { graphql } from '../src/gql';
 
-// again, we use the generated `graphql()` function to write GraphQL documents 👀
 export const FilmFragment = graphql(/* GraphQL */ `
   fragment FilmItem on Film {
     id
@@ -202,26 +202,88 @@ export const FilmFragment = graphql(/* GraphQL */ `
   }
 `);
 
-const Film = (props: {
-  // `film` property has the correct type 🎉
-  film: FragmentType<typeof FilmFragment>;
-}) => {
-  // `film` is of type `FilmFragment`, with no extraneous properties ⚡️
-  const film = useFragment(FilmFragment, props.film);
-  return (
+const Film = (props: { film: FragmentType<typeof FilmFragment> }) => {
+  const { data: film } = useFragment({
+    fragment: FilmFragment,
+    data: props.film,
+  });
+
+  return film ? (
     <div>
       <h3>{film.title}</h3>
       <p>{film.releaseDate}</p>
     </div>
-  );
+  ) : null;
 };
 
 export default Film;
 ```
 
-_Examples with Vue are available [in the GraphQL Code Generator repository](https://github.com/dotansimha/graphql-code-generator/tree/master/examples/vue/urql)_.
+The `FragmentType` reference and the fragment's result type are intentionally
+separate. `useFragment` accepts the generated reference as its input and infers
+its returned `data` from `FilmFragment`. This also allows an incremental
+fragment reference to be passed before an `@defer` patch has arrived; with
+Suspense enabled, the hook waits for that patch.
 
-You will notice that our `<Film>` component leverages 2 imports from our generated code (from `../src/gql`): the `FragmentType<T>` type helper and the `useFragment()` function.
+GraphQL Code Generator calls its generated unmasking helper `useFragment` by
+default, but that helper isn't a React hook. To avoid a naming collision, name
+it `readFragment` (or `getFragmentData`) in your Codegen configuration:
 
-- we use `FragmentType<typeof FilmFragment>` to get the corresponding Fragment TypeScript type
-- later on, we use `useFragment()` to retrieve the properly film property
+```ts
+presetConfig: {
+  fragmentMasking: {
+    unmaskFunctionName: 'readFragment',
+  },
+},
+```
+
+The generated `readFragment(Fragment, data)` helper may still be used before
+calling urql's hook for non-deferred data. It is not required: passing the
+fragment reference directly is preferred for `@defer`, since Codegen's
+incremental reference is not considered fully readable until its patch arrives.
+
+For a deferred fragment, type the component input from the parent query field so
+its incremental state is retained:
+
+```tsx
+const Film = (props: { film: NonNullable<FilmsQuery['film']> }) => {
+  const { data: film } = useFragment({
+    fragment: FilmFragment,
+    data: props.film,
+  });
+  // ...
+};
+```
+
+### Using gql.tada fragment references
+
+gql.tada's opaque `FragmentOf` references are also accepted directly:
+
+```tsx
+import { useFragment } from 'urql';
+import { graphql, type FragmentOf } from 'gql.tada';
+
+const FilmFragment = graphql(`
+  fragment FilmItem on Film {
+    id
+    title
+    releaseDate
+  }
+`);
+
+const Film = (props: { film: FragmentOf<typeof FilmFragment> }) => {
+  const { data: film } = useFragment({
+    fragment: FilmFragment,
+    data: props.film,
+  });
+  return film ? <h3>{film.title}</h3> : null;
+};
+```
+
+You may equivalently pass
+`readFragment(FilmFragment, props.film)` as `data`. Both gql.tada and GraphQL
+Code Generator's readers preserve `null` and `undefined`, which `useFragment`
+also returns unchanged. For deferred fields, pass the opaque/incremental
+reference directly so the hook can suspend until the streamed patch arrives.
+
+_Examples with Vue are available [in the GraphQL Code Generator repository](https://github.com/dotansimha/graphql-code-generator/tree/master/examples/vue/urql)._
