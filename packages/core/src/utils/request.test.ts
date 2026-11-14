@@ -204,4 +204,24 @@ describe('stringifyDocument ', () => {
         }"
       `);
   });
+
+  it('should not reuse loc.source.body from loader when definitions subset an external document', () => {
+    const full = parse(`
+      mutation createThing { createThing { id } }
+      mutation deleteThing { deleteThing }
+    `);
+    const createThing = {
+      kind: full.kind,
+      definitions: [full.definitions[0]],
+      loc: full.loc,
+    };
+    const req = createRequest(createThing as any, undefined);
+    expect(stringifyDocument(req.query)).toMatchInlineSnapshot(`
+      "mutation createThing {
+        createThing {
+          id
+        }
+      }"
+    `);
+  });
 });

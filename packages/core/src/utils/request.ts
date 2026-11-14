@@ -68,7 +68,12 @@ export const stringifyDocument = (
   let printed: string;
   if (typeof node === 'string') {
     printed = sanitizeDocument(node);
-  } else if (node.loc && docs.get((node as KeyedDocumentNode).__key) === node) {
+  } else if (
+    node.loc &&
+    node.loc.source &&
+    node.loc.source.name === SOURCE_NAME &&
+    docs.get((node as KeyedDocumentNode).__key) === node
+  ) {
     printed = node.loc.source.body;
   } else {
     printed = prints.get(node) || sanitizeDocument(print(node));
