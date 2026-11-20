@@ -345,11 +345,29 @@ export const relayPagination = (
         startNodes = concatNodes(startNodes, page.nodes);
         pageInfo.endCursor = page.pageInfo.endCursor;
         pageInfo.hasNextPage = page.pageInfo.hasNextPage;
+        // The server may also report the start-of-list fields for a
+        // forward page (e.g. `hasPreviousPage` when resuming pagination
+        // from a cursor), and this page may be the first or only page in
+        // the merged result, so they must not be dropped. (#2521)
+        if (pageInfo.startCursor === null) {
+          pageInfo.startCursor = page.pageInfo.startCursor;
+        }
+        pageInfo.hasPreviousPage =
+          pageInfo.hasPreviousPage || page.pageInfo.hasPreviousPage;
       } else if (args.before) {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
         pageInfo.startCursor = page.pageInfo.startCursor;
         pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
+        // Mirror of the forward case above: the server may also report
+        // the end-of-list fields for a backward page, and this page may
+        // be the last or only page in the merged result, so they must
+        // not be dropped either. (#2521)
+        if (pageInfo.endCursor === null) {
+          pageInfo.endCursor = page.pageInfo.endCursor;
+        }
+        pageInfo.hasNextPage =
+          pageInfo.hasNextPage || page.pageInfo.hasNextPage;
       } else if (typeof args.last === 'number') {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
