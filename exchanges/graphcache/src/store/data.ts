@@ -448,7 +448,9 @@ const updateDependencies = (entityKey: string, fieldKey?: string) => {
 };
 
 const updatePersist = (entityKey: string, fieldKey: string) => {
-  if (!currentOptimistic && currentData!.storage) {
+  // Results can arrive before the storage has been read and attached, and
+  // they still need to be persisted once it has
+  if (!currentOptimistic && (currentData!.storage || currentData!.hydrating)) {
     currentData!.persist.add(serializeKeys(entityKey, fieldKey));
   }
 };
@@ -713,11 +715,16 @@ export const hydrateData = (
     if (value !== undefined) {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
       if (value[0] === ':') {
-        if (readLink(entityKey, fieldKey) === undefined)
+        if (readLink(entityKey, fieldKey) === undefined) {
           writeLink(entityKey, fieldKey, JSON.parse(value.slice(1)));
+          // Already stored, so this doesn't need to be written back
+          data.persist.delete(key);
+        }
       } else {
-        if (readRecord(entityKey, fieldKey) === undefined)
+        if (readRecord(entityKey, fieldKey) === undefined) {
           writeRecord(entityKey, fieldKey, JSON.parse(value));
+          data.persist.delete(key);
+        }
       }
     }
   }
