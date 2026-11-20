@@ -1755,6 +1755,101 @@ describe('optimistic updates', () => {
     expect(result).toHaveBeenCalledTimes(4);
   });
 
+  it('keeps separate optimistic layers for repeated identical mutations', () => {
+    vi.useFakeTimers();
+
+    const cartQuery = gql`
+      {
+        cart {
+          id
+          a
+          b
+        }
+      }
+    `;
+
+    const addToCart = gql`
+      mutation ($field: String!) {
+        addToCart(field: $field) {
+          id
+          a
+          b
+        }
+      }
+    `;
+
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+    const { source: ops$, next } = makeSubject<Operation>();
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(next);
+
+    const opQuery = client.createRequestOperation('query', {
+      key: 1,
+      query: cartQuery,
+      variables: undefined,
+    });
+
+    const makeMutation = (field: 'a' | 'b') =>
+      client.createRequestOperation('mutation', {
+        key: field === 'a' ? 2 : 3,
+        query: addToCart,
+        variables: { field },
+      });
+
+    // Only the query gets a response; mutations stay pending, as when offline
+    const forward: ExchangeIO = ops$ =>
+      pipe(
+        ops$,
+        filter(op => op.kind === 'query'),
+        delay(1),
+        map(
+          (op): OperationResult => ({
+            ...queryResponse,
+            operation: op,
+            data: {
+              __typename: 'Query',
+              cart: { __typename: 'Cart', id: '1', a: 1, b: 1 },
+            },
+          })
+        ),
+        share
+      );
+
+    // Like the reported updater, this returns a full snapshot of the cart
+    const optimistic = {
+      addToCart: vi.fn((args, cache) => {
+        const { cart } = cache.readQuery({ query: cartQuery });
+        return { ...cart, [args.field]: cart[args.field] + 1 };
+      }) as any,
+    };
+
+    const result = vi.fn();
+    pipe(
+      cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(opQuery);
+    vi.runAllTimers();
+
+    next(makeMutation('a'));
+    next(makeMutation('b'));
+    // Same variables and key as the first mutation, but a new instance
+    next(makeMutation('a'));
+
+    const lastQueryResult = result.mock.calls
+      .map(call => call[0])
+      .filter(res => res.operation.kind === 'query')
+      .pop();
+
+    expect(lastQueryResult.data).toMatchObject({
+      cart: { a: 3, b: 2 },
+    });
+  });
+
   it('batches optimistic mutation result application', () => {
     vi.useFakeTimers();
 
