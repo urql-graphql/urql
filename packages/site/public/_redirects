@@ -1,1 +1,3 @@
 /discord https://discord.gg/NzUrbgz2dP 302
+/goto/docs /docs/ 301
+/goto/docs/* /docs/:splat 301
