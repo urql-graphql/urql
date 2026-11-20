@@ -150,8 +150,10 @@ export const cacheExchange =
             if (
               operation.kind === 'subscription' &&
               inFlightOperations.has(key)
-            )
+            ) {
               deferredReexecutes.add(reexecute);
+              refetchOperations.add(key);
+            }
             client.reexecuteOperation(reexecute);
           }
         }
@@ -171,15 +173,9 @@ export const cacheExchange =
 
     // Checks whether a reexecute's request is deferred until the query's in-flight request
     // completes, in which case the query is refetched then
-    const deferRequest = (operation: Operation): boolean => {
-      if (
-        !deferredReexecutes.has(operation) ||
-        !inFlightOperations.has(operation.key)
-      )
-        return false;
-      refetchOperations.add(operation.key);
-      return true;
-    };
+    const deferRequest = (operation: Operation): boolean =>
+      deferredReexecutes.has(operation) &&
+      inFlightOperations.has(operation.key);
 
     // This registers queries with the data layer to ensure commutativity
     const prepareForwardedOperation = (operation: Operation) => {
