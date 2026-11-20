@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 9.0.3
+
+### Patch Changes
+
+- Give each mutation its own optimistic layer, even when its variables match another pending mutation. Previously, repeating a mutation with the same variables reused the earlier mutation's optimistic layer, so its stale optimistic data could hide newer optimistic updates. This showed up with `offlineExchange` when the same mutation was queued more than once while offline
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3919](https://github.com/urql-graphql/urql/pull/3919))
+- Updated dependencies (See [#3922](https://github.com/urql-graphql/urql/pull/3922))
+  - @urql/core@6.0.4
+
 ## 9.0.2
 
 ### Patch Changes
