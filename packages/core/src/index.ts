@@ -16,3 +16,11 @@ export {
   makeOperation,
   getOperationName,
 } from './utils';
+
+export { makeFragmentStore, makeFragmentSource } from './utils';
+
+export type {
+  FragmentSnapshot,
+  FragmentStore,
+  FragmentSourceArgs,
+} from './utils';

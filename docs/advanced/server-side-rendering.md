@@ -174,6 +174,20 @@ All above examples for `react-ssr-prepass` will still be the same, except that i
 using the `urql` package we'll have to import from `@urql/preact`, and instead of `react-ssr-prepass`
 we'll have to import from. `preact-ssr-prepass`.
 
+## Streaming deferred fragments
+
+> **Beta:** [`useFragment`](../basics/react-preact.md#deferred-fragments) is experimental.
+
+With Suspense enabled and React's streaming renderer (`renderToPipeableStream` or
+`renderToReadableStream`), a Suspense boundary around a `useFragment` hook for a `@defer`-red
+fragment is streamed to the browser once its patch arrives, without holding back the rest of the
+page. If the deferred data fails, the server stops waiting and React leaves that boundary to the
+client to render.
+
+Hydration has a known gap: results restored by the `ssrExchange` are complete (`hasNext: false`),
+so on the client a fragment that failed on the server is rendered from its incomplete reference
+rather than as an error.
+
 ## Next.js
 
 If you're using [Next.js](https://nextjs.org/) you can save yourself a lot of work by using

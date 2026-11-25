@@ -349,6 +349,79 @@ const Todos = ({ from, limit }) => {
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for
 it.](../api/urql.md#usequery)
 
+## Deferred fragments
+
+> **Beta:** `useFragment` and `@defer` support are experimental. The GraphQL incremental delivery
+> RFC is still a draft (Stage 2), so the API may change in a minor release.
+
+A component can declare its own data as a fragment and read it with `useFragment`, from the
+reference its parent passes down. When the parent query spreads that fragment with `@defer`, the
+server streams its fields in later, and `useFragment` waits for them.
+
+```jsx
+import { Suspense } from 'react';
+import { gql, useQuery, useFragment } from 'urql';
+
+const TodoFields = gql`
+  fragment TodoFields on Todo {
+    text
+    complete
+  }
+`;
+
+const TodosQuery = gql`
+  query {
+    todos {
+      id
+      ...TodoFields @defer
+    }
+  }
+  ${TodoFields}
+`;
+
+const Todo = ({ todo }) => {
+  const { data } = useFragment({ fragment: TodoFields, data: todo });
+  return <li>{data.text}</li>;
+};
+
+const Todos = () => {
+  const [result] = useQuery({ query: TodosQuery });
+  return (
+    <ul>
+      {result.data.todos.map(todo => (
+        <Suspense key={todo.id} fallback={<li>Loading…</li>}>
+          <Todo todo={todo} />
+        </Suspense>
+      ))}
+    </ul>
+  );
+};
+```
+
+With `suspense: true` on the `Client` (or `context: { suspense: true }` on the hook),
+`useFragment`:
+
+- suspends until the deferred patch for its own reference arrives. Each boundary resolves
+  independently, without the parent re-rendering, so it also resolves during server streaming.
+- throws a `CombinedError` to the nearest error boundary if the query ends without the data. The
+  error holds the GraphQL errors reported under the fragment's path, or a generic error if the
+  server reported none.
+- keeps showing an entity it has already rendered while a refetch streams it in again, with
+  `fetching: true`, instead of falling back to the Suspense boundary.
+
+Without Suspense, it returns `fetching: true` while the patch is in flight, and `error` if it never
+arrives.
+
+`data` is the object the parent passed down (or its streamed-in successor), not a copy, so it can be
+passed on as another fragment reference. `useFragment` doesn't mask data at runtime: gql.tada and
+GraphQL Code Generator already do that at the type level. [Read more about using fragment
+references with TypeScript.](./typescript-integration.md)
+
+If a reference is missing fields and no streamed query will deliver them, for example a test
+fixture, `useFragment` returns it as-is and warns in development, rather than suspending forever.
+
+In Preact, import `Suspense` from `preact/compat`.
+
 ## Mutations
 
 Both libraries offer a `useMutation` hook and a `Mutation` component. The latter accepts the same

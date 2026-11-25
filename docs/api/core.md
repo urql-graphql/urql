@@ -503,6 +503,32 @@ requests that failed with a generic or network error.
 It accepts an [`Operation`](#operation), the error, and optionally the original `FetchResponse`
 for debugging as arguments, in that order.
 
+### makeFragmentStore
+
+> **Beta:** may change in a minor release while the GraphQL incremental delivery RFC is a draft.
+
+The primitive behind the bindings' `useFragment` hooks. It accepts `{ fragment, data, name? }`,
+like `useFragment`, and returns a store:
+
+- `getSnapshot()` returns `{ fetching, data, error? }`, the same object until something changes.
+- `subscribe(onChange)` calls `onChange` as patches for the reference's query arrive, and returns an
+  unsubscribe function.
+- `wait()` returns a promise that settles on the next change while `fetching`, for Suspense, or
+  `undefined`.
+
+The `Client` records which streamed query each object in a `@defer` result came from, so a store
+resolves from that query's later results without a parent re-render. Queries without `@defer` are
+not tracked. A reference with missing fields that no streamed query will deliver is returned as-is,
+with a warning in development.
+
+### makeFragmentSource
+
+> **Beta:** may change in a minor release while the GraphQL incremental delivery RFC is a draft.
+
+Wraps [`makeFragmentStore`](#makefragmentstore) as a Wonka `Source` of snapshots, for bindings
+without Suspense. It issues the current snapshot, re-issues it as deferred patches arrive, and
+completes once the snapshot is no longer `fetching`.
+
 ### formatDocument
 
 This utility is used by the [`cacheExchange`](#cacheexchange) and by
