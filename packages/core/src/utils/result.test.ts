@@ -618,3 +618,53 @@ describe('mergeResultPatch (defer/stream pre June-2023)', () => {
     });
   });
 });
+
+describe('mergeResultPatch immutability', () => {
+  it('should not mutate the previous result’s errors when merging a patch', () => {
+    const prevResult = makeResult(queryOperation, {
+      data: { __typename: 'Query', item: 1 },
+      errors: [{ message: 'first error' }],
+    });
+
+    expect(prevResult.error!.graphQLErrors).toHaveLength(1);
+
+    const merged = mergeResultPatch(prevResult, {
+      data: { __typename: 'Item' },
+      path: ['item'],
+      errors: [{ message: 'second error' }],
+    } as any);
+
+    // The merged result carries both errors…
+    expect(merged.error!.graphQLErrors).toHaveLength(2);
+    // …while the previously delivered result is left untouched.
+    expect(prevResult.error!.graphQLErrors).toHaveLength(1);
+    expect(prevResult.error!.graphQLErrors[0].message).toBe('first error');
+  });
+
+  it('should not mutate the previous result’s errors when merging multiple patches', () => {
+    const prevResult = makeResult(queryOperation, {
+      data: { __typename: 'Query', item: 1 },
+      errors: [{ message: 'first error' }],
+    });
+
+    const merged = mergeResultPatch(prevResult, {
+      incremental: [
+        {
+          path: ['item'],
+          data: { __typename: 'Item' },
+          errors: [{ message: 'second error' }],
+        },
+        {
+          path: ['item'],
+          data: { __typename: 'Item' },
+          errors: [{ message: 'third error' }],
+        },
+      ],
+      hasNext: true,
+    } as any);
+
+    expect(merged.error!.graphQLErrors).toHaveLength(3);
+    expect(prevResult.error!.graphQLErrors).toHaveLength(1);
+    expect(prevResult.error!.graphQLErrors[0].message).toBe('first error');
+  });
+});

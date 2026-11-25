@@ -99,7 +99,7 @@ export const mergeResultPatch = (
   response?: any,
   pending?: ExecutionResult['pending']
 ): OperationResult => {
-  let errors = prevResult.error ? prevResult.error.graphQLErrors : [];
+  let errors = prevResult.error ? [...prevResult.error.graphQLErrors] : [];
   let hasExtensions =
     !!prevResult.extensions || !!(nextResult.payload || nextResult).extensions;
   const extensions = {
