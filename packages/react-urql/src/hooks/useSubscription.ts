@@ -260,11 +260,19 @@ export function useSubscription<
   }
 
   React.useEffect(() => {
+    const source = state[0];
     const updateResult = (
-      result: Partial<UseSubscriptionState<Data, Variables>>
+      result: Partial<UseSubscriptionState<Data, Variables>>,
+      fetching?: boolean
     ) => {
       deferDispatch(setState, state => {
-        const nextResult = computeNextState(state[1], result);
+        if (state[0] !== source) return state;
+
+        let nextResult = computeNextState(state[1], result);
+        if (fetching !== undefined && nextResult.fetching !== fetching) {
+          nextResult = { ...nextResult, fetching };
+        }
+
         if (state[1] === nextResult) return state;
         if (
           handlerRef.current &&
@@ -281,14 +289,27 @@ export function useSubscription<
       });
     };
 
-    if (state[0]) {
-      return pipe(
-        state[0],
+    const updateFetching = (fetching: boolean) => {
+      deferDispatch(setState, state => {
+        if (state[0] !== source || state[1].fetching === fetching) return state;
+        return [state[0], { ...state[1], fetching }, state[2]] as const;
+      });
+    };
+
+    if (source) {
+      let isSubscribed = true;
+      const subscription = pipe(
+        source,
         onEnd(() => {
-          updateResult({ fetching: !!source });
+          if (isSubscribed) updateFetching(false);
         }),
-        subscribe(updateResult)
-      ).unsubscribe;
+        subscribe(result => updateResult(result, true))
+      );
+
+      return () => {
+        isSubscribed = false;
+        subscription.unsubscribe();
+      };
     } else {
       updateResult({ fetching: false });
     }
