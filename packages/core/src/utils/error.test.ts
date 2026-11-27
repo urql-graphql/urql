@@ -79,4 +79,22 @@ describe('CombinedError', () => {
 
     expect(err.response).toBe(response);
   });
+
+  it('includes both network and GraphQL error messages when both are present', () => {
+    const networkError = new Error('Network Shenanigans');
+    const graphQLErrors = ['Error Message A', 'Error Message B'];
+
+    const err = new CombinedError({ networkError, graphQLErrors });
+
+    expect(err.message).toBe(
+      `
+[Network] Network Shenanigans
+[GraphQL] Error Message A
+[GraphQL] Error Message B
+      `.trim()
+    );
+
+    expect(err.networkError).toBe(networkError);
+    expect(err.graphQLErrors).toEqual(graphQLErrors.map(x => new Error(x)));
+  });
 });

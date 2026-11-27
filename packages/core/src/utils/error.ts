@@ -6,7 +6,7 @@ const generateErrorMessage = (
   graphQlErrs?: GraphQLError[]
 ) => {
   let error = '';
-  if (networkErr) return `[Network] ${networkErr.message}`;
+  if (networkErr) error += `[Network] ${networkErr.message}`;
   if (graphQlErrs) {
     for (let i = 0, l = graphQlErrs.length; i < l; i++) {
       if (error) error += '\n';
