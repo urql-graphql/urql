@@ -41,8 +41,8 @@
     "@babel/plugin-transform-block-scoping": "^7.25.0",
     "@babel/plugin-transform-react-jsx": "^7.25.2",
     "@babel/plugin-transform-typescript": "^7.25.2",
-    "@changesets/cli": "^2.29.6",
-    "@changesets/get-github-info": "0.6.0",
+    "@changesets/cli": "^3.0.0",
+    "@changesets/get-github-info": "^1.0.0",
     "@npmcli/arborist": "^7.5.4",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^26.0.1",
@@ -91,8 +91,9 @@
     "@actions/github": "^6.0.0",
     "node-fetch": "^3.3.2"
   },
+  "packageManager": "pnpm@11.3.0",
   "engines": {
-    "pnpm": ">=9.0.0",
-    "node": ">=18.0.0"
+    "pnpm": ">=10.0.0",
+    "node": "^22.11 || ^24 || >=26"
   }
 }
