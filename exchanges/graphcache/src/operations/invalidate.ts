@@ -30,8 +30,9 @@ export const invalidateType = (
   excludedEntities: string[]
 ) => {
   const types = InMemoryData.getEntitiesForType(typename);
-  for (const entity of types) {
-    if (excludedEntities.includes(entity)) continue;
-    invalidateEntity(entity);
+  const iterator = types[Symbol.iterator]();
+  for (let result = iterator.next(); !result.done; result = iterator.next()) {
+    if (excludedEntities.includes(result.value)) continue;
+    invalidateEntity(result.value);
   }
 };
